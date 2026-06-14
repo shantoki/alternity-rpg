@@ -1,0 +1,591 @@
+<form class="{{cssClass}}" autocomplete="off">
+    {{!-- Sheet Header --}}
+    <header class="sheet-header">
+        <div style="background: yellow; color: black; padding: 5px; font-size: 10px;">
+            V2: {{isV2}} | FVTT: {{foundryVersion}} | Path: {{actorSheetV2Path}}
+        </div>
+        <div class="header-fields">
+            <div class="field-row">
+                <div class="field">
+                    <label>Hero's Name</label>
+                    <input name="name" type="text" value="{{actor.name}}" placeholder="Name"/>
+                </div>
+                <div class="field">
+                    <label>Player's Name</label>
+                    <input name="system.player" type="text" value="{{system.player}}"/>
+                </div>
+            </div>
+            <div class="field-row">
+                <div class="field">
+                    <label>Species</label>
+                    <input name="system.species" type="text" value="{{system.species}}"/>
+                </div>
+                <div class="field">
+                    <label>Profession</label>
+                    <select data-action="editState" data-field="profession">
+                        <option value="" {{#if (eq profession "")}}selected{{/if}}>None</option>
+                        <option value="Combat Spec" {{#if (eq profession "Combat Spec")}}selected{{/if}}>Combat Spec</option>
+                        <option value="Diplomat" {{#if (eq profession "Diplomat")}}selected{{/if}}>Diplomat</option>
+                        <option value="Free Agent" {{#if (eq profession "Free Agent")}}selected{{/if}}>Free Agent</option>
+                        <option value="Tech Op" {{#if (eq profession "Tech Op")}}selected{{/if}}>Tech Op</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Career</label>
+                    <input type="text" value="{{system.details.career}}" data-action="editState" data-field="career"/>
+                </div>
+            </div>
+            <div class="field-row personal-data">
+                <div class="field">
+                    <label>Age</label><input type="text" name="system.personalData.age" value="{{system.personalData.age}}"/>
+                </div>
+                <div class="field">
+                    <label>Height</label><input type="text" name="system.personalData.height" value="{{system.personalData.height}}"/>
+                </div>
+                <div class="field">
+                    <label>Weight</label><input type="text" name="system.personalData.weight" value="{{system.personalData.weight}}"/>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="main">Main</a>
+        <a class="item" data-tab="skills">Skills</a>
+        <a class="item" data-tab="inventory">Inventory</a>
+        <a class="item" data-tab="psionics">Psionics/Mutations</a>
+        <a class="item" data-tab="notes">Notes</a>
+    </nav>
+
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+        {{!-- Main Tab --}}
+        <div class="tab main active" data-group="primary" data-tab="main">
+            <div class="grid grid-2col">
+                {{!-- Abilities Column --}}
+                <section class="abilities">
+                    <h3>Abilities</h3>
+                    <div class="ability-list">
+                        {{#each abilities as |ability id|}}
+                        <div class="ability-row" data-ability="{{ability.label}}">
+                            <label class="ability-name">{{ability.label}}</label>
+                            <input class="ability-score" type="number" value="{{ability.score}}" data-action="editAbility" data-ability="{{ability.label}}" data-dtype="Number"/>
+                            <div class="ability-untrained-val">
+                                <label>Untrained</label>
+                                <span>{{ability.untrained}}</span>
+                            </div>
+                            <div class="ability-res-mod">
+                                <label>Res. Mod</label>
+                                <span class="res-mod-value">{{#if ability.resMod}}{{fmtMod ability.resMod}}{{else}}0{{/if}}</span>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
+                </section>
+
+                {{!-- Right Column: Action Check, Movement, Durability --}}
+                <section class="combat-stats">
+                    {{!-- Action Check Matrix --}}
+                    <div class="action-check-matrix">
+                        <h3>Action Check Score</h3>
+                        <div class="matrix-grid grid grid-4col">
+                            <div class="cell"><label>Marginal</label></div>
+                            <div class="cell"><label>Ordinary</label></div>
+                            <div class="cell"><label>Good</label></div>
+                            <div class="cell"><label>Amazing</label></div>
+                            <div class="cell"><input type="number"/></div>
+                            <div class="cell"><input type="number"/></div>
+                            <div class="cell"><input type="number"/></div>
+                            <div class="cell"><input type="number"/></div>
+                        </div>
+                    </div>
+
+                    {{!-- Combat Movement --}}
+                    <div class="movement-rates">
+                        <h3>Combat Movement</h3>
+                        <div class="grid grid-4col">
+                            <div class="field"><label>Sprint</label><input type="number" name="system.combatMovement.sprint" value="{{system.combatMovement.sprint}}"/></div>
+                            <div class="field"><label>Run</label><input type="number" name="system.combatMovement.run" value="{{system.combatMovement.run}}"/></div>
+                            <div class="field"><label>Walk</label><input type="number" name="system.combatMovement.walk" value="{{system.combatMovement.walk}}"/></div>
+                            <div class="field"><label>Glide</label><input type="number" name="system.combatMovement.glide" value="{{system.combatMovement.glide}}"/></div>
+                            <div class="field"><label>Easy Swim</label><input type="number" name="system.combatMovement.easySwim" value="{{system.combatMovement.easySwim}}"/></div>
+                            <div class="field"><label>Swim</label><input type="number" name="system.combatMovement.swim" value="{{system.combatMovement.swim}}"/></div>
+                            <div class="field"><label>Fly</label><input type="number" name="system.combatMovement.fly" value="{{system.combatMovement.fly}}"/></div>
+                        </div>
+                    </div>
+
+                    <div class="durability">
+                        <h3>Durability</h3>
+                        <div class="durability-list">
+                            {{#each system.durability as |d id|}}
+                            <div class="durability-row">
+                                <label>{{d.label}}</label>
+                                <div class="durability-track">
+                                    <input type="number" name="system.durability.{{id}}.value" value="{{d.value}}" data-dtype="Number"/>
+                                    <span>/</span>
+                                    <span>{{d.max}}</span>
+                                </div>
+                            </div>
+                            {{/each}}
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+            {{!-- Achievement Track --}}
+            <section class="achievement-track">
+                <h3>Achievement Track</h3>
+                <div class="field">
+                    <label>Level</label>
+                    <input type="number" name="system.achievementTrack.level" value="{{system.achievementTrack.level}}"/>
+                </div>
+                <div class="track-checkboxes">
+                    {{#each (range 1 23)}}
+                    <input type="checkbox" {{#if (lte this ../system.achievementTrack.level)}}checked{{/if}} disabled/>
+                    {{/each}}
+                </div>
+            </section>
+
+                    <div class="armor">
+                        <h3>Armor</h3>
+                        <div class="armor-stats grid grid-3col">
+                            <div class="armor-field">
+                                <label>(LI)</label>
+                                <input type="text" value="{{armor.li}}" data-action="editArmor" data-type="li"/>
+                            </div>
+                            <div class="armor-field">
+                                <label>(HI)</label>
+                                <input type="text" value="{{armor.hi}}" data-action="editArmor" data-type="hi"/>
+                            </div>
+                            <div class="armor-field">
+                                <label>(En)</label>
+                                <input type="text" value="{{armor.en}}" data-action="editArmor" data-type="en"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="durability-penalty" style="margin-top: 10px; padding: 5px; border: 1px solid #777; background: #eee; font-size: 11px;">
+                        <strong>Current Penalty:</strong> 
+                        <span class="{{#if woundPenalty}}penalty-active{{/if}}">{{fmtMod woundPenalty}} step(s)</span>
+                        {{#if (gt system.durability.mortal.value 0)}}
+                        <div style="color: darkred; font-size: 10px;">(Includes Dazed: +{{system.durability.mortal.value}} from Mortal damage)</div>
+                        {{/if}}
+                    </div>
+                </section>
+            </div>
+
+            <section class="background-section" style="margin-top: 15px;">
+                <h3>Background</h3>
+                <textarea data-action="editState" data-field="background" rows="3">{{background}}</textarea>
+            </section>
+
+            <section class="special-abilities">
+                <div class="group-header">
+                    <h3>Special Abilities & Stances</h3>
+                    <a class="ability-control ability-create" title="Add Ability"><i class="fas fa-plus"></i></a>
+                </div>
+                <div class="ability-set-list">
+                    {{#each abilitySets as |ability|}}
+                    <div class="ability-set-row {{ifThen ability.isActive 'active' ''}}" data-ability="{{ability.name}}">
+                        <div class="ability-info">
+                            <span class="ability-name">{{ability.name}}</span>
+                            <span class="ability-type">({{ability.type}})</span>
+                        </div>
+                        <div class="ability-controls">
+                            <a class="ability-control ability-toggle" title="{{ifThen ability.isActive 'Deactivate' 'Activate'}}">
+                                <i class="fas {{ifThen ability.isActive 'fa-toggle-on' 'fa-toggle-off'}}"></i>
+                            </a>
+                            <a class="ability-control ability-delete" title="Delete Ability"><i class="fas fa-trash"></i></a>
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+            </section>
+
+            <section class="attack-forms">
+                <h3>Attack Forms</h3>
+                <table class="attack-table">
+                    <thead>
+                        <tr>
+                            <th>Attack Form</th>
+                            <th>Score</th>
+                            <th>Type</th>
+                            <th>Range</th>
+                            <th>Damage [O/G/A]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each inventory.weapons as |attack|}}
+                        <tr class="item-row weapon-row" data-item-id="{{attack._id}}">
+                            <td><a class="weapon-roll rollable">{{attack.name}}</a></td>
+                            <td>{{attack.system.skill}}</td>
+                            <td>{{attack.type}}</td>
+                            <td>{{attack.system.range}}</td>
+                            <td>{{attack.system.damage.ordinary}}/{{attack.system.damage.good}}/{{attack.system.damage.amazing}}</td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </section>
+
+            {{!-- Situation Die Steps Scale --}}
+            <section class="situation-die-scale">
+                <h3>Situation Die Steps Scale</h3>
+                <div class="scale-container">
+                    <div class="scale-item bonus">-d20</div>
+                    <div class="scale-item bonus">-d12</div>
+                    <div class="scale-item bonus">-d8</div>
+                    <div class="scale-item bonus">-d6</div>
+                    <div class="scale-item bonus">-d4</div>
+                    <div class="scale-item neutral">+d0</div>
+                    <div class="scale-item penalty">+d4</div>
+                    <div class="scale-item penalty">+d6</div>
+                    <div class="scale-item penalty">+d8</div>
+                    <div class="scale-item penalty">+d12</div>
+                    <div class="scale-item penalty">+d20</div>
+                    <div class="scale-item penalty">+2d20</div>
+                    <div class="scale-item penalty">+3d20</div>
+                </div>
+                <div class="scale-labels">
+                    <span class="bonus-label">BONUS</span>
+                    <span class="penalty-label">PENALTY</span>
+                </div>
+            </section>
+        </div>
+
+        {{!-- Skills Tab --}}
+        <div class="tab skills" data-group="primary" data-tab="skills">
+            <div class="grid grid-3col">
+                {{!-- Column 1: STR, DEX, CON --}}
+                <div class="skill-column">
+                    {{#each skillsByAbility as |skills ab|}}
+                    {{#if (or (eq ab "STR") (eq ab "DEX") (eq ab "CON"))}}
+                    <section class="ability-group">
+                        <div class="group-header">
+                            <h3>{{ab}} Skills</h3>
+                            <a class="skill-control skill-create" data-ability="{{ab}}" title="Add Skill"><i class="fas fa-plus"></i></a>
+                        </div>
+                        <div class="skill-list">
+                            {{#each skills as |skill|}}
+                            <div class="skill-row {{ifThen skill.isBroad 'broad' 'specialty'}}" data-skill="{{skill.name}}">
+                                <span class="skill-name clickable">{{skill.name}}</span>
+                                <input class="skill-rank-input" type="number" value="{{skill.rank}}" data-skill="{{skill.name}}"/>
+                                <span class="skill-score">[{{skill.ordinary}}/{{skill.good}}/{{skill.amazing}}]</span>
+                                <div class="skill-controls">
+                                    <a class="skill-control skill-delete" title="Delete Skill"><i class="fas fa-trash"></i></a>
+                                </div>
+                            </div>
+                            {{else}}
+                            <p class="empty-msg">No skills defined for {{ab}}.</p>
+                            {{/each}}
+                        </div>
+                    </section>
+                    {{/if}}
+                    {{/each}}
+                </div>
+
+                {{!-- Column 2: INT --}}
+                <div class="skill-column">
+                    {{#each skillsByAbility as |skills ab|}}
+                    {{#if (eq ab "INT")}}
+                    <section class="ability-group">
+                        <div class="group-header">
+                            <h3>{{ab}} Skills</h3>
+                            <a class="skill-control skill-create" data-ability="{{ab}}" title="Add Skill"><i class="fas fa-plus"></i></a>
+                        </div>
+                        <div class="skill-list">
+                            {{#each skills as |skill|}}
+                            <div class="skill-row {{ifThen skill.isBroad 'broad' 'specialty'}}" data-skill="{{skill.name}}">
+                                <span class="skill-name clickable">{{skill.name}}</span>
+                                <input class="skill-rank-input" type="number" value="{{skill.rank}}" data-skill="{{skill.name}}"/>
+                                <span class="skill-score">[{{skill.ordinary}}/{{skill.good}}/{{skill.amazing}}]</span>
+                                <div class="skill-controls">
+                                    <a class="skill-control skill-delete" title="Delete Skill"><i class="fas fa-trash"></i></a>
+                                </div>
+                            </div>
+                            {{else}}
+                            <p class="empty-msg">No skills defined for {{ab}}.</p>
+                            {{/each}}
+                        </div>
+                    </section>
+                    {{/if}}
+                    {{/each}}
+                </div>
+
+                {{!-- Column 3: WIL, PER --}}
+                <div class="skill-column">
+                    {{#each skillsByAbility as |skills ab|}}
+                    {{#if (or (eq ab "WIL") (eq ab "PER"))}}
+                    <section class="ability-group">
+                        <div class="group-header">
+                            <h3>{{ab}} Skills</h3>
+                            <a class="skill-control skill-create" data-ability="{{ab}}" title="Add Skill"><i class="fas fa-plus"></i></a>
+                        </div>
+                        <div class="skill-list">
+                            {{#each skills as |skill|}}
+                            <div class="skill-row {{ifThen skill.isBroad 'broad' 'specialty'}}" data-skill="{{skill.name}}">
+                                <span class="skill-name clickable">{{skill.name}}</span>
+                                <input class="skill-rank-input" type="number" value="{{skill.rank}}" data-skill="{{skill.name}}"/>
+                                <span class="skill-score">[{{skill.ordinary}}/{{skill.good}}/{{skill.amazing}}]</span>
+                                <div class="skill-controls">
+                                    <a class="skill-control skill-delete" title="Delete Skill"><i class="fas fa-trash"></i></a>
+                                </div>
+                            </div>
+                            {{else}}
+                            <p class="empty-msg">No skills defined for {{ab}}.</p>
+                            {{/each}}
+                        </div>
+                    </section>
+                    {{/if}}
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+
+        {{!-- Psionics/Mutations Tab --}}
+        <div class="tab psionics" data-group="primary" data-tab="psionics">
+            <div class="grid grid-2col">
+                {{!-- Psionics Section --}}
+                <section class="psionics-section">
+                    <h3>Psionics</h3>
+                    <div class="psionic-energy-row">
+                        <label>Psionic Energy</label>
+                        <input type="number" name="psionics.energy.value" value="{{psionics.energy.value}}"/>
+                        <span>/</span>
+                        <input type="number" name="psionics.energy.max" value="{{psionics.energy.max}}"/>
+                    </div>
+                    
+                    <div class="psionic-loss-table">
+                        <label>Action Psionic Energy Loss</label>
+                        <ul>
+                            <li>Critical Failure result: 3</li>
+                            <li>Broad skill use: 2</li>
+                            <li>Specialty skill use: 1</li>
+                        </ul>
+                    </div>
+                </section>
+
+                {{!-- Mutations Section --}}
+                <section class="mutations-section">
+                    <h3>Mutations</h3>
+                    <div class="mutation-header grid grid-2col">
+                        <div class="field">
+                            <label>Origin</label>
+                            <input type="text" name="mutations.origin" value="{{mutations.origin}}"/>
+                        </div>
+                        <div class="field">
+                            <label>Uniqueness</label>
+                            <input type="text" name="mutations.uniqueness" value="{{mutations.uniqueness}}"/>
+                        </div>
+                    </div>
+                    <div class="mutation-points grid grid-2col">
+                        <div class="field">
+                            <label>Mutation Points</label>
+                            <input type="number" name="mutations.points" value="{{mutations.points}}"/>
+                        </div>
+                        <div class="field">
+                            <label>Drawback Points</label>
+                            <input type="number" name="mutations.drawbacks" value="{{mutations.drawbacks}}"/>
+                        </div>
+                    </div>
+
+                    <div class="mutation-lists">
+                        <div class="mutation-group">
+                            <label>Ordinary Mutations</label>
+                            <textarea name="mutations.ordinary">{{mutations.ordinary}}</textarea>
+                        </div>
+                        <div class="mutation-group">
+                            <label>Good Mutations</label>
+                            <textarea name="mutations.good">{{mutations.good}}</textarea>
+                        </div>
+                        <div class="mutation-group">
+                            <label>Amazing Mutation</label>
+                            <textarea name="mutations.amazing">{{mutations.amazing}}</textarea>
+                        </div>
+                        <div class="mutation-group">
+                            <label>Drawbacks</label>
+                            <textarea name="mutations.drawbackList">{{mutations.drawbackList}}</textarea>
+                        </div>
+                    </div>
+                </section>
+
+                {{!-- Cybertech Section --}}
+                <section class="cybertech-section">
+                    <h3>Cybertech</h3>
+                    <div class="cyber-header grid grid-2col">
+                        <div class="field">
+                            <label>Cyber Tolerance</label>
+                            <input type="number" name="cybertech.tolerance.value" value="{{cybertech.tolerance.value}}"/>
+                            <span>/</span>
+                            <input type="number" name="cybertech.tolerance.max" value="{{cybertech.tolerance.max}}"/>
+                        </div>
+                        <div class="field">
+                            <label>Cykosis</label>
+                            <input type="number" name="cybertech.cykosis" value="{{cybertech.cykosis}}"/>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        {{!-- Inventory Tab --}}
+        <div class="tab inventory" data-group="primary" data-tab="inventory">
+            {{!-- Weapons Section --}}
+            <section class="inventory-section weapons">
+                <div class="group-header">
+                    <h3>Weapon Data</h3>
+                    <a class="item-control item-create" data-type="weapon" title="Add Weapon"><i class="fas fa-plus"></i></a>
+                </div>
+                <table class="inventory-table">
+                    <thead>
+                        <tr>
+                            <th>Weapon</th>
+                            <th>Skill</th>
+                            <th>Acc</th>
+                            <th>Actions</th>
+                            <th>Clip/Ammo</th>
+                            <th>Hide</th>
+                            <th>Mass</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each inventory.weapons as |item|}}
+                        <tr class="item-row weapon-row" data-item-id="{{item._id}}">
+                            <td><a class="weapon-roll rollable">{{item.name}}</a></td>
+                            <td>{{item.system.skill}}</td>
+                            <td>{{item.system.acc}}</td>
+                            <td>{{item.system.actions}}</td>
+                            <td>{{item.system.clipSize}}/{{item.system.ammoUsed}}</td>
+                            <td>{{item.system.hide}}</td>
+                            <td>{{item.system.mass}}</td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </section>
+
+            {{!-- Armor Section --}}
+            <section class="inventory-section armor">
+                <div class="group-header">
+                    <h3>Armor</h3>
+                    <a class="item-control item-create" data-type="armor" title="Add Armor"><i class="fas fa-plus"></i></a>
+                </div>
+                <table class="inventory-table">
+                    <thead>
+                        <tr>
+                            <th>Armor Name</th>
+                            <th>(LI)</th>
+                            <th>(HI)</th>
+                            <th>(En)</th>
+                            <th>Mass</th>
+                            <th>Penalty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each inventory.armor as |item|}}
+                        <tr class="item-row" data-item-id="{{item._id}}">
+                            <td>{{item.name}}</td>
+                            <td>{{item.system.li}}</td>
+                            <td>{{item.system.hi}}</td>
+                            <td>{{item.system.en}}</td>
+                            <td>{{item.system.mass}}</td>
+                            <td>{{item.system.speedPenalty}}</td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </section>
+
+            {{!-- General Equipment --}}
+            <section class="inventory-section gear">
+                <div class="group-header">
+                    <h3>Equipment</h3>
+                    <a class="item-control item-create" data-type="gear" title="Add Gear"><i class="fas fa-plus"></i></a>
+                </div>
+                <div class="gear-list grid grid-3col">
+                    {{#each inventory.gear as |item|}}
+                    <div class="item-row gear-item" data-item-id="{{item._id}}">
+                        <span>{{item.name}}</span>
+                        <span class="item-mass">{{item.system.mass}}</span>
+                    </div>
+                    {{/each}}
+                </div>
+            </section>
+
+            {{!-- Cybertech Section --}}
+            <section class="inventory-section cybertech">
+                <div class="group-header">
+                    <h3>Cybertech</h3>
+                    <a class="item-control item-create" data-type="cybertech" title="Add Cybertech"><i class="fas fa-plus"></i></a>
+                </div>
+                <div class="cyber-header grid grid-2col">
+                    <div class="field">
+                        <label>Cyber Tolerance</label>
+                        <span>{{system.cyber.toleranceValue}} / {{system.cyber.toleranceMax}}</span>
+                    </div>
+                    <div class="field">
+                        <label>Cykosis</label>
+                        <span>{{system.cyber.cykosis}}</span>
+                    </div>
+                </div>
+                <table class="inventory-table">
+                    <thead>
+                        <tr>
+                            <th>Cyber Gear Installed</th>
+                            <th>Tolerance Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each inventory.cybertech as |item|}}
+                        <tr class="item-row" data-item-id="{{item._id}}">
+                            <td>{{item.name}}</td>
+                            <td>{{item.system.toleranceCost}}</td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </section>
+
+            {{!-- Computers Section --}}
+            <section class="inventory-section computers">
+                <div class="group-header">
+                    <h3>Computers</h3>
+                    <a class="item-control item-create" data-type="computer" title="Add Computer"><i class="fas fa-plus"></i></a>
+                </div>
+                {{#each inventory.computers as |comp|}}
+                <div class="computer-item" data-item-id="{{comp._id}}">
+                    <div class="comp-header grid grid-3col">
+                        <div class="field">
+                            <label>Model</label>
+                            <span>{{comp.name}}</span>
+                        </div>
+                        <div class="field">
+                            <label>Processor Quality</label>
+                            <span>{{comp.system.processorQuality}}</span>
+                        </div>
+                        <div class="field">
+                            <label>Memory/Storage</label>
+                            <span>{{comp.system.activeMemory}} / {{comp.system.activeStorage}}</span>
+                        </div>
+                    </div>
+                    <div class="comp-programs">
+                        <label>Programs</label>
+                        <ul>
+                            {{#each comp.system.programs as |prog|}}
+                            <li>{{prog.name}} ({{prog.location}})</li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                </div>
+                {{/each}}
+            </section>
+        </div>
+
+        {{!-- Notes Tab --}}
+        <div class="tab notes" data-group="primary" data-tab="notes">
+            <h3>Notes</h3>
+            <textarea name="system.notes">{{system.notes}}</textarea>
+        </div>
+    </section>
+</form>

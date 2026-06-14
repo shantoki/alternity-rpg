@@ -1,0 +1,40 @@
+<div class="{{alt}}-roll-panel" data-context="{{context}}">
+    <header class="{{alt}}-roll-header">
+        <span class="{{alt}}-roll-context-label">{{context}} {{localize "ALTERNITY.Roll.Roll"}}</span>
+        <button type="button" class="{{alt}}-roll-close" aria-label="Close" title="Close">✕</button>
+    </header>
+
+    <section class="{{alt}}-roll-checks">
+        {{#each checks}}
+        <div class="{{../alt}}-roll-check-row">
+            <span class="{{../alt}}-roll-check-name">{{name}}</span>
+        </div>
+        {{/each}}
+    </section>
+
+    <section class="{{alt}}-roll-steps">
+        <label class="{{alt}}-roll-step-label">{{localize "ALTERNITY.Roll.SituationSteps"}}</label>
+        <select class="{{alt}}-roll-step-select">
+            <option value="-5">Bonus (-5)</option>
+            <option value="-4">Bonus (-4)</option>
+            <option value="-3">Bonus (-3)</option>
+            <option value="-2">Bonus (-2)</option>
+            <option value="-1">Bonus (-1)</option>
+            <option value="0" selected>Base (0)</option>
+            <option value="1">Penalty (+1)</option>
+            <option value="2">Penalty (+2)</option>
+            <option value="3">Penalty (+3)</option>
+            <option value="4">Penalty (+4)</option>
+            <option value="5">Penalty (+5)</option>
+            <option value="6">Penalty (+6)</option>
+            <option value="7">Penalty (+7)</option>
+        </select>
+    </section>
+
+    <div class="{{alt}}-roll-actions">
+        <button type="button" class="{{alt}}-roll-btn" data-action="roll">
+            <span class="{{alt}}-roll-btn-icon">⬡</span>
+            {{localize "ALTERNITY.Roll.Roll"}}
+        </button>
+    </div>
+</div>

@@ -1,0 +1,28 @@
+{
+  "id": "alternity-v2",
+  "title": "Alternity Fastplay Core",
+  "description": "Alternity Fastplay Core RPG System for Foundry VTT.",
+  "version": "1.0.1",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "14"
+  },
+  "authors": [
+    {
+      "name": "Gemini CLI"
+    }
+  ],
+  "esmodules": [
+    "src/index.js"
+  ],
+  "styles": [
+    "src/client/css/alternity-sheet.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ]
+}

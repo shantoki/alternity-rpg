@@ -1,0 +1,130 @@
+<form class="{{cssClass}} {{alt}}-item-sheet" autocomplete="off">
+    <header class="sheet-header">
+        <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}"/>
+        <div class="header-fields">
+            <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="{{localize 'Name'}}"/></h1>
+            <div class="grid grid-2col">
+                <div class="resource">
+                    <label>{{localize 'ALTERNITY.ItemType'}}</label>
+                    <span>{{item.type}}</span>
+                </div>
+                <div class="resource">
+                    <label>{{localize 'ALTERNITY.Quantity'}}</label>
+                    <input type="number" name="system.quantity" value="{{system.quantity}}"/>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    {{!-- Item Sheet Navigation --}}
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="description">{{localize 'ALTERNITY.Description'}}</a>
+        <a class="item" data-tab="details">{{localize 'ALTERNITY.Details'}}</a>
+    </nav>
+
+    {{!-- Item Sheet Body --}}
+    <section class="sheet-body">
+
+        {{!-- Description Tab --}}
+        <div class="tab" data-group="primary" data-tab="description">
+            {{editor system.description target="system.description" button=true owner=owner editable=editable}}
+        </div>
+
+        {{!-- Details Tab --}}
+        <div class="tab details" data-group="primary" data-tab="details">
+            {{#if (eq item.type 'weapon')}}
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.WeaponType'}}</label>
+                    <select name="system.weaponType">
+                        {{selectOptions config.weaponTypes selected=system.weaponType}}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.DamageFormula'}}</label>
+                    <input type="text" name="system.damageFormula" value="{{system.damageFormula}}"/>
+                </div>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.DamageType'}}</label>
+                    <select name="system.damageType">
+                        {{selectOptions config.damageTypes selected=system.damageType}}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.DamageCategory'}}</label>
+                    <select name="system.damageCategory">
+                        <option value="stun" {{#if (eq system.damageCategory 'stun')}}selected{{/if}}>{{localize 'ALTERNITY.Stun'}}</option>
+                        <option value="wound" {{#if (eq system.damageCategory 'wound')}}selected{{/if}}>{{localize 'ALTERNITY.Wound'}}</option>
+                        <option value="mortal" {{#if (eq system.damageCategory 'mortal')}}selected{{/if}}>{{localize 'ALTERNITY.Mortal'}}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.RequiredSkill'}}</label>
+                    <select name="system.requiredSkill">
+                        {{selectOptions config.skills selected=system.requiredSkill}}
+                    </select>
+                </div>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Short'}}</label>
+                        <input type="number" name="system.range.short" value="{{system.range.short}}"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Medium'}}</label>
+                        <input type="number" name="system.range.medium" value="{{system.range.medium}}"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Long'}}</label>
+                        <input type="number" name="system.range.long" value="{{system.range.long}}"/>
+                    </div>
+                </div>
+            {{/if}}
+
+            {{#if (eq item.type 'armor')}}
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Armor.LI'}}</label>
+                        <input type="text" name="system.li" value="{{system.li}}"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Armor.HI'}}</label>
+                        <input type="text" name="system.hi" value="{{system.hi}}"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Armor.EN'}}</label>
+                        <input type="text" name="system.en" value="{{system.en}}"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.SpeedPenalty'}}</label>
+                    <input type="number" name="system.speedPenalty" value="{{system.speedPenalty}}"/>
+                </div>
+            {{/if}}
+            
+            {{#if (eq item.type 'computer')}}
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.Computer.Processor'}}</label>
+                    <input type="text" name="system.processorQuality" value="{{system.processorQuality}}"/>
+                </div>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Computer.Memory'}}</label>
+                        <input type="number" name="system.activeMemory" value="{{system.activeMemory}}"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Computer.Storage'}}</label>
+                        <input type="number" name="system.activeStorage" value="{{system.activeStorage}}"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.Computer.Programs'}}</label>
+                    <textarea name="system.programs" rows="10">{{system.programs}}</textarea>
+                </div>
+            {{/if}}
+
+            <div class="form-group">
+                <label>{{localize 'ALTERNITY.Mass'}}</label>
+                <input type="number" name="system.mass" value="{{system.mass}}" step="0.1"/>
+            </div>
+        </div>
+    </section>
+</form>

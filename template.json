@@ -1,0 +1,81 @@
+{
+  "Actor": {
+    "types": ["character"],
+    "templates": {
+      "base": {
+        "player": "",
+        "species": "",
+        "profession": "",
+        "career": "",
+        "abilities": {
+          "str": { "score": 10, "untrained": true, "resMod": 0, "label": "Strength" },
+          "dex": { "score": 10, "untrained": true, "resMod": 0, "label": "Dexterity" },
+          "con": { "score": 10, "untrained": true, "resMod": 0, "label": "Constitution" },
+          "int": { "score": 10, "untrained": true, "resMod": 0, "label": "Intelligence" },
+          "wil": { "score": 10, "untrained": true, "resMod": 0, "label": "Willpower" },
+          "per": { "score": 10, "untrained": true, "resMod": 0, "label": "Personality" }
+        },
+        "actionCheck": { "marginal": 0, "ordinary": 0, "good": 0, "amazing": 0 },
+        "durability": {
+          "stun": { "label": "Stun", "value": 0, "max": 0 },
+          "wound": { "label": "Wound", "value": 0, "max": 0 },
+          "mortal": { "label": "Mortal", "value": 0, "max": 0 }
+        },
+        "armor": { "li": 0, "hi": 0, "en": 0 },
+        "psionic": { "energy": 0, "max": 0 },
+        "mutations": {
+          "origin": "",
+          "uniqueness": "",
+          "points": 0,
+          "drawbacks": 0,
+          "ordinary": "",
+          "good": "",
+          "amazing": "",
+          "drawbackList": ""
+        },
+        "cyber": { "toleranceValue": 0, "toleranceMax": 0, "cykosis": 0 },
+        "notes": "",
+        "alternity_state_data": {}
+      }
+    },
+    "character": {
+      "templates": ["base"]
+    }
+  },
+  "Item": {
+    "types": ["weapon", "armor", "gear", "cybertech", "computer"],
+    "templates": {
+      "base": {
+        "mass": 0
+      }
+    },
+    "weapon": {
+      "templates": ["base"],
+      "skill": "",
+      "acc": 0,
+      "actions": "",
+      "clipSize": 0,
+      "ammoUsed": 0,
+      "hide": "",
+      "damage": { "ordinary": "", "good": "", "amazing": "" }
+    },
+    "armor": {
+      "templates": ["base"],
+      "li": 0,
+      "hi": 0,
+      "en": 0,
+      "speedPenalty": 0
+    },
+    "gear": {
+      "templates": ["base"]
+    },
+    "cybertech": { "templates": ["base"], "toleranceCost": 0 },
+    "computer": {
+      "templates": ["base"],
+      "processorQuality": "",
+      "activeMemory": 0,
+      "activeStorage": 0,
+      "programs": []
+    }
+  }
+}

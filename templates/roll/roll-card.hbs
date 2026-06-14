@@ -1,0 +1,62 @@
+<div class="alt-roll-card">
+    <header class="alt-roll-card-header">
+        <span class="alt-roll-card-context">{{context}}</span>
+        <span class="alt-roll-card-actor">{{actorName}}</span>
+    </header>
+    <div class="alt-roll-card-body">
+        <div class="alt-roll-summary">
+            <div class="alt-roll-result-group">
+                <div class="alt-roll-outcome-group">
+                    <span class="alt-roll-outcome">
+                        {{#if succeeded}}
+                        <strong class="alt-outcome-success">
+                            {{#if (eq degree "Marginal")}}{{localize "ALTERNITY.Roll.Marginal"}}{{/if}}
+                            {{#if (eq degree "Ordinary")}}{{localize "ALTERNITY.Roll.Ordinary"}}{{/if}}
+                            {{#if (eq degree "Good")}}{{localize "ALTERNITY.Roll.Good"}}{{/if}}
+                            {{#if (eq degree "Amazing")}}{{localize "ALTERNITY.Roll.Amazing"}}{{/if}}
+                        </strong>
+                        {{else}}
+                        <strong class="alt-outcome-failure">
+                            {{#if (eq degree "Critical Failure")}}
+                                {{localize "ALTERNITY.Roll.CriticalFailure"}}
+                            {{else}}
+                                {{localize "ALTERNITY.Roll.Failure"}}
+                            {{/if}}
+                        </strong>
+                        {{/if}}
+                    </span>
+                </div>
+                {{#if oga}}
+                <div class="alt-roll-oga">(O:{{oga.ordinary}} / G:{{oga.good}} / A:{{oga.amazing}})</div>
+                {{/if}}
+            </div>
+        </div>
+
+        <div class="alt-roll-rendered">
+            {{{rollHtml}}}
+        </div>
+        
+        <details class="alt-roll-breakdown" open>
+            <summary>{{localize "ALTERNITY.Roll.Breakdown"}}</summary>
+            <table class="alt-trace-table">
+                <tbody>
+                    {{#each modifierTrace}}
+                    <tr>
+                        <td class="alt-trace-source">{{source}}</td>
+                        <td class="alt-trace-value {{#if (gt value 0)}}penalty{{else}}{{#if (lt value 0)}}bonus{{/if}}{{/if}}">
+                            {{#if (gt value 0)}}+{{/if}}{{value}}
+                        </td>
+                        <td class="alt-trace-reason">{{reason}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+                <tfoot>
+                    <tr class="alt-trace-total">
+                        <td>{{localize "ALTERNITY.Roll.FinalTarget"}}</td>
+                        <td colspan="2">{{adjustedValue}}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </details>
+    </div>
+</div>

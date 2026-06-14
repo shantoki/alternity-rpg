@@ -1,0 +1,18 @@
+<div class="alt-roll-card">
+    <header class="alt-roll-card-header">
+        <span class="alt-roll-card-context">{{localize "ALTERNITY.ActionCheck"}}</span>
+        <span class="alt-roll-card-actor">{{actorName}}</span>
+    </header>
+    <div class="alt-roll-card-body">
+        <div class="alt-roll-summary">
+            <h3 class="alt-phase-label">{{localize (concat "ALTERNITY.Roll." phaseLabel)}} Phase</h3>
+            <div class="alt-ac-detail">
+                {{localize "ALTERNITY.Roll.Roll"}}: <strong>{{result}}</strong> vs {{localize "ALTERNITY.Details"}}: 
+                A:{{ac.amazing}} | G:{{ac.good}} | O:{{ac.ordinary}} | M:{{ac.marginal}}+
+            </div>
+        </div>
+        <div class="alt-roll-rendered">
+            {{{rollHtml}}}
+        </div>
+    </div>
+</div>

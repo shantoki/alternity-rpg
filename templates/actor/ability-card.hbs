@@ -1,0 +1,46 @@
+<div class="{{alt}}-ability-card {{#if ability.isActive}}active{{/if}}"
+     data-ability-id="{{ability.id}}"
+     data-ability-type="{{ability.type}}">
+    <div class="{{alt}}-ability-toggle-col">
+        <button type="button" class="{{alt}}-toggle-btn {{#if ability.isActive}}on{{else}}off{{/if}}"
+                data-action="toggleAbility"
+                data-ability-id="{{ability.id}}"
+                aria-pressed="{{ability.isActive}}"
+                aria-label="Toggle {{ability.name}}">
+            {{#if ability.isActive}}◆{{else}}◇{{/if}}
+        </button>
+    </div>
+    <div class="{{alt}}-ability-body">
+        <div class="{{alt}}-ability-header-row">
+            <span class="{{alt}}-ability-name" 
+                  contenteditable="true" 
+                  data-ability-id="{{ability.id}}" 
+                  data-field="name" 
+                  spellcheck="false">{{ability.name}}</span>
+            {{#if ability.effectPayload.modifier}}
+            <span class="{{alt}}-ability-mod {{#if (gte ability.effectPayload.modifier 0)}}positive{{else}}negative{{/if}}">{{fmtMod ability.effectPayload.modifier}}</span>
+            {{/if}}
+            {{#if ability.triggerCondition.context}}
+            <span class="{{alt}}-ability-trigger" title="Trigger context">{{ability.triggerCondition.context}}</span>
+            {{/if}}
+        </div>
+        <p class="{{alt}}-ability-desc" 
+           contenteditable="true" 
+           data-ability-id="{{ability.id}}" 
+           data-field="description" 
+           spellcheck="false"
+           data-placeholder="Enter description...">{{ability.effectPayload.reason}}</p>
+    </div>
+    <div class="{{alt}}-ability-actions-col">
+        {{#if (eq ability.type ABILITY_TYPES.ACTION)}}
+            <button type="button" class="{{alt}}-use-btn" data-action="useAbility"
+                       data-ability-id="{{ability.id}}"
+                       {{#unless ability.isActive}}disabled{{/unless}}
+                       title="Use {{ability.name}}">Use</button>
+        {{/if}}
+        <button type="button" class="{{alt}}-delete-btn" data-action="deleteAbility"
+                data-ability-id="{{ability.id}}"
+                aria-label="Delete {{ability.name}}"
+                title="Delete">✕</button>
+    </div>
+</div>

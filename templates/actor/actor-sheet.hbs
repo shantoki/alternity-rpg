@@ -1,0 +1,597 @@
+<form class="{{cssClass}} {{@root.alt}}-sheet" autocomplete="off">
+    {{!-- Sheet Header --}}
+    <header class="{{@root.alt}}-sheet-header">
+        <div class="{{@root.alt}}-sheet-portrait">
+            <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
+        </div>
+        <div class="{{@root.alt}}-sheet-identity">
+            <h1 class="{{@root.alt}}-sheet-name">
+                <input name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'Name'}}" spellcheck="false" />
+            </h1>
+            <div class="{{@root.alt}}-sheet-meta">
+                <span class="{{@root.alt}}-wound-badge {{@root.alt}}-wound-badge--{{woundSeverity}}" title="{{localize 'ALTERNITY.WoundLevel'}}">
+                    {{localize (concat 'ALTERNITY.' woundLevel)}}
+                    {{#if woundPenalty}}<em>({{fmtMod woundPenalty}})</em>{{/if}}
+                </span>
+                {{#if isIncapacitated}}<span class="{{@root.alt}}-incap-warning">⚠ {{localize 'ALTERNITY.Incapacitated'}}</span>{{/if}}
+            </div>
+
+            <div class="{{@root.alt}}-action-check-bar">
+                <div class="{{@root.alt}}-ac-marginal">{{localize 'ALTERNITY.ActionCheck'}}: <strong>{{actionCheck.marginal}}+</strong></div>
+                <div class="{{@root.alt}}-ac-phases">
+                    <span>O: {{actionCheck.ordinary}}</span>
+                    <span>G: {{actionCheck.good}}</span>
+                    <span>A: {{actionCheck.amazing}}</span>
+                </div>
+                <div class="{{@root.alt}}-ac-actions">
+                    {{localize 'ALTERNITY.Actions'}}: <input type="number" class="{{@root.alt}}-ac-actions-input" value="{{actionsPerRound}}" data-action="editState" data-field="actionsPerRound" />
+                </div>
+            </div>
+        </div>
+
+        <div class="{{@root.alt}}-identity-metadata">
+            <div class="{{@root.alt}}-meta-row">
+                <div class="{{@root.alt}}-meta-field">
+                    <label>{{localize 'ALTERNITY.Profession'}}</label>
+                    <select data-action="editState" data-field="profession">
+                        <option value="" {{#if (eq profession "")}}selected{{/if}}>{{localize 'None'}}</option>
+                        <option value="Combat Spec" {{#if (eq profession "Combat Spec")}}selected{{/if}}>Combat Spec</option>
+                        <option value="Diplomat" {{#if (eq profession "Diplomat")}}selected{{/if}}>Diplomat</option>
+                        <option value="Free Agent" {{#if (eq profession "Free Agent")}}selected{{/if}}>Free Agent</option>
+                        <option value="Tech Op" {{#if (eq profession "Tech Op")}}selected{{/if}}>Tech Op</option>
+                    </select>
+                </div>
+            </div>
+            
+            <nav class="{{@root.alt}}-sheet-nav">
+                <button type="button" class="{{@root.alt}}-nav-btn {{#if (eq activeTab 'character')}}active{{/if}}"
+                        data-action="switchTab" data-tab="character" data-group="primary"
+                        title="{{localize 'ALTERNITY.Sheet.Hero'}}">👤 {{localize 'ALTERNITY.Sheet.Hero'}}</button>
+                <button type="button" class="{{@root.alt}}-nav-btn {{#if (eq activeTab 'combat')}}active{{/if}}"
+                        data-action="switchTab" data-tab="combat" data-group="primary"
+                        title="{{localize 'ALTERNITY.Sheet.Combat'}}">⚔ {{localize 'ALTERNITY.Sheet.Combat'}}</button>
+                <button type="button" class="{{@root.alt}}-nav-btn {{#if (eq activeTab 'skills')}}active{{/if}}"
+                        data-action="switchTab" data-tab="skills" data-group="primary"
+                        title="{{localize 'ALTERNITY.Sheet.Skills'}}">📜 {{localize 'ALTERNITY.Sheet.Skills'}}</button>
+                <button type="button" class="{{@root.alt}}-nav-btn {{#if (eq activeTab 'abilities')}}active{{/if}}"
+                        data-action="switchTab" data-tab="abilities" data-group="primary"
+                        title="{{localize 'ALTERNITY.Sheet.Abilities'}}">◈ {{localize 'ALTERNITY.Sheet.Abilities'}}</button>
+                <button type="button" class="{{@root.alt}}-nav-btn {{#if (eq activeTab 'special')}}active{{/if}}"
+                        data-action="switchTab" data-tab="special" data-group="primary"
+                        title="{{localize 'ALTERNITY.Sheet.Special'}}">⭐ {{localize 'ALTERNITY.Sheet.Special'}}</button>
+                <button type="button" class="{{@root.alt}}-nav-btn {{#if (eq activeTab ACTION_TYPE)}}active{{/if}}"
+                        data-action="switchTab" data-tab="{{ACTION_TYPE}}" data-group="primary"
+                        title="{{localize 'ALTERNITY.Sheet.Actions'}}">{{ACTION_ICON}} {{localize 'ALTERNITY.Sheet.Actions'}}</button>
+                <button type="button" class="{{@root.alt}}-nav-btn {{#if (eq activeTab 'rules')}}active{{/if}}"
+                        data-action="switchTab" data-tab="rules" data-group="primary"
+                        title="{{localize 'ALTERNITY.Sheet.Rules'}}">⚙ {{localize 'ALTERNITY.Sheet.Rules'}}</button>
+            </nav>
+        </div>
+    </header>
+
+    <section class="{{@root.alt}}-resources">
+        <div class="{{@root.alt}}-penalty-display {{#if (gt woundPenalty 0)}}active{{/if}}">
+            <span class="{{@root.alt}}-penalty-label">{{localize 'ALTERNITY.StepPenalty'}}:</span>
+            <span class="{{@root.alt}}-penalty-value">{{fmtMod woundPenalty}}</span>
+        </div>
+        {{#each durability as |dur key|}}
+        <div class="{{@root.alt}}-resource-bar bar--{{key}}" data-resource="{{key}}">
+            <div class="{{@root.alt}}-bar-label">
+                <span class="{{@root.alt}}-bar-name">{{localize (concat 'ALTERNITY.' dur.label)}}</span>
+                <span class="{{@root.alt}}-bar-values"><input type="number" class="{{@root.alt}}-bar-current"
+                           value="{{dur.current}}" min="0" max="{{dur.max}}"
+                           data-action="editResource" data-resource="{{key}}" data-field="current"
+                           aria-label="{{localize (concat 'ALTERNITY.' dur.label)}} current" /><span class="{{@root.alt}}-bar-sep">/</span><span class="{{@root.alt}}-bar-max">{{dur.max}}</span></span>
+            </div>
+            <div class="{{@root.alt}}-bar-track">
+                <div class="{{@root.alt}}-bar-fill" style="width: {{dur.pct}}" aria-valuenow="{{dur.current}}"
+                     aria-valuemax="{{dur.max}}" role="progressbar"
+                     aria-label="{{localize (concat 'ALTERNITY.' dur.label)}}"></div>
+            </div>
+        </div>
+        {{/each}}
+    </section>
+
+    <div class="{{@root.alt}}-wound-track">
+        {{#each WOUND_LEVELS as |w|}}
+        <button type="button" class="{{@root.alt}}-wound-pip {{#if (eq w ../woundLevel)}}active{{/if}} {{@root.alt}}-wound-pip--{{lookup ../WOUND_SEVERITY w}}"
+                data-action="setWound" data-wound="{{w}}"
+                title="{{localize (concat 'ALTERNITY.' w)}}">{{firstChar w}}</button>
+        {{/each}}
+    </div>
+
+    <main class="{{@root.alt}}-sheet-body">
+        {{!-- Character Tab --}}
+        <section class="{{@root.alt}}-tab-panel {{#if (eq activeTab 'character')}}active{{/if}}" data-tab-panel="character">
+            <div class="{{@root.alt}}-character-details">
+                <div class="{{@root.alt}}-details-grid">
+                    <div class="{{@root.alt}}-abilities-grid">
+                        {{#each abilities as |ability label|}}
+                        <div class="{{@root.alt}}-ability-box" data-ability="{{label}}">
+                            <div class="{{@root.alt}}-ability-main">
+                                <label class="{{@root.alt}}-ability-label">{{label}}</label>
+                                <input type="number" class="{{@root.alt}}-ability-value"
+                                       value="{{ability.score}}" min="4" max="14"
+                                       data-action="editAbility" data-ability="{{label}}"
+                                       aria-label="{{label}} modifier" />
+                            </div>
+                            <div class="{{@root.alt}}-ability-derived">
+                                <span class="{{@root.alt}}-untrained-val" title="Untrained Score">{{ability.untrained}}</span>
+                                <span class="{{@root.alt}}-res-mod-val" title="Resistance Modifier">{{#if ability.resMod}}{{fmtMod ability.resMod}}{{else}}0{{/if}}</span>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
+                    
+                    <div class="{{@root.alt}}-character-sidebar">
+                        <div class="{{@root.alt}}-armor-list">
+                            <label class="{{@root.alt}}-armor-label">Armor Ratings</label>
+                            <div class="{{@root.alt}}-armor-grid-row">
+                                <div class="{{@root.alt}}-armor-field">
+                                    <span class="{{@root.alt}}-armor-type">LI:</span>
+                                    <input type="text" value="{{armor.li}}" data-action="editArmor" data-type="li" />
+                                </div>
+                                <div class="{{@root.alt}}-armor-field">
+                                    <span class="{{@root.alt}}-armor-type">HI:</span>
+                                    <input type="text" value="{{armor.hi}}" data-action="editArmor" data-type="hi" />
+                                </div>
+                                <div class="{{@root.alt}}-armor-field">
+                                    <span class="{{@root.alt}}-armor-type">En:</span>
+                                    <input type="text" value="{{armor.en}}" data-action="editArmor" data-type="en" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="{{@root.alt}}-armor-list {{@root.alt}}-achievement-track">
+                            <label class="{{@root.alt}}-armor-label">Achievement (Lvl: {{achievementTrack.level}})</label>
+                            <div class="{{@root.alt}}-level-track">
+                                {{#each achievementTrack.checkmarks}}
+                                <input type="checkbox" {{#if this}}checked{{/if}} disabled/>
+                                {{/each}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="{{@root.alt}}-summary-grid">
+                    <div class="{{@root.alt}}-form-group">
+                        <label>Career Path</label>
+                        <input type="text" value="{{career}}" 
+                               data-action="editState" data-field="career" 
+                               placeholder="e.g. Soldier, Bounty Hunter, Hacker..." />
+                    </div>
+
+                    <div class="{{@root.alt}}-form-group {{@root.alt}}-personal-data-grid">
+                        <label>Personal Data</label>
+                        <input type="text" data-action="editState" data-field="personalData.age" value="{{personalData.age}}" placeholder="Age"/>
+                        <input type="text" data-action="editState" data-field="personalData.height" value="{{personalData.height}}" placeholder="Height"/>
+                        <input type="text" data-action="editState" data-field="personalData.weight" value="{{personalData.weight}}" placeholder="Weight"/>
+                    </div>
+                </div>
+
+                <div class="{{@root.alt}}-form-group">
+                    <label>Background & Notes</label>
+                    <textarea data-action="editState" data-field="background" 
+                              rows="8" placeholder="Describe your hero's history...">{{background}}</textarea>
+                </div>
+            </div>
+        </section>
+
+        {{!-- Combat Tab --}}
+        <section class="{{@root.alt}}-tab-panel {{#if (eq activeTab 'combat')}}active{{/if}}" data-tab-panel="combat">
+            <div class="{{@root.alt}}-combat-list">
+                <header class="{{@root.alt}}-section-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--alt-color-primary); margin-bottom: 12px;">
+                    <h3 style="margin: 0; color: var(--alt-color-primary); text-transform: uppercase;">Weapons</h3>
+                    <button type="button" class="{{@root.alt}}-add-btn" data-action="addItem" data-type="weapon" style="padding: 2px 8px; font-size: 11px;">+ Add Weapon</button>
+                </header>
+                <div class="{{@root.alt}}-weapons-grid">
+                    {{#each inventory.weapons as |item|}}
+                    <div class="{{@root.alt}}-item-card weapon-card" data-item-id="{{item.id}}">
+                        <img src="{{item.img}}" data-action="editItem" data-item-id="{{item.id}}" title="Edit Item" />
+                        <div class="{{@root.alt}}-item-info">
+                            <span class="{{@root.alt}}-item-name">{{item.name}}</span>
+                            <span class="{{@root.alt}}-item-stats">{{item.system.weaponType}} | {{item.system.damageFormula}} {{item.system.damageType}} ({{item.system.damageCategory}})</span>
+                        </div>
+                        <div class="{{@root.alt}}-item-actions">
+                            <button type="button" class="{{@root.alt}}-roll-btn" data-action="rollWeapon" data-item-id="{{item.id}}" title="Attack">⚔</button>
+                            <button type="button" class="{{@root.alt}}-delete-btn" data-action="deleteItem" data-item-id="{{item.id}}" title="Delete">✕</button>
+                        </div>
+                    </div>
+                    {{else}}
+                    <p class="{{@root.alt}}-empty-state">No weapons equipped.</p>
+                    {{/each}}
+                </div>
+
+                <header class="{{@root.alt}}-section-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--alt-color-text-muted); margin-top: 24px; margin-bottom: 12px;">
+                    <h3 style="margin: 0; color: var(--alt-color-text-muted); text-transform: uppercase;">Armor</h3>
+                    <button type="button" class="{{@root.alt}}-add-btn" data-action="addItem" data-type="armor" style="padding: 2px 8px; font-size: 11px;">+ Add Armor</button>
+                </header>
+                <div class="{{@root.alt}}-armor-grid">
+                    {{#each inventory.armor as |item|}}
+                    <div class="{{@root.alt}}-item-card armor-card" data-item-id="{{item.id}}">
+                        <img src="{{item.img}}" data-action="editItem" data-item-id="{{item.id}}" title="Edit Item" />
+                        <div class="{{@root.alt}}-item-info">
+                            <span class="{{@root.alt}}-item-name">{{item.name}}</span>
+                            <span class="{{@root.alt}}-item-stats">LI: {{item.system.li}} | HI: {{item.system.hi}} | En: {{item.system.en}}</span>
+                        </div>
+                        <div class="{{@root.alt}}-item-actions">
+                            <button type="button" class="{{@root.alt}}-delete-btn" data-action="deleteItem" data-item-id="{{item.id}}" title="Delete">✕</button>
+                        </div>
+                    </div>
+                    {{else}}
+                    <p class="{{@root.alt}}-empty-state">No armor equipped.</p>
+                    {{/each}}
+                </div>
+            </div>
+        </section>
+
+        {{!-- Skills Tab --}}
+        <section class="{{@root.alt}}-tab-panel {{#if (eq activeTab 'skills')}}active{{/if}}" data-tab-panel="skills">
+            <div class="{{@root.alt}}-skills-search-bar">
+                <input type="text" class="{{@root.alt}}-skills-search-input" 
+                       placeholder="Filter skills..." 
+                       spellcheck="false" />
+                <span class="{{@root.alt}}-skills-search-icon">🔍</span>
+            </div>
+            <div class="{{@root.alt}}-skills-container">
+                {{#each skillsByAbility as |hierarchy ab|}}
+                <div class="{{@root.alt}}-skill-group">
+                    <div class="{{@root.alt}}-skill-group-header-row">
+                        <h3 class="{{@root.alt}}-skill-group-header">{{ab}} Skills</h3>
+                        <button type="button" class="{{@root.alt}}-add-skill-btn" 
+                                data-action="addSkill" data-ability="{{ab}}"
+                                title="Add Custom {{ab}} Skill">+</button>
+                    </div>
+                    <div class="{{@root.alt}}-skill-list">
+                        <div class="{{@root.alt}}-skill-item {{@root.alt}}-skill-header">
+                            <span class="{{@root.alt}}-skill-name">Skill</span>
+                            <span class="{{@root.alt}}-skill-rank-col">Rank</span>
+                            <span class="{{@root.alt}}-skill-score-col">O / G / A</span>
+                            <span class="{{@root.alt}}-skill-actions-col"></span>
+                        </div>
+                        {{#each hierarchy as |broad|}}
+                        <div class="{{@root.alt}}-skill-broad-container">
+                            <div class="{{@root.alt}}-skill-item is-broad {{#if broad.isOrphanContainer}}is-orphan-container{{/if}}" data-skill-id="{{broad.id}}">
+                                {{#if broad.isOrphanContainer}}
+                                    <span class="{{@root.alt}}-skill-name">{{broad.name}}</span>
+                                {{else if broad.isCustom}}
+                                    <div class="{{@root.alt}}-skill-name">
+                                        <div class="{{@root.alt}}-skill-name-container">
+                                            <span class="{{@root.alt}}-skill-marker">◆</span>
+                                            <span class="{{@root.alt}}-skill-name {{@root.alt}}-custom-skill-name" 
+                                                  contenteditable="true" 
+                                                  data-skill-id="{{broad.id}}"
+                                                  data-placeholder="Skill Name">{{broad.name}}</span>
+                                        </div>
+                                    </div>
+                                {{else}}
+                                    <button type="button" class="{{@root.alt}}-skill-roll-btn {{#if broad.cannotBeUsedUntrained}}is-untrained-restricted{{/if}}"
+                                            data-action="rollSkill" data-skill-id="{{broad.id}}"
+                                            title="Roll {{broad.name}} (Base Step: +1) {{#if broad.cannotBeUsedUntrained}}[Can't be used untrained]{{/if}}"
+                                            {{#if (and broad.cannotBeUsedUntrained (eq broad.rank 0))}}disabled{{/if}}>
+                                        {{broad.name}} <span class="skill-type-tag">Broad</span>
+                                    </button>
+                                {{/if}}
+                                <div class="{{@root.alt}}-skill-rank-col">
+                                    {{#unless broad.isOrphanContainer}}
+                                        <input type="number" class="{{@root.alt}}-skill-rank-input"
+                                               value="{{broad.rank}}" min="0" max="10"
+                                               data-action="editSkill" data-skill-id="{{broad.id}}" />
+                                    {{/unless}}
+                                </div>
+                                <div class="{{@root.alt}}-skill-score-col">
+                                    {{#unless broad.isOrphanContainer}}{{broad.scores.ordinary}} / {{broad.scores.good}} / {{broad.scores.amazing}}{{/unless}}
+                                </div>
+                                <div class="{{@root.alt}}-skill-actions-col">
+                                    {{#if broad.isCustom}}
+                                        <button type="button" class="{{@root.alt}}-skill-delete-btn" 
+                                                data-action="deleteSkill" data-skill-id="{{broad.id}}"
+                                                title="Delete Skill">×</button>
+                                    {{/if}}
+                                </div>
+                            </div>
+                            <div class="{{@root.alt}}-skill-specialties">
+                                {{#each broad.specialties as |s|}}
+                                <div class="{{@root.alt}}-skill-item is-specialty {{#if (and (eq s.rank 0) (eq ../broad.rank 0))}}is-locked{{/if}}" data-skill-id="{{s.id}}">
+                                    {{#if s.isCustom}}
+                                        <div class="{{@root.alt}}-skill-name">
+                                            <div class="{{@root.alt}}-skill-name-container">
+                                                <span class="{{@root.alt}}-skill-marker">↳</span>
+                                                <span class="{{@root.alt}}-skill-name {{@root.alt}}-custom-skill-name" 
+                                                      contenteditable="true" 
+                                                      data-skill-id="{{s.id}}"
+                                                      data-placeholder="Skill Name">{{s.name}}</span>
+                                            </div>
+                                        </div>
+                                    {{else}}
+                                        <button type="button" class="{{@root.alt}}-skill-roll-btn {{#if s.cannotBeUsedUntrained}}is-untrained-restricted{{/if}}"
+                                                data-action="rollSkill" data-skill-id="{{s.id}}"
+                                                title="Roll {{s.name}} (Base Step: 0) {{#if s.cannotBeUsedUntrained}}[Can't be used untrained]{{/if}}"
+                                                {{#if (or (and s.cannotBeUsedUntrained (eq s.rank 0)) (and (eq s.rank 0) (eq ../broad.rank 0)))}}disabled{{/if}}>
+                                            <span class="{{@root.alt}}-skill-branch">↳</span> {{s.name}}
+                                        </button>
+                                    {{/if}}
+                                    <div class="{{@root.alt}}-skill-rank-col">
+                                        <input type="number" class="{{@root.alt}}-skill-rank-input"
+                                               value="{{s.rank}}" min="0" max="10"
+                                               data-action="editSkill" data-skill-id="{{s.id}}" />
+                                    </div>
+                                    <div class="{{@root.alt}}-skill-score-col">
+                                        {{s.scores.ordinary}} / {{s.scores.good}} / {{s.scores.amazing}}
+                                    </div>
+                                    <div class="{{@root.alt}}-skill-actions-col">
+                                        {{#if s.isCustom}}
+                                            <button type="button" class="{{@root.alt}}-skill-delete-btn" 
+                                                    data-action="deleteSkill" data-skill-id="{{s.id}}"
+                                                    title="Delete Skill">×</button>
+                                        {{/if}}
+                                    </div>
+                                </div>
+                                {{/each}}
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- Abilities Tab --}}
+        <section class="{{@root.alt}}-tab-panel {{#if (eq activeTab 'abilities')}}active{{/if}}" data-tab-panel="abilities">
+            <div class="{{@root.alt}}-abilities-list">
+                {{#if abilitiesList.length}}
+                    {{#each abilitiesList as |ability|}}
+                        {{> (lookup .. 'abilityCardTemplate') ability=ability alt=../alt}}
+                    {{/each}}
+                {{else}}
+                    <p class="{{@root.alt}}-empty-state">No abilities defined.</p>
+                {{/if}}
+            </div>
+            <button type="button" class="{{@root.alt}}-add-btn" data-action="addAbility"
+                    data-type="{{ABILITY_TYPES.STANCE}}">+ Add Stance</button>
+            <button type="button" class="{{@root.alt}}-add-btn" data-action="addAbility"
+                    data-type="{{ABILITY_TYPES.PASSIVE}}">+ Add Passive</button>
+        </section>
+
+        {{!-- Special Tab --}}
+        <section class="{{@root.alt}}-tab-panel {{#if (eq activeTab 'special')}}active{{/if}}" data-tab-panel="special">
+            <div class="{{@root.alt}}-special-list">
+                {{!-- Special features toggles --}}
+                <div class="{{@root.alt}}-row {{@root.alt}}-feature-toggles" style="margin-bottom: 12px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; display: flex; gap: 16px;">
+                    <label style="display: flex; align-items: center; gap: 4px; cursor: pointer;"><input type="checkbox" data-action="editState" data-field="features.usePsionics" {{#if features.usePsionics}}checked{{/if}}/> Psionics</label>
+                    <label style="display: flex; align-items: center; gap: 4px; cursor: pointer;"><input type="checkbox" data-action="editState" data-field="features.useMutations" {{#if features.useMutations}}checked{{/if}}/> Mutations</label>
+                    <label style="display: flex; align-items: center; gap: 4px; cursor: pointer;"><input type="checkbox" data-action="editState" data-field="features.useCybertech" {{#if features.useCybertech}}checked{{/if}}/> Cybertech</label>
+                </div>
+
+                {{#if features.usePsionics}}
+                <section class="{{@root.alt}}-psionics-section" style="margin-bottom: 24px;">
+                    <header class="{{@root.alt}}-section-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--alt-color-primary); margin-bottom: 12px;">
+                        <h3 style="margin: 0; color: var(--alt-color-primary); text-transform: uppercase;">Psionics</h3>
+                        <div class="{{@root.alt}}-resource-row" style="display: flex; align-items: center; gap: 8px; font-weight: bold;">
+                            <label>Energy: {{psionics.energy.value}} / {{psionics.energy.max}}</label>
+                        </div>
+                    </header>
+
+                    <div class="{{@root.alt}}-psionic-energy-track">
+                        {{#each psionicEnergyTrack}}
+                        <div class="{{@root.alt}}-psionic-pip {{#if this}}active{{/if}}" 
+                             data-action="setPsionicEnergy" 
+                             data-value="{{add @index 1}}"
+                             title="Energy {{add @index 1}}"></div>
+                        {{/each}}
+                    </div>
+                    
+                    <div class="{{@root.alt}}-psionic-loss-box" style="margin-bottom: 16px; font-size: 11px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px; color: var(--alt-color-text-muted);">
+                        <strong style="color: var(--alt-color-primary); text-transform: uppercase; font-size: 10px;">Psionic Energy Loss:</strong>
+                        <ul style="margin: 4px 0 0 0; padding: 0;">
+                            <li><span>Critical Failure result</span> <span class="{{@root.alt}}-psionic-loss-value">3</span></li>
+                            <li><span>Broad skill use, success or failure</span> <span class="{{@root.alt}}-psionic-loss-value">2</span></li>
+                            <li><span>Specialty skill use, success or failure</span> <span class="{{@root.alt}}-psionic-loss-value">1</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="{{@root.alt}}-psionic-skills">
+                        <div class="{{@root.alt}}-skill-list">
+                            {{#each psionicHierarchy as |broad|}}
+                            <div class="{{@root.alt}}-skill-broad-container">
+                                <div class="{{@root.alt}}-skill-item is-broad" data-skill-id="{{broad.id}}">
+                                    <button type="button" class="{{@root.alt}}-skill-roll-btn {{#if broad.cannotBeUsedUntrained}}is-untrained-restricted{{/if}}"
+                                            data-action="rollSkill" data-skill-id="{{broad.id}}"
+                                            title="Roll {{broad.name}} (Base Step: +1) {{#if broad.cannotBeUsedUntrained}}[Can't be used untrained]{{/if}}"
+                                            {{#if (and broad.cannotBeUsedUntrained (eq broad.rank 0))}}disabled{{/if}}>
+                                        {{broad.name}} <span class="skill-type-tag">Broad</span>
+                                    </button>
+                                    <div class="{{@root.alt}}-skill-rank-col">
+                                        <input type="number" class="{{@root.alt}}-skill-rank-input"
+                                               value="{{broad.rank}}" min="0" max="10"
+                                               data-action="editSkill" data-skill-id="{{broad.id}}" />
+                                    </div>
+                                    <div class="{{@root.alt}}-skill-score-col">
+                                        {{broad.scores.ordinary}} / {{broad.scores.good}} / {{broad.scores.amazing}}
+                                    </div>
+                                    <div class="{{@root.alt}}-skill-actions-col"></div>
+                                </div>
+                                <div class="{{@root.alt}}-skill-specialties">
+                                    {{#each broad.specialties as |s|}}
+                                    <div class="{{@root.alt}}-skill-item is-specialty {{#if (or (and s.cannotBeUsedUntrained (eq s.rank 0)) (and (eq s.rank 0) (eq ../broad.rank 0)))}}is-locked{{/if}}" data-skill-id="{{s.id}}">
+                                        <button type="button" class="{{@root.alt}}-skill-roll-btn {{#if s.cannotBeUsedUntrained}}is-untrained-restricted{{/if}}"
+                                                data-action="rollSkill" data-skill-id="{{s.id}}"
+                                                title="Roll {{s.name}} (Base Step: 0) {{#if s.cannotBeUsedUntrained}}[Can't be used untrained]{{/if}}"
+                                                {{#if (or (and s.cannotBeUsedUntrained (eq s.rank 0)) (and (eq s.rank 0) (eq ../broad.rank 0)))}}disabled{{/if}}>
+                                            <span class="{{@root.alt}}-skill-branch">↳</span> {{s.name}}
+                                        </button>
+                                        <div class="{{@root.alt}}-skill-rank-col">
+                                            <input type="number" class="{{@root.alt}}-skill-rank-input"
+                                                   value="{{s.rank}}" min="0" max="10"
+                                                   data-action="editSkill" data-skill-id="{{s.id}}" />
+                                        </div>
+                                        <div class="{{@root.alt}}-skill-score-col">
+                                            {{s.scores.ordinary}} / {{s.scores.good}} / {{s.scores.amazing}}
+                                        </div>
+                                        <div class="{{@root.alt}}-skill-actions-col"></div>
+                                    </div>
+                                    {{/each}}
+                                </div>
+                            </div>
+                            {{/each}}
+                        </div>
+                    </div>
+
+                </section>
+                {{/if}}
+
+                {{#if features.useMutations}}
+                <section class="{{@root.alt}}-mutations-section" style="margin-bottom: 24px;">
+                    <header class="{{@root.alt}}-section-header" style="border-bottom: 2px solid #d9a44a; margin-bottom: 12px;">
+                        <h3 style="margin: 0; color: #d9a44a; text-transform: uppercase;">Mutations</h3>
+                    </header>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px;">
+                        <div class="{{@root.alt}}-field-group" style="display: flex; flex-direction: column; gap: 2px;">
+                            <label style="font-size: 10px; text-transform: uppercase; color: var(--alt-color-text-muted);">Origin</label>
+                            <input type="text" value="{{mutations.origin}}" data-action="editState" data-field="mutations.origin"/>
+                        </div>
+                        <div class="{{@root.alt}}-field-group" style="display: flex; flex-direction: column; gap: 2px;">
+                            <label style="font-size: 10px; text-transform: uppercase; color: var(--alt-color-text-muted);">Uniqueness</label>
+                            <input type="text" value="{{mutations.uniqueness}}" data-action="editState" data-field="mutations.uniqueness"/>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                        <div class="{{@root.alt}}-field-group"><label style="font-size: 9px; text-transform: uppercase; color: var(--alt-color-text-muted);">Ordinary</label><textarea data-action="editState" data-field="mutations.ordinary" style="min-height: 80px; font-size: 11px;">{{mutations.ordinary}}</textarea></div>
+                        <div class="{{@root.alt}}-field-group"><label style="font-size: 9px; text-transform: uppercase; color: var(--alt-color-text-muted);">Good</label><textarea data-action="editState" data-field="mutations.good" style="min-height: 80px; font-size: 11px;">{{mutations.good}}</textarea></div>
+                        <div class="{{@root.alt}}-field-group"><label style="font-size: 9px; text-transform: uppercase; color: var(--alt-color-text-muted);">Amazing</label><textarea data-action="editState" data-field="mutations.amazing" style="min-height: 80px; font-size: 11px;">{{mutations.amazing}}</textarea></div>
+                    </div>
+                </section>
+                {{/if}}
+
+                {{#if features.useCybertech}}
+                <section class="{{@root.alt}}-cybertech-section" style="margin-bottom: 24px;">
+                    <header class="{{@root.alt}}-section-header" style="border-bottom: 2px solid #4ad97a; margin-bottom: 12px;">
+                        <h3 style="margin: 0; color: #4ad97a; text-transform: uppercase;">Cybertech</h3>
+                    </header>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px;">
+                        <div class="{{@root.alt}}-field-group" style="display: flex; flex-direction: column; gap: 2px;">
+                            <label style="font-size: 10px; text-transform: uppercase; color: var(--alt-color-text-muted);">Cyber Tolerance</label>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <input type="number" value="{{cybertech.tolerance.value}}" data-action="editState" data-field="cybertech.tolerance.value" style="width: 50px; text-align: center;"/>
+                                <span>/</span>
+                                <input type="number" value="{{cybertech.tolerance.max}}" data-action="editState" data-field="cybertech.tolerance.max" style="width: 50px; text-align: center;"/>
+                            </div>
+                        </div>
+                        <div class="{{@root.alt}}-field-group" style="display: flex; flex-direction: column; gap: 2px;">
+                            <label style="font-size: 10px; text-transform: uppercase; color: var(--alt-color-text-muted);">Cykosis</label>
+                            <input type="number" value="{{cybertech.cykosis}}" data-action="editState" data-field="cybertech.cykosis" style="width: 60px; text-align: center;"/>
+                        </div>
+                    </div>
+                    <div class="{{@root.alt}}-field-group" style="display: flex; flex-direction: column; gap: 2px;">
+                        <label style="font-size: 10px; text-transform: uppercase; color: var(--alt-color-text-muted);">Cyber gear Installed</label>
+                        <textarea data-action="editState" data-field="cybertech.gearInstalled" style="min-height: 100px; font-size: 11px;">{{cybertech.gearInstalled}}</textarea>
+                    </div>
+                </section>
+                {{/if}}
+
+                <section class="{{@root.alt}}-computers-section">
+                    <header class="{{@root.alt}}-section-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--alt-color-text-muted); margin-bottom: 12px;">
+                        <h3 style="margin: 0; color: var(--alt-color-text-muted); text-transform: uppercase;">Computers</h3>
+                        <button type="button" class="{{@root.alt}}-add-btn" data-action="addItem" data-type="computer" style="padding: 2px 8px; font-size: 11px;">+ Add Computer</button>
+                    </header>
+                    <div class="{{@root.alt}}-computers-list" style="display: flex; flex-direction: column; gap: 16px;">
+                        {{#each computerItems as |item|}}
+                        <div class="{{@root.alt}}-computer-card" style="background: rgba(255,255,255,0.02); border: 1px solid var(--alt-color-border); border-radius: 4px; padding: 12px; position: relative;">
+                            <button type="button" class="{{@root.alt}}-delete-btn" data-action="deleteItem" data-item-id="{{item.id}}" style="position: absolute; top: 4px; right: 4px; border: none; background: transparent; color: var(--alt-color-text-muted); cursor: pointer;" title="Remove Computer">✕</button>
+                            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 8px;">
+                                <div class="{{@root.alt}}-field-group">
+                                    <label style="font-size: 9px; text-transform: uppercase; color: var(--alt-color-text-muted);">Model</label>
+                                    <input type="text" name="items.{{item.id}}.name" value="{{item.name}}" style="width: 100%;"/>
+                                </div>
+                                <div class="{{@root.alt}}-field-group">
+                                    <label style="font-size: 9px; text-transform: uppercase; color: var(--alt-color-text-muted);">Processor Quality</label>
+                                    <input type="text" name="items.{{item.id}}.system.processorQuality" value="{{item.system.processorQuality}}" style="width: 100%;"/>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px;">
+                                <div class="{{@root.alt}}-field-group">
+                                    <label style="font-size: 9px; text-transform: uppercase; color: var(--alt-color-text-muted);">Active Memory</label>
+                                    <input type="number" name="items.{{item.id}}.system.activeMemory" value="{{item.system.activeMemory}}" style="width: 100%;"/>
+                                </div>
+                                <div class="{{@root.alt}}-field-group">
+                                    <label style="font-size: 9px; text-transform: uppercase; color: var(--alt-color-text-muted);">Active Storage</label>
+                                    <input type="number" name="items.{{item.id}}.system.activeStorage" value="{{item.system.activeStorage}}" style="width: 100%;"/>
+                                </div>
+                            </div>
+                            <div class="{{@root.alt}}-field-group">
+                                <label style="font-size: 9px; text-transform: uppercase; color: var(--alt-color-text-muted);">Programs</label>
+                                <textarea name="items.{{item.id}}.system.programs" style="width: 100%; min-height: 60px; font-size: 11px;">{{item.system.programs}}</textarea>
+                            </div>
+                        </div>
+                        {{else}}
+                        <p style="font-style: italic; color: var(--alt-color-text-muted); text-align: center;">No computers registered.</p>
+                        {{/each}}
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        {{!-- Actions Tab --}}
+        <section class="{{@root.alt}}-tab-panel {{#if (eq activeTab ACTION_TYPE)}}active{{/if}}" data-tab-panel="{{ACTION_TYPE}}">
+            <div class="{{@root.alt}}-abilities-list">
+                {{#if actions.length}}
+                    {{#each actions as |ability|}}
+                        {{> (lookup .. 'abilityCardTemplate') ability=ability alt=../alt}}
+                    {{/each}}
+                {{else}}
+                    <p class="{{@root.alt}}-empty-state">No actions defined.</p>
+                {{/if}}
+            </div>
+            <button type="button" class="{{@root.alt}}-add-btn" data-action="addAbility"
+                    data-type="{{ACTION_TYPE}}">+ Add Action</button>
+        </section>
+
+        {{!-- Rules Tab --}}
+        <section class="{{@root.alt}}-tab-panel {{#if (eq activeTab 'rules')}}active{{/if}}" data-tab-panel="rules">
+            <div class="{{@root.alt}}-rules-list">
+                {{#if specialRules.length}}
+                    {{#each specialRules as |rule|}}
+                        <div class="{{@root.alt}}-rule-card {{#if rule.isEnabled}}active{{/if}}" data-rule-id="{{rule.id}}">
+                            <label class="{{@root.alt}}-rule-toggle-label">
+                                <input type="checkbox" class="{{@root.alt}}-rule-checkbox"
+                                       data-action="toggleRule" data-rule-id="{{rule.id}}"
+                                       {{#if rule.isEnabled}}checked{{/if}}
+                                       aria-label="{{rule.name}}" />
+                                <span class="{{@root.alt}}-rule-switch" aria-hidden="true"></span>
+                            </label>
+                            <div class="{{@root.alt}}-rule-body">
+                                <span class="{{@root.alt}}-rule-name">{{rule.name}}</span>
+                                {{#if rule.description}}<p class="{{@root.alt}}-rule-desc">{{rule.description}}</p>{{/if}}
+                                {{#if (and rule.isEnabled rule.config.currentBonus)}}
+                                <span class="{{@root.alt}}-rule-bonus">Bonus: {{fmtMod rule.config.currentBonus}}</span>
+                                {{/if}}
+                            </div>
+                        </div>
+                    {{/each}}
+                {{else}}
+                    <p class="{{@root.alt}}-empty-state">No special rules configured.</p>
+                {{/if}}
+            </div>
+        </section>
+    </main>
+
+    <footer class="{{@root.alt}}-roll-tray">
+        <div class="{{@root.alt}}-roll-mount" hidden></div>
+        <div class="{{@root.alt}}-quick-roll-bar">
+            <span class="{{@root.alt}}-quick-roll-label">Quick roll:</span>
+            <button type="button" class="{{@root.alt}}-quick-btn" data-action="quickRoll" data-context="Combat"
+                    data-ability="DEX" {{#if isIncapacitated}}disabled{{/if}}
+                    title="Base 20 + DEX">⚔ Combat</button>
+            <button type="button" class="{{@root.alt}}-quick-btn" data-action="quickRoll" data-context="Perception"
+                    data-ability="PER" {{#if isIncapacitated}}disabled{{/if}}
+                    title="Base 20 + PER">👁 Perception</button>
+            <button type="button" class="{{@root.alt}}-quick-btn" data-action="quickRoll" data-context="Stealth"
+                    data-ability="DEX" {{#if isIncapacitated}}disabled{{/if}}
+                    title="Base 20 + DEX">🌑 Stealth</button>
+            <button type="button" class="{{@root.alt}}-quick-btn" data-action="quickRoll" data-context="Science"
+                    data-ability="INT" {{#if isIncapacitated}}disabled{{/if}}
+                    title="Base 20 + INT">🔬 Science</button>
+        </div>
+    </footer>
+</form>
