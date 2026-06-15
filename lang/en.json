@@ -75,5 +75,19 @@
   "ALTERNITY.CR.Easy": "Easy",
   "ALTERNITY.CR.Average": "Average",
   "ALTERNITY.CR.Tough": "Tough",
-  "ALTERNITY.CR.Overwhelming": "Overwhelming"
+  "ALTERNITY.CR.Overwhelming": "Overwhelming",
+  "ALTERNITY.Bonus": "Bonus",
+  "ALTERNITY.Damage": "Damage",
+  "ALTERNITY.HullIntegrity": "Hull Integrity",
+  "ALTERNITY.Shields": "Shields",
+  "ALTERNITY.Type": "Type",
+  "ALTERNITY.Size": "Size",
+  "ALTERNITY.Speed": "Speed",
+  "ALTERNITY.Maneuver": "Maneuver",
+  "ALTERNITY.Crew": "Crew",
+  "ALTERNITY.Biography": "Biography",
+  "ALTERNITY.Morale": "Morale",
+  "ALTERNITY.XP": "XP",
+  "ALTERNITY.Elite": "Elite",
+  "ALTERNITY.Disabled": "Disabled"
 }

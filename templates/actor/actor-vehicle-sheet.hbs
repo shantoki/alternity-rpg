@@ -1,0 +1,111 @@
+<form class="{{cssClass}} {{alt}}-sheet {{alt}}-vehicle-sheet" autocomplete="off">
+    {{!-- Vehicle Sheet Header --}}
+    <header class="{{alt}}-sheet-header">
+        <div class="{{alt}}-sheet-portrait">
+            <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
+        </div>
+        <div class="{{alt}}-sheet-identity">
+            <h1 class="{{alt}}-sheet-name">
+                <input name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'Name'}}" spellcheck="false" />
+            </h1>
+            <div class="{{alt}}-sheet-meta">
+                <div class="{{alt}}-meta-field">
+                    <label>{{localize 'ALTERNITY.Type'}}</label>
+                    <select name="system.vehicleType">
+                        {{#each vehicleTypeChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq ../system.vehicleType choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="{{alt}}-meta-field">
+                    <label>{{localize 'ALTERNITY.Size'}}</label>
+                    <select name="system.size">
+                        {{#each sizeChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq ../system.size choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                {{#if system.isDisabled}}<span class="{{alt}}-incap-warning">⚠ {{localize 'ALTERNITY.Disabled'}}</span>{{/if}}
+            </div>
+        </div>
+    </header>
+
+    {{!-- Vehicle Resources --}}
+    <section class="{{alt}}-resources">
+        {{!-- Hull Integrity --}}
+        <div class="{{alt}}-resource-bar bar--hull" data-resource="hullIntegrity">
+            <div class="{{alt}}-bar-label">
+                <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.HullIntegrity'}}</span>
+                <span class="{{alt}}-bar-values">
+                    <input type="number" name="system.hullIntegrity.value" value="{{system.hullIntegrity.value}}" min="0" max="{{system.hullIntegrity.max}}" />
+                    <span class="{{alt}}-bar-sep">/</span>
+                    <input type="number" name="system.hullIntegrity.max" value="{{system.hullIntegrity.max}}" min="0" />
+                </span>
+            </div>
+            <div class="{{alt}}-bar-track">
+                <div class="{{alt}}-bar-fill" style="width: {{system.hullPercent}}%"></div>
+            </div>
+        </div>
+
+        {{!-- Shields --}}
+        <div class="{{alt}}-resource-bar bar--shields" data-resource="shields">
+            <div class="{{alt}}-bar-label">
+                <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.Shields'}}</span>
+                <span class="{{alt}}-bar-values">
+                    <input type="number" name="system.shields.value" value="{{system.shields.value}}" min="0" max="{{system.shields.max}}" />
+                    <span class="{{alt}}-bar-sep">/</span>
+                    <input type="number" name="system.shields.max" value="{{system.shields.max}}" min="0" />
+                </span>
+            </div>
+            <div class="{{alt}}-bar-track">
+                <div class="{{alt}}-bar-fill" style="width: {{system.shieldPercent}}%"></div>
+            </div>
+        </div>
+
+        {{!-- Tech Points --}}
+        <div class="{{alt}}-resource-bar bar--tp" data-resource="techPoints">
+            <div class="{{alt}}-bar-label">
+                <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.TechPoints'}}</span>
+                <span class="{{alt}}-bar-values">
+                    <input type="number" name="system.techPoints.value" value="{{system.techPoints.value}}" min="0" max="{{system.techPoints.max}}" />
+                    <span class="{{alt}}-bar-sep">/</span>
+                    <input type="number" name="system.techPoints.max" value="{{system.techPoints.max}}" min="0" />
+                </span>
+            </div>
+            <div class="{{alt}}-bar-track">
+                <div class="{{alt}}-bar-fill" style="width: {{pct system.techPoints.value system.techPoints.max}}"></div>
+            </div>
+        </div>
+    </section>
+
+    {{!-- Vehicle Stats Grid --}}
+    <section class="{{alt}}-sheet-body">
+        <div class="{{alt}}-stats-grid">
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Defense'}}</label>
+                <input type="number" name="system.defense" value="{{system.defense}}" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Speed'}}</label>
+                <input type="number" name="system.speed" value="{{system.speed}}" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Maneuver'}}</label>
+                <input type="number" name="system.maneuver" value="{{system.maneuver}}" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Crew'}}</label>
+                <div class="{{alt}}-crew-fields">
+                    <input type="number" name="system.currentCrew" value="{{system.currentCrew}}" min="0" />
+                    <span>/</span>
+                    <input type="number" name="system.crewCapacity" value="{{system.crewCapacity}}" min="1" />
+                </div>
+            </div>
+        </div>
+
+        <div class="{{alt}}-vehicle-description">
+            <label>{{localize 'ALTERNITY.Description'}}</label>
+            {{editor system.description target="system.description" button=true owner=owner editable=editable}}
+        </div>
+    </section>
+</form>

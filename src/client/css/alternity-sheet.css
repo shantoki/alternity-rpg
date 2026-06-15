@@ -189,6 +189,10 @@
     display: flex;
     align-items: center;
     gap: 6px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 2px 8px;
+    border-radius: 12px;
+    border: 1px solid var(--alt-color-border);
 }
 
 .alt-meta-field label {
@@ -199,13 +203,12 @@
 }
 
 .alt-meta-field select {
-    flex: 1;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--alt-color-border);
+    background: transparent;
+    border: none;
     color: white;
     font-size: 11px;
-    padding: 1px 4px;
-    border-radius: 2px;
+    padding: 0;
+    cursor: pointer;
 }
 
 .alt-sheet-nav {
@@ -364,6 +367,138 @@
 }
 
 .alt-wound-pip.active { border-color: white; color: white; }
+
+/* ── NPC & Vehicle Specific ────────────────────────────────────────────── */
+.alt-npc-sheet .alt-sheet-body,
+.alt-vehicle-sheet .alt-sheet-body {
+    padding: 12px;
+}
+
+.alt-npc-combat-summary {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.alt-npc-cr-badge {
+    background: #444;
+    color: #eee;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.alt-npc-main-content {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.alt-npc-stats-extras {
+    flex: 0 0 150px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid var(--alt-color-border);
+}
+
+.alt-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.alt-stat-row label {
+    font-size: 10px;
+    color: var(--alt-color-text-muted);
+}
+
+.alt-stat-row input {
+    width: 40px;
+    text-align: center;
+}
+
+.alt-vehicle-type-badge {
+    background: var(--alt-color-primary);
+    color: white;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.alt-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.alt-stat-box {
+    background: var(--alt-color-surface);
+    border: 1px solid var(--alt-color-border);
+    padding: 8px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.alt-stat-box label {
+    font-size: 9px;
+    text-transform: uppercase;
+    color: var(--alt-color-primary);
+    font-weight: bold;
+}
+
+.alt-stat-combined {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.alt-stat-sub {
+    font-size: 9px;
+    color: var(--alt-color-text-muted);
+    white-space: nowrap;
+}
+
+.alt-stat-sub input {
+    width: 30px !important;
+    height: 16px !important;
+    font-size: 9px !important;
+    padding: 0 2px !important;
+}
+
+.alt-stat-box strong {
+    font-size: 18px;
+}
+
+.alt-stat-box input {
+    width: 100%;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.alt-crew-fields {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.alt-crew-fields input {
+    width: 35px;
+}
 
 /* ── Main Body ─────────────────────────────────────────────────────────── */
 .alt-sheet-body {
