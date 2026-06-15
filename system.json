@@ -24,5 +24,19 @@
       "name": "English",
       "path": "lang/en.json"
     }
-  ]
+  ],
+  "documentTypes": {
+    "Actor": {
+      "character": {},
+      "npc": {},
+      "vehicle": {}
+    },
+    "Item": {
+      "weapon": {},
+      "armor": {},
+      "skill": {},
+      "effect": {},
+      "computer": {}
+    }
+  }
 }

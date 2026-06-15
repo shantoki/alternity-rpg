@@ -228,11 +228,13 @@
         {{!-- Skills Tab --}}
         <section class="{{@root.alt}}-tab-panel {{#if (eq activeTab 'skills')}}active{{/if}}" data-tab-panel="skills">
             <div class="{{@root.alt}}-skills-search-bar">
-                <input type="text" class="{{@root.alt}}-skills-search-input" 
-                       placeholder="Filter skills..." 
+                <input type="text" class="{{@root.alt}}-skills-search-input"
+                       placeholder="{{localize 'Filter skills...'}}"
+                       value="{{skillFilter}}"
                        spellcheck="false" />
                 <span class="{{@root.alt}}-skills-search-icon">🔍</span>
             </div>
+
             <div class="{{@root.alt}}-skills-container">
                 {{#each skillsByAbility as |hierarchy ab|}}
                 <div class="{{@root.alt}}-skill-group">

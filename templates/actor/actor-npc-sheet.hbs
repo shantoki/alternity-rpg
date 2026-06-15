@@ -1,0 +1,45 @@
+<form class="{{cssClass}} {{alt}}-sheet {{alt}}-npc-sheet" autocomplete="off">
+    {{!-- NPC Sheet Header --}}
+    <header class="{{alt}}-sheet-header">
+        <div class="{{alt}}-sheet-portrait">
+            <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
+        </div>
+        <div class="{{alt}}-sheet-identity">
+            <h1 class="{{alt}}-sheet-name">
+                <input name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'Name'}}" spellcheck="false" />
+            </h1>
+            <div class="{{alt}}-sheet-meta">
+                <span class="{{alt}}-wound-badge {{alt}}-wound-badge--{{woundSeverity}}">
+                    {{localize (concat 'ALTERNITY.' woundLevel)}}
+                </span>
+                {{#if isIncapacitated}}<span class="{{alt}}-incap-warning">⚠ {{localize 'ALTERNITY.Incapacitated'}}</span>{{/if}}
+            </div>
+            
+            <div class="{{alt}}-npc-combat-summary">
+                <span>{{localize 'ALTERNITY.Defense'}}: <strong>{{system.defense}}</strong></span>
+                <span>{{localize 'ALTERNITY.Attack'}}: <strong>{{fmtMod system.attackBonus}}</strong></span>
+                <span>CR: <strong>{{localize (concat 'ALTERNITY.CR.' system.cr)}}</strong></span>
+            </div>
+        </div>
+    </header>
+
+    {{!-- NPC Content --}}
+    <section class="{{alt}}-sheet-body">
+        <div class="{{alt}}-npc-tactics">
+            <label>{{localize 'ALTERNITY.Tactics'}}</label>
+            {{editor system.tactics target="system.tactics" button=true owner=owner editable=editable}}
+        </div>
+        
+        <div class="{{alt}}-abilities-grid">
+            {{#each system.abilities as |val key|}}
+            <div class="{{../alt}}-ability-box">
+                <div class="{{../alt}}-ability-main">
+                    <span class="{{../alt}}-ability-label">{{key}}</span>
+                    <input type="number" class="{{../alt}}-ability-value" value="{{val}}" 
+                           data-action="editState" data-field="abilities.{{key}}" />
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </section>
+</form>

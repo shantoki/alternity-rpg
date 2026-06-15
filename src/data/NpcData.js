@@ -60,7 +60,7 @@ export class NpcData extends foundry.abstract.TypeDataModel {
                 int: abilityField(0),
                 wil: abilityField(0),
                 per: abilityField(0),
-            }),
+            }, { initial: { str: 0, dex: 0, con: 0, int: 0, wil: 0, per: 0 } }),
 
             // ── Resource pools ───────────────────────────────────────────
             stamina:  resourceSchema(20, 20),

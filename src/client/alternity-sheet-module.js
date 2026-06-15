@@ -341,6 +341,11 @@ class AlternitySheetApplication extends foundry.applications.api.HandlebarsAppli
                 width: 540,
                 height: 860
             },
+            // NPC-specific template registration
+            templates: {
+                character: `systems/alternity-v2/templates/actor/actor-sheet.hbs`,
+                npc:       `systems/alternity-v2/templates/actor/actor-npc-sheet.hbs`
+            },
             actions: {
                 switchTab:      this._onTabAction,
                 toggleAbility:  this._onToggleAbilityAction,
@@ -358,7 +363,8 @@ class AlternitySheetApplication extends foundry.applications.api.HandlebarsAppli
                 deleteItem:     this._onDeleteItemAction,
                 editItem:       this._onEditItemAction,
                 rollWeapon:     this._onRollWeaponAction,
-                setPsionicEnergy: this._onPsionicPipAction
+                setPsionicEnergy: this._onPsionicPipAction,
+                editState:      this._onEditStateAction
             }
         });
     }
@@ -377,22 +383,32 @@ class AlternitySheetApplication extends foundry.applications.api.HandlebarsAppli
 
         super(actualOptions);
 
-        const actor = this.document || actualOptions.document;
-        if (!actor) throw new Error('[AlternitySheetApplication] valid actor required.');
-
         this._activeRoller = null;
         this._altState = null;
         this._activeTab = 'character';
         this._skillFilter = '';
     }
 
-    // -----------------------------------------------------------------------
-    // Foundry Application lifecycle
-    // -----------------------------------------------------------------------
-
     /** @override */
     async _prepareContext(options) {
-        this._altState = await getAlternityState(this.actor) || new AlternityCharacterState({ actorId: this.actor.id });
+        const context = await super._prepareContext(options);
+        context.actor = this.document;
+        context.system = this.document.system;
+        context.alt = NS;
+        
+        // NPC vs Character distinction
+        context.isNpc = this.document.type === 'npc';
+        
+        // Dynamic template resolution
+        const templatePath = context.isNpc 
+            ? "systems/alternity-v2/templates/actor/actor-npc-sheet.hbs"
+            : "systems/alternity-v2/templates/actor/actor-sheet.hbs";
+        
+        // Use the registry directly if V2 requires it
+        this.template = templatePath;
+
+        // Load Alternity state
+        this._altState = await getAlternityState(this.document) || new AlternityCharacterState({ actorId: this.document.id });
         const state    = this._altState;
 
         const dur      = state.durability;
@@ -422,17 +438,21 @@ class AlternitySheetApplication extends foundry.applications.api.HandlebarsAppli
                 })),
                 ...state.customSkills.filter(s => s.ability === ab).map(s => ({
                     ...s,
+                    rank: s.rank ?? 0,
                     scores: state.getSkillScores(s.id),
                     isCustom: true
                 }))
             ];
+            skillsByAbility[ab] = allForAb;
+        }
 
-            // Separate psionic skills
+        // Organize into Broad -> Specialties hierarchy
+        for (const ab of ABILITIES) {
+            const allForAb = skillsByAbility[ab];
             const nonPsionic = allForAb.filter(s => !s.isPsionic);
             const psionicOnly = allForAb.filter(s => s.isPsionic);
             psionicSkills.push(...psionicOnly);
 
-            // Organize into Broad -> Specialties hierarchy
             const hierarchy = [];
             const broads = nonPsionic.filter(s => !s.isSpecialty);
             
@@ -470,69 +490,73 @@ class AlternitySheetApplication extends foundry.applications.api.HandlebarsAppli
             });
         }
 
-        // Group items for the sheet
-        const weaponItems = this.actor.items.filter(i => i.type === 'weapon');
-        const armorItems  = this.actor.items.filter(i => i.type === 'armor');
-        const computerItems = this.actor.items.filter(i => i.type === 'computer');
+        // Merge into context
+        context.abilities       = abilities;
+        context.skillsByAbility = skillsByAbility;
+        context.psionicHierarchy = psionicHierarchy;
+        context.state           = state;
+        context.durability = Object.entries(state.resources || {}).map(([key, val]) => ({
+            label: key,
+            current: val?.value || 0,
+            max: val?.max || 0,
+            pct: pct(val?.value || 0, val?.max || 0)
+        }));
 
-        const ctx = {
-            actor: this.actor,
-            alt: NS,
-            abilities,
-            ABILITIES,
-            skillsByAbility,
-            actionCheck:      state.getActionCheckData(),
-            actionsPerRound:  state.getActionsPerRound(),
-            durability: {
-                stun:   { current: dur.stun,   max: dur.stunMax,   pct: pct(dur.stun,   dur.stunMax),   label: 'Stun' },
-                wound:  { current: dur.wound,  max: dur.woundMax,  pct: pct(dur.wound,  dur.woundMax),  label: 'Wound' },
-                mortal: { current: dur.mortal, max: dur.mortalMax, pct: pct(dur.mortal, dur.mortalMax), label: 'Mortal' },
-            },
-            woundLevel:       state.woundLevel,
-            WOUND_LEVELS,
-            WOUND_SEVERITY,
-            woundSeverity:    WOUND_SEVERITY[state.woundLevel] || 'healthy',
-            woundPenalty:     state.getDamageStepPenalty(),
-            isIncapacitated:  state.woundLevel === 'Out',
-            abilitiesList: state.abilitySets.filter(a => a.type === ABILITY_TYPES.STANCE || a.type === ABILITY_TYPES.PASSIVE),
-            actions:  state.abilitySets.filter(a => a.type === ABILITY_TYPES.ACTION),
-            specialRules: state.specialRules,
-            activeTab: this._activeTab,
-            profession: state.profession,
-            career: state.career,
-            background: state.background,
-            armor: state.armor,
-            combatMovement: state.combatMovement || { sprint: 0, run: 0, walk: 0, easySwim: 0, swim: 0, glide: 0, fly: 0 },
-            personalData: state.personalData || { age: '', height: '', weight: '', appearance: '', allegiance: '', socialStatus: '', contacts: '', enemies: '' },
-            achievementTrack: {
-                level: state.achievementTrack?.level || 1,
-                checkmarks: [...Array(23).keys()].map(i => i < (state.achievementTrack?.level || 1))
-            },
-            features: state.features || { usePsionics: false, useMutations: false, useCybertech: false },
-            psionics: state.psionics || { energy: { value: 0, max: 0 }, powers: [] },
-            psionicEnergyTrack: [...Array(state.psionics?.energy?.max || 0).keys()].map(i => i < (state.psionics?.energy?.value || 0)),
-            psionicHierarchy,
-            mutations: state.mutations || { 
-                origin: '', uniqueness: '', points: 0, drawbackPoints: 0, 
-                ordinary: '', good: '', amazing: '', 
-                slightDrawbacks: '', moderateDrawbacks: '', extremeDrawback: '' 
-            },
-            cybertech: state.cybertech || { tolerance: { value: 0, max: 0 }, cykosis: 0, gearInstalled: '' },
-            weaponItems,
-            armorItems,
-            computerItems,
-            inventory: {
-                weapons: weaponItems,
-                armor:   armorItems
-            },
-            ABILITY_TYPES,
-            ACTION_TYPE: ABILITY_TYPES.ACTION,
-            ACTION_ICON: ABILITY_TYPE_ICONS[ABILITY_TYPES.ACTION],
-            ABILITY_TYPE_ICONS,
-            fmtMod,
-            abilityCardTemplate: "systems/alternity-v2/templates/actor/ability-card.hbs"
+        // Group items for the sheet
+        const weaponItems = this.document.items.filter(i => i.type === 'weapon');
+        const armorItems  = this.document.items.filter(i => i.type === 'armor');
+        const computerItems = this.document.items.filter(i => i.type === 'computer');
+
+        context.inventory = {
+            weapons: weaponItems,
+            armor:   armorItems,
+            computers: computerItems
         };
-        return ctx;
+
+        // Context state assignments
+        context.woundLevel       = state.woundLevel;
+        context.WOUND_LEVELS     = WOUND_LEVELS;
+        context.WOUND_SEVERITY   = WOUND_SEVERITY;
+        context.woundSeverity    = WOUND_SEVERITY[state.woundLevel] || 'healthy';
+        context.woundPenalty     = state.getDamageStepPenalty();
+        context.isIncapacitated  = state.woundLevel === 'Out';
+        
+        context.abilitiesList    = state.abilitySets.filter(a => a.type === ABILITY_TYPES.STANCE || a.type === ABILITY_TYPES.PASSIVE);
+        context.actions          = state.abilitySets.filter(a => a.type === ABILITY_TYPES.ACTION);
+        context.specialRules     = state.specialRules;
+        context.activeTab        = this._activeTab || 'character';
+        context.skillFilter      = this._skillFilter || '';
+        context.career           = state.career;
+        context.background       = state.background;
+        context.armor            = state.armor;
+        context.combatMovement   = state.combatMovement || { sprint: 0, run: 0, walk: 0, easySwim: 0, swim: 0, glide: 0, fly: 0 };
+        context.personalData     = state.personalData || { age: '', height: '', weight: '', appearance: '', allegiance: '', socialStatus: '', contacts: '', enemies: '' };
+        
+        context.achievementTrack = {
+            level: state.achievementTrack?.level || 1,
+            checkmarks: [...Array(23).keys()].map(i => i < (state.achievementTrack?.level || 1))
+        };
+        
+        context.features         = state.features || { usePsionics: false, useMutations: false, useCybertech: false };
+        context.psionics         = state.psionics || { energy: { value: 0, max: 0 }, powers: [] };
+        context.psionicEnergyTrack = [...Array(state.psionics?.energy?.max || 0).keys()].map(i => i < (state.psionics?.energy?.value || 0));
+        context.psionicHierarchy = psionicHierarchy;
+        
+        context.mutations        = state.mutations || { 
+            origin: '', uniqueness: '', points: 0, drawbackPoints: 0, 
+            ordinary: '', good: '', amazing: '', 
+            slightDrawbacks: '', moderateDrawbacks: '', extremeDrawback: '' 
+        };
+        context.cybertech        = state.cybertech || { tolerance: { value: 0, max: 0 }, cykosis: 0, gearInstalled: '' };
+
+        context.ABILITY_TYPES    = ABILITY_TYPES;
+        context.ACTION_TYPE      = ABILITY_TYPES.ACTION;
+        context.ACTION_ICON      = ABILITY_TYPE_ICONS[ABILITY_TYPES.ACTION];
+        context.ABILITY_TYPE_ICONS = ABILITY_TYPE_ICONS;
+        context.fmtMod           = fmtMod;
+        context.abilityCardTemplate = "systems/alternity-v2/templates/actor/ability-card.hbs";
+
+        return context;
     }
 
     /** @override */
@@ -875,6 +899,7 @@ class AlternitySheetApplication extends foundry.applications.api.HandlebarsAppli
 
     static _onFilterSkillsAction(event, target) {
         const query = target.value.toLowerCase().trim();
+        console.log(`[Alternity] Filtering skills with query: "${query}"`);
         const html = this.element;
         const groups = html.querySelectorAll(`.${NS}-skill-group`);
 
@@ -919,8 +944,6 @@ class AlternitySheetApplication extends foundry.applications.api.HandlebarsAppli
                 container.hidden = !showBroad && visibleSpecialties === 0;
                 if (!container.hidden) visibleInGroup++;
             });
-
-            // Hide the entire group if no skills match AND the group header doesn't match
             group.hidden = visibleInGroup === 0 && !groupMatches;
         });
     }

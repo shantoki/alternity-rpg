@@ -167,7 +167,6 @@ export class CharacterData extends foundry.abstract.TypeDataModel {
                 initial:  0,
             }),
 
-            // ── New Features (Phase 4) ───────────────────────────────────
             combatMovement: new fields.SchemaField({
                 sprint: new fields.NumberField({ initial: 0 }),
                 run: new fields.NumberField({ initial: 0 }),
@@ -176,7 +175,7 @@ export class CharacterData extends foundry.abstract.TypeDataModel {
                 swim: new fields.NumberField({ initial: 0 }),
                 glide: new fields.NumberField({ initial: 0 }),
                 fly: new fields.NumberField({ initial: 0 }),
-            }),
+            }, { initial: { sprint: 0, run: 0, walk: 0, easySwim: 0, swim: 0, glide: 0, fly: 0 } }),
 
             personalData: new fields.SchemaField({
                 age: new fields.StringField({ initial: '' }),
@@ -187,19 +186,19 @@ export class CharacterData extends foundry.abstract.TypeDataModel {
                 socialStatus: new fields.StringField({ initial: '' }),
                 contacts: new fields.HTMLField({ initial: '' }),
                 enemies: new fields.HTMLField({ initial: '' }),
-            }),
+            }, { initial: { age: '', height: '', weight: '', appearance: '', allegiance: '', socialStatus: '', contacts: '', enemies: '' } }),
 
             achievementTrack: new fields.SchemaField({
                 level: new fields.NumberField({ initial: 1, min: 1 }),
                 pointsSpent: new fields.NumberField({ initial: 0 }),
                 pointsStored: new fields.NumberField({ initial: 0 }),
-            }),
+            }, { initial: { level: 1, pointsSpent: 0, pointsStored: 0 } }),
 
             features: new fields.SchemaField({
                 usePsionics: new fields.BooleanField({ initial: false }),
                 useMutations: new fields.BooleanField({ initial: false }),
                 useCybertech: new fields.BooleanField({ initial: false }),
-            }),
+            }, { initial: { usePsionics: false, useMutations: false, useCybertech: false } }),
 
             psionics: new fields.SchemaField({
                 energy: resourceSchema(0, 0),
@@ -207,7 +206,7 @@ export class CharacterData extends foundry.abstract.TypeDataModel {
                     name: new fields.StringField({ initial: '' }),
                     rank: new fields.NumberField({ initial: 0 }),
                 })),
-            }),
+            }, { initial: { energy: { value: 0, max: 0 }, powers: [] } }),
 
             mutations: new fields.SchemaField({
                 origin: new fields.StringField({ initial: '' }),
@@ -220,13 +219,13 @@ export class CharacterData extends foundry.abstract.TypeDataModel {
                 slightDrawbacks: new fields.HTMLField({ initial: '' }),
                 moderateDrawbacks: new fields.HTMLField({ initial: '' }),
                 extremeDrawback: new fields.HTMLField({ initial: '' }),
-            }),
+            }, { initial: { origin: '', uniqueness: '', points: 0, drawbackPoints: 0, ordinary: '', good: '', amazing: '', slightDrawbacks: '', moderateDrawbacks: '', extremeDrawback: '' } }),
 
             cybertech: new fields.SchemaField({
                 tolerance: resourceSchema(0, 0),
                 cykosis: new fields.NumberField({ initial: 0 }),
                 gearInstalled: new fields.HTMLField({ initial: '' }),
-            }),
+            }, { initial: { tolerance: { value: 0, max: 0 }, cykosis: 0, gearInstalled: '' } }),
 
             computers: new fields.ArrayField(new fields.SchemaField({
                 model: new fields.StringField({ initial: '' }),
@@ -234,7 +233,7 @@ export class CharacterData extends foundry.abstract.TypeDataModel {
                 activeMemory: new fields.NumberField({ initial: 0 }),
                 activeStorage: new fields.NumberField({ initial: 0 }),
                 programs: new fields.HTMLField({ initial: '' }),
-            })),
+            }), { initial: [] }),
         };
     }
 

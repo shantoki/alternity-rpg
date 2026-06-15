@@ -68,5 +68,12 @@
   "ALTERNITY.Activation.Action": "Action",
   "ALTERNITY.Activation.Reaction": "Reaction",
   "ALTERNITY.Activation.Passive": "Passive",
-  "ALTERNITY.Free": "Free"
+  "ALTERNITY.Free": "Free",
+  "ALTERNITY.Defense": "Defense",
+  "ALTERNITY.Attack": "Attack",
+  "ALTERNITY.Tactics": "Tactics",
+  "ALTERNITY.CR.Easy": "Easy",
+  "ALTERNITY.CR.Average": "Average",
+  "ALTERNITY.CR.Tough": "Tough",
+  "ALTERNITY.CR.Overwhelming": "Overwhelming"
 }
