@@ -16,3 +16,8 @@ export const Dialog = globalThis.Dialog;
 export const game = globalThis.game;
 export const Element = globalThis.Element || class {};
 export const DOMPack = globalThis.DOMPack || {};
+export const renderTemplate = (...args) => {
+    const fn = globalThis.foundry?.applications?.handlebars?.renderTemplate || globalThis.renderTemplate;
+    return fn(...args);
+};
+

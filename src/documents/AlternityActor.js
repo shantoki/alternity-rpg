@@ -33,7 +33,7 @@ import {
     ABILITY_TYPES,
 } from '../data/alternity-actor-data.js';
 import { AlternityMathService } from '../services/alternity-math.js';
-import { Actor, Roll, ChatMessage, game } from '../module-info.js';
+import { Actor, Roll, ChatMessage, game, renderTemplate } from '../module-info.js';
 
 // ---------------------------------------------------------------------------
 // AlternityActor
@@ -362,7 +362,7 @@ export class AlternityActor extends Actor {
             speaker: ChatMessage.getSpeaker({ actor: this }),
             content,
             rolls: [roll],
-            type: CONST.CHAT_MESSAGE_TYPES?.ROLL ?? 0
+            style: CONST.CHAT_MESSAGE_STYLES?.ROLL ?? CONST.CHAT_MESSAGE_STYLES?.OTHER ?? 0
         });
 
         // 5. Handle Multiple Actions (Extra Combatants)
@@ -541,7 +541,7 @@ export class AlternityActor extends Actor {
         const messageData = {
             speaker: ChatMessage.getSpeaker({ actor: this }),
             content,
-            type:    CONST.CHAT_MESSAGE_TYPES?.ROLL ?? 0,
+            style:   CONST.CHAT_MESSAGE_STYLES?.ROLL ?? CONST.CHAT_MESSAGE_STYLES?.OTHER ?? 0,
             rolls:   [roll],
             sound:   CONFIG.sounds?.dice,
         };

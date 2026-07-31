@@ -15,6 +15,7 @@ import {
     AlternityCharacterState,
 } from '../data/alternity-actor-data.js';
 import { AlternityMathService, SUCCESS_DEGREES, DIFFICULTY_DCS, SITUATION_DIE_SCALE } from '../services/alternity-math.js';
+import { renderTemplate } from '../module-info.js';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -373,7 +374,7 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
             });
             if (this._skillFilter) this.constructor._onFilterSkillsAction.call(this, null, searchInput);
         }
-        html.querySelectorAll(`.${NS}-ability-name[contenteditable="true"], ..${NS}-ability-desc[contenteditable="true"]`).forEach(el => {
+        html.querySelectorAll(`.${NS}-ability-name[contenteditable="true"], .${NS}-ability-desc[contenteditable="true"]`).forEach(el => {
             el.addEventListener('blur', (e) => this._onAbilityEdit(e));
         });
         html.querySelectorAll(`.${NS}-custom-skill-name[contenteditable="true"]`).forEach(el => {
