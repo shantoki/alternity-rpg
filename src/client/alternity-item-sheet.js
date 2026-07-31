@@ -15,6 +15,9 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
                 resizable: true,
                 width: 500,
                 height: 600
+            },
+            actions: {
+                switchTab: this._onTabAction
             }
         });
     }
@@ -26,12 +29,18 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
         }
     };
 
+    static _onTabAction(event, target) {
+        this._activeTab = target.dataset.tab;
+        this.render();
+    }
+
     /** @override */
     async _prepareContext(options) {
         const context = await super._prepareContext(options);
         context.alt = NS;
         context.system = this.item.system;
-        
+        context.activeTab = this._activeTab || 'description';
+
         // Provide configuration choices for selects
         context.config = {
             weaponTypes: {
@@ -70,8 +79,6 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
 
     /** @override */
     _onRender(context, options) {
-        const html = this.element;
-        // Standard Foundry tabs initialization if needed
-        // (ItemSheetV2 usually handles its own tabs if configured in DEFAULT_OPTIONS)
+        // Tab switching is handled by the switchTab action (see DEFAULT_OPTIONS.actions).
     }
 }
