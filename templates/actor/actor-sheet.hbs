@@ -222,6 +222,58 @@
                     <p class="{{@root.alt}}-empty-state">No armor equipped.</p>
                     {{/each}}
                 </div>
+
+                <header class="{{@root.alt}}-section-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--alt-color-text-muted); margin-top: 24px; margin-bottom: 12px;">
+                    <h3 style="margin: 0; color: var(--alt-color-text-muted); text-transform: uppercase;">Perks &amp; Flaws</h3>
+                    <button type="button" class="{{@root.alt}}-add-btn" data-action="addItem" data-type="perkFlaw" style="padding: 2px 8px; font-size: 11px;">+ Add Perk/Flaw</button>
+                </header>
+                <div class="{{@root.alt}}-perkflaw-grid">
+                    {{#each inventory.perksFlaws as |item|}}
+                    <div class="{{@root.alt}}-item-card perkflaw-card" data-item-id="{{item.id}}">
+                        <img src="{{item.img}}" data-action="editItem" data-item-id="{{item.id}}" title="Edit Item" />
+                        <div class="{{@root.alt}}-item-info">
+                            <span class="{{@root.alt}}-item-name">{{item.name}} <span class="skill-type-tag">{{item.system.category}}</span></span>
+                            <span class="{{@root.alt}}-item-stats">{{item.system.linkedAbility}} | {{item.system.costLabel}}{{#if item.system.requiresCheck}} | {{item.system.activationLabel}}{{/if}}</span>
+                        </div>
+                        <div class="{{@root.alt}}-item-actions">
+                            {{#if item.system.requiresCheck}}
+                            <button type="button" class="{{@root.alt}}-roll-btn" data-action="rollPerkCheck" data-item-id="{{item.id}}" title="Perk Check">⚄</button>
+                            {{/if}}
+                            <button type="button" class="{{@root.alt}}-delete-btn" data-action="deleteItem" data-item-id="{{item.id}}" title="Delete">✕</button>
+                        </div>
+                    </div>
+                    {{else}}
+                    <p class="{{@root.alt}}-empty-state">No perks or flaws.</p>
+                    {{/each}}
+                </div>
+
+                <header class="{{@root.alt}}-section-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--alt-color-text-muted); margin-top: 24px; margin-bottom: 12px;">
+                    <h3 style="margin: 0; color: var(--alt-color-text-muted); text-transform: uppercase;">Personal Equipment</h3>
+                    <button type="button" class="{{@root.alt}}-add-btn" data-action="addItem" data-type="personalEquipment" style="padding: 2px 8px; font-size: 11px;">+ Add Equipment</button>
+                </header>
+                <div class="{{@root.alt}}-equipment-grid">
+                    {{#each inventory.personalEquipment as |item|}}
+                    <div class="{{@root.alt}}-item-card equipment-card" data-item-id="{{item.id}}">
+                        <img src="{{item.img}}" data-action="editItem" data-item-id="{{item.id}}" title="Edit Item" />
+                        <div class="{{@root.alt}}-item-info">
+                            <span class="{{@root.alt}}-item-name">{{item.name}} <span class="skill-type-tag">{{item.system.category}}</span></span>
+                            <span class="{{@root.alt}}-item-stats">
+                                {{item.system.plLabel}}
+                                {{#if item.system.hasBonus}} | {{item.system.bonusDisplay}}{{/if}}
+                                {{#if item.system.isLimitedUse}} | Uses: {{item.system.chargesDisplay}}{{/if}}
+                            </span>
+                        </div>
+                        <div class="{{@root.alt}}-item-actions">
+                            {{#if item.system.isLimitedUse}}
+                            <button type="button" class="{{@root.alt}}-roll-btn" data-action="useCharge" data-item-id="{{item.id}}" title="Use Charge" {{#unless item.system.currentCharges}}disabled{{/unless}}>⚡</button>
+                            {{/if}}
+                            <button type="button" class="{{@root.alt}}-delete-btn" data-action="deleteItem" data-item-id="{{item.id}}" title="Delete">✕</button>
+                        </div>
+                    </div>
+                    {{else}}
+                    <p class="{{@root.alt}}-empty-state">No personal equipment.</p>
+                    {{/each}}
+                </div>
             </div>
         </section>
 

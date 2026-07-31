@@ -178,6 +178,13 @@
                         <input type="number" name="system.cost" value="{{system.cost}}"/>
                     </div>
                 {{/if}}
+
+                <div class="alt-item-summary">
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.PerkFlaw.Cost'}}:</strong> {{system.costLabel}}</span>
+                    {{#if (eq system.category 'Perk')}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.PerkFlaw.ActivationType'}}:</strong> {{system.activationLabel}}</span>
+                    {{/if}}
+                </div>
             {{/if}}
 
             {{#if (eq item.type 'personalEquipment')}}
@@ -220,6 +227,17 @@
                 <div class="form-group">
                     <label>{{localize 'ALTERNITY.PersonalEquipment.PowerNotes'}}</label>
                     <input type="text" name="system.powerNotes" value="{{system.powerNotes}}"/>
+                </div>
+
+                <div class="alt-item-summary">
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.PersonalEquipment.ProgressLevel'}}:</strong> {{system.plLabel}}</span>
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.PersonalEquipment.Cost'}}:</strong> {{system.costDisplay}}</span>
+                    {{#if system.hasBonus}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Bonus'}}:</strong> {{system.bonusDisplay}}</span>
+                    {{/if}}
+                    {{#if system.isLimitedUse}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.PersonalEquipment.MaxCharges'}}:</strong> {{system.chargesDisplay}}</span>
+                    {{/if}}
                 </div>
             {{/if}}
 

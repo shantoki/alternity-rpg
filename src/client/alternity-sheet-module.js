@@ -228,6 +228,8 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
                 deleteItem:     this._onDeleteItemAction,
                 editItem:       this._onEditItemAction,
                 rollWeapon:     this._onRollWeaponAction,
+                rollPerkCheck:  this._onRollPerkCheckAction,
+                useCharge:      this._onUseChargeAction,
                 setPsionicEnergy: this._onPsionicPipAction,
                 editState:      this._onEditStateAction
             }
@@ -320,7 +322,9 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
         context.inventory = {
             weapons: this.document.items.filter(i => i.type === 'weapon'),
             armor:   this.document.items.filter(i => i.type === 'armor'),
-            computers: this.document.items.filter(i => i.type === 'computer')
+            computers: this.document.items.filter(i => i.type === 'computer'),
+            perksFlaws: this.document.items.filter(i => i.type === 'perkFlaw'),
+            personalEquipment: this.document.items.filter(i => i.type === 'personalEquipment')
         };
 
         context.woundLevel       = state.woundLevel;
@@ -559,6 +563,29 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
         const context = item.system.weaponType === 'Melee' ? 'Melee Attack' : 'Ranged Attack';
         const score = this._altState.abilityScores[item.system.attackAbility.toUpperCase()] ?? 10;
         this._openRoller([{ name: item.name, scores: { ordinary: score, good: Math.floor(score/2), amazing: Math.floor(score/4) }, baseStep: item.system.weaponType === 'Melee' ? 0 : 1 }], context, this.element);
+    }
+
+    static async _onRollPerkCheckAction(event, target) {
+        const item = this.actor.items.get(target.dataset.itemId);
+        if (!item || item.type !== 'perkFlaw' || !item.system.requiresCheck) return;
+        const abilityKey = item.system.linkedAbility;
+        if (!['STR', 'DEX', 'CON', 'INT', 'WIL', 'PER'].includes(abilityKey)) {
+            ui.notifications?.warn(`${item.name} has no ability score to check against.`);
+            return;
+        }
+        const score = this._altState.abilityScores[abilityKey] ?? 10;
+        this._openRoller([{ name: item.name, scores: { ordinary: score, good: Math.floor(score/2), amazing: Math.floor(score/4) }, baseStep: 1 }], `${item.name} Perk Check`, this.element);
+    }
+
+    static async _onUseChargeAction(event, target) {
+        const item = this.actor.items.get(target.dataset.itemId);
+        if (!item || item.type !== 'personalEquipment') return;
+        const current = item.system.currentCharges ?? 0;
+        if (current <= 0) {
+            ui.notifications?.warn(`${item.name} has no charges remaining.`);
+            return;
+        }
+        await item.update({ 'system.currentCharges': current - 1 });
     }
 }
 

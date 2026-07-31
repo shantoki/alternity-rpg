@@ -1229,3 +1229,18 @@
     color: var(--alt-color-primary);
 }
 
+.alt-item-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--alt-color-border);
+    border-radius: var(--alt-radius);
+    padding: 6px 10px;
+    margin-bottom: 10px;
+    font-size: 11px;
+}
+
+.alt-item-summary-entry { color: var(--alt-color-text); }
+.alt-item-summary-entry strong { color: var(--alt-color-primary); }
+
