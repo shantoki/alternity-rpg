@@ -121,6 +121,108 @@
                 </div>
             {{/if}}
 
+            {{#if (eq item.type 'perkFlaw')}}
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.PerkFlaw.Category'}}</label>
+                        <select name="system.category">
+                            {{selectOptions config.perkFlawCategories selected=system.category}}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.PerkFlaw.LinkedAbility'}}</label>
+                        <select name="system.linkedAbility">
+                            {{selectOptions config.perkFlawAbilities selected=system.linkedAbility}}
+                        </select>
+                    </div>
+                </div>
+
+                {{#if (eq system.category 'Perk')}}
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.PerkFlaw.ActivationType'}}</label>
+                        <select name="system.activationType">
+                            {{selectOptions config.perkFlawActivationTypes selected=system.activationType}}
+                        </select>
+                    </div>
+                {{/if}}
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="system.isTiered" {{#if system.isTiered}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.PerkFlaw.IsTiered'}}
+                    </label>
+                </div>
+
+                {{#if system.isTiered}}
+                    <div class="grid grid-3col">
+                        <div class="form-group">
+                            <label>{{localize 'ALTERNITY.PerkFlaw.TierCost'}} 1</label>
+                            <input type="number" name="system.tierCosts.0" value="{{lookup system.tierCosts 0}}"/>
+                        </div>
+                        <div class="form-group">
+                            <label>{{localize 'ALTERNITY.PerkFlaw.TierCost'}} 2</label>
+                            <input type="number" name="system.tierCosts.1" value="{{lookup system.tierCosts 1}}"/>
+                        </div>
+                        <div class="form-group">
+                            <label>{{localize 'ALTERNITY.PerkFlaw.TierCost'}} 3</label>
+                            <input type="number" name="system.tierCosts.2" value="{{lookup system.tierCosts 2}}"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.PerkFlaw.CurrentTier'}}</label>
+                        <input type="number" name="system.currentTier" value="{{system.currentTier}}" min="0" max="3"/>
+                    </div>
+                {{else}}
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.PerkFlaw.Cost'}}</label>
+                        <input type="number" name="system.cost" value="{{system.cost}}"/>
+                    </div>
+                {{/if}}
+            {{/if}}
+
+            {{#if (eq item.type 'personalEquipment')}}
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.PersonalEquipment.Category'}}</label>
+                        <select name="system.category">
+                            {{selectOptions config.personalEquipmentCategories selected=system.category}}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.PersonalEquipment.ProgressLevel'}}</label>
+                        <input type="number" name="system.progressLevel" value="{{system.progressLevel}}" min="0" max="8"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.PersonalEquipment.Cost'}}</label>
+                    <input type="number" name="system.cost" value="{{system.cost}}" min="0"/>
+                </div>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.PersonalEquipment.BonusSkill'}}</label>
+                        <input type="text" name="system.bonusSkill" value="{{system.bonusSkill}}"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.PersonalEquipment.BonusValue'}}</label>
+                        <input type="number" name="system.bonusValue" value="{{system.bonusValue}}"/>
+                    </div>
+                </div>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.PersonalEquipment.MaxCharges'}}</label>
+                        <input type="number" name="system.maxCharges" value="{{system.maxCharges}}" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.PersonalEquipment.CurrentCharges'}}</label>
+                        <input type="number" name="system.currentCharges" value="{{system.currentCharges}}" min="0"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.PersonalEquipment.PowerNotes'}}</label>
+                    <input type="text" name="system.powerNotes" value="{{system.powerNotes}}"/>
+                </div>
+            {{/if}}
+
             <div class="form-group">
                 <label>{{localize 'ALTERNITY.Mass'}}</label>
                 <input type="number" name="system.mass" value="{{system.mass}}" step="0.1"/>

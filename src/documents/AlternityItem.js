@@ -45,6 +45,8 @@ export class AlternityItem extends Item {
             case 'armor':  return this._prepareArmorData();
             case 'skill':  return this._prepareSkillData();
             case 'effect': return this._prepareEffectData();
+            case 'perkFlaw': return this._preparePerkFlawData();
+            case 'personalEquipment': return this._preparePersonalEquipmentData();
         }
     }
 
@@ -163,6 +165,30 @@ export class AlternityItem extends Item {
         if (sys.techPointCost > 0) costs.push(`${sys.techPointCost} TP`);
         if (sys.psiPointCost  > 0) costs.push(`${sys.psiPointCost} PP`);
         sys.costDisplay = costs.length ? costs.join(', ') : game.i18n.localize('ALTERNITY.Free');
+    }
+
+    /**
+     * Compute display labels for the Perk/Flaw sheet (Player's Handbook Ch. 5/6).
+     * @private
+     */
+    _preparePerkFlawData() {
+        const sys = this.system;
+
+        sys.costLabel = sys.isFlaw
+            ? `+${sys.costDisplay} SP`
+            : `${sys.costDisplay} SP`;
+
+        sys.activationLabel = sys.isPerk ? sys.activationType : '—';
+    }
+
+    /**
+     * Compute display labels for the Personal Equipment sheet
+     * (Player's Handbook Ch. 9 comms/medical/professional/sensor/survival gear).
+     * @private
+     */
+    _preparePersonalEquipmentData() {
+        const sys = this.system;
+        sys.equippedLabel = sys.isEquipped ? game.i18n.localize('ALTERNITY.Equipped') : game.i18n.localize('ALTERNITY.Stowed');
     }
 
     // -----------------------------------------------------------------------
@@ -385,7 +411,7 @@ export class AlternityItem extends Item {
 
     /** True if this item type supports equipping. */
     get isEquippable() {
-        return ['weapon', 'armor'].includes(this.type);
+        return ['weapon', 'armor', 'personalEquipment'].includes(this.type);
     }
 
     /** True if this item is currently equipped (weapons or armor only). */

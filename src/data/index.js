@@ -8,3 +8,5 @@ export * from './ArmorData.js';
 export * from './SkillData.js';
 export * from './EffectData.js';
 export * from './ComputerData.js';
+export * from './PerkFlawData.js';
+export * from './PersonalEquipmentData.js';

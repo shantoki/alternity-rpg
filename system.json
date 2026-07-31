@@ -37,7 +37,9 @@
       "armor": {},
       "skill": {},
       "effect": {},
-      "computer": {}
+      "computer": {},
+      "perkFlaw": {},
+      "personalEquipment": {}
     }
   }
 }

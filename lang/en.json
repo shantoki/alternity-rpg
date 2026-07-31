@@ -114,5 +114,20 @@
   "ALTERNITY.Warship.SystemsInZone": "Systems in this zone",
   "ALTERNITY.Warship.KnockedOut": "Knocked Out",
   "ALTERNITY.Warship.TrackingCapacity": "Tracking",
-  "ALTERNITY.Warship.Notes": "GM Notes"
+  "ALTERNITY.Warship.Notes": "GM Notes",
+  "ALTERNITY.PerkFlaw.Category": "Category",
+  "ALTERNITY.PerkFlaw.LinkedAbility": "Linked Ability",
+  "ALTERNITY.PerkFlaw.ActivationType": "Type",
+  "ALTERNITY.PerkFlaw.Cost": "Cost (SP)",
+  "ALTERNITY.PerkFlaw.IsTiered": "Tiered (multiple purchase levels)",
+  "ALTERNITY.PerkFlaw.TierCost": "Tier Cost",
+  "ALTERNITY.PerkFlaw.CurrentTier": "Purchased Tier",
+  "ALTERNITY.PersonalEquipment.Category": "Category",
+  "ALTERNITY.PersonalEquipment.ProgressLevel": "Progress Level",
+  "ALTERNITY.PersonalEquipment.Cost": "Cost ($)",
+  "ALTERNITY.PersonalEquipment.BonusSkill": "Bonus Skill",
+  "ALTERNITY.PersonalEquipment.BonusValue": "Bonus Value",
+  "ALTERNITY.PersonalEquipment.MaxCharges": "Max Uses",
+  "ALTERNITY.PersonalEquipment.CurrentCharges": "Uses Remaining",
+  "ALTERNITY.PersonalEquipment.PowerNotes": "Power Source / Battery Life"
 }

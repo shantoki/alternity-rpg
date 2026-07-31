@@ -44,6 +44,13 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
                 'Ballistic', 'Energy', 'Laser', 'Piercing', 'Slashing',
                 'Impact', 'Incendiary', 'Toxic', 'Radiation', 'Psionic',
             ].reduce((obj, val) => { obj[val] = val; return obj; }, {}),
+            perkFlawCategories: { Perk: 'Perk', Flaw: 'Flaw' },
+            perkFlawAbilities: ['STR', 'DEX', 'CON', 'INT', 'WIL', 'PER', 'Special', 'None']
+                .reduce((obj, val) => { obj[val] = val; return obj; }, {}),
+            perkFlawActivationTypes: { Active: 'Active', Conscious: 'Conscious' },
+            personalEquipmentCategories: [
+                'Communications', 'Medical', 'Professional', 'Sensors', 'Survival', 'Clothing', 'Miscellaneous',
+            ].reduce((obj, val) => { obj[val] = val; return obj; }, {}),
             skills: {} // To be populated if needed
         };
 

@@ -21,6 +21,8 @@ import {
     SkillData,
     EffectData,
     ComputerData,
+    PerkFlawData,
+    PersonalEquipmentData,
 } from './data/index.js';
 
 // ── Logic / hooks ───────────────────────────────────────────────────────────
@@ -56,6 +58,8 @@ Hooks.once('init', async () => {
     CONFIG.Item.dataModels.skill  = SkillData;
     CONFIG.Item.dataModels.effect = EffectData;
     CONFIG.Item.dataModels.computer = ComputerData;
+    CONFIG.Item.dataModels.perkFlaw = PerkFlawData;
+    CONFIG.Item.dataModels.personalEquipment = PersonalEquipmentData;
 
     // ── 3. Initiative formula ───────────────────────────────────────────────
     // The actual roll logic is in AlternityActor.rollInitiative.
