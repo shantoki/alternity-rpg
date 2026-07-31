@@ -1,0 +1,301 @@
+<form class="{{cssClass}} {{alt}}-sheet {{alt}}-warship-sheet" autocomplete="off">
+    {{!-- Warship Sheet Header --}}
+    <header class="{{alt}}-sheet-header">
+        <div class="{{alt}}-sheet-portrait">
+            <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
+        </div>
+        <div class="{{alt}}-sheet-identity">
+            <h1 class="{{alt}}-sheet-name">
+                <input name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'Name'}}" spellcheck="false" />
+            </h1>
+            <div class="{{alt}}-sheet-meta">
+                <div class="{{alt}}-meta-field">
+                    <label>{{localize 'ALTERNITY.Warship.HullType'}}</label>
+                    <input type="text" name="system.hullType" value="{{system.hullType}}" list="alt-hull-type-list" />
+                    <datalist id="alt-hull-type-list">
+                        {{#each hullTypeChoices.Military as |choice|}}<option value="{{choice}}">{{/each}}
+                        {{#each hullTypeChoices.Civilian as |choice|}}<option value="{{choice}}">{{/each}}
+                    </datalist>
+                </div>
+                <div class="{{alt}}-meta-field">
+                    <label>{{localize 'ALTERNITY.Warship.HullCategory'}}</label>
+                    <select name="system.hullCategory">
+                        {{#each hullCategoryChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq ../system.hullCategory choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="{{alt}}-meta-field">
+                    <label>{{localize 'ALTERNITY.Warship.Toughness'}}</label>
+                    <select name="system.toughness">
+                        {{#each toughnessChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq ../system.toughness choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <span class="{{alt}}-ship-status-badge {{alt}}-ship-status--{{system.shipStatus}}" title="{{lookup (lookup shipStatusEffects system.shipStatus) 'text'}}">
+                    {{system.shipStatus}}
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="{{alt}}-sheet-body">
+        {{!-- Damage tracks --}}
+        <section class="{{alt}}-resources">
+            <div class="{{alt}}-resource-bar bar--stun" data-resource="stun">
+                <div class="{{alt}}-bar-label">
+                    <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.Stun'}}</span>
+                    <span class="{{alt}}-bar-values">
+                        <input type="number" name="system.damage.stun.value" value="{{system.damage.stun.value}}" min="0" max="{{system.damage.stun.max}}" />
+                        <span class="{{alt}}-bar-sep">/</span>
+                        <input type="number" name="system.damage.stun.max" value="{{system.damage.stun.max}}" min="0" />
+                    </span>
+                    <span class="{{alt}}-damage-quick">
+                        <button type="button" data-action="setDamage" data-track="stun" data-delta="-1">-1</button>
+                        <button type="button" data-action="setDamage" data-track="stun" data-delta="1">+1</button>
+                    </span>
+                </div>
+                <div class="{{alt}}-bar-track"><div class="{{alt}}-bar-fill" style="width: {{system.stunPct}}%"></div></div>
+            </div>
+
+            <div class="{{alt}}-resource-bar bar--wound" data-resource="wound">
+                <div class="{{alt}}-bar-label">
+                    <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.Wound'}}</span>
+                    <span class="{{alt}}-bar-values">
+                        <input type="number" name="system.damage.wound.value" value="{{system.damage.wound.value}}" min="0" max="{{system.damage.wound.max}}" />
+                        <span class="{{alt}}-bar-sep">/</span>
+                        <input type="number" name="system.damage.wound.max" value="{{system.damage.wound.max}}" min="0" />
+                    </span>
+                    <span class="{{alt}}-damage-quick">
+                        <button type="button" data-action="setDamage" data-track="wound" data-delta="-1">-1</button>
+                        <button type="button" data-action="setDamage" data-track="wound" data-delta="1">+1</button>
+                    </span>
+                </div>
+                <div class="{{alt}}-bar-track"><div class="{{alt}}-bar-fill" style="width: {{system.woundPct}}%"></div></div>
+            </div>
+
+            <div class="{{alt}}-resource-bar bar--mortal" data-resource="mortal">
+                <div class="{{alt}}-bar-label">
+                    <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.Mortal'}}</span>
+                    <span class="{{alt}}-bar-values">
+                        <input type="number" name="system.damage.mortal.value" value="{{system.damage.mortal.value}}" min="0" max="{{system.damage.mortal.max}}" />
+                        <span class="{{alt}}-bar-sep">/</span>
+                        <input type="number" name="system.damage.mortal.max" value="{{system.damage.mortal.max}}" min="0" />
+                    </span>
+                    <span class="{{alt}}-damage-quick">
+                        <button type="button" data-action="setDamage" data-track="mortal" data-delta="-1">-1</button>
+                        <button type="button" data-action="setDamage" data-track="mortal" data-delta="1">+1</button>
+                    </span>
+                </div>
+                <div class="{{alt}}-bar-track"><div class="{{alt}}-bar-fill" style="width: {{system.mortalPct}}%"></div></div>
+            </div>
+
+            <div class="{{alt}}-resource-bar bar--critical" data-resource="critical">
+                <div class="{{alt}}-bar-label">
+                    <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.Warship.Critical'}}</span>
+                    <span class="{{alt}}-bar-values">
+                        <input type="number" name="system.damage.critical.value" value="{{system.damage.critical.value}}" min="0" max="{{system.damage.critical.max}}" />
+                        <span class="{{alt}}-bar-sep">/</span>
+                        <input type="number" name="system.damage.critical.max" value="{{system.damage.critical.max}}" min="0" />
+                    </span>
+                    <span class="{{alt}}-damage-quick">
+                        <button type="button" data-action="setDamage" data-track="critical" data-delta="-1">-1</button>
+                        <button type="button" data-action="setDamage" data-track="critical" data-delta="1">+1</button>
+                    </span>
+                </div>
+                <div class="{{alt}}-bar-track"><div class="{{alt}}-bar-fill" style="width: {{system.criticalPct}}%"></div></div>
+            </div>
+        </section>
+
+        {{!-- Armor / Power / Stats --}}
+        <section class="{{alt}}-stats-grid">
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Armor.LI'}}</label>
+                <input type="text" name="system.armor.lowImpact" value="{{system.armor.lowImpact}}" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Armor.HI'}}</label>
+                <input type="text" name="system.armor.highImpact" value="{{system.armor.highImpact}}" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Armor.EN'}}</label>
+                <input type="text" name="system.armor.energy" value="{{system.armor.energy}}" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Warship.ArmorType'}}</label>
+                <input type="text" name="system.armor.armorType" value="{{system.armor.armorType}}" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Warship.PowerGenerated'}}</label>
+                <input type="number" name="system.power.generated" value="{{system.power.generated}}" min="0" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Warship.PowerConsumed'}}</label>
+                <input type="number" name="system.power.consumed" value="{{system.power.consumed}}" min="0" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Warship.PowerSurplus'}}</label>
+                <strong class="{{#if system.isPowerDeficit}}{{alt}}-power-deficit{{/if}}">{{system.powerSurplus}}</strong>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Warship.Edge'}}</label>
+                <input type="number" name="system.edge" value="{{system.edge}}" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Maneuver'}}</label>
+                <input type="number" name="system.maneuverClass" value="{{system.maneuverClass}}" min="0" max="4" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Warship.Acceleration'}}</label>
+                <input type="number" name="system.acceleration" value="{{system.acceleration}}" min="0" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Crew'}}</label>
+                <div class="{{alt}}-crew-fields">
+                    <input type="number" name="system.crew.current" value="{{system.crew.current}}" min="0" />
+                    <span>/</span>
+                    <input type="number" name="system.crew.estimate" value="{{system.crew.estimate}}" min="0" />
+                </div>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Warship.HullPoints'}}</label>
+                <div class="{{alt}}-crew-fields">
+                    <input type="number" name="system.hullPoints.base" value="{{system.hullPoints.base}}" min="0" />
+                    <span>+</span>
+                    <input type="number" name="system.hullPoints.bonus" value="{{system.hullPoints.bonus}}" min="0" />
+                </div>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Warship.Cost'}}</label>
+                <input type="text" name="system.cost" value="{{system.cost}}" />
+            </div>
+        </section>
+
+        {{!-- Systems table --}}
+        <section class="{{alt}}-warship-table-section">
+            <h3>{{localize 'ALTERNITY.Warship.Systems'}} <button type="button" data-action="addSystemRow" data-array="systems">+</button></h3>
+            <div class="{{alt}}-warship-table">
+                {{#each system.systems as |row idx|}}
+                <div class="{{alt}}-warship-table-row">
+                    <select name="system.systems.{{idx}}.category">
+                        {{#each ../systemCategoryChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.category choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                    <input type="text" name="system.systems.{{idx}}.name" value="{{row.name}}" placeholder="{{localize 'ALTERNITY.Name'}}" />
+                    <input type="number" name="system.systems.{{idx}}.hullPoints" value="{{row.hullPoints}}" min="0" title="{{localize 'ALTERNITY.Warship.HullPoints'}}" />
+                    <input type="number" name="system.systems.{{idx}}.powerReq" value="{{row.powerReq}}" title="{{localize 'ALTERNITY.Warship.PowerReq'}}" />
+                    <input type="text" name="system.systems.{{idx}}.cost" value="{{row.cost}}" placeholder="{{localize 'ALTERNITY.Warship.Cost'}}" />
+                    <button type="button" data-action="deleteSystemRow" data-array="systems" data-index="{{idx}}">✕</button>
+                </div>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- Weapons --}}
+        <section class="{{alt}}-warship-table-section">
+            <h3>{{localize 'ALTERNITY.Warship.Weapons'}} <button type="button" data-action="addSystemRow" data-array="weapons">+</button></h3>
+            <div class="{{alt}}-warship-table">
+                {{#each system.weapons as |row idx|}}
+                <div class="{{alt}}-warship-table-row">
+                    <input type="text" name="system.weapons.{{idx}}.name" value="{{row.name}}" placeholder="{{localize 'ALTERNITY.Name'}}" />
+                    <select name="system.weapons.{{idx}}.fireMode">
+                        {{#each ../fireModeChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.fireMode choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                    <select name="system.weapons.{{idx}}.arc">
+                        {{#each ../arcChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.arc choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                    <select name="system.weapons.{{idx}}.firepowerClass">
+                        {{#each ../firepowerClassChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.firepowerClass choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                    <input type="text" name="system.weapons.{{idx}}.damageFormula" value="{{row.damageFormula}}" placeholder="{{localize 'ALTERNITY.DamageFormula'}}" />
+                    <select name="system.weapons.{{idx}}.damageType">
+                        {{#each ../damageTypeChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.damageType choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                    <select name="system.weapons.{{idx}}.damageGrade">
+                        {{#each ../damageGradeChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.damageGrade choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                    <input type="number" name="system.weapons.{{idx}}.hullPoints" value="{{row.hullPoints}}" min="0" title="{{localize 'ALTERNITY.Warship.HullPoints'}}" />
+                    <input type="number" name="system.weapons.{{idx}}.powerReq" value="{{row.powerReq}}" title="{{localize 'ALTERNITY.Warship.PowerReq'}}" />
+                    <input type="text" name="system.weapons.{{idx}}.cost" value="{{row.cost}}" placeholder="{{localize 'ALTERNITY.Warship.Cost'}}" />
+                    <button type="button" data-action="rollShipWeapon" data-index="{{idx}}" title="{{localize 'ALTERNITY.Roll.Roll'}}">🎲</button>
+                    <button type="button" data-action="deleteSystemRow" data-array="weapons" data-index="{{idx}}">✕</button>
+                </div>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- Defenses --}}
+        <section class="{{alt}}-warship-table-section">
+            <h3>{{localize 'ALTERNITY.Warship.Defenses'}} <button type="button" data-action="addSystemRow" data-array="defenses">+</button></h3>
+            <div class="{{alt}}-warship-table">
+                {{#each system.defenses as |row idx|}}
+                <div class="{{alt}}-warship-table-row">
+                    <input type="text" name="system.defenses.{{idx}}.name" value="{{row.name}}" placeholder="{{localize 'ALTERNITY.Name'}}" />
+                    <input type="text" name="system.defenses.{{idx}}.effectText" value="{{row.effectText}}" placeholder="{{localize 'ALTERNITY.Details'}}" />
+                    <input type="number" name="system.defenses.{{idx}}.hullPoints" value="{{row.hullPoints}}" min="0" title="{{localize 'ALTERNITY.Warship.HullPoints'}}" />
+                    <input type="number" name="system.defenses.{{idx}}.powerReq" value="{{row.powerReq}}" title="{{localize 'ALTERNITY.Warship.PowerReq'}}" />
+                    <input type="text" name="system.defenses.{{idx}}.cost" value="{{row.cost}}" placeholder="{{localize 'ALTERNITY.Warship.Cost'}}" />
+                    <button type="button" data-action="deleteSystemRow" data-array="defenses" data-index="{{idx}}">✕</button>
+                </div>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- Sensors --}}
+        <section class="{{alt}}-warship-table-section">
+            <h3>{{localize 'ALTERNITY.Warship.Sensors'}} <button type="button" data-action="addSystemRow" data-array="sensors">+</button></h3>
+            <div class="{{alt}}-warship-table">
+                {{#each system.sensors as |row idx|}}
+                <div class="{{alt}}-warship-table-row">
+                    <input type="text" name="system.sensors.{{idx}}.name" value="{{row.name}}" placeholder="{{localize 'ALTERNITY.Name'}}" />
+                    <input type="number" name="system.sensors.{{idx}}.trackingCapacity" value="{{row.trackingCapacity}}" min="0" title="{{localize 'ALTERNITY.Warship.TrackingCapacity'}}" />
+                    <input type="number" name="system.sensors.{{idx}}.hullPoints" value="{{row.hullPoints}}" min="0" title="{{localize 'ALTERNITY.Warship.HullPoints'}}" />
+                    <input type="number" name="system.sensors.{{idx}}.powerReq" value="{{row.powerReq}}" title="{{localize 'ALTERNITY.Warship.PowerReq'}}" />
+                    <input type="text" name="system.sensors.{{idx}}.cost" value="{{row.cost}}" placeholder="{{localize 'ALTERNITY.Warship.Cost'}}" />
+                    <button type="button" data-action="deleteSystemRow" data-array="sensors" data-index="{{idx}}">✕</button>
+                </div>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- Hit-location zones ("damage diagram") --}}
+        <section class="{{alt}}-warship-table-section">
+            <h3>{{localize 'ALTERNITY.Warship.Zones'}} <button type="button" data-action="addSystemRow" data-array="zones">+</button></h3>
+            <div class="{{alt}}-warship-table">
+                {{#each system.zones as |row idx|}}
+                <div class="{{alt}}-warship-table-row {{#if row.isKnockedOut}}{{alt}}-zone-knocked-out{{/if}}">
+                    <input type="text" name="system.zones.{{idx}}.label" value="{{row.label}}" placeholder="F / FP / FC / ..." class="{{alt}}-zone-label" />
+                    <input type="number" name="system.zones.{{idx}}.hullPointLimit" value="{{row.hullPointLimit}}" min="0" title="{{localize 'ALTERNITY.Warship.HullPointLimit'}}" />
+                    <input type="number" name="system.zones.{{idx}}.hullPointsUsed" value="{{row.hullPointsUsed}}" min="0" title="{{localize 'ALTERNITY.Warship.HullPointsUsed'}}" />
+                    <input type="text" name="system.zones.{{idx}}.systemsText" value="{{row.systemsText}}" placeholder="{{localize 'ALTERNITY.Warship.SystemsInZone'}}" class="{{alt}}-zone-systems-text" />
+                    <label class="{{alt}}-zone-knockout-toggle">
+                        <input type="checkbox" name="system.zones.{{idx}}.isKnockedOut" {{#if row.isKnockedOut}}checked{{/if}} />
+                        {{localize 'ALTERNITY.Warship.KnockedOut'}}
+                    </label>
+                    <button type="button" data-action="deleteSystemRow" data-array="zones" data-index="{{idx}}">✕</button>
+                </div>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- GM notes --}}
+        <section class="{{alt}}-warship-notes">
+            <label>{{localize 'ALTERNITY.Warship.Notes'}}</label>
+            {{editor system.notes target="system.notes" button=true owner=owner editable=editable}}
+            <label>{{localize 'ALTERNITY.Description'}}</label>
+            {{editor system.description target="system.description" button=true owner=owner editable=editable}}
+        </section>
+    </main>
+</form>

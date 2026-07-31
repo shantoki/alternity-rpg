@@ -29,7 +29,8 @@
     "Actor": {
       "character": {},
       "npc": {},
-      "vehicle": {}
+      "vehicle": {},
+      "warship": {}
     },
     "Item": {
       "weapon": {},

@@ -33,7 +33,7 @@ import {
     ABILITY_TYPES,
 } from '../data/alternity-actor-data.js';
 import { AlternityMathService } from '../services/alternity-math.js';
-import { Actor, Roll, ChatMessage, game, renderTemplate } from '../module-info.js';
+import { Actor, Roll, ChatMessage, Hooks, game, renderTemplate } from '../module-info.js';
 
 // ---------------------------------------------------------------------------
 // AlternityActor
@@ -73,6 +73,7 @@ export class AlternityActor extends Actor {
         this.system.isCharacter = this.type === 'character';
         this.system.isNpc       = this.type === 'npc';
         this.system.isVehicle   = this.type === 'vehicle';
+        this.system.isWarship   = this.type === 'warship';
     }
 
     /**
@@ -88,6 +89,7 @@ export class AlternityActor extends Actor {
             case 'character': return this._prepareCharacterData();
             case 'npc':       return this._prepareNpcData();
             case 'vehicle':   return this._prepareVehicleData();
+            case 'warship':   return this._prepareWarshipData();
         }
     }
 
@@ -152,6 +154,17 @@ export class AlternityActor extends Actor {
     }
 
     /**
+     * Derive warship stats. WarshipData.prepareDerivedData() already computes
+     * damage percentages and shipStatus; this method exists for symmetry with
+     * the other type branches and as a hook point for future cross-item
+     * concerns (Phase 2 embedded-item sums, once ship systems become Items).
+     * @private
+     */
+    _prepareWarshipData() {
+        // Intentionally minimal — see WarshipData.prepareDerivedData().
+    }
+
+    /**
      * Compute percentage (0–100) for a resource object with value/max.
      * @param {{ value: number, max: number }} resource
      * @returns {number}
@@ -199,7 +212,8 @@ export class AlternityActor extends Actor {
      * @private
      */
     async _syncSystemFromState(state) {
-        if (this.type === 'vehicle') return; // vehicles don't use AlternityCharacterState
+        // vehicles and warships don't use AlternityCharacterState
+        if (this.type === 'vehicle' || this.type === 'warship') return;
 
         const updates = {
             'system.woundLevel':        state.woundLevel,
@@ -499,6 +513,115 @@ export class AlternityActor extends Actor {
         });
 
         return { finalDamage, mitigated, modifierTrace, woundLevelChanged, newWoundLevel };
+    }
+
+    /**
+     * Apply ship-combat damage to this warship actor (Warships Ch.1: "Firepower
+     * and Toughness" / "Effects of Damage"). Resolves the firepower-vs-toughness
+     * grade shift, negates damage with the ship's rolled armor value for the
+     * given damage type, applies the rulebook's 2-for-1 overflow cascade
+     * (excess stun -> wound, excess wound -> mortal, excess mortal -> critical),
+     * and persists the updated damage track.
+     *
+     * Armor dice must already be rolled by the caller (this method stays pure
+     * of dice-rolling, matching the "no dice logic outside the roll pipeline"
+     * constraint) — pass the rolled result via options.armorRoll.
+     *
+     * @param {number} rawDamage       - Unmitigated damage roll result.
+     * @param {string} damageType      - 'lowImpact' | 'highImpact' | 'energy'.
+     * @param {string} firepowerClass  - Attacking weapon's firepower class (SHIP_TOUGHNESS_CLASSES).
+     * @param {object} [options]
+     * @param {string} [options.damageGrade='wound'] - Base damage grade before any shift.
+     * @param {number} [options.armorRoll=0]         - Already-rolled armor die result for damageType.
+     * @param {string} [options.context='Ship Combat'] - Log context.
+     * @returns {Promise<{ finalDamage: number, finalGrade: string, multiplier: number, newShipStatus: string, modifierTrace: object[] }|null>}
+     */
+    async applyWarshipDamage(rawDamage, damageType, firepowerClass, options = {}) {
+        if (this.type !== 'warship') return null;
+
+        const context     = options.context ?? 'Ship Combat';
+        const damageGrade  = options.damageGrade ?? 'wound';
+        const armorRoll    = options.armorRoll ?? 0;
+        const sys          = this.system;
+
+        const shiftResult = AlternityMathService.calculateFirepowerShift(
+            damageGrade, firepowerClass, sys.toughness
+        );
+
+        if (shiftResult.finalGrade === 'none') {
+            return {
+                finalDamage: 0, finalGrade: 'none', multiplier: shiftResult.multiplier,
+                newShipStatus: sys.shipStatus, modifierTrace: shiftResult.modifierTrace,
+            };
+        }
+
+        const gradedRawDamage = rawDamage * shiftResult.multiplier;
+
+        const armorRatings = {
+            lowImpact:  Number(sys.armor.lowImpact)  || 0,
+            highImpact: Number(sys.armor.highImpact) || 0,
+            energy:     Number(sys.armor.energy)     || 0,
+        };
+        armorRatings[damageType] = armorRoll;
+
+        const { finalDamage, modifierTrace, mitigated } = AlternityMathService.calculateShipDamageMitigation(
+            gradedRawDamage, damageType, armorRatings, context
+        );
+
+        // Apply to the graded track, cascading overflow 2-for-1 into the next-worse track
+        // (Warships Ch.1: Shaken/Disabled/Crippled overflow rules).
+        const TRACK_ORDER = ['stun', 'wound', 'mortal', 'critical'];
+        let remaining = finalDamage;
+        let idx = TRACK_ORDER.indexOf(shiftResult.finalGrade);
+        const updates = {};
+
+        while (remaining > 0 && idx < TRACK_ORDER.length) {
+            const track = TRACK_ORDER[idx];
+            const current = sys.damage[track];
+            const room = Math.max(0, current.max - current.value);
+            const applied = Math.min(room, remaining);
+            updates[`system.damage.${track}.value`] = current.value + applied;
+            remaining -= applied;
+
+            if (remaining > 0) {
+                // Track is full — excess bleeds 2-for-1 into the next-worse track.
+                remaining = Math.floor(remaining / 2);
+                idx += 1;
+            }
+        }
+
+        await this.update(updates);
+
+        console.log(
+            `[Alternity] ${this.name} took ${finalDamage} ${shiftResult.finalGrade} damage ` +
+            `(${damageType}, ${firepowerClass} vs ${sys.toughness}) (${gradedRawDamage} graded, ${mitigated} mitigated). ` +
+            `Status: ${this.system.shipStatus}.`
+        );
+
+        Hooks.callAll('alternity:shipDamageApplied', this, {
+            rawDamage, gradedRawDamage, finalDamage, mitigated, damageType, firepowerClass,
+            finalGrade: shiftResult.finalGrade, multiplier: shiftResult.multiplier,
+            modifierTrace: [...shiftResult.modifierTrace, ...modifierTrace],
+            newShipStatus: this.system.shipStatus,
+        });
+
+        return {
+            finalDamage,
+            finalGrade: shiftResult.finalGrade,
+            multiplier: shiftResult.multiplier,
+            newShipStatus: this.system.shipStatus,
+            modifierTrace: [...shiftResult.modifierTrace, ...modifierTrace],
+        };
+    }
+
+    /**
+     * True when this warship's damage track has crossed into Disabled, Crippled,
+     * or Destroyed (Warships Ch.1 "Effects of Damage").
+     * @returns {boolean}
+     */
+    get isWarshipDisabled() {
+        if (this.type !== 'warship') return false;
+        return ['Disabled', 'Crippled', 'Destroyed'].includes(this.system?.shipStatus);
     }
 
     // -----------------------------------------------------------------------

@@ -50,6 +50,16 @@ const SUCCESS_DEGREES = Object.freeze({
 });
 
 /**
+ * Ship toughness/firepower classes, ordered small → large (Warships Ch.1).
+ */
+const SHIP_TOUGHNESS_CLASSES = Object.freeze(['SmallCraft', 'Light', 'Medium', 'Heavy', 'SuperHeavy']);
+
+/**
+ * Ship damage grades, ordered least → most severe (Warships Ch.1).
+ */
+const SHIP_DAMAGE_GRADES = Object.freeze(['stun', 'wound', 'mortal', 'critical']);
+
+/**
  * Situation Die Steps Scale (Fastplay Accurate).
  * Index maps total step to [sign, dieLabel, formula]
  */
@@ -280,6 +290,121 @@ const AlternityMathService = {
     },
 
     // -----------------------------------------------------------------------
+    // calculateShipDamageMitigation
+    // -----------------------------------------------------------------------
+
+    /**
+     * Apply a ship's armor negation to a raw damage roll for a given damage type.
+     * Thin wrapper around calculateMitigatedDamage — armor is just a single
+     * mitigation modifier keyed by damage type (Warships Ch.1: "Armor and Screens").
+     *
+     * @param {number} rawDamage      - The unmodified damage roll result.
+     * @param {string} damageType     - 'lowImpact' | 'highImpact' | 'energy'.
+     * @param {object} armorRatings   - { lowImpact, highImpact, energy } — already-rolled armor dice results.
+     * @param {string} context        - Descriptive context for logging.
+     *
+     * @returns {{ finalDamage: number, modifierTrace: object[], totalModifier: number, mitigated: number, rawDamage: number }}
+     */
+    calculateShipDamageMitigation(rawDamage, damageType, armorRatings, context) {
+        if (!['lowImpact', 'highImpact', 'energy'].includes(damageType)) {
+            throw new Error(
+                `[AlternityMathService.calculateShipDamageMitigation] damageType must be one of ` +
+                `'lowImpact', 'highImpact', 'energy'. Received "${damageType}".`
+            );
+        }
+        if (!armorRatings || typeof armorRatings[damageType] !== 'number' || !isFinite(armorRatings[damageType])) {
+            throw new Error(
+                `[AlternityMathService.calculateShipDamageMitigation] armorRatings.${damageType} must be a finite number.`
+            );
+        }
+
+        const armorModifier = this.buildModifier(
+            `Armor (${damageType})`,
+            -armorRatings[damageType],
+            'Ship armor negation'
+        );
+
+        return this.calculateMitigatedDamage(rawDamage, [armorModifier], context);
+    },
+
+    // -----------------------------------------------------------------------
+    // calculateFirepowerShift
+    // -----------------------------------------------------------------------
+
+    /**
+     * Resolve the firepower-vs-toughness grade shift for a ship-combat hit
+     * (Warships Ch.1: "Firepower and Toughness" / Table 1-3 Downgrading / Table 1-4 Upgrading).
+     *
+     * If firepower exceeds toughness, damage upgrades one grade per excess class
+     * (stun -> wound -> mortal -> critical), and further excess beyond critical
+     * multiplies the critical damage (2x/3x/4x). If toughness exceeds firepower,
+     * damage downgrades one grade per excess class (critical -> mortal -> wound ->
+     * stun -> 'none'), floored at 'none' (no damage) rather than going negative.
+     *
+     * @param {string} damageGrade    - 'stun' | 'wound' | 'mortal' | 'critical'.
+     * @param {string} firepowerClass - One of SHIP_TOUGHNESS_CLASSES.
+     * @param {string} toughnessClass - One of SHIP_TOUGHNESS_CLASSES.
+     *
+     * @returns {{
+     *   finalGrade:    string,   // 'stun' | 'wound' | 'mortal' | 'critical' | 'none'
+     *   multiplier:    number,   // Critical-damage multiplier (1 unless upgraded past critical)
+     *   modifierTrace: object[],
+     *   shift:         number,   // firepower rank - toughness rank
+     * }}
+     */
+    calculateFirepowerShift(damageGrade, firepowerClass, toughnessClass) {
+        const gradeIndex = SHIP_DAMAGE_GRADES.indexOf(damageGrade);
+        if (gradeIndex === -1) {
+            throw new Error(
+                `[AlternityMathService.calculateFirepowerShift] damageGrade must be one of ` +
+                `${SHIP_DAMAGE_GRADES.join(', ')}. Received "${damageGrade}".`
+            );
+        }
+        const firepowerRank = SHIP_TOUGHNESS_CLASSES.indexOf(firepowerClass);
+        if (firepowerRank === -1) {
+            throw new Error(
+                `[AlternityMathService.calculateFirepowerShift] firepowerClass must be one of ` +
+                `${SHIP_TOUGHNESS_CLASSES.join(', ')}. Received "${firepowerClass}".`
+            );
+        }
+        const toughnessRank = SHIP_TOUGHNESS_CLASSES.indexOf(toughnessClass);
+        if (toughnessRank === -1) {
+            throw new Error(
+                `[AlternityMathService.calculateFirepowerShift] toughnessClass must be one of ` +
+                `${SHIP_TOUGHNESS_CLASSES.join(', ')}. Received "${toughnessClass}".`
+            );
+        }
+
+        const shift = firepowerRank - toughnessRank;
+        let idx = gradeIndex; // -1 = 'none', 0..3 = SHIP_DAMAGE_GRADES index
+        let multiplier = 1;
+
+        if (shift > 0) {
+            for (let i = 0; i < shift; i++) {
+                if (idx < SHIP_DAMAGE_GRADES.length - 1) idx++;
+                else multiplier++;
+            }
+        } else if (shift < 0) {
+            for (let i = 0; i < -shift; i++) {
+                if (idx > -1) idx--;
+            }
+        }
+
+        const finalGrade = idx === -1 ? 'none' : SHIP_DAMAGE_GRADES[idx];
+
+        const modifierTrace = [
+            this.buildModifier('Base Grade', 0, `Starting grade: ${damageGrade}`),
+            this.buildModifier(
+                'Firepower vs Toughness',
+                shift,
+                `${firepowerClass} firepower vs ${toughnessClass} toughness (${shift >= 0 ? '+' : ''}${shift} class${Math.abs(shift) === 1 ? '' : 'es'})`
+            ),
+        ];
+
+        return { finalGrade, multiplier, modifierTrace, shift };
+    },
+
+    // -----------------------------------------------------------------------
     // calculateSkillTarget
     // -----------------------------------------------------------------------
 
@@ -387,4 +512,6 @@ export {
     DIFFICULTY_DCS,
     SUCCESS_DEGREES,
     SITUATION_DIE_SCALE,
+    SHIP_TOUGHNESS_CLASSES,
+    SHIP_DAMAGE_GRADES,
 };

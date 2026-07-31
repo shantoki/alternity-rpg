@@ -15,6 +15,7 @@ import {
     CharacterData,
     NpcData,
     VehicleData,
+    WarshipData,
     WeaponData,
     ArmorData,
     SkillData,
@@ -47,6 +48,7 @@ Hooks.once('init', async () => {
     CONFIG.Actor.dataModels.character = CharacterData;
     CONFIG.Actor.dataModels.npc       = NpcData;
     CONFIG.Actor.dataModels.vehicle   = VehicleData;
+    CONFIG.Actor.dataModels.warship   = WarshipData;
 
     CONFIG.Item.dataModels = CONFIG.Item.dataModels ?? {};
     CONFIG.Item.dataModels.weapon = WeaponData;
@@ -75,6 +77,10 @@ Hooks.once('init', async () => {
         vehicle: {
             bar: ['hullIntegrity', 'shields', 'techPoints'],
             value: [],
+        },
+        warship: {
+            bar: ['damage.stun', 'damage.wound', 'damage.mortal', 'damage.critical'],
+            value: ['shipStatus'],
         },
     };
 

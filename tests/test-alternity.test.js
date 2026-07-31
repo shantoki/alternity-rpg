@@ -242,4 +242,61 @@ describe('Alternity System Unit Tests', () => {
             expect(bonusResult.degree).toBe(SUCCESS_DEGREES.GOOD);
         });
     });
+
+    // Test Suite for Warship Combat Math (Warships Ch.1: Firepower and Toughness)
+    describe('AlternityMathService — Ship Combat', () => {
+        it('should apply no shift when firepower equals toughness', () => {
+            const result = AlternityMathService.calculateFirepowerShift('wound', 'Heavy', 'Heavy');
+            expect(result.finalGrade).toBe('wound');
+            expect(result.multiplier).toBe(1);
+            expect(result.shift).toBe(0);
+        });
+
+        it('should downgrade damage when toughness exceeds firepower (Table 1-3)', () => {
+            // Medium firepower vs Heavy toughness (1 class short) -> wound becomes stun
+            expect(AlternityMathService.calculateFirepowerShift('wound', 'Medium', 'Heavy').finalGrade).toBe('stun');
+            // 2 classes short -> wound floors at 'none'
+            expect(AlternityMathService.calculateFirepowerShift('wound', 'SmallCraft', 'Heavy').finalGrade).toBe('none');
+            // Stun downgraded by any amount floors at 'none', never goes negative
+            expect(AlternityMathService.calculateFirepowerShift('stun', 'SmallCraft', 'SuperHeavy').finalGrade).toBe('none');
+        });
+
+        it('should upgrade damage when firepower exceeds toughness (Table 1-4)', () => {
+            // Heavy firepower vs Light toughness (2 classes over) -> mortal becomes 2x critical
+            const twoOver = AlternityMathService.calculateFirepowerShift('mortal', 'Heavy', 'Light');
+            expect(twoOver.finalGrade).toBe('critical');
+            expect(twoOver.multiplier).toBe(2);
+
+            // SuperHeavy firepower vs Heavy toughness (1 class over), critical damage doubles
+            const oneOverCritical = AlternityMathService.calculateFirepowerShift('critical', 'SuperHeavy', 'Heavy');
+            expect(oneOverCritical.finalGrade).toBe('critical');
+            expect(oneOverCritical.multiplier).toBe(2);
+
+            // Table 1-4, Stun row, three classes of excess firepower -> Critical (no multiplier yet)
+            const threeOver = AlternityMathService.calculateFirepowerShift('stun', 'Heavy', 'SmallCraft');
+            expect(threeOver.finalGrade).toBe('critical');
+            expect(threeOver.multiplier).toBe(1);
+        });
+
+        it('should throw on an invalid toughness/firepower class', () => {
+            expect(() => AlternityMathService.calculateFirepowerShift('wound', 'Massive', 'Heavy')).toThrow();
+        });
+
+        it('should negate ship damage using the armor rating for the matching damage type', () => {
+            const armorRatings = { lowImpact: 4, highImpact: 7, energy: 2 };
+            const result = AlternityMathService.calculateShipDamageMitigation(10, 'highImpact', armorRatings, 'Ship Combat');
+            expect(result.finalDamage).toBe(3); // 10 - 7
+            expect(result.mitigated).toBe(7);
+        });
+
+        it('should clamp ship damage mitigation at zero', () => {
+            const armorRatings = { lowImpact: 20, highImpact: 0, energy: 0 };
+            const result = AlternityMathService.calculateShipDamageMitigation(5, 'lowImpact', armorRatings, 'Ship Combat');
+            expect(result.finalDamage).toBe(0);
+        });
+
+        it('should reject an unknown damage type', () => {
+            expect(() => AlternityMathService.calculateShipDamageMitigation(5, 'ballistic', { lowImpact: 0 }, 'Ship Combat')).toThrow();
+        });
+    });
 });

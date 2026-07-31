@@ -1058,3 +1058,67 @@
     color: var(--alt-color-primary);
 }
 
+/* ── Warship sheet ───────────────────────────────────────────────────────── */
+.bar--critical .alt-bar-fill { background: #ffffff; }
+
+.alt-ship-status-badge {
+    padding: 2px 8px;
+    border-radius: var(--alt-radius);
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border: 1px solid var(--alt-color-border);
+}
+.alt-ship-status--Nominal  { background: rgba(74, 217, 122, 0.15); color: var(--alt-color-success); }
+.alt-ship-status--Shaken   { background: rgba(217, 164, 74, 0.15); color: var(--alt-color-warning); }
+.alt-ship-status--Disabled,
+.alt-ship-status--Crippled { background: rgba(217, 74, 74, 0.15); color: var(--alt-color-danger); }
+.alt-ship-status--Destroyed { background: rgba(0, 0, 0, 0.4); color: var(--alt-color-text-muted); }
+
+.alt-damage-quick { display: inline-flex; gap: 2px; margin-left: 6px; }
+.alt-damage-quick button { padding: 0 4px; font-size: 10px; }
+
+.alt-power-deficit { color: var(--alt-color-danger); }
+
+.alt-warship-table-section { margin-bottom: 12px; }
+.alt-warship-table-section h3 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--alt-color-primary);
+    border-bottom: 1px solid var(--alt-color-border);
+    padding-bottom: 2px;
+    margin-bottom: 4px;
+}
+
+.alt-warship-table { display: flex; flex-direction: column; gap: 4px; }
+
+.alt-warship-table-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 6px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--alt-color-border);
+    border-radius: var(--alt-radius);
+}
+.alt-warship-table-row input,
+.alt-warship-table-row select { flex: 1 1 auto; min-width: 0; }
+.alt-warship-table-row.alt-zone-knocked-out { opacity: 0.6; border-color: var(--alt-color-danger); }
+
+.alt-zone-label { flex: 0 0 48px !important; text-align: center; }
+.alt-zone-systems-text { flex: 3 1 auto !important; }
+.alt-zone-knockout-toggle {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    white-space: nowrap;
+    flex: 0 0 auto;
+}
+
+.alt-warship-notes { margin-top: 10px; }
+.alt-warship-notes label { display: block; margin: 6px 0 2px; font-weight: bold; }
+

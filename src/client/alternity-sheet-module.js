@@ -15,7 +15,8 @@ import {
     AlternityCharacterState,
 } from '../data/alternity-actor-data.js';
 import { AlternityMathService, SUCCESS_DEGREES, DIFFICULTY_DCS, SITUATION_DIE_SCALE } from '../services/alternity-math.js';
-import { renderTemplate } from '../module-info.js';
+import { SHIP_TOUGHNESS_CLASSES, SHIP_HULL_TYPES, SHIP_STATUS_EFFECTS } from '../data/WarshipData.js';
+import { renderTemplate, Roll, ChatMessage } from '../module-info.js';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -662,6 +663,102 @@ class AlternityVehicleSheet extends foundry.applications.api.HandlebarsApplicati
 }
 
 // ---------------------------------------------------------------------------
+// AlternityWarshipSheet
+// ---------------------------------------------------------------------------
+
+const WARSHIP_ARRAY_FIELDS = Object.freeze({
+    systems:  { category: 'Misc', name: '' },
+    weapons:  { name: '', fireMode: 'Single', arc: 'Fore', firepowerClass: 'Medium', damageFormula: '1d6', damageType: 'lowImpact', damageGrade: 'wound' },
+    defenses: { name: '' },
+    sensors:  { name: '' },
+    zones:    { label: '', hullPointLimit: 0 },
+});
+
+class AlternityWarshipSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
+    static DEFAULT_OPTIONS = foundry.utils.mergeObject(super.DEFAULT_OPTIONS, {
+        classes: [NS, `${NS}-sheet-app`, `${NS}-warship-sheet`],
+        tag: "form",
+        window: { resizable: true, width: 700, height: 780 },
+        actions: {
+            addSystemRow:    this._onAddArrayRowAction,
+            deleteSystemRow: this._onDeleteArrayRowAction,
+            rollShipWeapon:  this._onRollShipWeaponAction,
+            setDamage:       this._onSetDamageAction,
+        }
+    });
+
+    static PARTS = {
+        sheet: { template: "systems/alternity-v2/templates/actor/actor-warship-sheet.hbs" }
+    };
+
+    async _prepareContext(options) {
+        const context = await super._prepareContext(options);
+        context.actor = this.document;
+        context.system = this.document.system;
+        context.alt = NS;
+        context.hullCategoryChoices = ['Military', 'Civilian'];
+        context.hullTypeChoices = SHIP_HULL_TYPES;
+        context.toughnessChoices = SHIP_TOUGHNESS_CLASSES;
+        context.firepowerClassChoices = SHIP_TOUGHNESS_CLASSES;
+        context.fireModeChoices = ['Single', 'Burst', 'Auto', 'Battery'];
+        context.arcChoices = ['Fore', 'Aft', 'Port', 'Starboard', 'Turret', 'Fixed'];
+        context.damageTypeChoices = ['lowImpact', 'highImpact', 'energy'];
+        context.damageGradeChoices = ['stun', 'wound', 'mortal', 'critical'];
+        context.systemCategoryChoices = ['Hull', 'Armor', 'Power', 'Engine', 'FTL', 'Support', 'Command', 'Sensors', 'Hangar', 'Misc'];
+        context.shipStatusEffects = SHIP_STATUS_EFFECTS;
+        return context;
+    }
+
+    _onRender(context, options) {
+        this.element.addEventListener('change', (e) => {
+            const input = e.target;
+            if (input.name) {
+                const val = input.type === 'checkbox' ? input.checked : input.value;
+                this.document.update({ [input.name]: val });
+            }
+        });
+    }
+
+    static async _onAddArrayRowAction(event, target) {
+        const arrayKey = target.dataset.array;
+        const defaults = WARSHIP_ARRAY_FIELDS[arrayKey];
+        if (!defaults) return;
+        const current = foundry.utils.getProperty(this.document.system, arrayKey) ?? [];
+        await this.document.update({ [`system.${arrayKey}`]: [...current, { ...defaults }] });
+    }
+
+    static async _onDeleteArrayRowAction(event, target) {
+        const arrayKey = target.dataset.array;
+        const idx = safeInt(target.dataset.index, -1);
+        if (idx < 0) return;
+        const current = foundry.utils.getProperty(this.document.system, arrayKey) ?? [];
+        await this.document.update({ [`system.${arrayKey}`]: current.filter((_, i) => i !== idx) });
+    }
+
+    static async _onRollShipWeaponAction(event, target) {
+        const idx = safeInt(target.dataset.index, -1);
+        const weapon = this.document.system.weapons?.[idx];
+        if (!weapon) return;
+        const roll = await new Roll(weapon.damageFormula || '1d6').evaluate();
+        await roll.toMessage({
+            speaker: ChatMessage.getSpeaker({ actor: this.document }),
+            flavor: `${weapon.name || 'Weapon'} — ${weapon.damageType} (${weapon.firepowerClass})`,
+        });
+    }
+
+    static async _onSetDamageAction(event, target) {
+        // Quick +/- adjuster for the damage tracks (point-based, unlike the
+        // character sheet's discrete wound-level pips) — data-delta e.g. "1", "-1", "5", "-5".
+        const track = target.dataset.track;
+        const delta = safeInt(target.dataset.delta, 0);
+        const current = this.document.system.damage?.[track];
+        if (!current) return;
+        const newVal = Math.min(current.max, Math.max(0, current.value + delta));
+        await this.document.update({ [`system.damage.${track}.value`]: newVal });
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Registration
 // ---------------------------------------------------------------------------
 
@@ -689,6 +786,7 @@ async function registerAlternitySheet() {
     ActorsCollection.registerSheet('alternity-v2', AlternityCharacterSheet, { types: ['character'], makeDefault: true, label: 'Alternity Character Sheet' });
     ActorsCollection.registerSheet('alternity-v2', AlternityNpcSheet, { types: ['npc'], makeDefault: true, label: 'Alternity NPC Sheet' });
     ActorsCollection.registerSheet('alternity-v2', AlternityVehicleSheet, { types: ['vehicle'], makeDefault: true, label: 'Alternity Vehicle Sheet' });
+    ActorsCollection.registerSheet('alternity-v2', AlternityWarshipSheet, { types: ['warship'], makeDefault: true, label: 'Alternity Warship Sheet' });
 }
 
 export {
@@ -697,6 +795,7 @@ export {
     AlternityCharacterSheet,
     AlternityNpcSheet,
     AlternityVehicleSheet,
+    AlternityWarshipSheet,
     registerAlternitySheet,
     pct,
     fmtMod,
