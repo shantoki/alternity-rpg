@@ -12,6 +12,24 @@ const EFFECT_ARRAY_DEFAULTS = Object.freeze({
     requiredChecks: { checkType: 'resource', params: {}, failMessage: '' },
 });
 
+// Registered once, at module load, on `document` in the capture phase — this fires
+// before any per-instance listener attached to `this.element` could be skipped by an
+// unexpected stopPropagation(), and doesn't depend on exactly which <form> element
+// (outer app shell vs. the template's own nested <form>) ends up as the actual
+// implicit-submission target. Belt-and-suspenders against the item sheet's Enter key
+// triggering the browser's native form submission (a real GET request to the current
+// URL, since our forms have no explicit action/method) — every field is already saved
+// via the per-sheet 'change' listener in _onRender, so native submission is never wanted.
+document.addEventListener('submit', (e) => {
+    if (e.target?.closest?.('.alt-item-sheet')) e.preventDefault();
+}, true);
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target instanceof HTMLInputElement && e.target.closest?.('.alt-item-sheet')) {
+        e.preventDefault();
+    }
+}, true);
+
 export class AlternityItemSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ItemSheetV2) {
     /** @override */
     static get DEFAULT_OPTIONS() {
@@ -123,19 +141,8 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
     /** @override */
     _onRender(context, options) {
         // Tab switching is handled by the switchTab action (see DEFAULT_OPTIONS.actions).
-        // The sheet root is a real <form> (tag: "form"); pressing Enter in any single
-        // text input triggers the browser's native implicit submission (a GET request
-        // that navigates the page) unless we stop it — we persist fields ourselves via
-        // the 'change' listener below, so the native submit is never wanted. Belt and
-        // suspenders: stop it at the 'submit' event AND at the originating keydown,
-        // in case something submits the form programmatically before a 'submit'
-        // listener would otherwise catch it.
-        this.element.addEventListener('submit', (e) => e.preventDefault());
-        this.element.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
-                e.preventDefault();
-            }
-        });
+        // Native-submit prevention is handled once, globally, at module load (see the
+        // document-level capture-phase listeners above) rather than per-instance here.
 
         // ApplicationV2 doesn't auto-save on input change, so wire it up manually —
         // mirrors the identical pattern in AlternityNpcSheet/AlternityVehicleSheet/AlternityWarshipSheet.
