@@ -54,9 +54,6 @@
   "ALTERNITY.Short": "Short",
   "ALTERNITY.Medium": "Medium",
   "ALTERNITY.Long": "Long",
-  "ALTERNITY.Armor.LI": "Low Impact (LI)",
-  "ALTERNITY.Armor.HI": "High Impact (HI)",
-  "ALTERNITY.Armor.EN": "Energy (En)",
   "ALTERNITY.SpeedPenalty": "Speed Penalty",
   "ALTERNITY.Computer.Processor": "Processor Quality",
   "ALTERNITY.Computer.Memory": "Active Memory",
@@ -162,5 +159,16 @@
   "ALTERNITY.Effect.RequiredChecks": "Required Checks",
   "ALTERNITY.Effect.FailMessage": "Fail Message",
   "ALTERNITY.Effect.Params": "Params (JSON)",
-  "ALTERNITY.Effect.CostDisplay": "Cost"
+  "ALTERNITY.Effect.CostDisplay": "Cost",
+  "ALTERNITY.Weapon.AttackAbility": "Attack Ability",
+  "ALTERNITY.Weapon.AttackBonus": "Attack Bonus",
+  "ALTERNITY.Weapon.DamageBonus": "Damage Bonus",
+  "ALTERNITY.Weapon.TotalAttackBonus": "Total Attack Bonus",
+  "ALTERNITY.TechPointCost": "Tech Point Cost",
+  "ALTERNITY.Weight": "Weight (kg)",
+  "ALTERNITY.Armor.Type": "Armor Type",
+  "ALTERNITY.Armor.DefenseBonus": "Defense Bonus",
+  "ALTERNITY.Armor.SkillPenalty": "Skill Penalty",
+  "ALTERNITY.Armor.DamageResistance": "Damage Resistance",
+  "ALTERNITY.Armor.ResistedTypes": "Resisted Types (empty = resists all)"
 }

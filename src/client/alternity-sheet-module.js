@@ -796,6 +796,7 @@ async function registerAlternitySheet() {
     Handlebars.registerHelper('add', (a, b) => Number(a) + Number(b));
     Handlebars.registerHelper('and', (a, b) => a && b);
     Handlebars.registerHelper('or', (a, b) => a || b);
+    Handlebars.registerHelper('includes', (arr, val) => Array.isArray(arr) && arr.includes(val));
     
     await foundry.applications.handlebars.loadTemplates([
         "systems/alternity-v2/templates/actor/ability-card.hbs"

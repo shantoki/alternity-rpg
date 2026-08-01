@@ -74,6 +74,8 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
                 'Thrown': 'Thrown',
                 'Heavy': 'Heavy'
             },
+            armorTypes: ['Light', 'Medium', 'Heavy', 'Powered']
+                .reduce((obj, val) => { obj[val] = val; return obj; }, {}),
             damageTypes: [
                 'Ballistic', 'Energy', 'Laser', 'Piercing', 'Slashing',
                 'Impact', 'Incendiary', 'Toxic', 'Radiation', 'Psionic',

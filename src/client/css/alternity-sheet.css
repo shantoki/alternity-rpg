@@ -1274,3 +1274,19 @@
     resize: vertical;
 }
 
+.alt-item-sheet .alt-checkbox-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+}
+.alt-item-sheet .alt-checkbox-inline {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    text-transform: none;
+    font-weight: normal;
+    color: var(--alt-color-text);
+    white-space: nowrap;
+}
+
