@@ -165,6 +165,12 @@ export class AlternityItem extends Item {
         if (sys.techPointCost > 0) costs.push(`${sys.techPointCost} TP`);
         if (sys.psiPointCost  > 0) costs.push(`${sys.psiPointCost} PP`);
         sys.costDisplay = costs.length ? costs.join(', ') : game.i18n.localize('ALTERNITY.Free');
+
+        // Pre-serialise each prerequisite's free-form params object so the sheet
+        // can edit it as plain JSON text (ObjectField accepts a JSON string on submit).
+        for (const check of sys.requiredChecks ?? []) {
+            check.paramsJson = JSON.stringify(check.params ?? {});
+        }
     }
 
     /**

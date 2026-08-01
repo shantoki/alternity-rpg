@@ -5,6 +5,13 @@
 
 const NS = 'alt';
 
+// Default row shapes for the effect item's array fields, keyed by field name
+// (mirrors the generic add/delete-row pattern used by AlternityWarshipSheet).
+const EFFECT_ARRAY_DEFAULTS = Object.freeze({
+    effects:        { effectType: 'Modifier', value: 0, damageType: null, stat: '', duration: 'instant', notes: '' },
+    requiredChecks: { checkType: 'resource', params: {}, failMessage: '' },
+});
+
 export class AlternityItemSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ItemSheetV2) {
     /** @override */
     static get DEFAULT_OPTIONS() {
@@ -17,7 +24,9 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
                 height: 600
             },
             actions: {
-                switchTab: this._onTabAction
+                switchTab:     this._onTabAction,
+                addArrayRow:   this._onAddArrayRowAction,
+                deleteArrayRow: this._onDeleteArrayRowAction,
             }
         });
     }
@@ -32,6 +41,22 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
     static _onTabAction(event, target) {
         this._activeTab = target.dataset.tab;
         this.render();
+    }
+
+    static async _onAddArrayRowAction(event, target) {
+        const arrayKey = target.dataset.array;
+        const defaults = EFFECT_ARRAY_DEFAULTS[arrayKey];
+        if (!defaults) return;
+        const current = foundry.utils.getProperty(this.item.system, arrayKey) ?? [];
+        await this.item.update({ [`system.${arrayKey}`]: [...current, { ...defaults }] });
+    }
+
+    static async _onDeleteArrayRowAction(event, target) {
+        const arrayKey = target.dataset.array;
+        const idx = Number(target.dataset.index);
+        if (!Number.isInteger(idx) || idx < 0) return;
+        const current = foundry.utils.getProperty(this.item.system, arrayKey) ?? [];
+        await this.item.update({ [`system.${arrayKey}`]: current.filter((_, i) => i !== idx) });
     }
 
     /** @override */
@@ -60,6 +85,22 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
             personalEquipmentCategories: [
                 'Communications', 'Medical', 'Professional', 'Sensors', 'Survival', 'Clothing', 'Miscellaneous',
             ].reduce((obj, val) => { obj[val] = val; return obj; }, {}),
+            abilities: ['STR', 'DEX', 'CON', 'INT', 'WIL', 'PER']
+                .reduce((obj, val) => { obj[val] = val; return obj; }, {}),
+            effectCategories: ['Power', 'Stance', 'Passive', 'Equipment', 'Action']
+                .reduce((obj, val) => { obj[val] = val; return obj; }, {}),
+            effectTargetScopes: ['Self', 'Single', 'Area', 'AllAllies', 'AllEnemies']
+                .reduce((obj, val) => { obj[val] = val; return obj; }, {}),
+            effectActivations: {
+                free:     game.i18n.localize('ALTERNITY.Activation.Free'),
+                minor:    game.i18n.localize('ALTERNITY.Activation.Minor'),
+                action:   game.i18n.localize('ALTERNITY.Activation.Action'),
+                reaction: game.i18n.localize('ALTERNITY.Activation.Reaction'),
+                passive:  game.i18n.localize('ALTERNITY.Activation.Passive'),
+            },
+            effectEntryTypes: ['Damage', 'Buff', 'Modifier'],
+            effectDurations: ['instant', 'round', 'scene', 'permanent'],
+            checkTypes: ['resource', 'condition', 'skill'],
             skills: {} // To be populated if needed
         };
 

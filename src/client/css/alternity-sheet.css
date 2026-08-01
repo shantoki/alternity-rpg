@@ -1244,3 +1244,33 @@
 .alt-item-summary-entry { color: var(--alt-color-text); }
 .alt-item-summary-entry strong { color: var(--alt-color-primary); }
 
+.alt-item-sheet .alt-item-array-section { margin-bottom: 12px; }
+.alt-item-sheet .alt-item-array-section h3 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--alt-color-primary);
+    border-bottom: 1px solid var(--alt-color-border);
+    padding-bottom: 2px;
+    margin: 0 0 4px;
+}
+.alt-item-sheet .alt-item-array-table { display: flex; flex-direction: column; gap: 4px; }
+.alt-item-sheet .alt-item-array-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 6px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--alt-color-border);
+    border-radius: var(--alt-radius);
+}
+.alt-item-sheet .alt-item-array-row input,
+.alt-item-sheet .alt-item-array-row select { flex: 1 1 auto; min-width: 0; }
+.alt-item-sheet .alt-item-array-row.alt-item-array-row-wrap textarea {
+    flex: 2 1 auto;
+    min-width: 0;
+    resize: vertical;
+}
+

@@ -121,6 +121,149 @@
                 </div>
             {{/if}}
 
+            {{#if (eq item.type 'skill')}}
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Skill.SkillId'}}</label>
+                        <select name="system.skillId">
+                            <option value="">—</option>
+                            {{selectOptions config.skills selected=system.skillId}}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Skill.LinkedAbility'}}</label>
+                        <select name="system.linkedAbility">
+                            {{selectOptions config.abilities selected=system.linkedAbility}}
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Skill.Rank'}}</label>
+                        <input type="number" name="system.rank" value="{{system.rank}}" min="0" max="10"/>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" name="system.isBackground" {{#if system.isBackground}}checked{{/if}}/>
+                            {{localize 'ALTERNITY.Skill.IsBackground'}}
+                        </label>
+                    </div>
+                </div>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Skill.Specialisation'}}</label>
+                        <input type="text" name="system.specialisation" value="{{system.specialisation}}"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Skill.SpecialisationBonus'}}</label>
+                        <input type="number" name="system.specialisationBonus" value="{{system.specialisationBonus}}" min="0" max="5"/>
+                    </div>
+                </div>
+
+                <div class="alt-item-summary">
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Skill.EffectiveRank'}}:</strong> {{system.rankDisplay}}</span>
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Skill.TargetNumber'}}:</strong> {{system.dcDisplay}}</span>
+                    {{#if system.specialisation}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Skill.TargetNumberWithSpec'}}:</strong> DC {{system.targetNumberWithSpec}}</span>
+                    {{/if}}
+                </div>
+            {{/if}}
+
+            {{#if (eq item.type 'effect')}}
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Effect.Category'}}</label>
+                        <select name="system.effectCategory">
+                            {{selectOptions config.effectCategories selected=system.effectCategory}}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Effect.TargetScope'}}</label>
+                        <select name="system.targetScope">
+                            {{selectOptions config.effectTargetScopes selected=system.targetScope}}
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Effect.Activation'}}</label>
+                        <select name="system.activation">
+                            {{selectOptions config.effectActivations selected=system.activation}}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" name="system.isReusable" {{#if system.isReusable}}checked{{/if}}/>
+                            {{localize 'ALTERNITY.Effect.IsReusable'}}
+                        </label>
+                    </div>
+                </div>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.TechPoints'}}</label>
+                        <input type="number" name="system.techPointCost" value="{{system.techPointCost}}" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.PsiPoints'}}</label>
+                        <input type="number" name="system.psiPointCost" value="{{system.psiPointCost}}" min="0"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.Effect.TriggerContext'}}</label>
+                    <input type="text" name="system.triggerContext" value="{{system.triggerContext}}" placeholder="Combat, Stealth, Any…"/>
+                </div>
+
+                <div class="alt-item-array-section">
+                    <h3>{{localize 'ALTERNITY.Effect.Entries'}} <button type="button" data-action="addArrayRow" data-array="effects">+</button></h3>
+                    <div class="alt-item-array-table">
+                        {{#each system.effects as |row idx|}}
+                        <div class="alt-item-array-row">
+                            <select name="system.effects.{{idx}}.effectType">
+                                {{#each ../config.effectEntryTypes as |choice|}}
+                                <option value="{{choice}}" {{#if (eq row.effectType choice)}}selected{{/if}}>{{choice}}</option>
+                                {{/each}}
+                            </select>
+                            <input type="number" name="system.effects.{{idx}}.value" value="{{row.value}}" title="{{localize 'ALTERNITY.Effect.Value'}}"/>
+                            <select name="system.effects.{{idx}}.damageType" title="{{localize 'ALTERNITY.DamageType'}}">
+                                {{selectOptions ../config.damageTypes selected=row.damageType}}
+                            </select>
+                            <input type="text" name="system.effects.{{idx}}.stat" value="{{row.stat}}" placeholder="{{localize 'ALTERNITY.Effect.Stat'}}"/>
+                            <select name="system.effects.{{idx}}.duration">
+                                {{#each ../config.effectDurations as |choice|}}
+                                <option value="{{choice}}" {{#if (eq row.duration choice)}}selected{{/if}}>{{choice}}</option>
+                                {{/each}}
+                            </select>
+                            <input type="text" name="system.effects.{{idx}}.notes" value="{{row.notes}}" placeholder="{{localize 'ALTERNITY.Effect.Notes'}}"/>
+                            <button type="button" data-action="deleteArrayRow" data-array="effects" data-index="{{idx}}">✕</button>
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+
+                <div class="alt-item-array-section">
+                    <h3>{{localize 'ALTERNITY.Effect.RequiredChecks'}} <button type="button" data-action="addArrayRow" data-array="requiredChecks">+</button></h3>
+                    <div class="alt-item-array-table">
+                        {{#each system.requiredChecks as |row idx|}}
+                        <div class="alt-item-array-row alt-item-array-row-wrap">
+                            <select name="system.requiredChecks.{{idx}}.checkType">
+                                {{#each ../config.checkTypes as |choice|}}
+                                <option value="{{choice}}" {{#if (eq row.checkType choice)}}selected{{/if}}>{{choice}}</option>
+                                {{/each}}
+                            </select>
+                            <input type="text" name="system.requiredChecks.{{idx}}.failMessage" value="{{row.failMessage}}" placeholder="{{localize 'ALTERNITY.Effect.FailMessage'}}"/>
+                            <textarea name="system.requiredChecks.{{idx}}.params" rows="1" placeholder="{{localize 'ALTERNITY.Effect.Params'}}">{{row.paramsJson}}</textarea>
+                            <button type="button" data-action="deleteArrayRow" data-array="requiredChecks" data-index="{{idx}}">✕</button>
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+
+                <div class="alt-item-summary">
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Effect.CostDisplay'}}:</strong> {{system.costDisplay}}</span>
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Effect.Activation'}}:</strong> {{system.activationLabel}}</span>
+                </div>
+            {{/if}}
+
             {{#if (eq item.type 'perkFlaw')}}
                 <div class="grid grid-2col">
                     <div class="form-group">
