@@ -123,6 +123,12 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
     /** @override */
     _onRender(context, options) {
         // Tab switching is handled by the switchTab action (see DEFAULT_OPTIONS.actions).
+        // The sheet root is a real <form> (tag: "form"); pressing Enter in any single
+        // text input triggers the browser's native implicit submission (a GET request
+        // that navigates the page) unless we stop it — we persist fields ourselves via
+        // the 'change' listener below, so the native submit is never wanted.
+        this.element.addEventListener('submit', (e) => e.preventDefault());
+
         // ApplicationV2 doesn't auto-save on input change, so wire it up manually —
         // mirrors the identical pattern in AlternityNpcSheet/AlternityVehicleSheet/AlternityWarshipSheet.
         this.element.addEventListener('change', (e) => {
