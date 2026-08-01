@@ -1,6 +1,6 @@
 /**
  * @file alternity-item-sheet.js
- * @description Item sheet for Alternity Fastplay.
+ * @description Shared item sheet for every Alternity Fastplay item type.
  */
 
 const NS = 'alt';
@@ -13,38 +13,38 @@ const EFFECT_ARRAY_DEFAULTS = Object.freeze({
 });
 
 export class AlternityItemSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ItemSheetV2) {
-    /** @override */
-    static get DEFAULT_OPTIONS() {
-        return foundry.utils.mergeObject(super.DEFAULT_OPTIONS, {
-            classes: [NS, `${NS}-item-sheet`],
-            tag: "form",
-            // DocumentSheetV2's own form controller owns the <form>'s submit/Enter-key
-            // handling and already updates `this.document` from the form on submit —
-            // submitOnChange makes it fire on every field change too, so we don't need
-            // to hand-roll a `change` listener or guard against native form submission
-            // ourselves (both were tried earlier and fought against this built-in behavior
-            // instead of using it).
-            form: {
-                submitOnChange: true,
-            },
-            window: {
-                resizable: true,
-                width: 500,
-                height: 600
-            },
-            actions: {
-                switchTab:     this._onTabAction,
-                addArrayRow:   this._onAddArrayRowAction,
-                deleteArrayRow: this._onDeleteArrayRowAction,
-            }
-        });
-    }
+    /**
+     * A plain static field, not a getter calling `mergeObject(super.DEFAULT_OPTIONS, …)`:
+     * ApplicationV2 already walks the prototype chain and merges each class's own
+     * DEFAULT_OPTIONS. The old getter merged *in place*, mutating the shared base-class
+     * static and leaking these classes onto every other ItemSheetV2 in the world.
+     */
+    static DEFAULT_OPTIONS = {
+        classes: [NS, `${NS}-item-sheet`],
+        tag: 'form',
+        // Foundry's own form controller owns the <form>'s submit/Enter-key handling and
+        // writes the submitted form back onto the document. `submitOnChange` makes it fire
+        // on every field change too, so this sheet needs no hand-wired 'change' listener
+        // and no manual submit/keydown guards.
+        form: {
+            submitOnChange: true,
+            closeOnSubmit:  false,
+        },
+        // width/height belong under `position`; under `window` they were silently ignored.
+        position: { width: 560, height: 620 },
+        window:   { resizable: true },
+        actions: {
+            switchTab:      this._onTabAction,
+            addArrayRow:    this._onAddArrayRowAction,
+            deleteArrayRow: this._onDeleteArrayRowAction,
+        },
+    };
 
     /** @override */
     static PARTS = {
         sheet: {
-            template: "systems/alternity-v2/templates/item/item-sheet.hbs"
-        }
+            template: 'systems/alternity-v2/templates/item/item-sheet.hbs',
+        },
     };
 
     static _onTabAction(event, target) {
@@ -71,9 +71,41 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
     /** @override */
     async _prepareContext(options) {
         const context = await super._prepareContext(options);
+        const item = this.item;
+
         context.alt = NS;
-        context.system = this.item.system;
-        context.activeTab = this._activeTab || 'description';
+        // `item` was previously never put on the context — the header's {{item.name}} and
+        // every `{{#if (eq item.type '…')}}` Details branch silently resolved against
+        // undefined, which is why the sheet showed a blank name and an empty Details tab.
+        // Every actor sheet in this system sets its own `context.actor` the same way.
+        context.item     = item;
+        context.system   = item.system;
+        context.itemType = item.type;
+        // Precomputed rather than built in-template: no `concat` Handlebars helper exists
+        // in this codebase, so `{{localize (concat 'TYPES.Item.' itemType)}}` would silently
+        // render nothing.
+        context.typeLabel = game.i18n.localize(`TYPES.Item.${item.type}`);
+        context.owner    = item.isOwner;
+        context.editable = this.isEditable;
+        // Schema fields for {{formInput}} (used for the rich-text description).
+        context.systemFields = item.system?.schema?.fields ?? {};
+        context.activeTab    = this._activeTab || 'description';
+
+        // Explicit per-type booleans rather than repeated `(eq item.type '…')` calls in the
+        // template: a single missing context key or helper can't blank out the whole
+        // Details tab this way, which is exactly the failure mode that hid these fields.
+        context.isWeapon            = item.type === 'weapon';
+        context.isArmor             = item.type === 'armor';
+        context.isComputer          = item.type === 'computer';
+        context.isSkill             = item.type === 'skill';
+        context.isEffect            = item.type === 'effect';
+        context.isPerkFlaw          = item.type === 'perkFlaw';
+        context.isPersonalEquipment = item.type === 'personalEquipment';
+
+        // Which shared fields this type's schema actually defines.
+        context.hasQuantity    = context.isWeapon || context.isPersonalEquipment;
+        context.hasMass        = context.isComputer || context.isPersonalEquipment;
+        context.hasEquipToggle = context.isWeapon || context.isArmor || context.isPersonalEquipment;
 
         // Provide configuration choices for selects
         context.config = {
@@ -89,6 +121,12 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
                 'Ballistic', 'Energy', 'Laser', 'Piercing', 'Slashing',
                 'Impact', 'Incendiary', 'Toxic', 'Radiation', 'Psionic',
             ].reduce((obj, val) => { obj[val] = val; return obj; }, {}),
+            damageCategories: {
+                stun:   game.i18n.localize('ALTERNITY.Stun'),
+                wound:  game.i18n.localize('ALTERNITY.Wound'),
+                mortal: game.i18n.localize('ALTERNITY.Mortal'),
+            },
+            attackAbilities: { str: 'STR', dex: 'DEX' },
             perkFlawCategories: { Perk: 'Perk', Flaw: 'Flaw' },
             perkFlawAbilities: ['STR', 'DEX', 'CON', 'INT', 'WIL', 'PER', 'Special', 'None']
                 .reduce((obj, val) => { obj[val] = val; return obj; }, {}),
@@ -128,5 +166,4 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
 
         return context;
     }
-
 }

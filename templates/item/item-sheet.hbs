@@ -1,17 +1,32 @@
-<form class="{{cssClass}} {{alt}}-sheet {{alt}}-item-sheet" autocomplete="off">
+{{!--
+    Shared Details/Description sheet for every Alternity item type.
+
+    NOTE: this template must NOT declare its own <form>. AlternityItemSheet sets
+    `tag: "form"` in DEFAULT_OPTIONS, so ApplicationV2 already renders the <form>
+    root that Foundry's form controller binds to. A <form> here produced a nested
+    form, and Enter in any text field submitted the *inner* one — bypassing the
+    controller and navigating the browser to /game?name=…
+
+    For the same reason every control is an <a>, never a <button>: a <button>
+    without an explicit type="button" defaults to type="submit" and re-enables
+    the browser's implicit form submission. (Same convention the Fallout system uses.)
+--}}
+<div class="{{alt}}-sheet {{alt}}-item-sheet" autocomplete="off">
     <header class="sheet-header">
         <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}"/>
         <div class="header-fields">
-            <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="{{localize 'Name'}}"/></h1>
+            <h1 class="charname">
+                <input name="name" type="text" value="{{item.name}}" placeholder="{{localize 'Name'}}"/>
+            </h1>
             <div class="grid grid-2col">
                 <div class="resource">
                     <label>{{localize 'ALTERNITY.ItemType'}}</label>
-                    <span>{{item.type}}</span>
+                    <span>{{typeLabel}}</span>
                 </div>
-                {{#if (or (eq item.type 'weapon') (eq item.type 'personalEquipment'))}}
+                {{#if hasQuantity}}
                 <div class="resource">
                     <label>{{localize 'ALTERNITY.Quantity'}}</label>
-                    <input type="number" name="system.quantity" value="{{system.quantity}}"/>
+                    <input type="number" name="system.quantity" value="{{system.quantity}}" data-dtype="Number" min="0"/>
                 </div>
                 {{/if}}
             </div>
@@ -29,81 +44,91 @@
 
         {{!-- Description Tab --}}
         <div class="tab {{#if (eq activeTab 'description')}}active{{/if}}" data-tab="description">
-            {{editor system.description target="system.description" button=true owner=owner editable=editable}}
+            {{!-- {{formInput}} renders the HTMLField as a <prose-mirror> element. The old
+                  {{editor … button=true}} helper injected an untyped <button>, which acted
+                  as a submit button and triggered the Enter-key navigation bug. --}}
+            {{#if systemFields.description}}
+                {{formInput systemFields.description value=system.description name="system.description"}}
+            {{else}}
+                <textarea name="system.description" rows="12">{{system.description}}</textarea>
+            {{/if}}
         </div>
 
         {{!-- Details Tab --}}
         <div class="tab details {{#if (eq activeTab 'details')}}active{{/if}}" data-tab="details">
-            {{#if (eq item.type 'weapon')}}
+
+            {{#if isWeapon}}
                 <div class="form-group">
                     <label>{{localize 'ALTERNITY.WeaponType'}}</label>
                     <select name="system.weaponType">
                         {{selectOptions config.weaponTypes selected=system.weaponType}}
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>{{localize 'ALTERNITY.DamageFormula'}}</label>
-                    <input type="text" name="system.damageFormula" value="{{system.damageFormula}}"/>
-                </div>
-                <div class="form-group">
-                    <label>{{localize 'ALTERNITY.DamageType'}}</label>
-                    <select name="system.damageType">
-                        {{selectOptions config.damageTypes selected=system.damageType}}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>{{localize 'ALTERNITY.DamageCategory'}}</label>
-                    <select name="system.damageCategory">
-                        <option value="stun" {{#if (eq system.damageCategory 'stun')}}selected{{/if}}>{{localize 'ALTERNITY.Stun'}}</option>
-                        <option value="wound" {{#if (eq system.damageCategory 'wound')}}selected{{/if}}>{{localize 'ALTERNITY.Wound'}}</option>
-                        <option value="mortal" {{#if (eq system.damageCategory 'mortal')}}selected{{/if}}>{{localize 'ALTERNITY.Mortal'}}</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>{{localize 'ALTERNITY.RequiredSkill'}}</label>
-                    <select name="system.requiredSkill">
-                        {{selectOptions config.skills selected=system.requiredSkill}}
-                    </select>
-                </div>
-                <div class="grid grid-3col">
+                <div class="grid grid-2col">
                     <div class="form-group">
-                        <label>{{localize 'ALTERNITY.Short'}}</label>
-                        <input type="number" name="system.range.short" value="{{system.range.short}}"/>
+                        <label>{{localize 'ALTERNITY.DamageFormula'}}</label>
+                        <input type="text" name="system.damageFormula" value="{{system.damageFormula}}" data-dtype="String"/>
                     </div>
                     <div class="form-group">
-                        <label>{{localize 'ALTERNITY.Medium'}}</label>
-                        <input type="number" name="system.range.medium" value="{{system.range.medium}}"/>
+                        <label>{{localize 'ALTERNITY.Weapon.DamageBonus'}}</label>
+                        <input type="number" name="system.damageBonus" value="{{system.damageBonus}}" data-dtype="Number"/>
+                    </div>
+                </div>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.DamageType'}}</label>
+                        <select name="system.damageType">
+                            {{selectOptions config.damageTypes selected=system.damageType}}
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label>{{localize 'ALTERNITY.Long'}}</label>
-                        <input type="number" name="system.range.long" value="{{system.range.long}}"/>
+                        <label>{{localize 'ALTERNITY.DamageCategory'}}</label>
+                        <select name="system.damageCategory">
+                            {{selectOptions config.damageCategories selected=system.damageCategory}}
+                        </select>
                     </div>
                 </div>
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Weapon.AttackAbility'}}</label>
                         <select name="system.attackAbility">
-                            <option value="str" {{#if (eq system.attackAbility 'str')}}selected{{/if}}>STR</option>
-                            <option value="dex" {{#if (eq system.attackAbility 'dex')}}selected{{/if}}>DEX</option>
+                            {{selectOptions config.attackAbilities selected=system.attackAbility}}
                         </select>
                     </div>
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Weapon.AttackBonus'}}</label>
-                        <input type="number" name="system.attackBonus" value="{{system.attackBonus}}"/>
+                        <input type="number" name="system.attackBonus" value="{{system.attackBonus}}" data-dtype="Number"/>
                     </div>
+                </div>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.RequiredSkill'}}</label>
+                    <select name="system.requiredSkill">
+                        <option value="">&mdash;</option>
+                        {{selectOptions config.skills selected=system.requiredSkill}}
+                    </select>
                 </div>
                 <div class="grid grid-3col">
                     <div class="form-group">
-                        <label>{{localize 'ALTERNITY.Weapon.DamageBonus'}}</label>
-                        <input type="number" name="system.damageBonus" value="{{system.damageBonus}}"/>
+                        <label>{{localize 'ALTERNITY.Short'}}</label>
+                        <input type="number" name="system.range.short" value="{{system.range.short}}" data-dtype="Number" min="0"/>
                     </div>
                     <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Medium'}}</label>
+                        <input type="number" name="system.range.medium" value="{{system.range.medium}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Long'}}</label>
+                        <input type="number" name="system.range.long" value="{{system.range.long}}" data-dtype="Number" min="0"/>
+                    </div>
+                </div>
+                <div class="grid grid-2col">
+                    <div class="form-group">
                         <label>{{localize 'ALTERNITY.TechPointCost'}}</label>
-                        <input type="number" name="system.techPointCost" value="{{system.techPointCost}}" min="0"/>
+                        <input type="number" name="system.techPointCost" value="{{system.techPointCost}}" data-dtype="Number" min="0"/>
                     </div>
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Weight'}}</label>
-                        <input type="number" name="system.weight" value="{{system.weight}}" min="0" step="0.1"/>
+                        <input type="number" name="system.weight" value="{{system.weight}}" data-dtype="Number" min="0" step="0.1"/>
                     </div>
                 </div>
 
@@ -117,7 +142,7 @@
                 </div>
             {{/if}}
 
-            {{#if (eq item.type 'armor')}}
+            {{#if isArmor}}
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Armor.Type'}}</label>
@@ -127,29 +152,29 @@
                     </div>
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Armor.DefenseBonus'}}</label>
-                        <input type="number" name="system.armorBonus" value="{{system.armorBonus}}" min="0" max="15"/>
+                        <input type="number" name="system.armorBonus" value="{{system.armorBonus}}" data-dtype="Number" min="0" max="15"/>
                     </div>
                 </div>
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.SpeedPenalty'}}</label>
-                        <input type="number" name="system.speedPenalty" value="{{system.speedPenalty}}" min="0"/>
+                        <input type="number" name="system.speedPenalty" value="{{system.speedPenalty}}" data-dtype="Number" min="0" max="30"/>
                     </div>
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Armor.SkillPenalty'}}</label>
-                        <input type="number" name="system.skillPenalty" value="{{system.skillPenalty}}" min="0"/>
+                        <input type="number" name="system.skillPenalty" value="{{system.skillPenalty}}" data-dtype="Number" min="0" max="10"/>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>{{localize 'ALTERNITY.Armor.DamageResistance'}}</label>
-                    <input type="number" name="system.damageResistance" value="{{system.damageResistance}}" min="0"/>
+                    <input type="number" name="system.damageResistance" value="{{system.damageResistance}}" data-dtype="Number" min="0"/>
                 </div>
                 <div class="form-group">
                     <label>{{localize 'ALTERNITY.Armor.ResistedTypes'}}</label>
                     <div class="alt-checkbox-row">
                         {{#each config.damageTypes as |label key|}}
                         <label class="alt-checkbox-inline">
-                            <input type="checkbox" name="system.resistedTypes" value="{{key}}" {{#if (includes system.resistedTypes key)}}checked{{/if}}/>
+                            <input type="checkbox" name="system.resistedTypes" value="{{key}}" {{#if (includes ../system.resistedTypes key)}}checked{{/if}}/>
                             {{key}}
                         </label>
                         {{/each}}
@@ -158,11 +183,11 @@
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.TechPointCost'}}</label>
-                        <input type="number" name="system.techPointCost" value="{{system.techPointCost}}" min="0"/>
+                        <input type="number" name="system.techPointCost" value="{{system.techPointCost}}" data-dtype="Number" min="0"/>
                     </div>
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Weight'}}</label>
-                        <input type="number" name="system.weight" value="{{system.weight}}" min="0" step="0.1"/>
+                        <input type="number" name="system.weight" value="{{system.weight}}" data-dtype="Number" min="0" step="0.1"/>
                     </div>
                 </div>
 
@@ -178,34 +203,38 @@
                     {{/if}}
                 </div>
             {{/if}}
-            
-            {{#if (eq item.type 'computer')}}
+
+            {{#if isComputer}}
                 <div class="form-group">
                     <label>{{localize 'ALTERNITY.Computer.Processor'}}</label>
-                    <input type="text" name="system.processorQuality" value="{{system.processorQuality}}"/>
+                    <input type="text" name="system.processorQuality" value="{{system.processorQuality}}" data-dtype="String"/>
                 </div>
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Computer.Memory'}}</label>
-                        <input type="number" name="system.activeMemory" value="{{system.activeMemory}}"/>
+                        <input type="number" name="system.activeMemory" value="{{system.activeMemory}}" data-dtype="Number" min="0"/>
                     </div>
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Computer.Storage'}}</label>
-                        <input type="number" name="system.activeStorage" value="{{system.activeStorage}}"/>
+                        <input type="number" name="system.activeStorage" value="{{system.activeStorage}}" data-dtype="Number" min="0"/>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>{{localize 'ALTERNITY.Computer.Programs'}}</label>
-                    <textarea name="system.programs" rows="10">{{system.programs}}</textarea>
+                    {{#if systemFields.programs}}
+                        {{formInput systemFields.programs value=system.programs name="system.programs"}}
+                    {{else}}
+                        <textarea name="system.programs" rows="10">{{system.programs}}</textarea>
+                    {{/if}}
                 </div>
             {{/if}}
 
-            {{#if (eq item.type 'skill')}}
+            {{#if isSkill}}
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Skill.SkillId'}}</label>
                         <select name="system.skillId">
-                            <option value="">—</option>
+                            <option value="">&mdash;</option>
                             {{selectOptions config.skills selected=system.skillId}}
                         </select>
                     </div>
@@ -219,10 +248,10 @@
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Skill.Rank'}}</label>
-                        <input type="number" name="system.rank" value="{{system.rank}}" min="0" max="10"/>
+                        <input type="number" name="system.rank" value="{{system.rank}}" data-dtype="Number" min="0" max="10"/>
                     </div>
                     <div class="form-group">
-                        <label>
+                        <label class="alt-checkbox-inline">
                             <input type="checkbox" name="system.isBackground" data-dtype="Boolean" {{#if system.isBackground}}checked{{/if}}/>
                             {{localize 'ALTERNITY.Skill.IsBackground'}}
                         </label>
@@ -231,11 +260,11 @@
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Skill.Specialisation'}}</label>
-                        <input type="text" name="system.specialisation" value="{{system.specialisation}}"/>
+                        <input type="text" name="system.specialisation" value="{{system.specialisation}}" data-dtype="String"/>
                     </div>
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Skill.SpecialisationBonus'}}</label>
-                        <input type="number" name="system.specialisationBonus" value="{{system.specialisationBonus}}" min="0" max="5"/>
+                        <input type="number" name="system.specialisationBonus" value="{{system.specialisationBonus}}" data-dtype="Number" min="0" max="5"/>
                     </div>
                 </div>
 
@@ -248,7 +277,7 @@
                 </div>
             {{/if}}
 
-            {{#if (eq item.type 'effect')}}
+            {{#if isEffect}}
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Effect.Category'}}</label>
@@ -271,7 +300,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>
+                        <label class="alt-checkbox-inline">
                             <input type="checkbox" name="system.isReusable" data-dtype="Boolean" {{#if system.isReusable}}checked{{/if}}/>
                             {{localize 'ALTERNITY.Effect.IsReusable'}}
                         </label>
@@ -280,20 +309,23 @@
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.TechPoints'}}</label>
-                        <input type="number" name="system.techPointCost" value="{{system.techPointCost}}" min="0"/>
+                        <input type="number" name="system.techPointCost" value="{{system.techPointCost}}" data-dtype="Number" min="0"/>
                     </div>
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.PsiPoints'}}</label>
-                        <input type="number" name="system.psiPointCost" value="{{system.psiPointCost}}" min="0"/>
+                        <input type="number" name="system.psiPointCost" value="{{system.psiPointCost}}" data-dtype="Number" min="0"/>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>{{localize 'ALTERNITY.Effect.TriggerContext'}}</label>
-                    <input type="text" name="system.triggerContext" value="{{system.triggerContext}}" placeholder="Combat, Stealth, Any…"/>
+                    <input type="text" name="system.triggerContext" value="{{system.triggerContext}}" data-dtype="String" placeholder="Combat, Stealth, Any…"/>
                 </div>
 
                 <div class="alt-item-array-section">
-                    <h3>{{localize 'ALTERNITY.Effect.Entries'}} <button type="button" data-action="addArrayRow" data-array="effects">+</button></h3>
+                    <h3>
+                        {{localize 'ALTERNITY.Effect.Entries'}}
+                        <a class="alt-item-array-add" data-action="addArrayRow" data-array="effects" data-tooltip="{{localize 'ALTERNITY.AddRow'}}"><i class="fas fa-plus"></i></a>
+                    </h3>
                     <div class="alt-item-array-table">
                         {{#each system.effects as |row idx|}}
                         <div class="alt-item-array-row">
@@ -302,25 +334,28 @@
                                 <option value="{{choice}}" {{#if (eq row.effectType choice)}}selected{{/if}}>{{choice}}</option>
                                 {{/each}}
                             </select>
-                            <input type="number" name="system.effects.{{idx}}.value" value="{{row.value}}" title="{{localize 'ALTERNITY.Effect.Value'}}"/>
+                            <input type="number" name="system.effects.{{idx}}.value" value="{{row.value}}" data-dtype="Number" title="{{localize 'ALTERNITY.Effect.Value'}}"/>
                             <select name="system.effects.{{idx}}.damageType" title="{{localize 'ALTERNITY.DamageType'}}">
                                 {{selectOptions ../config.damageTypes selected=row.damageType}}
                             </select>
-                            <input type="text" name="system.effects.{{idx}}.stat" value="{{row.stat}}" placeholder="{{localize 'ALTERNITY.Effect.Stat'}}"/>
+                            <input type="text" name="system.effects.{{idx}}.stat" value="{{row.stat}}" data-dtype="String" placeholder="{{localize 'ALTERNITY.Effect.Stat'}}"/>
                             <select name="system.effects.{{idx}}.duration">
                                 {{#each ../config.effectDurations as |choice|}}
                                 <option value="{{choice}}" {{#if (eq row.duration choice)}}selected{{/if}}>{{choice}}</option>
                                 {{/each}}
                             </select>
-                            <input type="text" name="system.effects.{{idx}}.notes" value="{{row.notes}}" placeholder="{{localize 'ALTERNITY.Effect.Notes'}}"/>
-                            <button type="button" data-action="deleteArrayRow" data-array="effects" data-index="{{idx}}">✕</button>
+                            <input type="text" name="system.effects.{{idx}}.notes" value="{{row.notes}}" data-dtype="String" placeholder="{{localize 'ALTERNITY.Effect.Notes'}}"/>
+                            <a class="alt-item-array-delete" data-action="deleteArrayRow" data-array="effects" data-index="{{idx}}" data-tooltip="{{localize 'ALTERNITY.DeleteRow'}}"><i class="fas fa-times"></i></a>
                         </div>
                         {{/each}}
                     </div>
                 </div>
 
                 <div class="alt-item-array-section">
-                    <h3>{{localize 'ALTERNITY.Effect.RequiredChecks'}} <button type="button" data-action="addArrayRow" data-array="requiredChecks">+</button></h3>
+                    <h3>
+                        {{localize 'ALTERNITY.Effect.RequiredChecks'}}
+                        <a class="alt-item-array-add" data-action="addArrayRow" data-array="requiredChecks" data-tooltip="{{localize 'ALTERNITY.AddRow'}}"><i class="fas fa-plus"></i></a>
+                    </h3>
                     <div class="alt-item-array-table">
                         {{#each system.requiredChecks as |row idx|}}
                         <div class="alt-item-array-row alt-item-array-row-wrap">
@@ -329,9 +364,9 @@
                                 <option value="{{choice}}" {{#if (eq row.checkType choice)}}selected{{/if}}>{{choice}}</option>
                                 {{/each}}
                             </select>
-                            <input type="text" name="system.requiredChecks.{{idx}}.failMessage" value="{{row.failMessage}}" placeholder="{{localize 'ALTERNITY.Effect.FailMessage'}}"/>
+                            <input type="text" name="system.requiredChecks.{{idx}}.failMessage" value="{{row.failMessage}}" data-dtype="String" placeholder="{{localize 'ALTERNITY.Effect.FailMessage'}}"/>
                             <textarea name="system.requiredChecks.{{idx}}.params" rows="1" placeholder="{{localize 'ALTERNITY.Effect.Params'}}">{{row.paramsJson}}</textarea>
-                            <button type="button" data-action="deleteArrayRow" data-array="requiredChecks" data-index="{{idx}}">✕</button>
+                            <a class="alt-item-array-delete" data-action="deleteArrayRow" data-array="requiredChecks" data-index="{{idx}}" data-tooltip="{{localize 'ALTERNITY.DeleteRow'}}"><i class="fas fa-times"></i></a>
                         </div>
                         {{/each}}
                     </div>
@@ -343,7 +378,7 @@
                 </div>
             {{/if}}
 
-            {{#if (eq item.type 'perkFlaw')}}
+            {{#if isPerkFlaw}}
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.PerkFlaw.Category'}}</label>
@@ -369,7 +404,7 @@
                 {{/if}}
 
                 <div class="form-group">
-                    <label>
+                    <label class="alt-checkbox-inline">
                         <input type="checkbox" name="system.isTiered" data-dtype="Boolean" {{#if system.isTiered}}checked{{/if}}/>
                         {{localize 'ALTERNITY.PerkFlaw.IsTiered'}}
                     </label>
@@ -379,25 +414,25 @@
                     <div class="grid grid-3col">
                         <div class="form-group">
                             <label>{{localize 'ALTERNITY.PerkFlaw.TierCost'}} 1</label>
-                            <input type="number" name="system.tierCosts.0" value="{{lookup system.tierCosts 0}}"/>
+                            <input type="number" name="system.tierCosts.0" value="{{lookup system.tierCosts 0}}" data-dtype="Number" min="0"/>
                         </div>
                         <div class="form-group">
                             <label>{{localize 'ALTERNITY.PerkFlaw.TierCost'}} 2</label>
-                            <input type="number" name="system.tierCosts.1" value="{{lookup system.tierCosts 1}}"/>
+                            <input type="number" name="system.tierCosts.1" value="{{lookup system.tierCosts 1}}" data-dtype="Number" min="0"/>
                         </div>
                         <div class="form-group">
                             <label>{{localize 'ALTERNITY.PerkFlaw.TierCost'}} 3</label>
-                            <input type="number" name="system.tierCosts.2" value="{{lookup system.tierCosts 2}}"/>
+                            <input type="number" name="system.tierCosts.2" value="{{lookup system.tierCosts 2}}" data-dtype="Number" min="0"/>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.PerkFlaw.CurrentTier'}}</label>
-                        <input type="number" name="system.currentTier" value="{{system.currentTier}}" min="0" max="3"/>
+                        <input type="number" name="system.currentTier" value="{{system.currentTier}}" data-dtype="Number" min="0" max="3"/>
                     </div>
                 {{else}}
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.PerkFlaw.Cost'}}</label>
-                        <input type="number" name="system.cost" value="{{system.cost}}"/>
+                        <input type="number" name="system.cost" value="{{system.cost}}" data-dtype="Number" min="0"/>
                     </div>
                 {{/if}}
 
@@ -409,7 +444,7 @@
                 </div>
             {{/if}}
 
-            {{#if (eq item.type 'personalEquipment')}}
+            {{#if isPersonalEquipment}}
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.PersonalEquipment.Category'}}</label>
@@ -419,36 +454,36 @@
                     </div>
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.PersonalEquipment.ProgressLevel'}}</label>
-                        <input type="number" name="system.progressLevel" value="{{system.progressLevel}}" min="0" max="8"/>
+                        <input type="number" name="system.progressLevel" value="{{system.progressLevel}}" data-dtype="Number" min="0" max="8"/>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>{{localize 'ALTERNITY.PersonalEquipment.Cost'}}</label>
-                    <input type="number" name="system.cost" value="{{system.cost}}" min="0"/>
+                    <input type="number" name="system.cost" value="{{system.cost}}" data-dtype="Number" min="0"/>
                 </div>
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.PersonalEquipment.BonusSkill'}}</label>
-                        <input type="text" name="system.bonusSkill" value="{{system.bonusSkill}}"/>
+                        <input type="text" name="system.bonusSkill" value="{{system.bonusSkill}}" data-dtype="String"/>
                     </div>
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.PersonalEquipment.BonusValue'}}</label>
-                        <input type="number" name="system.bonusValue" value="{{system.bonusValue}}"/>
+                        <input type="number" name="system.bonusValue" value="{{system.bonusValue}}" data-dtype="Number"/>
                     </div>
                 </div>
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.PersonalEquipment.MaxCharges'}}</label>
-                        <input type="number" name="system.maxCharges" value="{{system.maxCharges}}" min="0"/>
+                        <input type="number" name="system.maxCharges" value="{{system.maxCharges}}" data-dtype="Number" min="0"/>
                     </div>
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.PersonalEquipment.CurrentCharges'}}</label>
-                        <input type="number" name="system.currentCharges" value="{{system.currentCharges}}" min="0"/>
+                        <input type="number" name="system.currentCharges" value="{{system.currentCharges}}" data-dtype="Number" min="0"/>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>{{localize 'ALTERNITY.PersonalEquipment.PowerNotes'}}</label>
-                    <input type="text" name="system.powerNotes" value="{{system.powerNotes}}"/>
+                    <input type="text" name="system.powerNotes" value="{{system.powerNotes}}" data-dtype="String"/>
                 </div>
 
                 <div class="alt-item-summary">
@@ -463,12 +498,22 @@
                 </div>
             {{/if}}
 
-            {{#if (or (eq item.type 'computer') (eq item.type 'personalEquipment'))}}
+            {{!-- Shared inventory fields, only for the types whose schema defines them --}}
+            {{#if hasMass}}
             <div class="form-group">
                 <label>{{localize 'ALTERNITY.Mass'}}</label>
-                <input type="number" name="system.mass" value="{{system.mass}}" step="0.1"/>
+                <input type="number" name="system.mass" value="{{system.mass}}" data-dtype="Number" min="0" step="0.1"/>
+            </div>
+            {{/if}}
+
+            {{#if hasEquipToggle}}
+            <div class="form-group">
+                <label class="alt-checkbox-inline">
+                    <input type="checkbox" name="system.isEquipped" data-dtype="Boolean" {{#if system.isEquipped}}checked{{/if}}/>
+                    {{localize 'ALTERNITY.Equipped'}}
+                </label>
             </div>
             {{/if}}
         </div>
     </section>
-</form>
+</div>

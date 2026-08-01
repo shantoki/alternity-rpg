@@ -14,6 +14,9 @@ export class ComputerData extends foundry.abstract.TypeDataModel {
             activeMemory: new fields.NumberField({ initial: 0, min: 0 }),
             activeStorage: new fields.NumberField({ initial: 0, min: 0 }),
             programs: new fields.HTMLField({ initial: '' }),
+            // Every other item type defines this and the shared sheet's Description tab
+            // binds to it — without it, anything typed there was silently discarded.
+            description: new fields.HTMLField({ required: false, initial: '' }),
         };
     }
 }

@@ -170,5 +170,7 @@
   "ALTERNITY.Armor.DefenseBonus": "Defense Bonus",
   "ALTERNITY.Armor.SkillPenalty": "Skill Penalty",
   "ALTERNITY.Armor.DamageResistance": "Damage Resistance",
-  "ALTERNITY.Armor.ResistedTypes": "Resisted Types (empty = resists all)"
+  "ALTERNITY.Armor.ResistedTypes": "Resisted Types (empty = resists all)",
+  "ALTERNITY.AddRow": "Add row",
+  "ALTERNITY.DeleteRow": "Remove row"
 }

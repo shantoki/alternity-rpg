@@ -1216,6 +1216,24 @@
 .alt-item-sheet .tab { display: none; }
 .alt-item-sheet .tab.active { display: block; }
 
+/* {{formInput}} on an HTMLField renders a <prose-mirror> custom element, which has no
+   intrinsic height — without this the Description tab collapses to nothing. */
+.alt-item-sheet .tab[data-tab="description"].active {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.alt-item-sheet prose-mirror {
+    display: block;
+    min-height: 160px;
+    padding: 4px 6px;
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--alt-color-border);
+    border-radius: var(--alt-radius);
+    overflow-y: auto;
+}
+.alt-item-sheet .tab[data-tab="description"] prose-mirror { flex: 1; }
+
 .alt-item-sheet .form-group {
     display: flex;
     flex-direction: column;
@@ -1256,6 +1274,20 @@
     padding-bottom: 2px;
     margin: 0 0 4px;
 }
+/* Row add/remove controls are anchors, not <button>s: a button without an explicit
+   type="button" defaults to type="submit" and re-enables the browser's implicit form
+   submission (Enter in a text field would navigate the page). */
+.alt-item-sheet .alt-item-array-add,
+.alt-item-sheet .alt-item-array-delete {
+    flex: 0 0 auto;
+    cursor: pointer;
+    color: var(--alt-color-text);
+    opacity: 0.7;
+    padding: 0 3px;
+}
+.alt-item-sheet .alt-item-array-add:hover { color: var(--alt-color-primary); opacity: 1; }
+.alt-item-sheet .alt-item-array-delete:hover { color: var(--alt-color-danger, #c8503c); opacity: 1; }
+
 .alt-item-sheet .alt-item-array-table { display: flex; flex-direction: column; gap: 4px; }
 .alt-item-sheet .alt-item-array-row {
     display: flex;
