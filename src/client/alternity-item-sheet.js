@@ -91,21 +91,11 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
         context.systemFields = item.system?.schema?.fields ?? {};
         context.activeTab    = this._activeTab || 'description';
 
-        // Explicit per-type booleans rather than repeated `(eq item.type '…')` calls in the
-        // template: a single missing context key or helper can't blank out the whole
-        // Details tab this way, which is exactly the failure mode that hid these fields.
-        context.isWeapon            = item.type === 'weapon';
-        context.isArmor             = item.type === 'armor';
-        context.isComputer          = item.type === 'computer';
-        context.isSkill             = item.type === 'skill';
-        context.isEffect            = item.type === 'effect';
-        context.isPerkFlaw          = item.type === 'perkFlaw';
-        context.isPersonalEquipment = item.type === 'personalEquipment';
-
-        // Which shared fields this type's schema actually defines.
-        context.hasQuantity    = context.isWeapon || context.isPersonalEquipment;
-        context.hasMass        = context.isComputer || context.isPersonalEquipment;
-        context.hasEquipToggle = context.isWeapon || context.isArmor || context.isPersonalEquipment;
+        // NOTE: the template deliberately branches on `document.type` (supplied by
+        // DocumentSheetV2._prepareContext) rather than on per-type flags added here.
+        // Binding the type branches to framework-provided context means a problem in this
+        // method can't blank out the entire Details tab — which is exactly what happened
+        // when `context.item` was missing and every `(eq item.type '…')` test saw undefined.
 
         // Provide configuration choices for selects
         context.config = {

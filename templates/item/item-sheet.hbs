@@ -12,18 +12,23 @@
     the browser's implicit form submission. (Same convention the Fallout system uses.)
 --}}
 <div class="{{alt}}-sheet {{alt}}-item-sheet" autocomplete="off">
+    {{!--
+        The header binds to `source` and `document`, which DocumentSheetV2._prepareContext
+        always supplies, rather than to a context key this sheet class adds itself. `source`
+        is the raw document._source, which is what a form input should round-trip.
+    --}}
     <header class="sheet-header">
-        <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}"/>
+        <img class="profile-img" src="{{source.img}}" data-edit="img" title="{{source.name}}"/>
         <div class="header-fields">
             <h1 class="charname">
-                <input name="name" type="text" value="{{item.name}}" placeholder="{{localize 'Name'}}"/>
+                <input name="name" type="text" value="{{source.name}}" placeholder="{{localize 'Name'}}"/>
             </h1>
             <div class="grid grid-2col">
                 <div class="resource">
                     <label>{{localize 'ALTERNITY.ItemType'}}</label>
-                    <span>{{typeLabel}}</span>
+                    <span>{{#if typeLabel}}{{typeLabel}}{{else}}{{document.type}}{{/if}}</span>
                 </div>
-                {{#if hasQuantity}}
+                {{#if (or (eq document.type 'weapon') (eq document.type 'personalEquipment'))}}
                 <div class="resource">
                     <label>{{localize 'ALTERNITY.Quantity'}}</label>
                     <input type="number" name="system.quantity" value="{{system.quantity}}" data-dtype="Number" min="0"/>
@@ -57,7 +62,7 @@
         {{!-- Details Tab --}}
         <div class="tab details {{#if (eq activeTab 'details')}}active{{/if}}" data-tab="details">
 
-            {{#if isWeapon}}
+            {{#if (eq document.type 'weapon')}}
                 <div class="form-group">
                     <label>{{localize 'ALTERNITY.WeaponType'}}</label>
                     <select name="system.weaponType">
@@ -142,7 +147,7 @@
                 </div>
             {{/if}}
 
-            {{#if isArmor}}
+            {{#if (eq document.type 'armor')}}
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Armor.Type'}}</label>
@@ -204,7 +209,7 @@
                 </div>
             {{/if}}
 
-            {{#if isComputer}}
+            {{#if (eq document.type 'computer')}}
                 <div class="form-group">
                     <label>{{localize 'ALTERNITY.Computer.Processor'}}</label>
                     <input type="text" name="system.processorQuality" value="{{system.processorQuality}}" data-dtype="String"/>
@@ -229,7 +234,7 @@
                 </div>
             {{/if}}
 
-            {{#if isSkill}}
+            {{#if (eq document.type 'skill')}}
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Skill.SkillId'}}</label>
@@ -277,7 +282,7 @@
                 </div>
             {{/if}}
 
-            {{#if isEffect}}
+            {{#if (eq document.type 'effect')}}
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Effect.Category'}}</label>
@@ -378,7 +383,7 @@
                 </div>
             {{/if}}
 
-            {{#if isPerkFlaw}}
+            {{#if (eq document.type 'perkFlaw')}}
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.PerkFlaw.Category'}}</label>
@@ -444,7 +449,7 @@
                 </div>
             {{/if}}
 
-            {{#if isPersonalEquipment}}
+            {{#if (eq document.type 'personalEquipment')}}
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.PersonalEquipment.Category'}}</label>
@@ -499,14 +504,14 @@
             {{/if}}
 
             {{!-- Shared inventory fields, only for the types whose schema defines them --}}
-            {{#if hasMass}}
+            {{#if (or (eq document.type 'computer') (eq document.type 'personalEquipment'))}}
             <div class="form-group">
                 <label>{{localize 'ALTERNITY.Mass'}}</label>
                 <input type="number" name="system.mass" value="{{system.mass}}" data-dtype="Number" min="0" step="0.1"/>
             </div>
             {{/if}}
 
-            {{#if hasEquipToggle}}
+            {{#if (or (or (eq document.type 'weapon') (eq document.type 'armor')) (eq document.type 'personalEquipment'))}}
             <div class="form-group">
                 <label class="alt-checkbox-inline">
                     <input type="checkbox" name="system.isEquipped" data-dtype="Boolean" {{#if system.isEquipped}}checked{{/if}}/>
