@@ -78,6 +78,9 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
         // every `{{#if (eq item.type '…')}}` Details branch silently resolved against
         // undefined, which is why the sheet showed a blank name and an empty Details tab.
         // Every actor sheet in this system sets its own `context.actor` the same way.
+        // That empty Details tab was also the reason Enter used to navigate the browser:
+        // it left the form with exactly one text input, which is the only case where a
+        // submit-button-less form submits implicitly. See the note in item-sheet.hbs.
         context.item     = item;
         context.system   = item.system;
         context.itemType = item.type;

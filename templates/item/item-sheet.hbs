@@ -3,13 +3,22 @@
 
     NOTE: this template must NOT declare its own <form>. AlternityItemSheet sets
     `tag: "form"` in DEFAULT_OPTIONS, so ApplicationV2 already renders the <form>
-    root that Foundry's form controller binds to. A <form> here produced a nested
-    form, and Enter in any text field submitted the *inner* one — bypassing the
-    controller and navigating the browser to /game?name=…
+    root that Foundry's form controller binds to. Declaring one here produced a
+    nested form (it survives parsing because HandlebarsApplicationMixin builds part
+    HTML in a detached <div>), which made every input belong to the *inner* form —
+    the one with no submit handler. Enter then triggered the browser's native
+    submission and navigated to /game?name=…
 
-    For the same reason every control is an <a>, never a <button>: a <button>
-    without an explicit type="button" defaults to type="submit" and re-enables
-    the browser's implicit form submission. (Same convention the Fallout system uses.)
+    What made that reachable at all: per the HTML spec, a form with no submit button
+    only submits implicitly when it has *exactly one* field that blocks implicit
+    submission (text/number-style inputs; select and textarea don't count). Back when
+    the Details tab rendered empty, Name was the only such field. That is also why the
+    actor sheets never showed this despite having the same nested <form> — they have
+    dozens of inputs, so the browser refuses to submit implicitly.
+
+    Controls here are <a>, never <button>, as defensive habit (the Fallout system uses
+    the same convention): a <button> without an explicit type="button" is a submit
+    button, and a submit button bypasses the one-field rule entirely.
 --}}
 <div class="{{alt}}-sheet {{alt}}-item-sheet" autocomplete="off">
     {{!--
