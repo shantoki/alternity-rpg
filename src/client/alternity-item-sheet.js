@@ -121,12 +121,9 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
                 'Ballistic', 'Energy', 'Laser', 'Piercing', 'Slashing',
                 'Impact', 'Incendiary', 'Toxic', 'Radiation', 'Psionic',
             ].reduce((obj, val) => { obj[val] = val; return obj; }, {}),
-            damageCategories: {
-                stun:   game.i18n.localize('ALTERNITY.Stun'),
-                wound:  game.i18n.localize('ALTERNITY.Wound'),
-                mortal: game.i18n.localize('ALTERNITY.Mortal'),
-            },
-            attackAbilities: { str: 'STR', dex: 'DEX' },
+            // NOTE: damageCategory and attackAbility deliberately have no entry here —
+            // the template renders those two selects with inline <option> markup so it
+            // does not depend on config keys introduced in the same change as the markup.
             perkFlawCategories: { Perk: 'Perk', Flaw: 'Flaw' },
             perkFlawAbilities: ['STR', 'DEX', 'CON', 'INT', 'WIL', 'PER', 'Special', 'None']
                 .reduce((obj, val) => { obj[val] = val; return obj; }, {}),

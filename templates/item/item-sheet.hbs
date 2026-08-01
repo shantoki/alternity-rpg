@@ -97,8 +97,13 @@
                     </div>
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.DamageCategory'}}</label>
+                        {{!-- Inline options on purpose: these mirror the schema's own
+                              `choices` and need no context.config key, so the sheet still
+                              renders if _prepareContext ever fails to supply one. --}}
                         <select name="system.damageCategory">
-                            {{selectOptions config.damageCategories selected=system.damageCategory}}
+                            <option value="stun" {{#if (eq system.damageCategory 'stun')}}selected{{/if}}>{{localize 'ALTERNITY.Stun'}}</option>
+                            <option value="wound" {{#if (eq system.damageCategory 'wound')}}selected{{/if}}>{{localize 'ALTERNITY.Wound'}}</option>
+                            <option value="mortal" {{#if (eq system.damageCategory 'mortal')}}selected{{/if}}>{{localize 'ALTERNITY.Mortal'}}</option>
                         </select>
                     </div>
                 </div>
@@ -106,7 +111,8 @@
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Weapon.AttackAbility'}}</label>
                         <select name="system.attackAbility">
-                            {{selectOptions config.attackAbilities selected=system.attackAbility}}
+                            <option value="str" {{#if (eq system.attackAbility 'str')}}selected{{/if}}>STR</option>
+                            <option value="dex" {{#if (eq system.attackAbility 'dex')}}selected{{/if}}>DEX</option>
                         </select>
                     </div>
                     <div class="form-group">
