@@ -12,30 +12,21 @@ const EFFECT_ARRAY_DEFAULTS = Object.freeze({
     requiredChecks: { checkType: 'resource', params: {}, failMessage: '' },
 });
 
-// Registered once, at module load, on `document` in the capture phase — this fires
-// before any per-instance listener attached to `this.element` could be skipped by an
-// unexpected stopPropagation(), and doesn't depend on exactly which <form> element
-// (outer app shell vs. the template's own nested <form>) ends up as the actual
-// implicit-submission target. Belt-and-suspenders against the item sheet's Enter key
-// triggering the browser's native form submission (a real GET request to the current
-// URL, since our forms have no explicit action/method) — every field is already saved
-// via the per-sheet 'change' listener in _onRender, so native submission is never wanted.
-document.addEventListener('submit', (e) => {
-    if (e.target?.closest?.('.alt-item-sheet')) e.preventDefault();
-}, true);
-
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && e.target instanceof HTMLInputElement && e.target.closest?.('.alt-item-sheet')) {
-        e.preventDefault();
-    }
-}, true);
-
 export class AlternityItemSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ItemSheetV2) {
     /** @override */
     static get DEFAULT_OPTIONS() {
         return foundry.utils.mergeObject(super.DEFAULT_OPTIONS, {
             classes: [NS, `${NS}-item-sheet`],
             tag: "form",
+            // DocumentSheetV2's own form controller owns the <form>'s submit/Enter-key
+            // handling and already updates `this.document` from the form on submit —
+            // submitOnChange makes it fire on every field change too, so we don't need
+            // to hand-roll a `change` listener or guard against native form submission
+            // ourselves (both were tried earlier and fought against this built-in behavior
+            // instead of using it).
+            form: {
+                submitOnChange: true,
+            },
             window: {
                 resizable: true,
                 width: 500,
@@ -138,32 +129,4 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
         return context;
     }
 
-    /** @override */
-    _onRender(context, options) {
-        // Tab switching is handled by the switchTab action (see DEFAULT_OPTIONS.actions).
-        // Native-submit prevention is handled once, globally, at module load (see the
-        // document-level capture-phase listeners above) rather than per-instance here.
-
-        // ApplicationV2 doesn't auto-save on input change, so wire it up manually —
-        // mirrors the identical pattern in AlternityNpcSheet/AlternityVehicleSheet/AlternityWarshipSheet.
-        this.element.addEventListener('change', (e) => {
-            const input = e.target;
-            if (!input.name) return;
-
-            if (input.type === 'checkbox') {
-                // Multiple checkboxes sharing a name (e.g. armor's resistedTypes) form
-                // an array field — collect every checked value, not just this one.
-                const group = this.element.querySelectorAll(`[name="${input.name}"]`);
-                if (group.length > 1) {
-                    const values = Array.from(group).filter(el => el.checked).map(el => el.value);
-                    this.item.update({ [input.name]: values });
-                    return;
-                }
-                this.item.update({ [input.name]: input.checked });
-                return;
-            }
-
-            this.item.update({ [input.name]: input.value });
-        });
-    }
 }
