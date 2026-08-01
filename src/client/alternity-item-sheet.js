@@ -123,5 +123,26 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
     /** @override */
     _onRender(context, options) {
         // Tab switching is handled by the switchTab action (see DEFAULT_OPTIONS.actions).
+        // ApplicationV2 doesn't auto-save on input change, so wire it up manually —
+        // mirrors the identical pattern in AlternityNpcSheet/AlternityVehicleSheet/AlternityWarshipSheet.
+        this.element.addEventListener('change', (e) => {
+            const input = e.target;
+            if (!input.name) return;
+
+            if (input.type === 'checkbox') {
+                // Multiple checkboxes sharing a name (e.g. armor's resistedTypes) form
+                // an array field — collect every checked value, not just this one.
+                const group = this.element.querySelectorAll(`[name="${input.name}"]`);
+                if (group.length > 1) {
+                    const values = Array.from(group).filter(el => el.checked).map(el => el.value);
+                    this.item.update({ [input.name]: values });
+                    return;
+                }
+                this.item.update({ [input.name]: input.checked });
+                return;
+            }
+
+            this.item.update({ [input.name]: input.value });
+        });
     }
 }
