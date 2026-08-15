@@ -5,13 +5,6 @@
 
 const NS = 'alt';
 
-// TEMPORARY diagnostic: Foundry re-fetches .hbs templates on every reload but the browser
-// can serve this ES module from cache, so template edits go live while JS edits silently
-// do not — which produced a very confusing round of "the fix didn't work" reports.
-// If this line is absent from the console, the sheet is running stale cached JS.
-// Safe to delete once we've confirmed cache behaviour.
-console.log('[Alternity] alternity-item-sheet.js build 2026-08-01-a loaded');
-
 // Default row shapes for the effect item's array fields, keyed by field name
 // (mirrors the generic add/delete-row pattern used by AlternityWarshipSheet).
 const EFFECT_ARRAY_DEFAULTS = Object.freeze({
