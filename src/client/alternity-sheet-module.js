@@ -230,6 +230,8 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
                 rollWeapon:     this._onRollWeaponAction,
                 rollPerkCheck:  this._onRollPerkCheckAction,
                 useCharge:      this._onUseChargeAction,
+                toggleInstalled: this._onToggleInstalledAction,
+                rollCyberCheck:  this._onRollCyberCheckAction,
                 setPsionicEnergy: this._onPsionicPipAction,
                 editState:      this._onEditStateAction
             }
@@ -324,8 +326,21 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
             armor:   this.document.items.filter(i => i.type === 'armor'),
             computers: this.document.items.filter(i => i.type === 'computer'),
             perksFlaws: this.document.items.filter(i => i.type === 'perkFlaw'),
-            personalEquipment: this.document.items.filter(i => i.type === 'personalEquipment')
+            personalEquipment: this.document.items.filter(i => i.type === 'personalEquipment'),
+            cybertech: this.document.items.filter(i => i.type === 'cybertech')
         };
+
+        // Cyber tolerance is derived from CON + the sizes of installed cybertech items
+        // (PHB Ch.15), so the sheet reads it rather than storing it. Called defensively:
+        // template and document-class changes can reach a live server out of step.
+        context.cyberTolerance = this.document.getCyberTolerance?.() ?? null;
+        context.cyberToleranceTrack = context.cyberTolerance
+            ? ['left', 'centre', 'right'].map(section => ({
+                section,
+                boxes: [...Array(context.cyberTolerance.sections[section]).keys()]
+                    .map(i => i < context.cyberTolerance.filled[section]),
+            }))
+            : [];
 
         context.woundLevel       = state.woundLevel;
         context.WOUND_LEVELS     = WOUND_LEVELS;
@@ -575,6 +590,65 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
         }
         const score = this._altState.abilityScores[abilityKey] ?? 10;
         this._openRoller([{ name: item.name, scores: { ordinary: score, good: Math.floor(score/2), amazing: Math.floor(score/4) }, baseStep: 1 }], `${item.name} Perk Check`, this.element);
+    }
+
+    /**
+     * Install or remove a piece of cyber gear (PHB Ch.15 "Installing Cyber Gear").
+     *
+     * Installation is refused outright when the gear would overflow the hero's cyber
+     * tolerance track, and triggers a Constitution feat check when it pushes them past
+     * the halfway mark — the point at which the body starts rejecting implants.
+     */
+    static async _onToggleInstalledAction(event, target) {
+        const itemId = target.dataset.itemId ?? target.closest('[data-item-id]')?.dataset.itemId;
+        const item   = this.actor.items.get(itemId);
+        if (!item || item.type !== 'cybertech') return;
+
+        const installing = !item.system.isInstalled;
+
+        if (installing) {
+            // Ask the actor what the track would look like with this piece fitted,
+            // rather than doing the arithmetic here.
+            const projected = this.actor.getCyberTolerance?.({ alsoInstall: item.id });
+
+            if (projected?.isOverloaded) {
+                ui.notifications?.warn(
+                    `${item.name}: ${game.i18n.localize('ALTERNITY.Cybertech.ToleranceFull')}`
+                );
+                return;
+            }
+
+            if (projected?.requiresFeatCheck) {
+                // Not rolled here: the item update re-renders the sheet, which would tear
+                // the roll panel back out. The card exposes its own rollCyberCheck button.
+                ui.notifications?.info(
+                    `${item.name}: ${game.i18n.localize('ALTERNITY.Cybertech.FeatCheckRequired')}`
+                );
+            }
+        }
+
+        await item.update({ 'system.isInstalled': installing });
+    }
+
+    /**
+     * Roll the Constitution feat check that decides whether the body accepts a new
+     * implant (PHB Ch.15 "Surgery Results"). Feat checks use base step +1.
+     */
+    static async _onRollCyberCheckAction(event, target) {
+        const itemId = target.dataset.itemId ?? target.closest('[data-item-id]')?.dataset.itemId;
+        const item   = this.actor.items.get(itemId);
+        if (!item || item.type !== 'cybertech') return;
+
+        const score = this._altState.abilityScores.CON ?? 10;
+        this._openRoller(
+            [{
+                name: item.name,
+                scores: { ordinary: score, good: Math.floor(score / 2), amazing: Math.floor(score / 4) },
+                baseStep: 1,
+            }],
+            'Cyber Tolerance (CON Feat Check)',
+            this.element
+        );
     }
 
     static async _onUseChargeAction(event, target) {

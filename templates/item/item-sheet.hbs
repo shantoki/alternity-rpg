@@ -518,6 +518,173 @@
                 </div>
             {{/if}}
 
+            {{#if (eq document.type 'cybertech')}}
+                {{!-- Selects here use inline <option> markup rather than {{selectOptions config.x}}:
+                      they mirror CybertechData's own schema choices, and an undefined config key
+                      makes selectOptions throw, which aborts the render of this whole shared sheet. --}}
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.Category'}}</label>
+                        <select name="system.category">
+                            <option value="Weapon" {{#if (eq system.category 'Weapon')}}selected{{/if}}>{{localize 'ALTERNITY.Cybertech.CategoryWeapon'}}</option>
+                            <option value="Protection" {{#if (eq system.category 'Protection')}}selected{{/if}}>{{localize 'ALTERNITY.Cybertech.CategoryProtection'}}</option>
+                            <option value="Enhancement" {{#if (eq system.category 'Enhancement')}}selected{{/if}}>{{localize 'ALTERNITY.Cybertech.CategoryEnhancement'}}</option>
+                            <option value="Sensory" {{#if (eq system.category 'Sensory')}}selected{{/if}}>{{localize 'ALTERNITY.Cybertech.CategorySensory'}}</option>
+                            <option value="Interface" {{#if (eq system.category 'Interface')}}selected{{/if}}>{{localize 'ALTERNITY.Cybertech.CategoryInterface'}}</option>
+                            <option value="Utility" {{#if (eq system.category 'Utility')}}selected{{/if}}>{{localize 'ALTERNITY.Cybertech.CategoryUtility'}}</option>
+                            <option value="Cosmetic" {{#if (eq system.category 'Cosmetic')}}selected{{/if}}>{{localize 'ALTERNITY.Cybertech.CategoryCosmetic'}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.Quality'}}</label>
+                        <select name="system.quality">
+                            <option value="Ordinary" {{#if (eq system.quality 'Ordinary')}}selected{{/if}}>{{localize 'ALTERNITY.Quality.Ordinary'}}</option>
+                            <option value="Good" {{#if (eq system.quality 'Good')}}selected{{/if}}>{{localize 'ALTERNITY.Quality.Good'}}</option>
+                            <option value="Amazing" {{#if (eq system.quality 'Amazing')}}selected{{/if}}>{{localize 'ALTERNITY.Quality.Amazing'}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.ProgressLevel'}}</label>
+                        <input type="number" name="system.progressLevel" value="{{system.progressLevel}}" data-dtype="Number" min="0" max="9"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.Size'}}</label>
+                        <input type="number" name="system.size" value="{{system.size}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.Cost'}}</label>
+                        <input type="number" name="system.cost" value="{{system.cost}}" data-dtype="Number" min="0"/>
+                    </div>
+                </div>
+
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.Cybertech.Requirements'}}</h3>
+                <div class="alt-checkbox-row">
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.requiresNanocomputer" data-dtype="Boolean" {{#if system.requiresNanocomputer}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.Cybertech.RequiresNanocomputer'}}
+                    </label>
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.requiresExoskeleton" data-dtype="Boolean" {{#if system.requiresExoskeleton}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.Cybertech.RequiresExoskeleton'}}
+                    </label>
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.requiresCyberlimb" data-dtype="Boolean" {{#if system.requiresCyberlimb}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.Cybertech.RequiresCyberlimb'}}
+                    </label>
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.requiresSkillPoints" data-dtype="Boolean" {{#if system.requiresSkillPoints}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.Cybertech.RequiresSkillPoints'}}
+                    </label>
+                </div>
+
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.Cybertech.Benefits'}}</h3>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.AbilityModifier'}}</label>
+                        <select name="system.abilityModifier.ability">
+                            <option value="None" {{#if (eq system.abilityModifier.ability 'None')}}selected{{/if}}>&mdash;</option>
+                            <option value="STR" {{#if (eq system.abilityModifier.ability 'STR')}}selected{{/if}}>STR</option>
+                            <option value="DEX" {{#if (eq system.abilityModifier.ability 'DEX')}}selected{{/if}}>DEX</option>
+                            <option value="CON" {{#if (eq system.abilityModifier.ability 'CON')}}selected{{/if}}>CON</option>
+                            <option value="INT" {{#if (eq system.abilityModifier.ability 'INT')}}selected{{/if}}>INT</option>
+                            <option value="WIL" {{#if (eq system.abilityModifier.ability 'WIL')}}selected{{/if}}>WIL</option>
+                            <option value="PER" {{#if (eq system.abilityModifier.ability 'PER')}}selected{{/if}}>PER</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.AbilityModifierValue'}}</label>
+                        <input type="number" name="system.abilityModifier.value" value="{{system.abilityModifier.value}}" data-dtype="Number"/>
+                    </div>
+                </div>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.BonusStun'}}</label>
+                        <input type="number" name="system.durabilityBonus.stun" value="{{system.durabilityBonus.stun}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.BonusWound'}}</label>
+                        <input type="number" name="system.durabilityBonus.wound" value="{{system.durabilityBonus.wound}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.BonusMortal'}}</label>
+                        <input type="number" name="system.durabilityBonus.mortal" value="{{system.durabilityBonus.mortal}}" data-dtype="Number" min="0"/>
+                    </div>
+                </div>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.ArmorLI'}}</label>
+                        <input type="text" name="system.armorProtection.li" value="{{system.armorProtection.li}}" data-dtype="String" placeholder="d4"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.ArmorHI'}}</label>
+                        <input type="text" name="system.armorProtection.hi" value="{{system.armorProtection.hi}}" data-dtype="String" placeholder="d4"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.ArmorEN'}}</label>
+                        <input type="text" name="system.armorProtection.en" value="{{system.armorProtection.en}}" data-dtype="String" placeholder="d4-1"/>
+                    </div>
+                </div>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.ActionCheckModifier'}}</label>
+                        <input type="number" name="system.actionCheckModifier" value="{{system.actionCheckModifier}}" data-dtype="Number" min="-5" max="5"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.DamageFormula'}}</label>
+                        <input type="text" name="system.damageFormula" value="{{system.damageFormula}}" data-dtype="String" placeholder="d4+2w/d6+2w/d4m"/>
+                    </div>
+                </div>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.ActivationCost'}}</label>
+                        <input type="text" name="system.activationCost" value="{{system.activationCost}}" data-dtype="String" placeholder="1 fatigue per use"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Mass'}}</label>
+                        <input type="number" name="system.mass" value="{{system.mass}}" data-dtype="Number" min="0" step="0.1"/>
+                    </div>
+                </div>
+
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.Cybertech.Status'}}</h3>
+                <div class="alt-checkbox-row">
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.isInstalled" data-dtype="Boolean" {{#if system.isInstalled}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.Cybertech.IsInstalled'}}
+                    </label>
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.isDamaged" data-dtype="Boolean" {{#if system.isDamaged}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.Cybertech.IsDamaged'}}
+                    </label>
+                </div>
+
+                <div class="alt-item-summary">
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Cybertech.Quality'}}:</strong> {{system.quality}} &mdash; {{system.plLabel}}</span>
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Cybertech.Size'}}:</strong> {{system.sizeDisplay}}</span>
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Cybertech.Cost'}}:</strong> {{system.costDisplay}}</span>
+                    {{#if system.hasRequirements}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Cybertech.Requirements'}}:</strong> {{system.requirementsDisplay}}</span>
+                    {{/if}}
+                    {{#if system.hasAbilityModifier}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Cybertech.AbilityModifier'}}:</strong> {{system.abilityModifierDisplay}}</span>
+                    {{/if}}
+                    {{#if system.hasDurabilityBonus}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Cybertech.Durability'}}:</strong> {{system.durabilityDisplay}}</span>
+                    {{/if}}
+                    {{#if system.hasArmorProtection}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Cybertech.Armor'}}:</strong> {{system.armorDisplay}}</span>
+                    {{/if}}
+                    {{#if system.hasActionCheckModifier}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Cybertech.ActionCheckModifier'}}:</strong> {{system.actionCheckDisplay}}</span>
+                    {{/if}}
+                    {{#if system.hasDamage}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.DamageFormula'}}:</strong> {{system.damageFormula}}</span>
+                    {{/if}}
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Cybertech.Status'}}:</strong> {{system.statusLabel}}</span>
+                </div>
+            {{/if}}
+
             {{!-- Shared inventory fields, only for the types whose schema defines them --}}
             {{#if (or (eq document.type 'computer') (eq document.type 'personalEquipment'))}}
             <div class="form-group">

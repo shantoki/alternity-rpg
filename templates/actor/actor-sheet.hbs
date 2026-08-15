@@ -212,7 +212,13 @@
                         <img src="{{item.img}}" data-action="editItem" data-item-id="{{item.id}}" title="Edit Item" />
                         <div class="{{@root.alt}}-item-info">
                             <span class="{{@root.alt}}-item-name">{{item.name}}</span>
-                            <span class="{{@root.alt}}-item-stats">LI: {{item.system.li}} | HI: {{item.system.hi}} | En: {{item.system.en}}</span>
+                            {{!-- ArmorData has no li/hi/en fields — those were left over from an
+                                  older data shape and rendered blank for every armor item. --}}
+                            <span class="{{@root.alt}}-item-stats">
+                                {{item.system.armorType}} | Defense {{item.system.defenseBonusLabel}}
+                                {{#if item.system.hasResistance}} | {{item.system.resistanceLabel}}{{/if}}
+                                {{#if item.system.skillPenalty}} | Skill {{item.system.skillPenaltyLabel}}{{/if}}
+                            </span>
                         </div>
                         <div class="{{@root.alt}}-item-actions">
                             <button type="button" class="{{@root.alt}}-delete-btn" data-action="deleteItem" data-item-id="{{item.id}}" title="Delete">✕</button>
@@ -523,23 +529,77 @@
                     <header class="{{@root.alt}}-section-header" style="border-bottom: 2px solid #4ad97a; margin-bottom: 12px;">
                         <h3 style="margin: 0; color: #4ad97a; text-transform: uppercase;">Cybertech</h3>
                     </header>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px;">
-                        <div class="{{@root.alt}}-field-group" style="display: flex; flex-direction: column; gap: 2px;">
-                            <label style="font-size: 10px; text-transform: uppercase; color: var(--alt-color-text-muted);">Cyber Tolerance</label>
-                            <div style="display: flex; align-items: center; gap: 4px;">
-                                <input type="number" value="{{cybertech.tolerance.value}}" data-action="editState" data-field="cybertech.tolerance.value" style="width: 50px; text-align: center;"/>
-                                <span>/</span>
-                                <input type="number" value="{{cybertech.tolerance.max}}" data-action="editState" data-field="cybertech.tolerance.max" style="width: 50px; text-align: center;"/>
+                    {{!-- Cyber tolerance is derived from CON and the sizes of installed cybertech
+                          items (PHB Ch.15), not typed in. Boxes fill left to right: once the centre
+                          section is reached mortal damage hits the gear instead of the hero, and the
+                          right section extends that to wound damage. --}}
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 12px;">
+                        <div class="{{@root.alt}}-field-group" style="display: flex; flex-direction: column; gap: 4px;">
+                            <label style="font-size: 10px; text-transform: uppercase; color: var(--alt-color-text-muted);">
+                                Cyber Tolerance {{#if cyberTolerance}}({{cyberTolerance.used}} / {{cyberTolerance.max}}){{/if}}
+                            </label>
+                            <div class="{{@root.alt}}-cyber-track" style="display: flex; align-items: center; gap: 8px;">
+                                {{#each cyberToleranceTrack as |group|}}
+                                <div class="{{@root.alt}}-cyber-track-section {{group.section}}" style="display: flex; gap: 2px;">
+                                    {{#each group.boxes as |filled|}}
+                                    <span class="{{@root.alt}}-cyber-box{{#if filled}} is-filled{{/if}}"></span>
+                                    {{/each}}
+                                </div>
+                                {{#unless @last}}<span style="color: var(--alt-color-text-muted);">/</span>{{/unless}}
+                                {{/each}}
                             </div>
+                            {{#if cyberTolerance}}
+                                {{#if (eq cyberTolerance.damageRedirect 'mortal')}}
+                                <span style="font-size: 10px; color: #d9a44a;">Mortal damage is applied to cyber gear.</span>
+                                {{/if}}
+                                {{#if (eq cyberTolerance.damageRedirect 'woundAndMortal')}}
+                                <span style="font-size: 10px; color: #d94a4a;">Wound and mortal damage are applied to cyber gear.</span>
+                                {{/if}}
+                            {{/if}}
                         </div>
                         <div class="{{@root.alt}}-field-group" style="display: flex; flex-direction: column; gap: 2px;">
                             <label style="font-size: 10px; text-transform: uppercase; color: var(--alt-color-text-muted);">Cykosis</label>
                             <input type="number" value="{{cybertech.cykosis}}" data-action="editState" data-field="cybertech.cykosis" style="width: 60px; text-align: center;"/>
                         </div>
                     </div>
-                    <div class="{{@root.alt}}-field-group" style="display: flex; flex-direction: column; gap: 2px;">
-                        <label style="font-size: 10px; text-transform: uppercase; color: var(--alt-color-text-muted);">Cyber gear Installed</label>
-                        <textarea data-action="editState" data-field="cybertech.gearInstalled" style="min-height: 100px; font-size: 11px;">{{cybertech.gearInstalled}}</textarea>
+
+                    <header class="{{@root.alt}}-section-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--alt-color-border); margin-bottom: 8px;">
+                        <h4 style="margin: 0; font-size: 11px; text-transform: uppercase; color: var(--alt-color-text-muted);">Cyber Gear</h4>
+                        <button type="button" class="{{@root.alt}}-add-btn" data-action="addItem" data-type="cybertech" style="padding: 2px 8px; font-size: 11px;">+ Add Cyber Gear</button>
+                    </header>
+                    <div class="{{@root.alt}}-cybertech-grid">
+                        {{#each inventory.cybertech as |item|}}
+                        <div class="{{@root.alt}}-item-card cybertech-card{{#unless item.system.isInstalled}} is-uninstalled{{/unless}}" data-item-id="{{item.id}}">
+                            <img src="{{item.img}}" data-action="editItem" data-item-id="{{item.id}}" title="Edit Item" />
+                            <div class="{{@root.alt}}-item-info">
+                                <span class="{{@root.alt}}-item-name">
+                                    {{item.name}} <span class="skill-type-tag">{{item.system.category}}</span>
+                                    {{#if item.system.isDamaged}}<span class="skill-type-tag" style="color: #d94a4a;">Damaged</span>{{/if}}
+                                </span>
+                                <span class="{{@root.alt}}-item-stats">
+                                    {{item.system.quality}} | {{item.system.plLabel}} | Size {{item.system.size}}
+                                    {{#if item.system.hasAbilityModifier}} | {{item.system.abilityModifierDisplay}}{{/if}}
+                                    {{#if item.system.hasArmorProtection}} | {{item.system.armorDisplay}}{{/if}}
+                                    {{#if item.system.hasDurabilityBonus}} | {{item.system.durabilityDisplay}}{{/if}}
+                                    {{#if item.system.hasRequirements}} | Requires: {{item.system.requirementsDisplay}}{{/if}}
+                                </span>
+                            </div>
+                            <div class="{{@root.alt}}-item-actions">
+                                <button type="button" class="{{@root.alt}}-roll-btn" data-action="toggleInstalled" data-item-id="{{item.id}}" title="{{#if item.system.isInstalled}}Remove implant{{else}}Install implant{{/if}}">{{#if item.system.isInstalled}}⏻{{else}}⊕{{/if}}</button>
+                                {{#if @root.cyberTolerance.requiresFeatCheck}}
+                                <button type="button" class="{{@root.alt}}-roll-btn" data-action="rollCyberCheck" data-item-id="{{item.id}}" title="CON feat check">⚄</button>
+                                {{/if}}
+                                <button type="button" class="{{@root.alt}}-delete-btn" data-action="deleteItem" data-item-id="{{item.id}}" title="Delete">✕</button>
+                            </div>
+                        </div>
+                        {{else}}
+                        <p class="{{@root.alt}}-empty-state">No cyber gear.</p>
+                        {{/each}}
+                    </div>
+
+                    <div class="{{@root.alt}}-field-group" style="display: flex; flex-direction: column; gap: 2px; margin-top: 12px;">
+                        <label style="font-size: 10px; text-transform: uppercase; color: var(--alt-color-text-muted);">Cybertech Notes</label>
+                        <textarea data-action="editState" data-field="cybertech.gearInstalled" style="min-height: 60px; font-size: 11px;">{{cybertech.gearInstalled}}</textarea>
                     </div>
                 </section>
                 {{/if}}

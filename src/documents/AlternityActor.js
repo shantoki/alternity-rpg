@@ -625,6 +625,43 @@ export class AlternityActor extends Actor {
     }
 
     // -----------------------------------------------------------------------
+    // Cybertech
+    // -----------------------------------------------------------------------
+
+    /**
+     * Resolve this actor's cyber tolerance track from their Constitution score and
+     * the cyber gear currently installed in their body (PHB Ch.15 "Cyber Tolerance").
+     *
+     * Only installed gear counts — an owned-but-uninstalled cybertech item is cargo.
+     * Mechalus heroes get CON+4; species is free text on the sheet, so it is matched
+     * by name rather than by a dedicated flag.
+     *
+     * @param {object} [options]
+     * @param {string|string[]} [options.alsoInstall] - Item id(s) to count as installed even if
+     *        they are not yet, so a caller can ask "what would the track look like if I fitted this?"
+     * @returns {object|null} The result of AlternityMathService.calculateCyberTolerance,
+     *                        or null for actor types that have no tolerance track.
+     */
+    getCyberTolerance(options = {}) {
+        if (!['character', 'npc'].includes(this.type)) return null;
+
+        const alsoInstall = options.alsoInstall === undefined ? []
+            : Array.isArray(options.alsoInstall) ? options.alsoInstall
+            : [options.alsoInstall];
+
+        const con = this.system?.abilities?.con ?? 0;
+        const installed = this.items
+            .filter(i => i.type === 'cybertech' && (i.system?.isInstalled || alsoInstall.includes(i.id)))
+            .map(i => ({ name: i.name, size: i.system?.size ?? 0 }));
+
+        const species = String(this.system?.details?.species ?? '').toLowerCase();
+
+        return AlternityMathService.calculateCyberTolerance(con, installed, {
+            isMechalus: species.includes('mechalus'),
+        });
+    }
+
+    // -----------------------------------------------------------------------
     // Chat message creation
     // -----------------------------------------------------------------------
 

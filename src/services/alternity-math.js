@@ -405,6 +405,112 @@ const AlternityMathService = {
     },
 
     // -----------------------------------------------------------------------
+    // calculateCyberTolerance
+    // -----------------------------------------------------------------------
+
+    /**
+     * Resolve a character's cyber tolerance track from their Constitution score and
+     * the sizes of the cyber gear installed in their body
+     * (Player's Handbook Ch.15: "Cyber Tolerance", Table P53).
+     *
+     * The tolerance track is the character's Constitution score worth of boxes
+     * (mechalus use CON+4), split into three sections written as "left/centre/right":
+     *   left   = half the score, rounded down
+     *   centre = a quarter of the score, rounded up
+     *   right  = whatever is left over
+     * A CON 12 hero therefore has a 6/3/3 track, matching the book's worked example.
+     *
+     * Installed gear fills boxes left to right. Two thresholds matter:
+     *   - Once more than the left section is filled (i.e. over half the track), every
+     *     further installation requires a Constitution feat check, and any *mortal*
+     *     damage the hero takes is treated as damage to their cyber gear instead.
+     *   - Once the right section is reached, *wound* damage is redirected too.
+     *
+     * @param {number} constitutionScore - The character's CON score.
+     * @param {Array<number|{name?: string, size?: number}>} [installedSizes] - Sizes of installed
+     *        gear, either as raw numbers or as objects with a `size` (and optional `name` for the trace).
+     * @param {object}  [options]
+     * @param {boolean} [options.isMechalus] - Mechalus characters use CON+4 (PHB Ch.2).
+     *
+     * @returns {{
+     *   max:            number,
+     *   used:           number,
+     *   remaining:      number,
+     *   isFull:         boolean,
+     *   isOverloaded:   boolean,
+     *   sections:       { left: number, centre: number, right: number },
+     *   filled:         { left: number, centre: number, right: number },
+     *   requiresFeatCheck: boolean,
+     *   damageRedirect: 'none'|'mortal'|'woundAndMortal',
+     *   modifierTrace:  object[]
+     * }}
+     */
+    calculateCyberTolerance(constitutionScore, installedSizes = [], options = {}) {
+        if (typeof constitutionScore !== 'number' || !isFinite(constitutionScore) || constitutionScore < 0) {
+            throw new Error(
+                '[AlternityMathService.calculateCyberTolerance] constitutionScore must be a finite number ≥ 0.'
+            );
+        }
+        if (!Array.isArray(installedSizes)) {
+            throw new Error(
+                '[AlternityMathService.calculateCyberTolerance] installedSizes must be an array.'
+            );
+        }
+
+        const isMechalus = !!options.isMechalus;
+        const max = Math.floor(constitutionScore) + (isMechalus ? 4 : 0);
+
+        // Section widths. `right` is the remainder rather than its own formula so the
+        // three sections always add back up to `max` exactly, at every score.
+        const left   = Math.floor(max / 2);
+        const centre = Math.ceil(max / 4);
+        const right  = Math.max(0, max - left - centre);
+
+        const modifierTrace = [
+            this.buildModifier('Constitution', constitutionScore, 'Base cyber tolerance'),
+        ];
+        if (isMechalus) {
+            modifierTrace.push(this.buildModifier('Mechalus', 4, 'Integrated cybernetics (CON+4)'));
+        }
+
+        let used = 0;
+        for (const entry of installedSizes) {
+            const size = typeof entry === 'number' ? entry : (entry?.size ?? 0);
+            if (typeof size !== 'number' || !isFinite(size) || size < 0) {
+                throw new Error(
+                    '[AlternityMathService.calculateCyberTolerance] every installed size must be a finite number ≥ 0.'
+                );
+            }
+            used += size;
+            const label = typeof entry === 'number' ? 'Cyber gear' : (entry?.name || 'Cyber gear');
+            modifierTrace.push(this.buildModifier(label, size, 'Cyber tolerance consumed'));
+        }
+
+        // Boxes fill left to right; each section holds at most its own width.
+        const filledLeft   = Math.min(used, left);
+        const filledCentre = Math.min(Math.max(0, used - left), centre);
+        const filledRight  = Math.min(Math.max(0, used - left - centre), right);
+
+        const damageRedirect = filledRight  > 0 ? 'woundAndMortal'
+                             : filledCentre > 0 ? 'mortal'
+                             : 'none';
+
+        return {
+            max,
+            used,
+            remaining: Math.max(0, max - used),
+            isFull:       used >= max,
+            isOverloaded: used > max,
+            sections: { left, centre, right },
+            filled:   { left: filledLeft, centre: filledCentre, right: filledRight },
+            // Past the halfway mark every further installation calls for a CON feat check.
+            requiresFeatCheck: used > left,
+            damageRedirect,
+            modifierTrace,
+        };
+    },
+
+    // -----------------------------------------------------------------------
     // calculateSkillTarget
     // -----------------------------------------------------------------------
 

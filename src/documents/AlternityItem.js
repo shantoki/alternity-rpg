@@ -47,6 +47,7 @@ export class AlternityItem extends Item {
             case 'effect': return this._prepareEffectData();
             case 'perkFlaw': return this._preparePerkFlawData();
             case 'personalEquipment': return this._preparePersonalEquipmentData();
+            case 'cybertech': return this._prepareCybertechData();
         }
     }
 
@@ -195,6 +196,26 @@ export class AlternityItem extends Item {
     _preparePersonalEquipmentData() {
         const sys = this.system;
         sys.equippedLabel = sys.isEquipped ? game.i18n.localize('ALTERNITY.Equipped') : game.i18n.localize('ALTERNITY.Stowed');
+    }
+
+    /**
+     * Compute display labels for the Cybertech sheet
+     * (Player's Handbook Ch. 15 cyber gear).
+     * @private
+     */
+    _prepareCybertechData() {
+        const sys = this.system;
+
+        // Everything else this type derives is actor-independent and lives in
+        // CybertechData.prepareDerivedData(). Only the localized status label needs
+        // game.i18n, which the data model has no business reaching for.
+        //
+        // Note there is deliberately no "tolerance cost" field here: size only counts
+        // against the owner once the gear is actually in the body, and that roll-up is
+        // AlternityActor.getCyberTolerance()'s job, not this item's.
+        sys.statusLabel = sys.isInstalled
+            ? game.i18n.localize('ALTERNITY.Cybertech.Installed')
+            : game.i18n.localize('ALTERNITY.Cybertech.NotInstalled');
     }
 
     // -----------------------------------------------------------------------

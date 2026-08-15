@@ -10,3 +10,4 @@ export * from './EffectData.js';
 export * from './ComputerData.js';
 export * from './PerkFlawData.js';
 export * from './PersonalEquipmentData.js';
+export * from './CybertechData.js';

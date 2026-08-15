@@ -126,6 +126,11 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
             ].reduce((obj, val) => { obj[val] = val; return obj; }, {}),
             abilities: ['STR', 'DEX', 'CON', 'INT', 'WIL', 'PER']
                 .reduce((obj, val) => { obj[val] = val; return obj; }, {}),
+            // NOTE: the cybertech Details tab deliberately has no config entry here.
+            // Its selects render inline <option> markup mirroring CybertechData's own
+            // schema choices, so the template can't depend on a config key arriving in
+            // the same deploy — `selectOptions` throws on an undefined choices object,
+            // which would abort the render of the whole shared sheet, for every type.
             effectCategories: ['Power', 'Stance', 'Passive', 'Equipment', 'Action']
                 .reduce((obj, val) => { obj[val] = val; return obj; }, {}),
             effectTargetScopes: ['Self', 'Single', 'Area', 'AllAllies', 'AllEnemies']

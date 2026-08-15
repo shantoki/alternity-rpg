@@ -299,4 +299,83 @@ describe('Alternity System Unit Tests', () => {
             expect(() => AlternityMathService.calculateShipDamageMitigation(5, 'ballistic', { lowImpact: 0 }, 'Ship Combat')).toThrow();
         });
     });
+
+    describe('AlternityMathService — Cyber Tolerance', () => {
+        it('should split the tolerance track the way the book\'s worked example does', () => {
+            // PHB Ch.15: "Taylor Windsor has a cyber tolerance score of 12 (6/3/3)".
+            const result = AlternityMathService.calculateCyberTolerance(12);
+            expect(result.max).toBe(12);
+            expect(result.sections).toEqual({ left: 6, centre: 3, right: 3 });
+            expect(result.used).toBe(0);
+            expect(result.remaining).toBe(12);
+        });
+
+        it('should always have the three sections add back up to the maximum', () => {
+            for (let con = 1; con <= 20; con++) {
+                const { max, sections } = AlternityMathService.calculateCyberTolerance(con);
+                expect(sections.left + sections.centre + sections.right).toBe(max);
+            }
+        });
+
+        it('should give mechalus characters CON+4 tolerance', () => {
+            const result = AlternityMathService.calculateCyberTolerance(12, [], { isMechalus: true });
+            expect(result.max).toBe(16);
+            expect(result.modifierTrace.some(m => m.source === 'Mechalus')).toBe(true);
+        });
+
+        it('should fill boxes left to right across the three sections', () => {
+            // CON 12 -> 6/3/3. Seven points of gear fills the left section and one centre box.
+            const result = AlternityMathService.calculateCyberTolerance(12, [
+                { name: 'Reflex', size: 2 },
+                { name: 'Body Plating', size: 3 },
+                { name: 'MusclePlus', size: 2 },
+            ]);
+            expect(result.used).toBe(7);
+            expect(result.filled).toEqual({ left: 6, centre: 1, right: 0 });
+            expect(result.remaining).toBe(5);
+        });
+
+        it('should require a Constitution feat check once past half the track', () => {
+            // 6 of 12 is exactly half — still no check.
+            expect(AlternityMathService.calculateCyberTolerance(12, [6]).requiresFeatCheck).toBe(false);
+            // The seventh point crosses the line.
+            expect(AlternityMathService.calculateCyberTolerance(12, [7]).requiresFeatCheck).toBe(true);
+        });
+
+        it('should redirect damage to cyber gear as the later sections fill', () => {
+            expect(AlternityMathService.calculateCyberTolerance(12, [6]).damageRedirect).toBe('none');
+            // Into the centre section: mortal damage hits the gear.
+            expect(AlternityMathService.calculateCyberTolerance(12, [7]).damageRedirect).toBe('mortal');
+            // Into the right section: wound damage does too.
+            expect(AlternityMathService.calculateCyberTolerance(12, [10]).damageRedirect).toBe('woundAndMortal');
+        });
+
+        it('should report a full and an overloaded track', () => {
+            const full = AlternityMathService.calculateCyberTolerance(12, [12]);
+            expect(full.isFull).toBe(true);
+            expect(full.isOverloaded).toBe(false);
+            expect(full.remaining).toBe(0);
+
+            const over = AlternityMathService.calculateCyberTolerance(12, [13]);
+            expect(over.isOverloaded).toBe(true);
+            expect(over.remaining).toBe(0);
+            // Boxes can't overflow past the width of the track.
+            expect(over.filled).toEqual({ left: 6, centre: 3, right: 3 });
+        });
+
+        it('should accept plain numbers as well as named gear entries', () => {
+            const numbers = AlternityMathService.calculateCyberTolerance(14, [2, 3]);
+            const named   = AlternityMathService.calculateCyberTolerance(14, [{ name: 'A', size: 2 }, { name: 'B', size: 3 }]);
+            expect(numbers.used).toBe(5);
+            expect(named.used).toBe(5);
+            expect(named.modifierTrace.some(m => m.source === 'B')).toBe(true);
+        });
+
+        it('should reject invalid Constitution scores and gear sizes', () => {
+            expect(() => AlternityMathService.calculateCyberTolerance(-1)).toThrow();
+            expect(() => AlternityMathService.calculateCyberTolerance('12')).toThrow();
+            expect(() => AlternityMathService.calculateCyberTolerance(12, 'nope')).toThrow();
+            expect(() => AlternityMathService.calculateCyberTolerance(12, [{ name: 'Bad', size: -2 }])).toThrow();
+        });
+    });
 });

@@ -1322,3 +1322,46 @@
     white-space: nowrap;
 }
 
+/* Sub-heading inside a Details tab, grouping related fields (cybertech uses these
+   to separate Requirements / Benefits / Status). Same look as the array-section
+   headings above, minus the add-row control. */
+.alt-item-sheet .alt-item-subhead {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--alt-color-primary);
+    border-bottom: 1px solid var(--alt-color-border);
+    padding-bottom: 2px;
+    margin: 12px 0 6px;
+}
+
+/* ── Cyber tolerance track (character sheet) ────────────────────────────── */
+/* Three sections of boxes, filled left to right. Reaching the centre section
+   redirects mortal damage to the hero's gear; the right section adds wound damage. */
+.alt-cyber-track { flex-wrap: wrap; }
+
+.alt-cyber-box {
+    width: 12px;
+    height: 12px;
+    border: 1px solid #4ad97a;
+    border-radius: 2px;
+    background: transparent;
+}
+.alt-cyber-box.is-filled {
+    background: #4ad97a;
+    box-shadow: 0 0 4px #4ad97a;
+}
+.alt-cyber-track-section.centre .alt-cyber-box { border-color: #d9a44a; }
+.alt-cyber-track-section.centre .alt-cyber-box.is-filled {
+    background: #d9a44a;
+    box-shadow: 0 0 4px #d9a44a;
+}
+.alt-cyber-track-section.right .alt-cyber-box { border-color: #d94a4a; }
+.alt-cyber-track-section.right .alt-cyber-box.is-filled {
+    background: #d94a4a;
+    box-shadow: 0 0 4px #d94a4a;
+}
+
+.alt-cybertech-grid { display: flex; flex-direction: column; gap: 6px; }
+/* Owned but not implanted — it takes up no tolerance and grants nothing yet. */
+.alt-item-card.cybertech-card.is-uninstalled { opacity: 0.6; }
+
