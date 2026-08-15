@@ -158,6 +158,10 @@
                           (ability score + rank), which the character sheet resolves. --}}
                     <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Weapon.TotalAttackBonus'}}:</strong> {{fmtMod system.totalAttackBonus}} {{localize 'ALTERNITY.Steps'}}</span>
                     <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.DamageFormula'}}:</strong> {{system.fullDamageFormula}}</span>
+                    {{#if system.strengthDamageAdjustment}}
+                        {{!-- Melee and thrown weapons only (PHB Table P9). --}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Weapon.StrengthDamage'}}:</strong> {{fmtMod system.strengthDamageAdjustment}}</span>
+                    {{/if}}
                     <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Range'}}:</strong> {{system.rangeDisplay}}</span>
                     {{#if system.usesTechPoints}}
                         <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.TechPointCost'}}:</strong> {{system.techCostDisplay}}</span>

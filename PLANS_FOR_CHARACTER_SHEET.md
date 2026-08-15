@@ -6,13 +6,24 @@ This document outlines the missing features and planned improvements for the Alt
 These are core mechanics that should be automated in the data layer and displayed on the sheet.
 
 - [x] **Resistance Modifiers**: Implement calculation for STR, DEX, INT, and WIL.
-    - 1-10: 0
-    - 11-12: +1
-    - 13-14: +2
+    - Player's Handbook Table P2 (verified 2026-08-15): ≤3: −2, 4-5: −1, 6-10: 0,
+      11-12: +1, 13-14: +2, 15-16: +3, 17-18: +4, 19+: +5.
+    - This entry previously listed only "1-10: 0 / 11-12: +1 / 13-14: +2", which is the
+      middle of the table — the negative bands and everything past +2 were missing.
+      The bands above +2 are reachable once cybertech is in play (a cyberlimb and
+      MusclePlus add up to +3 STR each).
+    - CON and PER have no resistance modifier; the book is explicit that they are
+      used actively instead.
 - [x] **Untrained Scores**: Display `Ability / 2` (rounded down) next to each Ability score.
 - [x] **Action Check Profession Bonus**: Automate the Marginal Action Check score.
-    - Formula: `(DEX + INT) / 2 + Profession Bonus`
-    - Bonuses: Combat Spec (+4), Free Agent (+3), Diplomat (+2), Tech Op (+2).
+    - Formula: `floor((DEX + INT) / 2) + Profession Bonus`; Marginal = Ordinary + 1,
+      Good = half Ordinary, Amazing = a quarter (both rounded down).
+    - Bonuses (Player's Handbook Ch.2 "Special Benefits", verified 2026-08-15):
+      **Combat Spec +3, Free Agent +2, Diplomat +1, Tech Op +1.**
+    - This entry previously said +4/+3/+2/+2, which is wrong — every value was one too
+      high. `AlternityCharacterState.getActionCheckData()` has always used the correct
+      numbers, checked against the book's own worked templates (e.g. DEX 11 / INT 9
+      Combat Spec → Marginal 14+, Ordinary 13, Good 6, Amazing 3).
 - [x] **Actions per Round**: Calculate and display this stat (Fastplay default is 2, but should be derived from CON/WIL for future-proofing).
 - [x] **Secondary Damage Refinement**: Ensure `applyDamage` perfectly matches the 2:1 conversion rules and trigger UI updates.
 

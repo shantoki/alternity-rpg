@@ -61,19 +61,29 @@ export class AlternityItem extends Item {
      * @private
      */
     _prepareWeaponData() {
-        const sys = this.system;
+        const sys   = this.system;
+        const actor = this.actor;
 
-        // No ability term in either of these. An Alternity attack is a skill check
-        // rolled under (ability score + rank) — the ability is already the basis of
-        // the score the sheet rolls against, so folding it in here counted it twice.
-        // `attackBonus` is the weapon's own situation-die step modifier (negative is
-        // a bonus, per the convention used throughout this codebase).
+        // No ability term here. An Alternity attack is a skill check rolled under
+        // (ability score + rank) — the ability is already the basis of the score the
+        // sheet rolls against, so folding it in counted it twice. `attackBonus` is the
+        // weapon's own situation-die step modifier (negative is a bonus, per the
+        // convention used throughout this codebase).
         sys.totalAttackBonus = sys.attackBonus ?? 0;
 
-        // Likewise the damage formula is the weapon's die plus its own flat bonus.
-        // It used to add the wielder's ability *score* straight into the dice string,
-        // so a STR 12 hero's d4+1w knife rolled d4+13.
-        const damageMod = sys.damageBonus ?? 0;
+        // Damage is the weapon's die, its own flat bonus, and — for melee and thrown
+        // weapons only — the wielder's Strength damage adjustment (PHB Table P9; Ch.2
+        // "Strength" limits it to unarmed, melee and thrown attacks). This used to add
+        // the raw ability *score* for every weapon type, so a STR 12 hero's d4+1w knife
+        // rolled d4+13, and their rifle got the bonus too.
+        // Unowned (compendium/sidebar) weapons get no adjustment at all rather than the
+        // -1 a STR of 0 would imply — there is no wielder to draw a Strength from.
+        const usesStrengthDamage = actor && ['Melee', 'Thrown'].includes(sys.weaponType);
+        sys.strengthDamageAdjustment = usesStrengthDamage
+            ? AlternityMathService.calculateStrengthDamageAdjustment(actor.system?.abilities?.str ?? 0)
+            : 0;
+
+        const damageMod = (sys.damageBonus ?? 0) + sys.strengthDamageAdjustment;
         sys.fullDamageFormula = damageMod === 0
             ? sys.damageFormula
             : damageMod > 0

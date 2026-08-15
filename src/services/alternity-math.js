@@ -559,15 +559,20 @@ const AlternityMathService = {
 
     /**
      * Look up an ability's resistance modifier — the step penalty an attacker takes
-     * when this ability resists them (Fastplay standard bands).
+     * when this ability resists them (Player's Handbook Table P2).
      *
-     *   score 1-10 : 0
-     *   score 11-12: +1
-     *   score 13-14: +2
+     *   ≤3: -2   4-5: -1   6-10: 0   11-12: +1
+     *   13-14: +2   15-16: +3   17-18: +4   19+: +5
      *
-     * Only STR, DEX, INT and WIL have resistance modifiers; CON and PER return 0.
-     * Alternity has no armor-class-style "defense number" — defending is a step
-     * modifier applied to the attacker's check, which is what this produces.
+     * A positive modifier is good for the defender: it penalises the opponent's
+     * check. Only STR, DEX, INT and WIL have resistance modifiers — the book is
+     * explicit that CON and PER are used actively instead, so they return 0.
+     *
+     * Alternity has no armor-class-style "defense number"; defending is this step
+     * modifier applied to the attacker's check.
+     *
+     * The bands past +2 are reachable in play: cybertech alone can add up to +3 STR
+     * from a cyberlimb and another +3 from MusclePlus.
      *
      * @param {number} abilityScore - The ability's score.
      * @param {string} [ability]    - Ability key ('STR'|'DEX'|'INT'|'WIL'|'CON'|'PER').
@@ -581,9 +586,46 @@ const AlternityMathService = {
         if (ability !== null && !['STR', 'DEX', 'INT', 'WIL'].includes(String(ability).toUpperCase())) {
             return 0;
         }
+        if (abilityScore >= 19) return 5;
+        if (abilityScore >= 17) return 4;
+        if (abilityScore >= 15) return 3;
         if (abilityScore >= 13) return 2;
         if (abilityScore >= 11) return 1;
-        return 0;
+        if (abilityScore >= 6)  return 0;
+        if (abilityScore >= 4)  return -1;
+        return -2;
+    },
+
+    // -----------------------------------------------------------------------
+    // calculateStrengthDamageAdjustment
+    // -----------------------------------------------------------------------
+
+    /**
+     * Look up the damage adjustment a Strength score grants (Player's Handbook
+     * Table P9: Strength & Damage).
+     *
+     *   ≤5: -1   6-10: 0   11-12: +1   13-14: +2
+     *   15-16: +3   17-18: +4   19+: +5
+     *
+     * Per the Player's Handbook (Ch.2, "Strength"), this applies to damage from an
+     * unarmed attack, a melee weapon or a thrown weapon — never to ranged or heavy
+     * weapons. The book caps the benefit at +5, and a negative adjustment never
+     * reduces damage below 1 point, which callers must enforce on the rolled result.
+     *
+     * @param {number} strengthScore
+     * @returns {number}
+     */
+    calculateStrengthDamageAdjustment(strengthScore) {
+        if (typeof strengthScore !== 'number' || !isFinite(strengthScore)) {
+            throw new Error('[AlternityMathService.calculateStrengthDamageAdjustment] strengthScore must be a finite number.');
+        }
+        if (strengthScore >= 19) return 5;
+        if (strengthScore >= 17) return 4;
+        if (strengthScore >= 15) return 3;
+        if (strengthScore >= 13) return 2;
+        if (strengthScore >= 11) return 1;
+        if (strengthScore >= 6)  return 0;
+        return -1;
     },
 
     // -----------------------------------------------------------------------

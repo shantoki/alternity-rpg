@@ -326,12 +326,20 @@ describe('Alternity System Unit Tests', () => {
             expect(() => AlternityMathService.calculateSkillScores('12')).toThrow();
         });
 
-        it('should apply the resistance modifier bands', () => {
-            expect(AlternityMathService.calculateResistanceModifier(10, 'DEX')).toBe(0);
-            expect(AlternityMathService.calculateResistanceModifier(11, 'DEX')).toBe(1);
-            expect(AlternityMathService.calculateResistanceModifier(12, 'DEX')).toBe(1);
-            expect(AlternityMathService.calculateResistanceModifier(13, 'DEX')).toBe(2);
-            expect(AlternityMathService.calculateResistanceModifier(14, 'DEX')).toBe(2);
+        it('should apply every resistance modifier band (PHB Table P2)', () => {
+            const bands = [[3, -2], [4, -1], [5, -1], [6, 0], [10, 0], [11, 1], [12, 1],
+                           [13, 2], [14, 2], [15, 3], [16, 3], [17, 4], [18, 4], [19, 5], [25, 5]];
+            for (const [score, expected] of bands) {
+                expect(AlternityMathService.calculateResistanceModifier(score, 'DEX')).toBe(expected);
+            }
+        });
+
+        it('should apply every Strength damage adjustment band (PHB Table P9)', () => {
+            const bands = [[3, -1], [5, -1], [6, 0], [10, 0], [11, 1], [12, 1],
+                           [13, 2], [14, 2], [15, 3], [16, 3], [17, 4], [18, 4], [19, 5], [25, 5]];
+            for (const [score, expected] of bands) {
+                expect(AlternityMathService.calculateStrengthDamageAdjustment(score)).toBe(expected);
+            }
         });
 
         it('should give CON and PER no resistance modifier', () => {
