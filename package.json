@@ -5,7 +5,7 @@
   "description": "Alternity Fastplay Core RPG System for Foundry VTT.",
   "main": "src/index.js",
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest --config ./jest.config.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./jest.config.js",
     "lint": "eslint ."
   },
   "keywords": [
