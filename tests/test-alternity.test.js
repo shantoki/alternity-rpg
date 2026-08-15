@@ -326,8 +326,11 @@ describe('Alternity System Unit Tests', () => {
             expect(() => AlternityMathService.calculateSkillScores('12')).toThrow();
         });
 
+        // Both band tables transcribed from photographs of the printed tables.
         it('should apply every resistance modifier band (PHB Table P2)', () => {
-            const bands = [[3, -2], [4, -1], [5, -1], [6, 0], [10, 0], [11, 1], [12, 1],
+            // 4 or less: -2 | 5-6: -1 | 7-10: 0 | 11-12: +1 | 13-14: +2
+            // 15-16: +3 | 17-18: +4 | 19+: +5
+            const bands = [[1, -2], [4, -2], [5, -1], [6, -1], [7, 0], [10, 0], [11, 1], [12, 1],
                            [13, 2], [14, 2], [15, 3], [16, 3], [17, 4], [18, 4], [19, 5], [25, 5]];
             for (const [score, expected] of bands) {
                 expect(AlternityMathService.calculateResistanceModifier(score, 'DEX')).toBe(expected);
@@ -335,11 +338,18 @@ describe('Alternity System Unit Tests', () => {
         });
 
         it('should apply every Strength damage adjustment band (PHB Table P9)', () => {
-            const bands = [[3, -1], [5, -1], [6, 0], [10, 0], [11, 1], [12, 1],
+            // 3-6: -1 | 7-10: 0 | 11-12: +1 | 13-14: +2 | 15-16: +3 | 17-18: +4 | 19+: +5
+            const bands = [[3, -1], [6, -1], [7, 0], [10, 0], [11, 1], [12, 1],
                            [13, 2], [14, 2], [15, 3], [16, 3], [17, 4], [18, 4], [19, 5], [25, 5]];
             for (const [score, expected] of bands) {
                 expect(AlternityMathService.calculateStrengthDamageAdjustment(score)).toBe(expected);
             }
+        });
+
+        it('should keep the two tables distinct below score 7', () => {
+            // P2 has a -2 band that P9 does not; P9's single -1 band spans 3-6.
+            expect(AlternityMathService.calculateResistanceModifier(4, 'STR')).toBe(-2);
+            expect(AlternityMathService.calculateStrengthDamageAdjustment(4)).toBe(-1);
         });
 
         it('should give CON and PER no resistance modifier', () => {

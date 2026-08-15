@@ -561,7 +561,7 @@ const AlternityMathService = {
      * Look up an ability's resistance modifier — the step penalty an attacker takes
      * when this ability resists them (Player's Handbook Table P2).
      *
-     *   ≤3: -2   4-5: -1   6-10: 0   11-12: +1
+     *   4 or less: -2   5-6: -1   7-10: 0   11-12: +1
      *   13-14: +2   15-16: +3   17-18: +4   19+: +5
      *
      * A positive modifier is good for the defender: it penalises the opponent's
@@ -591,8 +591,8 @@ const AlternityMathService = {
         if (abilityScore >= 15) return 3;
         if (abilityScore >= 13) return 2;
         if (abilityScore >= 11) return 1;
-        if (abilityScore >= 6)  return 0;
-        if (abilityScore >= 4)  return -1;
+        if (abilityScore >= 7)  return 0;
+        if (abilityScore >= 5)  return -1;
         return -2;
     },
 
@@ -604,13 +604,18 @@ const AlternityMathService = {
      * Look up the damage adjustment a Strength score grants (Player's Handbook
      * Table P9: Strength & Damage).
      *
-     *   ≤5: -1   6-10: 0   11-12: +1   13-14: +2
+     *   3-6: -1   7-10: 0   11-12: +1   13-14: +2
      *   15-16: +3   17-18: +4   19+: +5
      *
      * Per the Player's Handbook (Ch.2, "Strength"), this applies to damage from an
      * unarmed attack, a melee weapon or a thrown weapon — never to ranged or heavy
-     * weapons. The book caps the benefit at +5, and a negative adjustment never
-     * reduces damage below 1 point, which callers must enforce on the rolled result.
+     * weapons. The book caps the benefit at +5, and the table's footnote caps the -1
+     * penalty "to a minimum of 1", which callers must enforce on the rolled result
+     * (AlternityItem.rollDamage does).
+     *
+     * The table's lowest printed band starts at 3; scores below that keep the -1,
+     * since the book offers nothing lower and the minimum-1 rule bounds the result
+     * anyway.
      *
      * @param {number} strengthScore
      * @returns {number}
@@ -624,7 +629,7 @@ const AlternityMathService = {
         if (strengthScore >= 15) return 3;
         if (strengthScore >= 13) return 2;
         if (strengthScore >= 11) return 1;
-        if (strengthScore >= 6)  return 0;
+        if (strengthScore >= 7)  return 0;
         return -1;
     },
 

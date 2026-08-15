@@ -6,8 +6,8 @@ This document outlines the missing features and planned improvements for the Alt
 These are core mechanics that should be automated in the data layer and displayed on the sheet.
 
 - [x] **Resistance Modifiers**: Implement calculation for STR, DEX, INT, and WIL.
-    - Player's Handbook Table P2 (verified 2026-08-15): ≤3: −2, 4-5: −1, 6-10: 0,
-      11-12: +1, 13-14: +2, 15-16: +3, 17-18: +4, 19+: +5.
+    - Player's Handbook Table P2 (transcribed from the printed table, 2026-08-15):
+      4 or less: −2, 5-6: −1, 7-10: 0, 11-12: +1, 13-14: +2, 15-16: +3, 17-18: +4, 19+: +5.
     - This entry previously listed only "1-10: 0 / 11-12: +1 / 13-14: +2", which is the
       middle of the table — the negative bands and everything past +2 were missing.
       The bands above +2 are reachable once cybertech is in play (a cyberlimb and

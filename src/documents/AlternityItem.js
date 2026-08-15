@@ -286,10 +286,16 @@ export class AlternityItem extends Item {
             rollMode: options.whisper ? 'gmroll' : 'roll',
         });
 
+        // A negative Strength damage adjustment never takes a hit below 1 point
+        // (Table P9's "* To a minimum of 1" footnote).
+        const damageTotal = (this.system.strengthDamageAdjustment ?? 0) < 0
+            ? Math.max(1, roll.total)
+            : roll.total;
+
         // Optionally apply the damage to a target (if one is selected)
         if (options.applyToTarget && game.user.targets.size > 0) {
             for (const token of game.user.targets) {
-                await token.actor?.applyAlternityDamage?.(roll.total, this.system.damageType, {
+                await token.actor?.applyAlternityDamage?.(damageTotal, this.system.damageType, {
                     category: this.system.damageCategory,
                     context:  `${this.name} Damage`,
                 });
