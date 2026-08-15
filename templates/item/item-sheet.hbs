@@ -153,7 +153,10 @@
                 </div>
 
                 <div class="alt-item-summary">
-                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Weapon.TotalAttackBonus'}}:</strong> {{system.totalAttackBonus}} ({{system.abilityModLabel}} {{localize 'ALTERNITY.Weapon.AttackAbility'}})</span>
+                    {{!-- A situation-die step modifier, not a d20-style to-hit bonus:
+                          the attack itself is a skill check rolled under the wielder's
+                          (ability score + rank), which the character sheet resolves. --}}
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Weapon.TotalAttackBonus'}}:</strong> {{fmtMod system.totalAttackBonus}} {{localize 'ALTERNITY.Steps'}}</span>
                     <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.DamageFormula'}}:</strong> {{system.fullDamageFormula}}</span>
                     <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Range'}}:</strong> {{system.rangeDisplay}}</span>
                     {{#if system.usesTechPoints}}
@@ -290,9 +293,10 @@
 
                 <div class="alt-item-summary">
                     <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Skill.EffectiveRank'}}:</strong> {{system.rankDisplay}}</span>
-                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Skill.TargetNumber'}}:</strong> {{system.dcDisplay}}</span>
+                    {{!-- Roll-under triple (Ordinary / Good / Amazing), not a d20 DC. --}}
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Skill.TargetNumber'}}:</strong> {{system.scoreDisplay}}</span>
                     {{#if system.specialisation}}
-                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Skill.TargetNumberWithSpec'}}:</strong> DC {{system.targetNumberWithSpec}}</span>
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Skill.TargetNumberWithSpec'}}:</strong> {{system.targetNumberWithSpec}}</span>
                     {{/if}}
                 </div>
             {{/if}}

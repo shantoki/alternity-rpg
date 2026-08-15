@@ -344,6 +344,16 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
             }))
             : [];
 
+        // Values the template has always rendered but nothing ever supplied, so they
+        // showed blank: the Action Check block at the top of the sheet, actions per
+        // round, the armor ratings, career and background. All five already lived on
+        // AlternityCharacterState — only the hand-off was missing.
+        context.actionCheck      = state.getActionCheckData();
+        context.actionsPerRound  = state.getActionsPerRound();
+        context.armor            = state.armor || { li: 0, hi: 0, en: 0 };
+        context.career           = state.career || '';
+        context.background       = state.background || '';
+
         context.woundLevel       = state.woundLevel;
         context.WOUND_LEVELS     = WOUND_LEVELS;
         context.WOUND_SEVERITY   = WOUND_SEVERITY;
@@ -445,6 +455,14 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
             foundry.utils.setProperty(this._altState, input.dataset.field, val);
             await saveAlternityState(this.actor, this._altState);
             if (input.dataset.field === 'profession' || input.dataset.field.startsWith('features.')) this.render(true);
+        } else if (action === 'editArmor') {
+            // Armor ratings are free text so they can hold die ranges ("d6-1"), which
+            // is why they are not run through safeInt like the numeric fields above.
+            const type = input.dataset.type;
+            if (this._altState.armor && Object.hasOwn(this._altState.armor, type)) {
+                this._altState.armor[type] = input.value.trim();
+                await saveAlternityState(this.actor, this._altState);
+            }
         } else if (action === 'editSkill') {
             this._altState.setSkillRank(input.dataset.skillId, safeInt(input.value, 0));
             await saveAlternityState(this.actor, this._altState);

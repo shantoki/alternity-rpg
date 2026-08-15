@@ -511,27 +511,79 @@ const AlternityMathService = {
     },
 
     // -----------------------------------------------------------------------
-    // calculateSkillTarget
+    // calculateSkillScores
     // -----------------------------------------------------------------------
 
     /**
-     * Compute the base target number for a skill check from its component parts,
-     * before any situational modifiers are applied.
+     * Compute the Ordinary/Good/Amazing triple a skill check rolls under.
      *
-     * Formula: skillRank + abilityModifier + 10
+     * Alternity has no "target number = rank + modifier + 10" — that is a d20-shaped
+     * formula this codebase carried around for a while and never used for real rolls.
+     * The actual rule (alternity-core-mechanics.md, "Skills"):
+     *   Broad skill     : score = ability score
+     *   Specialty skill : score = ability score + skill rank
+     *   Untrained       : score = half the ability score, rounded down
+     * The triple is then Ordinary = score, Good = half, Amazing = a quarter (both
+     * rounded down), which is the same split AlternityCharacterState.getSkillScores()
+     * applies to the main skill tree.
      *
-     * @param {number} skillRank       - The character's rank in the skill (0–10).
-     * @param {number} abilityModifier - The relevant ability score modifier (-3 to +6).
+     * @param {number} abilityScore - The linked ability's score.
+     * @param {number} [skillRank=0] - Ranks held in the skill (0 for broad/untrained).
+     * @param {object} [options]
+     * @param {boolean} [options.untrained] - Character has no ranks and is improvising.
+     * @returns {{ ordinary: number, good: number, amazing: number, base: number }}
+     */
+    calculateSkillScores(abilityScore, skillRank = 0, options = {}) {
+        if (typeof abilityScore !== 'number' || !isFinite(abilityScore) || abilityScore < 0) {
+            throw new Error('[AlternityMathService.calculateSkillScores] abilityScore must be a finite number ≥ 0.');
+        }
+        if (typeof skillRank !== 'number' || !isFinite(skillRank) || skillRank < 0) {
+            throw new Error('[AlternityMathService.calculateSkillScores] skillRank must be a finite number ≥ 0.');
+        }
+
+        const base = options.untrained
+            ? Math.floor(abilityScore / 2)
+            : Math.floor(abilityScore) + Math.floor(skillRank);
+
+        return {
+            base,
+            ordinary: base,
+            good:     Math.floor(base / 2),
+            amazing:  Math.floor(base / 4),
+        };
+    },
+
+    // -----------------------------------------------------------------------
+    // calculateResistanceModifier
+    // -----------------------------------------------------------------------
+
+    /**
+     * Look up an ability's resistance modifier — the step penalty an attacker takes
+     * when this ability resists them (Fastplay standard bands).
+     *
+     *   score 1-10 : 0
+     *   score 11-12: +1
+     *   score 13-14: +2
+     *
+     * Only STR, DEX, INT and WIL have resistance modifiers; CON and PER return 0.
+     * Alternity has no armor-class-style "defense number" — defending is a step
+     * modifier applied to the attacker's check, which is what this produces.
+     *
+     * @param {number} abilityScore - The ability's score.
+     * @param {string} [ability]    - Ability key ('STR'|'DEX'|'INT'|'WIL'|'CON'|'PER').
+     *                                Omit to apply the bands unconditionally.
      * @returns {number}
      */
-    calculateSkillTarget(skillRank, abilityModifier) {
-        if (typeof skillRank !== 'number' || skillRank < 0 || skillRank > 10) {
-            throw new Error('[AlternityMathService.calculateSkillTarget] skillRank must be 0–10.');
+    calculateResistanceModifier(abilityScore, ability = null) {
+        if (typeof abilityScore !== 'number' || !isFinite(abilityScore)) {
+            throw new Error('[AlternityMathService.calculateResistanceModifier] abilityScore must be a finite number.');
         }
-        if (typeof abilityModifier !== 'number' || abilityModifier < -3 || abilityModifier > 6) {
-            throw new Error('[AlternityMathService.calculateSkillTarget] abilityModifier must be -3 to +6.');
+        if (ability !== null && !['STR', 'DEX', 'INT', 'WIL'].includes(String(ability).toUpperCase())) {
+            return 0;
         }
-        return skillRank + abilityModifier + 10;
+        if (abilityScore >= 13) return 2;
+        if (abilityScore >= 11) return 1;
+        return 0;
     },
 
     // -----------------------------------------------------------------------

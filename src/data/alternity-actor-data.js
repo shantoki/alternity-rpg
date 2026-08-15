@@ -6,6 +6,8 @@
  * All state must be serializable/deserializable — no Functions, Dates, or RegExps stored.
  */
 
+import { AlternityMathService } from '../services/alternity-math.js';
+
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -674,19 +676,13 @@ class AlternityCharacterState {
     getAbilityData(ab) {
         if (!ABILITIES.includes(ab)) throw new Error(`[AlternityCharacterState] Unknown ability "${ab}".`);
         const score = this.abilityScores[ab];
-        
-        // Resistance Modifier: 11-12: +1, 13-14: +2 (Fastplay standard)
-        // Only applies to STR, DEX, INT, WIL as per templates.
-        let resMod = 0;
-        if (['STR', 'DEX', 'INT', 'WIL'].includes(ab)) {
-            if (score >= 13) resMod = 2;
-            else if (score >= 11) resMod = 1;
-        }
 
+        // Band table lives in the math service — it is shared with the actor's own
+        // derived resistance modifier, and this codebase keeps arithmetic in one place.
         return {
             score,
             untrained: Math.floor(score / 2),
-            resMod
+            resMod:    AlternityMathService.calculateResistanceModifier(score, ab),
         };
     }
 

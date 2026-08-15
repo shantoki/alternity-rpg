@@ -300,6 +300,48 @@ describe('Alternity System Unit Tests', () => {
         });
     });
 
+    describe('AlternityMathService — Skill Scores & Resistance', () => {
+        it('should score a specialty skill as ability score + rank, with the O/G/A triple', () => {
+            // alternity-core-mechanics.md: specialty score = ability score + rank.
+            const scores = AlternityMathService.calculateSkillScores(12, 3);
+            expect(scores.base).toBe(15);
+            expect(scores.ordinary).toBe(15);
+            expect(scores.good).toBe(7);   // half, rounded down
+            expect(scores.amazing).toBe(3); // quarter, rounded down
+        });
+
+        it('should score a broad skill as the bare ability score', () => {
+            expect(AlternityMathService.calculateSkillScores(12).ordinary).toBe(12);
+        });
+
+        it('should halve the ability score when untrained', () => {
+            const scores = AlternityMathService.calculateSkillScores(13, 0, { untrained: true });
+            expect(scores.ordinary).toBe(6);
+            expect(scores.good).toBe(3);
+        });
+
+        it('should reject nonsensical skill score inputs', () => {
+            expect(() => AlternityMathService.calculateSkillScores(-1)).toThrow();
+            expect(() => AlternityMathService.calculateSkillScores(12, -2)).toThrow();
+            expect(() => AlternityMathService.calculateSkillScores('12')).toThrow();
+        });
+
+        it('should apply the resistance modifier bands', () => {
+            expect(AlternityMathService.calculateResistanceModifier(10, 'DEX')).toBe(0);
+            expect(AlternityMathService.calculateResistanceModifier(11, 'DEX')).toBe(1);
+            expect(AlternityMathService.calculateResistanceModifier(12, 'DEX')).toBe(1);
+            expect(AlternityMathService.calculateResistanceModifier(13, 'DEX')).toBe(2);
+            expect(AlternityMathService.calculateResistanceModifier(14, 'DEX')).toBe(2);
+        });
+
+        it('should give CON and PER no resistance modifier', () => {
+            expect(AlternityMathService.calculateResistanceModifier(14, 'CON')).toBe(0);
+            expect(AlternityMathService.calculateResistanceModifier(14, 'PER')).toBe(0);
+            // Omitting the ability applies the bands unconditionally.
+            expect(AlternityMathService.calculateResistanceModifier(14)).toBe(2);
+        });
+    });
+
     describe('AlternityMathService — Cyber Tolerance', () => {
         it('should split the tolerance track the way the book\'s worked example does', () => {
             // PHB Ch.15: "Taylor Windsor has a cyber tolerance score of 12 (6/3/3)".

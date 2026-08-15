@@ -79,6 +79,8 @@
   "ALTERNITY.Activation.Passive": "Passive",
   "ALTERNITY.Free": "Free",
   "ALTERNITY.Defense": "Defense",
+  "ALTERNITY.ResistanceModifier": "Resistance",
+  "ALTERNITY.Steps": "steps",
   "ALTERNITY.Attack": "Attack",
   "ALTERNITY.Tactics": "Tactics",
   "ALTERNITY.CR.Easy": "Easy",

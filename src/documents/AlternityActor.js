@@ -112,8 +112,13 @@ export class AlternityActor extends Actor {
         sys.totalSpeedPenalty   = equippedArmor.reduce((t, a) => t + (a.system.speedPenalty ?? 0), 0);
         sys.totalSkillPenalty   = equippedArmor.reduce((t, a) => t + (a.system.skillPenalty ?? 0), 0);
 
-        // Derived defense: 10 + DEX modifier + armor bonus
-        sys.defense = 10 + (sys.abilities?.dex ?? 0) + sys.totalArmorBonus;
+        // Derived defense. Alternity has no armor-class number: defending applies a
+        // step penalty to the attacker's check, so this is DEX's resistance modifier
+        // plus whatever the worn armor contributes. The old `10 + dex + armor` was a
+        // d20-shaped formula that also read the DEX *score* as if it were a modifier.
+        sys.resistanceModifier = AlternityMathService.calculateResistanceModifier(
+            sys.abilities?.dex ?? 0, 'DEX'
+        ) + sys.totalArmorBonus;
 
         // Derived speed: 30ft base − speed penalty
         sys.speed = Math.max(0, 30 - sys.totalSpeedPenalty);
@@ -135,7 +140,10 @@ export class AlternityActor extends Actor {
      */
     _prepareNpcData() {
         const sys = this.system;
-        sys.defense    = 10 + (sys.abilities?.dex ?? 0) + (sys.defenseBonus ?? 0);
+        // See _prepareCharacterData: a resistance modifier, not an armor class.
+        sys.resistanceModifier = AlternityMathService.calculateResistanceModifier(
+            sys.abilities?.dex ?? 0, 'DEX'
+        ) + (sys.defenseBonus ?? 0);
         sys.staminaPct = this._resourcePct(sys.stamina);
         sys.vitalityPct = this._resourcePct(sys.vitality);
         sys.isIncapacitated = sys.woundLevel === 'Out';
@@ -731,8 +739,12 @@ export class AlternityActor extends Actor {
         return WOUND_PENALTIES[this.system?.woundLevel] ?? 0;
     }
 
-    /** The actor's DEX modifier — used for initiative and ranged attack/defense. */
-    get dexModifier() {
-        return this.system?.abilities?.dex ?? 0;
+    /**
+     * DEX's resistance modifier — the step penalty an attacker takes against this
+     * actor. Replaces the old `dexModifier` getter, which returned the raw DEX score
+     * under a name that invited callers to treat it as a modifier.
+     */
+    get dexResistanceModifier() {
+        return AlternityMathService.calculateResistanceModifier(this.system?.abilities?.dex ?? 0, 'DEX');
     }
 }

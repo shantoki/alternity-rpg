@@ -20,6 +20,7 @@
 
 import { getEffectTemplate, saveEffectTemplate } from '../data/alternity-item-template.js';
 import { getAlternityState, saveAlternityState }  from '../data/alternity-actor-data.js';
+import { AlternityMathService }                   from '../services/alternity-math.js';
 
 // ---------------------------------------------------------------------------
 // AlternityItem
@@ -60,19 +61,19 @@ export class AlternityItem extends Item {
      * @private
      */
     _prepareWeaponData() {
-        const sys   = this.system;
-        const actor = this.actor;
+        const sys = this.system;
 
-        // Resolve ability modifier from the owning actor (if equipped)
-        const abilityKey = sys.attackAbility ?? 'str';
-        const abilityMod = actor?.system?.abilities?.[abilityKey] ?? 0;
+        // No ability term in either of these. An Alternity attack is a skill check
+        // rolled under (ability score + rank) — the ability is already the basis of
+        // the score the sheet rolls against, so folding it in here counted it twice.
+        // `attackBonus` is the weapon's own situation-die step modifier (negative is
+        // a bonus, per the convention used throughout this codebase).
+        sys.totalAttackBonus = sys.attackBonus ?? 0;
 
-        // Derived attack bonus display (attackBonus + ability modifier)
-        sys.totalAttackBonus = (sys.attackBonus ?? 0) + abilityMod;
-        sys.abilityModLabel  = abilityMod >= 0 ? `+${abilityMod}` : String(abilityMod);
-
-        // Full damage formula including ability modifier
-        const damageMod = abilityMod + (sys.damageBonus ?? 0);
+        // Likewise the damage formula is the weapon's die plus its own flat bonus.
+        // It used to add the wielder's ability *score* straight into the dice string,
+        // so a STR 12 hero's d4+1w knife rolled d4+13.
+        const damageMod = sys.damageBonus ?? 0;
         sys.fullDamageFormula = damageMod === 0
             ? sys.damageFormula
             : damageMod > 0
@@ -114,20 +115,24 @@ export class AlternityItem extends Item {
      * @private
      */
     _prepareSkillData() {
-        const sys      = this.system;
-        const actor    = this.actor;
+        const sys        = this.system;
+        const actor      = this.actor;
         const abilityKey = sys.linkedAbility?.toLowerCase();
-        const abilityMod = actor?.system?.abilities?.[abilityKey] ?? 0;
+        const abilityScore = actor?.system?.abilities?.[abilityKey] ?? 0;
 
         const effectiveRank = sys.isBackground
             ? Math.floor((sys.rank ?? 0) / 2)
             : (sys.rank ?? 0);
 
+        // Roll-under against ability score + rank, not a d20-style "DC = rank + mod + 10".
+        const scores = AlternityMathService.calculateSkillScores(abilityScore, effectiveRank);
+
         sys.effectiveRank = effectiveRank;
-        sys.targetNumber  = effectiveRank + abilityMod + 10;
+        sys.scores        = scores;
+        sys.targetNumber  = scores.ordinary;
 
         sys.rankDisplay   = sys.isBackground ? `${sys.rank} (bg)` : String(sys.rank ?? 0);
-        sys.dcDisplay     = `DC ${sys.targetNumber}`;
+        sys.scoreDisplay  = `${scores.ordinary} / ${scores.good} / ${scores.amazing}`;
     }
 
     /**

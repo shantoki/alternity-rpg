@@ -26,9 +26,11 @@
             
             <div class="{{alt}}-npc-combat-summary">
                 <div class="{{alt}}-stat-box">
-                    <label>{{localize 'ALTERNITY.Defense'}}</label>
+                    <label>{{localize 'ALTERNITY.ResistanceModifier'}}</label>
                     <div class="{{alt}}-stat-combined">
-                        <strong>{{system.defense}}</strong>
+                        {{!-- A step penalty applied to attackers, not an armor class:
+                              DEX's resistance modifier plus this NPC's flat bonus. --}}
+                        <strong>{{fmtMod system.resistanceModifier}}</strong>
                         <span class="{{alt}}-stat-sub">({{localize 'ALTERNITY.Bonus'}}: <input type="number" name="system.defenseBonus" value="{{system.defenseBonus}}" />)</span>
                     </div>
                 </div>

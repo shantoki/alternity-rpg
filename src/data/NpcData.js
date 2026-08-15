@@ -15,6 +15,8 @@
  *   - tactics     : GM-facing text describing combat behaviour
  */
 
+import { AlternityMathService } from '../services/alternity-math.js';
+
 const { fields } = foundry.data;
 
 /**
@@ -181,8 +183,13 @@ export class NpcData extends foundry.abstract.TypeDataModel {
         this.woundPenalty    = WOUND_PENALTIES[this.woundLevel] ?? 0;
         this.isIncapacitated = this.woundLevel === 'Out';
 
-        // Derived defense value (base 10 + DEX modifier + any armor bonus)
-        this.defense = 10 + (this.abilities.dex ?? 0) + (this.defenseBonus ?? 0);
+        // Derived defense. Alternity has no armor-class number — defending applies a
+        // step penalty to the attacker's check — so this is DEX's resistance modifier
+        // plus any flat bonus the GM has given this NPC. AlternityActor._prepareNpcData()
+        // recomputes the same value once the document layer runs.
+        this.resistanceModifier = AlternityMathService.calculateResistanceModifier(
+            this.abilities.dex ?? 0, 'DEX'
+        ) + (this.defenseBonus ?? 0);
     }
 
     /** @override */

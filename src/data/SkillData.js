@@ -19,6 +19,8 @@
  *   - targetNumber   : Derived — the DC to roll under for this skill
  */
 
+import { AlternityMathService } from '../services/alternity-math.js';
+
 const { fields } = foundry.data;
 
 export class SkillData extends foundry.abstract.TypeDataModel {
@@ -107,13 +109,13 @@ export class SkillData extends foundry.abstract.TypeDataModel {
             ? Math.floor(this.rank / 2)
             : this.rank;
 
-        // Target number: effectiveRank + ability modifier (from owning actor) + 10
-        // The owning actor's ability modifier is resolved here if the parent is set.
-        const actor         = this.parent?.actor ?? this.parent;
-        const abilityKey    = this.linkedAbility?.toLowerCase();
-        const abilityMod    = actor?.system?.abilities?.[abilityKey] ?? 0;
+        // Alternity rolls under (ability score + rank); there is no "+10 DC".
+        const actor        = this.parent?.actor ?? this.parent;
+        const abilityKey   = this.linkedAbility?.toLowerCase();
+        const abilityScore = actor?.system?.abilities?.[abilityKey] ?? 0;
 
-        this.targetNumber = this.effectiveRank + abilityMod + 10;
+        this.scores       = AlternityMathService.calculateSkillScores(abilityScore, this.effectiveRank);
+        this.targetNumber = this.scores.ordinary;
 
         // Include specialisation bonus in a separate display field
         this.targetNumberWithSpec = this.specialisation
