@@ -639,6 +639,10 @@ export class AlternityActor extends Actor {
      * @param {object} [options]
      * @param {string|string[]} [options.alsoInstall] - Item id(s) to count as installed even if
      *        they are not yet, so a caller can ask "what would the track look like if I fitted this?"
+     * @param {number} [options.constitution] - CON score to use instead of the `system.abilities.con`
+     *        mirror. Callers that already hold an AlternityCharacterState should pass
+     *        `state.abilityScores.CON`: the state is the source of truth for gameplay logic, while
+     *        `system.abilities.*` is a mirror that is only refreshed when the state is saved.
      * @returns {object|null} The result of AlternityMathService.calculateCyberTolerance,
      *                        or null for actor types that have no tolerance track.
      */
@@ -649,7 +653,7 @@ export class AlternityActor extends Actor {
             : Array.isArray(options.alsoInstall) ? options.alsoInstall
             : [options.alsoInstall];
 
-        const con = this.system?.abilities?.con ?? 0;
+        const con = options.constitution ?? this.system?.abilities?.con ?? 0;
         const installed = this.items
             .filter(i => i.type === 'cybertech' && (i.system?.isInstalled || alsoInstall.includes(i.id)))
             .map(i => ({ name: i.name, size: i.system?.size ?? 0 }));

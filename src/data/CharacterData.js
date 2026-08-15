@@ -30,17 +30,28 @@ const { fields } = foundry.data;
 // ---------------------------------------------------------------------------
 
 /**
- * A single ability score modifier, stored as an integer −3 to +6.
- * @param {number} [initial=0]
+ * A single raw ability score (STR/DEX/CON/INT/WIL/PER).
+ *
+ * This is the *score*, not a modifier: `saveAlternityState()` mirrors
+ * `AlternityCharacterState.abilityScores` straight into `system.abilities.*` so
+ * native Foundry features can read them. The field used to be declared as a
+ * modifier clamped to −3..+6, which silently truncated every score of 7 or more
+ * down to 6 — a CON 10 hero's mirror read 6, and anything deriving from it (cyber
+ * tolerance, defense, weapon ability bonuses) quietly used the wrong number.
+ *
+ * Range is deliberately generous: humans roll 4–14, but cybertech (a cyberlimb
+ * adds up to +3 STR), mutations and non-human species all push past that.
+ *
+ * @param {number} [initial=10] - Matches AlternityCharacterState's own default.
  */
-function abilityField(initial = 0) {
+function abilityField(initial = 10) {
     return new fields.NumberField({
         required: true,
         nullable: false,
         integer:  true,
         initial:  initial,
-        min:      -3,
-        max:      6,
+        min:      0,
+        max:      30,
     });
 }
 
@@ -78,12 +89,12 @@ export class CharacterData extends foundry.abstract.TypeDataModel {
         return {
             // ── Ability scores ───────────────────────────────────────────
             abilities: new fields.SchemaField({
-                str: abilityField(0),
-                dex: abilityField(0),
-                con: abilityField(0),
-                int: abilityField(0),
-                wil: abilityField(0),
-                per: abilityField(0),
+                str: abilityField(),
+                dex: abilityField(),
+                con: abilityField(),
+                int: abilityField(),
+                wil: abilityField(),
+                per: abilityField(),
             }),
 
             // ── Resource pools ───────────────────────────────────────────

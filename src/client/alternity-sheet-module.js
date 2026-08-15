@@ -333,7 +333,9 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
         // Cyber tolerance is derived from CON + the sizes of installed cybertech items
         // (PHB Ch.15), so the sheet reads it rather than storing it. Called defensively:
         // template and document-class changes can reach a live server out of step.
-        context.cyberTolerance = this.document.getCyberTolerance?.() ?? null;
+        context.cyberTolerance = this.document.getCyberTolerance?.({
+            constitution: state.abilityScores.CON,
+        }) ?? null;
         context.cyberToleranceTrack = context.cyberTolerance
             ? ['left', 'centre', 'right'].map(section => ({
                 section,
@@ -609,7 +611,10 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
         if (installing) {
             // Ask the actor what the track would look like with this piece fitted,
             // rather than doing the arithmetic here.
-            const projected = this.actor.getCyberTolerance?.({ alsoInstall: item.id });
+            const projected = this.actor.getCyberTolerance?.({
+                alsoInstall:  item.id,
+                constitution: this._altState?.abilityScores?.CON,
+            });
 
             if (projected?.isOverloaded) {
                 ui.notifications?.warn(

@@ -17,14 +17,20 @@
 
 const { fields } = foundry.data;
 
-function abilityField(initial = 0) {
+/**
+ * A single raw ability score, same shape and range as CharacterData's — NPCs are
+ * synced from AlternityCharacterState by the same code path. See the note there:
+ * this used to be clamped to −3..+6 as if it held a modifier, which truncated
+ * every score of 7 or more down to 6.
+ */
+function abilityField(initial = 10) {
     return new fields.NumberField({
         required: true,
         nullable: false,
         integer:  true,
         initial:  initial,
-        min:      -3,
-        max:      6,
+        min:      0,
+        max:      30,
     });
 }
 
@@ -54,13 +60,13 @@ export class NpcData extends foundry.abstract.TypeDataModel {
         return {
             // ── Core abilities (same range as characters) ────────────────
             abilities: new fields.SchemaField({
-                str: abilityField(0),
-                dex: abilityField(0),
-                con: abilityField(0),
-                int: abilityField(0),
-                wil: abilityField(0),
-                per: abilityField(0),
-            }, { initial: { str: 0, dex: 0, con: 0, int: 0, wil: 0, per: 0 } }),
+                str: abilityField(),
+                dex: abilityField(),
+                con: abilityField(),
+                int: abilityField(),
+                wil: abilityField(),
+                per: abilityField(),
+            }, { initial: { str: 10, dex: 10, con: 10, int: 10, wil: 10, per: 10 } }),
 
             // ── Resource pools ───────────────────────────────────────────
             stamina:  resourceSchema(20, 20),
