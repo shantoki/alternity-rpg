@@ -819,6 +819,9 @@
 
 /* ── Combat Tab ─────────────────────────────────────────────────────────── */
 .alt-item-card { display: flex; flex-direction: row; align-items: center; gap: 8px; padding: 4px 8px; background: rgba(0,0,0,0.2); border: 1px solid var(--alt-color-border); border-radius: 4px; }
+/* Item images have no intrinsic size limit, and Foundry's default item icons are large
+   SVGs — without this every card rendered its icon at full size and blew the row apart. */
+.alt-item-card img { flex: 0 0 auto; width: 32px; height: 32px; object-fit: contain; border: none; cursor: pointer; }
 .alt-item-info { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .alt-item-name { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .alt-item-stats { font-size: 10px; color: var(--alt-color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -1223,14 +1226,18 @@
     flex-direction: column;
     height: 100%;
 }
+/* Give the editor a height and our own framing, but do NOT touch its `display`.
+   On activation Foundry wraps the editor in `.menu-container` (flex: 0 0 menu-height)
+   and `.editor-container` (flex: 1), whose child `.editor-content` is
+   `position: absolute; inset: 0`. Both wrappers get all their height from the host
+   being `display: flex` — overriding that to `block` collapsed them to zero, which
+   rendered an empty box with invisible, unclickable text. */
 .alt-item-sheet prose-mirror {
-    display: block;
     min-height: 160px;
     padding: 4px 6px;
     background: rgba(0, 0, 0, 0.15);
     border: 1px solid var(--alt-color-border);
     border-radius: var(--alt-radius);
-    overflow-y: auto;
 }
 .alt-item-sheet .tab[data-tab="description"] prose-mirror { flex: 1; }
 
