@@ -881,14 +881,35 @@
 }
 
 /* ── Last resort points (PHB Ch.2) ──────────────────────────────────────── */
-/* Five boxes is the printed ceiling, because a Free Agent can reach that many. */
+/* Five boxes is the printed ceiling, because a Free Agent can reach that many.
+   `.alt-resources` is a grid of minmax(110px, 1fr) columns sized for uniform
+   damage bars, so this row must span the whole track rather than becoming a
+   fifth cell — as a cell it wrapped and crushed its own contents. */
 .alt-last-resort {
+    grid-column: 1 / -1;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
-    margin-top: 6px;
+    gap: 4px 10px;
+    margin-top: 2px;
+    padding-top: 6px;
+    border-top: 1px solid var(--alt-color-border);
+    min-width: 0;
 }
-.alt-last-resort-track { display: flex; gap: 4px; }
+.alt-last-resort-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    color: var(--alt-color-text-muted);
+    font-weight: bold;
+    white-space: nowrap;
+    flex: 0 0 auto;
+}
+.alt-last-resort-track {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    flex: 0 0 auto;
+}
 .alt-last-resort-pip {
     width: 14px;
     height: 14px;
@@ -917,18 +938,25 @@
     text-transform: uppercase;
     color: var(--alt-color-text-muted);
     white-space: nowrap;
+    flex: 0 0 auto;
 }
 .alt-last-resort-field input {
-    width: 34px;
+    width: 30px !important;
+    flex: 0 0 30px !important;
+    height: 15px !important;
     text-align: center;
+    font-size: 10px;
+    background: rgba(0, 0, 0, 0.3);
 }
 /* Shown instead of the pip row while max is still 0, so an empty track reads as
-   "not configured" rather than "broken". */
+   "not configured" rather than "broken". Must not wrap — at narrow widths it
+   was breaking across three lines and dragging the row open. */
 .alt-last-resort-hint {
     font-size: 9px;
     font-style: italic;
     color: var(--alt-color-text-muted);
     opacity: 0.7;
+    white-space: nowrap;
 }
 
 /* ── Damage track bar tints ─────────────────────────────────────────────── */

@@ -102,23 +102,27 @@
               (keyed to Personality), and that table is an image in the available
               scans whose numerals did not survive OCR. Without this input the
               track has no pips and no way to get any. --}}
+        {{!-- Its own class rather than `.alt-bar-name`: that one is built to
+              shrink and ellipsis inside a bar label (flex: 1 1 auto; min-width: 0;
+              overflow: hidden), which collapsed this label to zero width here. --}}
         <div class="{{@root.alt}}-last-resort">
-            <span class="{{@root.alt}}-bar-name">{{localize 'ALTERNITY.LastResort.Label'}}</span>
+            <span class="{{@root.alt}}-last-resort-label">{{localize 'ALTERNITY.LastResort.Label'}}</span>
             <div class="{{@root.alt}}-last-resort-track">
                 {{#each lastResort.pips as |spent|}}
                 <button type="button" class="{{@root.alt}}-last-resort-pip {{#if spent}}active{{/if}}"
                         data-action="setLastResort" data-value="{{add @index 1}}"
                         title="{{localize 'ALTERNITY.LastResort.Label'}} {{add @index 1}}"></button>
-                {{/each}}
-                {{#unless lastResort.pips.length}}
+                {{else}}
                 <span class="{{@root.alt}}-last-resort-hint">{{localize 'ALTERNITY.LastResort.SetMax'}}</span>
-                {{/unless}}
+                {{/each}}
             </div>
-            <label class="{{@root.alt}}-last-resort-field">{{localize 'ALTERNITY.LastResort.Max'}}
+            <label class="{{@root.alt}}-last-resort-field" title="{{localize 'ALTERNITY.LastResort.MaxTitle'}}">
+                <span>{{localize 'ALTERNITY.LastResort.Max'}}</span>
                 <input type="number" min="0" max="5" value="{{lastResort.max}}"
                        data-action="editLastResort" data-field="max" />
             </label>
-            <label class="{{@root.alt}}-last-resort-field">{{localize 'ALTERNITY.LastResort.Cost'}}
+            <label class="{{@root.alt}}-last-resort-field" title="{{localize 'ALTERNITY.LastResort.CostTitle'}}">
+                <span>{{localize 'ALTERNITY.LastResort.Cost'}}</span>
                 <input type="number" min="0" value="{{lastResort.cost}}"
                        data-action="editLastResort" data-field="cost" />
             </label>
