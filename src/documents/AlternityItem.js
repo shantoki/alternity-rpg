@@ -49,6 +49,10 @@ export class AlternityItem extends Item {
             case 'perkFlaw': return this._preparePerkFlawData();
             case 'personalEquipment': return this._preparePersonalEquipmentData();
             case 'cybertech': return this._prepareCybertechData();
+            case 'program':   return this._prepareProgramData();
+            case 'fx':        return this._prepareFXData();
+            case 'mutation':  return this._prepareMutationData();
+            case 'achievementBenefit': return this._prepareAchievementBenefitData();
         }
     }
 
@@ -231,6 +235,109 @@ export class AlternityItem extends Item {
         sys.statusLabel = sys.isInstalled
             ? game.i18n.localize('ALTERNITY.Cybertech.Installed')
             : game.i18n.localize('ALTERNITY.Cybertech.NotInstalled');
+    }
+
+    /**
+     * Compute display labels for the Program sheet
+     * (Player's Handbook Ch.10; Dataware).
+     * @private
+     */
+    _prepareProgramData() {
+        const sys = this.system;
+
+        // Everything mechanical is actor-independent and already derived in
+        // ProgramData.prepareDerivedData(); only the localized status label needs
+        // game.i18n, which the data model has no business reaching for.
+        //
+        // Note there is no "slots consumed by this actor" roll-up here: whether a
+        // program fits is a property of the computer it is loaded into, not of the
+        // program, and that belongs to AlternityActor.getActiveMemory().
+        sys.statusLabel = sys.isLoaded
+            ? game.i18n.localize('ALTERNITY.Program.Loaded')
+            : game.i18n.localize('ALTERNITY.Program.Stored');
+    }
+
+    /**
+     * Resolve an FX power's roll-under scores from the owning actor's ability
+     * score and the power's rank (Mindwalking; Gamemaster Guide Ch.16).
+     *
+     * A power is a skill, so this is the ordinary skill-score calculation: a
+     * specialty adds its rank to the linked ability, a broad skill does not.
+     * @private
+     */
+    _prepareFXData() {
+        const sys        = this.system;
+        const actor      = this.actor;
+        const abilityKey = sys.linkedAbility?.toLowerCase();
+        const abilityScore = actor?.system?.abilities?.[abilityKey] ?? 0;
+
+        // Broad skills roll against the bare ability; specialties add their rank.
+        const effectiveRank = sys.isBroadSkill ? 0 : (sys.rank ?? 0);
+        const scores = AlternityMathService.calculateSkillScores(abilityScore, effectiveRank);
+
+        sys.scores       = scores;
+        sys.scoreDisplay = `${scores.ordinary} / ${scores.good} / ${scores.amazing}`;
+
+        // A power with no ranks that can't be used untrained is simply unusable —
+        // the sheet greys the roll button off this rather than off rank alone,
+        // since a broad skill legitimately sits at rank 0.
+        sys.isUsable = !(sys.cannotBeUsedUntrained && (sys.rank ?? 0) === 0);
+
+        // Whether the owner can currently pay for it. Psionic and FX energy are
+        // tracked in the same pool on the actor.
+        const energy = actor?.system?.psiPoints?.value ?? 0;
+        sys.canAffordEnergy = !actor || energy >= (sys.energyCost ?? 0);
+    }
+
+    /**
+     * Resolve a mutation's check scores from the owning actor
+     * (Player's Handbook Ch.13 "Mutants").
+     *
+     * A mutation resolves against its linked ability's skill if the hero has
+     * one; failing that it is an untrained check at half the ability score.
+     * Only the untrained fallback is derived here — if the hero does have the
+     * relevant skill, the sheet rolls that skill from the main skill tree
+     * instead, and this item has no say in it.
+     * @private
+     */
+    _prepareMutationData() {
+        const sys        = this.system;
+        const actor      = this.actor;
+        // 'Varies' has no single ability to read (Psionic Power), so there is
+        // nothing to derive and the sheet falls back to a manual roll.
+        const abilityKey = sys.linkedAbility === 'Varies' ? null : sys.linkedAbility?.toLowerCase();
+        const abilityScore = abilityKey ? (actor?.system?.abilities?.[abilityKey] ?? 0) : 0;
+
+        const scores = AlternityMathService.calculateSkillScores(abilityScore, 0, { untrained: true });
+
+        sys.untrainedScores = scores;
+        sys.scoreDisplay    = abilityKey
+            ? `${scores.ordinary} / ${scores.good} / ${scores.amazing}`
+            : '—';
+
+        // The untrained fallback carries a +4 base situation die, not the usual
+        // +1 of a feat check — this is the single largest penalty in the system
+        // and the reason a mutant wants the matching skill.
+        sys.untrainedBaseStep = 4;
+
+        sys.tierLabel = game.i18n.localize(
+            sys.isAdvantage ? 'ALTERNITY.Mutation.Advantage' : 'ALTERNITY.Mutation.Drawback'
+        );
+    }
+
+    /**
+     * Compute display labels for the Achievement Benefit sheet
+     * (Player's Handbook Ch.8, Table P29).
+     * @private
+     */
+    _prepareAchievementBenefitData() {
+        const sys = this.system;
+
+        sys.statusLabel = sys.isMaxed
+            ? game.i18n.localize('ALTERNITY.AchievementBenefit.Maxed')
+            : sys.isPurchased
+                ? game.i18n.localize('ALTERNITY.AchievementBenefit.Purchased')
+                : game.i18n.localize('ALTERNITY.AchievementBenefit.Available');
     }
 
     // -----------------------------------------------------------------------

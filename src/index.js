@@ -24,6 +24,10 @@ import {
     PerkFlawData,
     PersonalEquipmentData,
     CybertechData,
+    ProgramData,
+    FXData,
+    MutationData,
+    AchievementBenefitData,
 } from './data/index.js';
 
 // ── Logic / hooks ───────────────────────────────────────────────────────────
@@ -62,6 +66,10 @@ Hooks.once('init', async () => {
     CONFIG.Item.dataModels.perkFlaw = PerkFlawData;
     CONFIG.Item.dataModels.personalEquipment = PersonalEquipmentData;
     CONFIG.Item.dataModels.cybertech = CybertechData;
+    CONFIG.Item.dataModels.program   = ProgramData;
+    CONFIG.Item.dataModels.fx        = FXData;
+    CONFIG.Item.dataModels.mutation  = MutationData;
+    CONFIG.Item.dataModels.achievementBenefit = AchievementBenefitData;
 
     // ── 3. Initiative formula ───────────────────────────────────────────────
     // The actual roll logic is in AlternityActor.rollInitiative.

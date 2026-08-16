@@ -232,6 +232,11 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
                 useCharge:      this._onUseChargeAction,
                 toggleInstalled: this._onToggleInstalledAction,
                 rollCyberCheck:  this._onRollCyberCheckAction,
+                toggleLoaded:    this._onToggleLoadedAction,
+                rollFXPower:     this._onRollFXPowerAction,
+                rollMutation:    this._onRollMutationAction,
+                purchaseBenefit: this._onPurchaseBenefitAction,
+                refundBenefit:   this._onRefundBenefitAction,
                 setPsionicEnergy: this._onPsionicPipAction,
                 editState:      this._onEditStateAction
             }
@@ -327,7 +332,28 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
             computers: this.document.items.filter(i => i.type === 'computer'),
             perksFlaws: this.document.items.filter(i => i.type === 'perkFlaw'),
             personalEquipment: this.document.items.filter(i => i.type === 'personalEquipment'),
-            cybertech: this.document.items.filter(i => i.type === 'cybertech')
+            cybertech: this.document.items.filter(i => i.type === 'cybertech'),
+            programs: this.document.items.filter(i => i.type === 'program'),
+            fxPowers: this.document.items.filter(i => i.type === 'fx'),
+            mutations: this.document.items.filter(i => i.type === 'mutation'),
+            achievementBenefits: this.document.items.filter(i => i.type === 'achievementBenefit')
+        };
+
+        // Active memory is derived from the owned computers' capacity and the
+        // slot costs of the loaded programs (PHB Ch.10) — the software analogue
+        // of the cyber tolerance track above. Called defensively for the same
+        // reason: a live server can be running out-of-step JS.
+        context.activeMemory = this.document.getActiveMemory?.() ?? null;
+
+        // Mutation points are two separate pools: advantages spend mutation
+        // points, drawbacks grant drawback points that must themselves be spent.
+        // Totals come off the items so the sheet can't disagree with what's owned.
+        const mutationItems = context.inventory.mutations;
+        context.mutationPoints = {
+            spent:     mutationItems.filter(i => i.system.isAdvantage).reduce((sum, i) => sum + (i.system.cost ?? 0), 0),
+            available: state.mutations?.points ?? 0,
+            drawbackGranted: mutationItems.filter(i => i.system.isDrawback).reduce((sum, i) => sum + (i.system.cost ?? 0), 0),
+            drawbackBudget:  state.mutations?.drawbackPoints ?? 0,
         };
 
         // Cyber tolerance is derived from CON + the sizes of installed cybertech items
@@ -366,9 +392,15 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
         context.skillFilter      = this._skillFilter || '';
         context.combatMovement   = state.combatMovement || { sprint: 0, run: 0, walk: 0, easySwim: 0, swim: 0, glide: 0, fly: 0 };
         context.personalData     = state.personalData || { age: '', height: '', weight: '', appearance: '', allegiance: '', socialStatus: '', contacts: '', enemies: '' };
+        // The achievement track is stored on actor.system (CharacterData), not on
+        // AlternityCharacterState — this used to read `state.achievementTrack`,
+        // which does not exist, so the level silently rendered as 1 forever.
+        const achievement = this.document.system?.achievementTrack ?? {};
         context.achievementTrack = {
-            level: state.achievementTrack?.level || 1,
-            checkmarks: [...Array(23).keys()].map(i => i < (state.achievementTrack?.level || 1))
+            level:        achievement.level ?? 1,
+            pointsSpent:  achievement.pointsSpent ?? 0,
+            pointsStored: achievement.pointsStored ?? 0,
+            checkmarks: [...Array(23).keys()].map(i => i < (achievement.level ?? 1))
         };
         context.features         = state.features || { usePsionics: false, useMutations: false, useCybertech: false };
         context.psionics         = state.psionics || { energy: { value: 0, max: 0 }, powers: [] };
@@ -683,6 +715,147 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
             return;
         }
         await item.update({ 'system.currentCharges': current - 1 });
+    }
+
+    /**
+     * Load or unload a program from the computer's active memory
+     * (PHB Ch.10; Dataware Ch.2 "Running Programs").
+     *
+     * Loading is refused when the program would overflow the available slots —
+     * the same guard `toggleInstalled` applies to the cyber tolerance track, and
+     * for the same reason: the budget is the whole point of the mechanic.
+     * Unloading is always allowed.
+     */
+    static async _onToggleLoadedAction(event, target) {
+        const itemId = target.dataset.itemId ?? target.closest('[data-item-id]')?.dataset.itemId;
+        const item   = this.actor.items.get(itemId);
+        if (!item || item.type !== 'program') return;
+
+        const loading = !item.system.isLoaded;
+
+        if (loading) {
+            const projected = this.actor.getActiveMemory?.({ alsoLoad: item.id });
+
+            if (projected && projected.max === 0 && !projected.isUnlimited) {
+                ui.notifications?.warn(
+                    `${item.name}: ${game.i18n.localize('ALTERNITY.Program.NoComputer')}`
+                );
+                return;
+            }
+
+            if (projected?.isOverloaded) {
+                ui.notifications?.warn(
+                    `${item.name}: ${game.i18n.localize('ALTERNITY.Program.MemoryFull')}`
+                );
+                return;
+            }
+        }
+
+        await item.update({ 'system.isLoaded': loading });
+    }
+
+    /**
+     * Roll an FX power (Mindwalking; GM Guide Ch.16).
+     *
+     * A power is a skill, so this rolls under the power's own score — the
+     * linked ability plus its rank — at the broad/specialty base step the item
+     * derives. Energy is deliberately NOT deducted here: the cost is paid on
+     * success *or* failure, but only once the roll resolves, and the roll panel
+     * owns that outcome.
+     */
+    static async _onRollFXPowerAction(event, target) {
+        const itemId = target.dataset.itemId ?? target.closest('[data-item-id]')?.dataset.itemId;
+        const item   = this.actor.items.get(itemId);
+        if (!item || item.type !== 'fx') return;
+
+        if (!item.system.isUsable) {
+            ui.notifications?.warn(`${item.name}: ${game.i18n.localize('ALTERNITY.FX.Untrained')}`);
+            return;
+        }
+        if (!item.system.canAffordEnergy) {
+            ui.notifications?.warn(`${item.name}: ${game.i18n.localize('ALTERNITY.FX.NoEnergy')}`);
+            return;
+        }
+
+        const scores = item.system.scores
+            ?? { ordinary: 0, good: 0, amazing: 0 };
+
+        this._openRoller(
+            [{ name: item.name, scores, baseStep: item.system.baseStep ?? 0 }],
+            `${item.name} (${item.system.broadSkill})`,
+            this.element
+        );
+    }
+
+    /**
+     * Roll a mutation's activation check (PHB Ch.13).
+     *
+     * This rolls the *untrained* fallback — half the linked ability score at a
+     * +4 base situation die. A hero who actually has the related skill should
+     * roll that skill from the Skills tab instead, which is why this is only
+     * offered on mutations that need a check at all.
+     */
+    static async _onRollMutationAction(event, target) {
+        const itemId = target.dataset.itemId ?? target.closest('[data-item-id]')?.dataset.itemId;
+        const item   = this.actor.items.get(itemId);
+        if (!item || item.type !== 'mutation') return;
+
+        if (item.system.isPassive) {
+            ui.notifications?.info(`${item.name}: ${game.i18n.localize('ALTERNITY.Mutation.Passive')}`);
+            return;
+        }
+        if (item.system.linkedAbility === 'Varies') {
+            ui.notifications?.warn(`${item.name} has no single ability to check against.`);
+            return;
+        }
+
+        const scores = item.system.untrainedScores ?? { ordinary: 0, good: 0, amazing: 0 };
+
+        this._openRoller(
+            [{ name: item.name, scores, baseStep: item.system.untrainedBaseStep ?? 4 }],
+            `${item.name} (untrained)`,
+            this.element
+        );
+    }
+
+    /**
+     * Buy one more instance of an achievement benefit (PHB Ch.8).
+     *
+     * The item owns the eligibility rules, so this asks it rather than
+     * re-deriving them: the level gate, the purchase cap, the one-per-level
+     * rule and the price all differ per benefit and per profession.
+     */
+    static async _onPurchaseBenefitAction(event, target) {
+        const itemId = target.dataset.itemId ?? target.closest('[data-item-id]')?.dataset.itemId;
+        const item   = this.actor.items.get(itemId);
+        if (!item || item.type !== 'achievementBenefit') return;
+
+        // The achievement track lives on actor.system (CharacterData), NOT on
+        // AlternityCharacterState — `pointsStored` is the unspent skill point pool.
+        const track = this.actor.system?.achievementTrack ?? {};
+
+        const verdict = item.system.getPurchaseVerdict({
+            achievementLevel:     track.level ?? 1,
+            availableSkillPoints: track.pointsStored ?? 0,
+        });
+
+        if (!verdict.canPurchase) {
+            ui.notifications?.warn(`${item.name}: ${verdict.reasons[0]}`);
+            return;
+        }
+
+        await item.update({ 'system.timesPurchased': (item.system.timesPurchased ?? 0) + 1 });
+    }
+
+    /** Undo a purchase — the counter is player-editable, so this just decrements. */
+    static async _onRefundBenefitAction(event, target) {
+        const itemId = target.dataset.itemId ?? target.closest('[data-item-id]')?.dataset.itemId;
+        const item   = this.actor.items.get(itemId);
+        if (!item || item.type !== 'achievementBenefit') return;
+
+        const current = item.system.timesPurchased ?? 0;
+        if (current <= 0) return;
+        await item.update({ 'system.timesPurchased': current - 1 });
     }
 }
 

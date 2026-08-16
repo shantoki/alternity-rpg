@@ -673,6 +673,47 @@ export class AlternityActor extends Actor {
         });
     }
 
+    /**
+     * Roll up this actor's computer active memory budget and what the programs
+     * they have loaded are consuming (Player's Handbook Ch.10; Dataware Ch.2).
+     *
+     * Capacity is the sum of every owned computer's active memory. That is a
+     * deliberate simplification of the book, which tracks memory per machine:
+     * modelling it per-computer would mean each program storing which computer
+     * it lives in, and nothing in the sheet asks that question yet. Revisit if
+     * a hero ever needs to run two machines with separate program loadouts.
+     *
+     * A supercomputer has unlimited active memory, so any owned computer marked
+     * as one lifts the ceiling entirely.
+     *
+     * @param {object} [options]
+     * @param {string} [options.alsoLoad] - Id of a program to count as loaded, for
+     *        testing whether it would fit before committing the change.
+     * @returns {object|null} The result of AlternityMathService.calculateActiveMemory.
+     */
+    getActiveMemory(options = {}) {
+        if (!['character', 'npc'].includes(this.type)) return null;
+
+        const alsoLoad = options.alsoLoad === undefined ? []
+            : Array.isArray(options.alsoLoad) ? options.alsoLoad
+            : [options.alsoLoad];
+
+        const computers = this.items.filter(i => i.type === 'computer');
+        const capacity  = computers.reduce((sum, c) => sum + (c.system?.activeMemory ?? 0), 0);
+
+        // "Supercomputer" is recorded in the processor quality free-text field —
+        // there is no dedicated flag for it on ComputerData.
+        const unlimited = computers.some(
+            c => String(c.system?.processorQuality ?? '').toLowerCase().includes('supercomputer')
+        );
+
+        const loaded = this.items
+            .filter(i => i.type === 'program' && (i.system?.isLoaded || alsoLoad.includes(i.id)))
+            .map(i => ({ name: i.name, slots: i.system?.slots ?? 0 }));
+
+        return AlternityMathService.calculateActiveMemory(capacity, loaded, { unlimited });
+    }
+
     // -----------------------------------------------------------------------
     // Chat message creation
     // -----------------------------------------------------------------------

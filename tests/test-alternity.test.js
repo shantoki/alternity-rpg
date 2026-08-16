@@ -438,4 +438,71 @@ describe('Alternity System Unit Tests', () => {
             expect(() => AlternityMathService.calculateCyberTolerance(12, [{ name: 'Bad', size: -2 }])).toThrow();
         });
     });
+
+    describe('AlternityMathService — Active Memory', () => {
+        it('should match the book\'s worked example of a loaded gridpilot', () => {
+            // Dataware Ch.2: "a Good processor in his computer gauntlet (7 slots of
+            // active memory) … he keeps a shadow form, shadow weapon, shadow armor,
+            // alarm, and break-in program all running … keeping one slot open."
+            const result = AlternityMathService.calculateActiveMemory(7, [
+                { name: 'Shadow form',   slots: 2 },
+                { name: 'Shadow weapon', slots: 1 },
+                { name: 'Shadow armor',  slots: 1 },
+                { name: 'Alarm',         slots: 1 },
+                { name: 'Break-in',      slots: 1 },
+            ]);
+            expect(result.max).toBe(7);
+            expect(result.used).toBe(6);
+            expect(result.remaining).toBe(1);
+            expect(result.isFull).toBe(false);
+            expect(result.programCount).toBe(5);
+        });
+
+        it('should report a full and an overloaded budget', () => {
+            const full = AlternityMathService.calculateActiveMemory(4, [2, 2]);
+            expect(full.isFull).toBe(true);
+            expect(full.isOverloaded).toBe(false);
+            expect(full.remaining).toBe(0);
+
+            const over = AlternityMathService.calculateActiveMemory(4, [3, 3]);
+            expect(over.isOverloaded).toBe(true);
+            // Remaining never goes negative — it is a display value, not a balance.
+            expect(over.remaining).toBe(0);
+        });
+
+        it('should never overload a supercomputer', () => {
+            // PHB Ch.10: "a supercomputer has an unlimited amount of active memory."
+            const result = AlternityMathService.calculateActiveMemory(0, [5, 5, 5], { unlimited: true });
+            expect(result.used).toBe(15);
+            expect(result.isUnlimited).toBe(true);
+            expect(result.isFull).toBe(false);
+            expect(result.isOverloaded).toBe(false);
+            expect(result.remaining).toBe(Infinity);
+        });
+
+        it('should charge nothing when no programs are loaded', () => {
+            // Storage memory is effectively unlimited; only loading costs slots.
+            const result = AlternityMathService.calculateActiveMemory(7);
+            expect(result.used).toBe(0);
+            expect(result.remaining).toBe(7);
+            expect(result.programCount).toBe(0);
+        });
+
+        it('should accept plain numbers as well as named program entries', () => {
+            const numbers = AlternityMathService.calculateActiveMemory(10, [2, 3]);
+            const named   = AlternityMathService.calculateActiveMemory(10, [
+                { name: 'Fortress', slots: 2 }, { name: 'Evade', slots: 3 },
+            ]);
+            expect(numbers.used).toBe(5);
+            expect(named.used).toBe(5);
+            expect(named.modifierTrace.some(m => m.source === 'Evade')).toBe(true);
+        });
+
+        it('should reject invalid capacities and slot counts', () => {
+            expect(() => AlternityMathService.calculateActiveMemory(-1)).toThrow();
+            expect(() => AlternityMathService.calculateActiveMemory('7')).toThrow();
+            expect(() => AlternityMathService.calculateActiveMemory(7, 'nope')).toThrow();
+            expect(() => AlternityMathService.calculateActiveMemory(7, [{ name: 'Bad', slots: -2 }])).toThrow();
+        });
+    });
 });

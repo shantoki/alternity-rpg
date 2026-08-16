@@ -5,11 +5,15 @@
 
 const NS = 'alt';
 
-// Default row shapes for the effect item's array fields, keyed by field name
+// Default row shapes for every item type's array fields, keyed by field name
 // (mirrors the generic add/delete-row pattern used by AlternityWarshipSheet).
-const EFFECT_ARRAY_DEFAULTS = Object.freeze({
+// Keyed by schema field name rather than by item type, so the names must stay
+// unique across types — `effects`/`requiredChecks` belong to `effect`,
+// `rankBenefits` to `fx`.
+const ARRAY_ROW_DEFAULTS = Object.freeze({
     effects:        { effectType: 'Modifier', value: 0, damageType: null, stat: '', duration: 'instant', notes: '' },
     requiredChecks: { checkType: 'resource', params: {}, failMessage: '' },
+    rankBenefits:   { rank: 3, name: '', description: '' },
 });
 
 export class AlternityItemSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ItemSheetV2) {
@@ -54,7 +58,7 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
 
     static async _onAddArrayRowAction(event, target) {
         const arrayKey = target.dataset.array;
-        const defaults = EFFECT_ARRAY_DEFAULTS[arrayKey];
+        const defaults = ARRAY_ROW_DEFAULTS[arrayKey];
         if (!defaults) return;
         const current = foundry.utils.getProperty(this.item.system, arrayKey) ?? [];
         await this.item.update({ [`system.${arrayKey}`]: [...current, { ...defaults }] });

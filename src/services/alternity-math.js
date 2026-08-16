@@ -511,6 +511,96 @@ const AlternityMathService = {
     },
 
     // -----------------------------------------------------------------------
+    // calculateActiveMemory
+    // -----------------------------------------------------------------------
+
+    /**
+     * Resolve a computer's active memory budget from its processor capacity and
+     * the slot costs of the programs currently loaded into it
+     * (Player's Handbook Ch.10 "The Computer Itself"; Dataware Ch.2 "Running
+     * Programs").
+     *
+     * This is the software counterpart of the cyber tolerance track: a fixed
+     * pool of slots that only *loaded* software draws on. Storage memory is
+     * effectively unlimited, so an unloaded program costs nothing — it is the
+     * act of loading it into active memory that consumes the budget.
+     *
+     * Two rules beyond the raw arithmetic:
+     *   - A supercomputer has unlimited active memory (`options.unlimited`),
+     *     in which case nothing can ever overflow.
+     *   - The operating system is always resident but never charges slots
+     *     (PHB Ch.10: "Though the OS is considered to be active, it doesn't use
+     *     up any active memory slots"), so it simply must not appear in
+     *     `loadedPrograms`.
+     *
+     * Automated programs are counted here like any other: automation exempts a
+     * program from the operator's one-use-per-phase limit, not from memory.
+     *
+     * @param {number} activeMemory - Slots the processor provides.
+     * @param {Array<number|{name?: string, slots?: number}>} [loadedPrograms] - Slot
+     *        costs of loaded software, as raw numbers or objects with `slots`
+     *        (and an optional `name` for the trace).
+     * @param {object}  [options]
+     * @param {boolean} [options.unlimited] - Supercomputer: no slot ceiling.
+     *
+     * @returns {{
+     *   max:           number,
+     *   used:          number,
+     *   remaining:     number,
+     *   isFull:        boolean,
+     *   isOverloaded:  boolean,
+     *   isUnlimited:   boolean,
+     *   programCount:  number,
+     *   modifierTrace: object[]
+     * }}
+     */
+    calculateActiveMemory(activeMemory, loadedPrograms = [], options = {}) {
+        if (typeof activeMemory !== 'number' || !isFinite(activeMemory) || activeMemory < 0) {
+            throw new Error(
+                '[AlternityMathService.calculateActiveMemory] activeMemory must be a finite number ≥ 0.'
+            );
+        }
+        if (!Array.isArray(loadedPrograms)) {
+            throw new Error(
+                '[AlternityMathService.calculateActiveMemory] loadedPrograms must be an array.'
+            );
+        }
+
+        const isUnlimited = !!options.unlimited;
+        const max = Math.floor(activeMemory);
+
+        const modifierTrace = [
+            this.buildModifier('Processor', max, 'Active memory slots'),
+        ];
+
+        let used = 0;
+        for (const entry of loadedPrograms) {
+            const slots = typeof entry === 'number' ? entry : (entry?.slots ?? 0);
+            if (typeof slots !== 'number' || !isFinite(slots) || slots < 0) {
+                throw new Error(
+                    '[AlternityMathService.calculateActiveMemory] every program slot count must be a finite number ≥ 0.'
+                );
+            }
+            used += slots;
+            const label = typeof entry === 'number' ? 'Program' : (entry?.name || 'Program');
+            modifierTrace.push(this.buildModifier(label, slots, 'Active memory consumed'));
+        }
+
+        return {
+            max,
+            used,
+            // A supercomputer never runs out, so `remaining` would be meaningless —
+            // report Infinity rather than a number that invites a false comparison.
+            remaining: isUnlimited ? Infinity : Math.max(0, max - used),
+            isFull:       isUnlimited ? false : used >= max,
+            isOverloaded: isUnlimited ? false : used > max,
+            isUnlimited,
+            programCount: loadedPrograms.length,
+            modifierTrace,
+        };
+    },
+
+    // -----------------------------------------------------------------------
     // calculateSkillScores
     // -----------------------------------------------------------------------
 

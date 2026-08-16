@@ -40,7 +40,11 @@
       "computer": {},
       "perkFlaw": {},
       "personalEquipment": {},
-      "cybertech": {}
+      "cybertech": {},
+      "program": {},
+      "fx": {},
+      "mutation": {},
+      "achievementBenefit": {}
     }
   }
 }

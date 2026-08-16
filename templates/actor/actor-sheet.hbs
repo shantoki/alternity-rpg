@@ -169,9 +169,48 @@
                     </div>
                 </div>
 
+                {{!-- Achievement benefits are bought with skill points, not achievement
+                      points: filling the track converts achievement points 1:1 into
+                      skill points, and those buy the benefits (PHB Ch.8). --}}
+                <section class="{{@root.alt}}-achievement-benefits-section" style="margin-bottom: 16px;">
+                    <header class="{{@root.alt}}-section-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--alt-color-primary); margin-bottom: 12px;">
+                        <h3 style="margin: 0; color: var(--alt-color-primary); text-transform: uppercase;">
+                            Achievement Benefits
+                            <span class="skill-type-tag">{{achievementTrack.pointsStored}} SP stored</span>
+                        </h3>
+                        <button type="button" class="{{@root.alt}}-add-btn" data-action="addItem" data-type="achievementBenefit" style="padding: 2px 8px; font-size: 11px;">+ Add Benefit</button>
+                    </header>
+                    <div class="{{@root.alt}}-cybertech-grid">
+                        {{#each inventory.achievementBenefits as |item|}}
+                        <div class="{{@root.alt}}-item-card achievement-card{{#unless item.system.isPurchased}} is-uninstalled{{/unless}}" data-item-id="{{item.id}}">
+                            <img src="{{item.img}}" data-action="editItem" data-item-id="{{item.id}}" title="Edit Item" />
+                            <div class="{{@root.alt}}-item-info">
+                                <span class="{{@root.alt}}-item-name">
+                                    {{item.name}} <span class="skill-type-tag">{{item.system.benefitType}}</span>
+                                    <span class="skill-type-tag">{{item.system.profession}}</span>
+                                </span>
+                                <span class="{{@root.alt}}-item-stats">
+                                    {{item.system.costDisplay}} | {{item.system.levelDisplay}} | {{item.system.purchasesDisplay}}
+                                    {{#if item.system.hasEffect}} | {{item.system.effectDisplay}}{{/if}}
+                                </span>
+                            </div>
+                            <div class="{{@root.alt}}-item-actions">
+                                <button type="button" class="{{@root.alt}}-roll-btn" data-action="purchaseBenefit" data-item-id="{{item.id}}" title="Purchase">⊕</button>
+                                {{#if item.system.isPurchased}}
+                                <button type="button" class="{{@root.alt}}-roll-btn" data-action="refundBenefit" data-item-id="{{item.id}}" title="Undo purchase">⊖</button>
+                                {{/if}}
+                                <button type="button" class="{{@root.alt}}-delete-btn" data-action="deleteItem" data-item-id="{{item.id}}" title="Delete">✕</button>
+                            </div>
+                        </div>
+                        {{else}}
+                        <p class="{{@root.alt}}-empty-state">No achievement benefits.</p>
+                        {{/each}}
+                    </div>
+                </section>
+
                 <div class="{{@root.alt}}-form-group">
                     <label>Background & Notes</label>
-                    <textarea data-action="editState" data-field="background" 
+                    <textarea data-action="editState" data-field="background"
                               rows="8" placeholder="Describe your hero's history...">{{background}}</textarea>
                 </div>
             </div>
@@ -498,6 +537,40 @@
                         </div>
                     </div>
 
+                    {{!-- Individual powers, as items. The skill tree above holds the
+                          broad/specialty ranks; these carry each power's own range,
+                          damage, degrees of success and rank benefits. --}}
+                    <header class="{{@root.alt}}-section-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--alt-color-border); margin: 16px 0 8px;">
+                        <h4 style="margin: 0; font-size: 11px; text-transform: uppercase; color: var(--alt-color-text-muted);">FX Powers</h4>
+                        <button type="button" class="{{@root.alt}}-add-btn" data-action="addItem" data-type="fx" style="padding: 2px 8px; font-size: 11px;">+ Add Power</button>
+                    </header>
+                    <div class="{{@root.alt}}-cybertech-grid">
+                        {{#each inventory.fxPowers as |item|}}
+                        <div class="{{@root.alt}}-item-card fx-card{{#unless item.system.isUsable}} is-uninstalled{{/unless}}" data-item-id="{{item.id}}">
+                            <img src="{{item.img}}" data-action="editItem" data-item-id="{{item.id}}" title="Edit Item" />
+                            <div class="{{@root.alt}}-item-info">
+                                <span class="{{@root.alt}}-item-name">
+                                    {{item.name}} <span class="skill-type-tag">{{item.system.broadSkill}}</span>
+                                    <span class="skill-type-tag">{{item.system.skillTypeLabel}}</span>
+                                    {{#if item.system.hasExtendedDuration}}<span class="skill-type-tag">Extended</span>{{/if}}
+                                </span>
+                                <span class="{{@root.alt}}-item-stats">
+                                    Rank {{item.system.rank}} | {{item.system.scoreDisplay}} | {{item.system.energyCostDisplay}}
+                                    {{#if item.system.hasRange}} | {{item.system.rangeDisplay}}{{/if}}
+                                    {{#if item.system.hasDamage}} | {{item.system.damageDisplay}}{{/if}}
+                                    {{#if item.system.hasResistance}} | Resisted by {{item.system.resistance}}{{/if}}
+                                </span>
+                            </div>
+                            <div class="{{@root.alt}}-item-actions">
+                                <button type="button" class="{{@root.alt}}-roll-btn" data-action="rollFXPower" data-item-id="{{item.id}}" title="Roll {{item.name}}">⚄</button>
+                                <button type="button" class="{{@root.alt}}-delete-btn" data-action="deleteItem" data-item-id="{{item.id}}" title="Delete">✕</button>
+                            </div>
+                        </div>
+                        {{else}}
+                        <p class="{{@root.alt}}-empty-state">No FX powers.</p>
+                        {{/each}}
+                    </div>
+
                 </section>
                 {{/if}}
 
@@ -520,6 +593,47 @@
                         <div class="{{@root.alt}}-field-group"><label style="font-size: 9px; text-transform: uppercase; color: var(--alt-color-text-muted);">Ordinary</label><textarea data-action="editState" data-field="mutations.ordinary" style="min-height: 80px; font-size: 11px;">{{mutations.ordinary}}</textarea></div>
                         <div class="{{@root.alt}}-field-group"><label style="font-size: 9px; text-transform: uppercase; color: var(--alt-color-text-muted);">Good</label><textarea data-action="editState" data-field="mutations.good" style="min-height: 80px; font-size: 11px;">{{mutations.good}}</textarea></div>
                         <div class="{{@root.alt}}-field-group"><label style="font-size: 9px; text-transform: uppercase; color: var(--alt-color-text-muted);">Amazing</label><textarea data-action="editState" data-field="mutations.amazing" style="min-height: 80px; font-size: 11px;">{{mutations.amazing}}</textarea></div>
+                    </div>
+
+                    {{!-- Two separate pools: advantages spend mutation points, drawbacks
+                          grant drawback points that must themselves be spent (PHB Ch.13). --}}
+                    <header class="{{@root.alt}}-section-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--alt-color-border); margin: 16px 0 8px;">
+                        <h4 style="margin: 0; font-size: 11px; text-transform: uppercase; color: var(--alt-color-text-muted);">
+                            Mutations
+                            <span class="skill-type-tag">{{mutationPoints.spent}} / {{mutationPoints.available}} MP</span>
+                            <span class="skill-type-tag">{{mutationPoints.drawbackGranted}} / {{mutationPoints.drawbackBudget}} DP</span>
+                        </h4>
+                        <button type="button" class="{{@root.alt}}-add-btn" data-action="addItem" data-type="mutation" style="padding: 2px 8px; font-size: 11px;">+ Add Mutation</button>
+                    </header>
+                    <div class="{{@root.alt}}-cybertech-grid">
+                        {{#each inventory.mutations as |item|}}
+                        <div class="{{@root.alt}}-item-card mutation-card{{#if item.system.isDrawback}} is-drawback{{/if}}" data-item-id="{{item.id}}">
+                            <img src="{{item.img}}" data-action="editItem" data-item-id="{{item.id}}" title="Edit Item" />
+                            <div class="{{@root.alt}}-item-info">
+                                <span class="{{@root.alt}}-item-name">
+                                    {{item.name}} <span class="skill-type-tag">{{item.system.tier}}</span>
+                                    {{#if item.system.isDrawback}}<span class="skill-type-tag" style="color: #d94a4a;">Drawback</span>{{/if}}
+                                    {{#if item.system.hasTierMismatch}}<span class="skill-type-tag" style="color: #d94a4a;" title="Tier belongs to the other category's ladder">⚠</span>{{/if}}
+                                </span>
+                                <span class="{{@root.alt}}-item-stats">
+                                    {{item.system.costDisplay}} | {{item.system.linkedAbility}} | {{item.system.activationType}}
+                                    {{#if item.system.hasAbilityModifier}} | {{item.system.abilityModifierDisplay}}{{/if}}
+                                    {{#if item.system.hasArmorProtection}} | {{item.system.armorDisplay}}{{/if}}
+                                    {{#if item.system.hasDurabilityBonus}} | {{item.system.durabilityDisplay}}{{/if}}
+                                    {{#if item.system.hasAttack}} | {{item.system.attackDamageDisplay}}{{/if}}
+                                    {{#if item.system.hasUseCost}} | {{item.system.useCostDisplay}}{{/if}}
+                                </span>
+                            </div>
+                            <div class="{{@root.alt}}-item-actions">
+                                {{#if item.system.isActivated}}
+                                <button type="button" class="{{@root.alt}}-roll-btn" data-action="rollMutation" data-item-id="{{item.id}}" title="Roll {{item.name}} (untrained)">⚄</button>
+                                {{/if}}
+                                <button type="button" class="{{@root.alt}}-delete-btn" data-action="deleteItem" data-item-id="{{item.id}}" title="Delete">✕</button>
+                            </div>
+                        </div>
+                        {{else}}
+                        <p class="{{@root.alt}}-empty-state">No mutations.</p>
+                        {{/each}}
                     </div>
                 </section>
                 {{/if}}
@@ -610,7 +724,9 @@
                         <button type="button" class="{{@root.alt}}-add-btn" data-action="addItem" data-type="computer" style="padding: 2px 8px; font-size: 11px;">+ Add Computer</button>
                     </header>
                     <div class="{{@root.alt}}-computers-list" style="display: flex; flex-direction: column; gap: 16px;">
-                        {{#each computerItems as |item|}}
+                        {{!-- `inventory.computers`, not `computerItems`: nothing ever set
+                              the latter, so this list always rendered empty. --}}
+                        {{#each inventory.computers as |item|}}
                         <div class="{{@root.alt}}-computer-card" style="background: rgba(255,255,255,0.02); border: 1px solid var(--alt-color-border); border-radius: 4px; padding: 12px; position: relative;">
                             <button type="button" class="{{@root.alt}}-delete-btn" data-action="deleteItem" data-item-id="{{item.id}}" style="position: absolute; top: 4px; right: 4px; border: none; background: transparent; color: var(--alt-color-text-muted); cursor: pointer;" title="Remove Computer">✕</button>
                             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 8px;">
@@ -633,13 +749,59 @@
                                     <input type="number" name="items.{{item.id}}.system.activeStorage" value="{{item.system.activeStorage}}" style="width: 100%;"/>
                                 </div>
                             </div>
+                            {{!-- Free-text notes, kept alongside the real program list
+                                  below — same treatment the cybertech gear textarea got. --}}
                             <div class="{{@root.alt}}-field-group">
-                                <label style="font-size: 9px; text-transform: uppercase; color: var(--alt-color-text-muted);">Programs</label>
+                                <label style="font-size: 9px; text-transform: uppercase; color: var(--alt-color-text-muted);">Notes</label>
                                 <textarea name="items.{{item.id}}.system.programs" style="width: 100%; min-height: 60px; font-size: 11px;">{{item.system.programs}}</textarea>
                             </div>
                         </div>
                         {{else}}
                         <p style="font-style: italic; color: var(--alt-color-text-muted); text-align: center;">No computers registered.</p>
+                        {{/each}}
+                    </div>
+
+                    {{!-- Programs draw on the pooled active memory of every computer
+                          above; only loaded software consumes slots (PHB Ch.10). --}}
+                    <header class="{{@root.alt}}-section-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--alt-color-border); margin: 16px 0 8px;">
+                        <h4 style="margin: 0; font-size: 11px; text-transform: uppercase; color: var(--alt-color-text-muted);">
+                            Software
+                            {{#if activeMemory}}
+                            <span class="skill-type-tag{{#if activeMemory.isOverloaded}} is-overloaded{{/if}}">
+                                {{#if activeMemory.isUnlimited}}
+                                    {{activeMemory.used}} slots &mdash; unlimited
+                                {{else}}
+                                    {{activeMemory.used}} / {{activeMemory.max}} slots
+                                {{/if}}
+                            </span>
+                            {{/if}}
+                        </h4>
+                        <button type="button" class="{{@root.alt}}-add-btn" data-action="addItem" data-type="program" style="padding: 2px 8px; font-size: 11px;">+ Add Program</button>
+                    </header>
+                    <div class="{{@root.alt}}-cybertech-grid">
+                        {{#each inventory.programs as |item|}}
+                        <div class="{{@root.alt}}-item-card program-card{{#unless item.system.isLoaded}} is-uninstalled{{/unless}}" data-item-id="{{item.id}}">
+                            <img src="{{item.img}}" data-action="editItem" data-item-id="{{item.id}}" title="Edit Item" />
+                            <div class="{{@root.alt}}-item-info">
+                                <span class="{{@root.alt}}-item-name">
+                                    {{item.name}} <span class="skill-type-tag">{{item.system.category}}</span>
+                                    {{#if item.system.isBuggy}}<span class="skill-type-tag" style="color: #d94a4a;">Buggy</span>{{/if}}
+                                    {{#if item.system.isAutomated}}<span class="skill-type-tag">Auto</span>{{/if}}
+                                </span>
+                                <span class="{{@root.alt}}-item-stats">
+                                    {{item.system.quality}} | {{item.system.plLabel}} | {{item.system.slotsDisplay}}
+                                    {{#if item.system.hasDamage}} | {{item.system.damageDisplay}}{{/if}}
+                                    | {{item.system.stepModifierDisplay}}
+                                    {{#if item.system.hasRequirements}} | Requires: {{item.system.requirementsDisplay}}{{/if}}
+                                </span>
+                            </div>
+                            <div class="{{@root.alt}}-item-actions">
+                                <button type="button" class="{{@root.alt}}-roll-btn" data-action="toggleLoaded" data-item-id="{{item.id}}" title="{{#if item.system.isLoaded}}Unload from active memory{{else}}Load into active memory{{/if}}">{{#if item.system.isLoaded}}⏻{{else}}⊕{{/if}}</button>
+                                <button type="button" class="{{@root.alt}}-delete-btn" data-action="deleteItem" data-item-id="{{item.id}}" title="Delete">✕</button>
+                            </div>
+                        </div>
+                        {{else}}
+                        <p class="{{@root.alt}}-empty-state">No programs.</p>
                         {{/each}}
                     </div>
                 </section>

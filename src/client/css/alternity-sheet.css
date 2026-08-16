@@ -1169,6 +1169,7 @@
 }
 .alt-item-sheet .grid-2col { grid-template-columns: repeat(2, 1fr); }
 .alt-item-sheet .grid-3col { grid-template-columns: repeat(3, 1fr); }
+.alt-item-sheet .grid-4col { grid-template-columns: repeat(4, 1fr); }
 
 .alt-item-sheet .resource {
     display: flex;
@@ -1268,6 +1269,10 @@
 
 .alt-item-summary-entry { color: var(--alt-color-text); }
 .alt-item-summary-entry strong { color: var(--alt-color-primary); }
+/* A summary line flagging a data problem rather than reporting a value — used
+   where a mutation's tier is on the wrong ladder for its category. */
+.alt-item-summary-entry.alt-item-warning,
+.alt-item-summary-entry.alt-item-warning strong { color: var(--alt-color-danger, #c8503c); }
 
 .alt-item-sheet .alt-item-array-section { margin-bottom: 12px; }
 .alt-item-sheet .alt-item-array-section h3 {
@@ -1311,6 +1316,17 @@
     flex: 2 1 auto;
     min-width: 0;
     resize: vertical;
+}
+/* A rank/level column that shouldn't share the row's equal-flex sizing. */
+.alt-item-sheet .alt-item-array-row input.alt-item-array-narrow {
+    flex: 0 0 48px;
+    text-align: center;
+}
+/* FX rank benefits the owner hasn't reached yet: still editable, visibly not
+   yet earned. */
+.alt-item-sheet .alt-item-array-row-locked {
+    opacity: 0.55;
+    border-style: dashed;
 }
 
 .alt-item-sheet .alt-checkbox-row {
@@ -1369,6 +1385,29 @@
 }
 
 .alt-cybertech-grid { display: flex; flex-direction: column; gap: 6px; }
-/* Owned but not implanted — it takes up no tolerance and grants nothing yet. */
-.alt-item-card.cybertech-card.is-uninstalled { opacity: 0.6; }
+/* Owned but not yet doing anything: cyber gear that isn't implanted, a program
+   that isn't loaded into active memory, an FX power that can't be used untrained,
+   an achievement benefit that hasn't been bought. Deliberately not scoped to
+   `.cybertech-card` — every card list in the Special tab reuses this state. */
+.alt-item-card.is-uninstalled { opacity: 0.6; }
+
+/* A mutation drawback is a cost, not a benefit — colour it like one. */
+.alt-item-card.mutation-card.is-drawback {
+    border-left: 3px solid var(--alt-color-danger, #c8503c);
+}
+
+/* Loaded programs exceeding the pooled active memory of every owned computer. */
+.skill-type-tag.is-overloaded {
+    color: var(--alt-color-danger, #c8503c);
+    font-weight: bold;
+}
+
+/* Placeholder line shown in place of an empty card list. */
+.alt-empty-state {
+    font-style: italic;
+    color: var(--alt-color-text-muted);
+    text-align: center;
+    margin: 6px 0;
+    font-size: 11px;
+}
 

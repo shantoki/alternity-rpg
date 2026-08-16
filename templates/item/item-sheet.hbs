@@ -693,6 +693,809 @@
                 </div>
             {{/if}}
 
+            {{!-- ─── Program (PHB Ch.10; Dataware) ─────────────────────────────
+                  Selects use inline <option> markup for the same reason cybertech's
+                  do: an undefined config key makes selectOptions throw, which aborts
+                  the render of this whole shared sheet for every item type. --}}
+            {{#if (eq document.type 'program')}}
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Program.Category'}}</label>
+                        <select name="system.category">
+                            <option value="Operator" {{#if (eq system.category 'Operator')}}selected{{/if}}>{{localize 'ALTERNITY.Program.CategoryOperator'}}</option>
+                            <option value="Hacking" {{#if (eq system.category 'Hacking')}}selected{{/if}}>{{localize 'ALTERNITY.Program.CategoryHacking'}}</option>
+                            <option value="Utility" {{#if (eq system.category 'Utility')}}selected{{/if}}>{{localize 'ALTERNITY.Program.CategoryUtility'}}</option>
+                            <option value="Artificial Intelligence" {{#if (eq system.category 'Artificial Intelligence')}}selected{{/if}}>{{localize 'ALTERNITY.Program.CategoryAI'}}</option>
+                            <option value="Robot" {{#if (eq system.category 'Robot')}}selected{{/if}}>{{localize 'ALTERNITY.Program.CategoryRobot'}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Program.Quality'}}</label>
+                        <select name="system.quality">
+                            <option value="Marginal" {{#if (eq system.quality 'Marginal')}}selected{{/if}}>{{localize 'ALTERNITY.Quality.Marginal'}}</option>
+                            <option value="Ordinary" {{#if (eq system.quality 'Ordinary')}}selected{{/if}}>{{localize 'ALTERNITY.Quality.Ordinary'}}</option>
+                            <option value="Good" {{#if (eq system.quality 'Good')}}selected{{/if}}>{{localize 'ALTERNITY.Quality.Good'}}</option>
+                            <option value="Amazing" {{#if (eq system.quality 'Amazing')}}selected{{/if}}>{{localize 'ALTERNITY.Quality.Amazing'}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-3col">
+                    {{!-- A text input, not a number: the book prints "6/8" and "varies"
+                          as often as it prints a plain integer. --}}
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Program.ProgressLevel'}}</label>
+                        <input type="text" name="system.progressLevel" value="{{system.progressLevel}}" data-dtype="String" placeholder="5"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Program.Slots'}}</label>
+                        <input type="number" name="system.slots" value="{{system.slots}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Program.Cost'}}</label>
+                        <input type="number" name="system.cost" value="{{system.cost}}" data-dtype="Number" min="0"/>
+                    </div>
+                </div>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Program.Availability'}}</label>
+                        <select name="system.availability">
+                            <option value="Any" {{#if (eq system.availability 'Any')}}selected{{/if}}>{{localize 'ALTERNITY.Program.AvailAny'}}</option>
+                            <option value="Common" {{#if (eq system.availability 'Common')}}selected{{/if}}>{{localize 'ALTERNITY.Program.AvailCommon'}}</option>
+                            <option value="Controlled" {{#if (eq system.availability 'Controlled')}}selected{{/if}}>{{localize 'ALTERNITY.Program.AvailControlled'}}</option>
+                            <option value="Military" {{#if (eq system.availability 'Military')}}selected{{/if}}>{{localize 'ALTERNITY.Program.AvailMilitary'}}</option>
+                            <option value="Restricted" {{#if (eq system.availability 'Restricted')}}selected{{/if}}>{{localize 'ALTERNITY.Program.AvailRestricted'}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Program.Automation'}}</label>
+                        <select name="system.automation">
+                            <option value="None" {{#if (eq system.automation 'None')}}selected{{/if}}>{{localize 'ALTERNITY.Program.AutomationNone'}}</option>
+                            <option value="Optional" {{#if (eq system.automation 'Optional')}}selected{{/if}}>{{localize 'ALTERNITY.Program.AutomationOptional'}}</option>
+                            <option value="Required" {{#if (eq system.automation 'Required')}}selected{{/if}}>{{localize 'ALTERNITY.Program.AutomationRequired'}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.Program.Tagline'}}</label>
+                    <input type="text" name="system.tagline" value="{{system.tagline}}" data-dtype="String" placeholder="Tags and removes an intruder from a domain."/>
+                </div>
+
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.Program.Payload'}}</h3>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Roll.Ordinary'}}</label>
+                        <input type="text" name="system.damage.ordinary" value="{{system.damage.ordinary}}" data-dtype="String" placeholder="d4s"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Roll.Good'}}</label>
+                        <input type="text" name="system.damage.good" value="{{system.damage.good}}" data-dtype="String" placeholder="d4+2s"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Roll.Amazing'}}</label>
+                        <input type="text" name="system.damage.amazing" value="{{system.damage.amazing}}" data-dtype="String" placeholder="d6+2s"/>
+                    </div>
+                </div>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Program.SkillScore'}}</label>
+                        <input type="number" name="system.skillScore" value="{{system.skillScore}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Program.ExtraSuccesses'}}</label>
+                        <input type="number" name="system.extraSuccesses" value="{{system.extraSuccesses}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Program.TailoredBonus'}}</label>
+                        <input type="number" name="system.tailoring.bonusSteps" value="{{system.tailoring.bonusSteps}}" data-dtype="Number" min="0"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.Program.TailoredTarget'}}</label>
+                    <input type="text" name="system.tailoring.target" value="{{system.tailoring.target}}" data-dtype="String" placeholder="New Ursa Bank datacores"/>
+                </div>
+                {{!-- Leave all three at 0 to use the quality default (Marginal 2/2/1,
+                      Ordinary 4/4/2, Good 6/6/3, Amazing 8/8/4). --}}
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.BonusStun'}}</label>
+                        <input type="number" name="system.durability.stun" value="{{system.durability.stun}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.BonusWound'}}</label>
+                        <input type="number" name="system.durability.wound" value="{{system.durability.wound}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.BonusMortal'}}</label>
+                        <input type="number" name="system.durability.mortal" value="{{system.durability.mortal}}" data-dtype="Number" min="0"/>
+                    </div>
+                </div>
+
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.Program.Requirements'}}</h3>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Program.RequiredSkill'}}</label>
+                        <input type="text" name="system.requiredSkill" value="{{system.requiredSkill}}" data-dtype="String" placeholder="Computer Science-hacking"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Program.RequiredRank'}}</label>
+                        <input type="number" name="system.requiredRank" value="{{system.requiredRank}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Program.RequiredHardware'}}</label>
+                        <input type="text" name="system.requiredHardware" value="{{system.requiredHardware}}" data-dtype="String" placeholder="mainframe"/>
+                    </div>
+                </div>
+
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.Program.Status'}}</h3>
+                <div class="alt-checkbox-row">
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.isLoaded" data-dtype="Boolean" {{#if system.isLoaded}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.Program.IsLoaded'}}
+                    </label>
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.isBuggy" data-dtype="Boolean" {{#if system.isBuggy}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.Program.IsBuggy'}}
+                    </label>
+                </div>
+
+                <div class="alt-item-summary">
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Program.Quality'}}:</strong> {{system.quality}} &mdash; {{system.plLabel}}</span>
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Program.Slots'}}:</strong> {{system.slotsDisplay}}</span>
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Program.StepModifier'}}:</strong> {{system.stepModifierDisplay}}</span>
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Program.Cost'}}:</strong> {{system.costDisplay}}</span>
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Program.Durability'}}:</strong> {{system.durabilityDisplay}}{{#if system.usesDefaultDurability}} ({{localize 'ALTERNITY.Program.DefaultDurability'}}){{/if}}</span>
+                    {{#if system.hasDamage}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.DamageFormula'}}:</strong> {{system.damageDisplay}}</span>
+                    {{/if}}
+                    {{#if system.isAutonomous}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Program.SkillScore'}}:</strong> {{system.skillScore}}</span>
+                    {{/if}}
+                    {{#if system.isTailored}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Program.Tailored'}}:</strong> {{system.tailoringDisplay}}</span>
+                    {{/if}}
+                    {{#if system.hasRequirements}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Program.Requirements'}}:</strong> {{system.requirementsDisplay}}</span>
+                    {{/if}}
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Program.Status'}}:</strong> {{system.statusLabel}}</span>
+                </div>
+            {{/if}}
+
+            {{!-- ─── FX power (Mindwalking; GM Guide Ch.16) ────────────────── --}}
+            {{#if (eq document.type 'fx')}}
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.FX.Tradition'}}</label>
+                        <select name="system.tradition">
+                            <option value="Psionic" {{#if (eq system.tradition 'Psionic')}}selected{{/if}}>{{localize 'ALTERNITY.FX.TraditionPsionic'}}</option>
+                            <option value="Arcane Magic" {{#if (eq system.tradition 'Arcane Magic')}}selected{{/if}}>{{localize 'ALTERNITY.FX.TraditionArcane'}}</option>
+                            <option value="Faith" {{#if (eq system.tradition 'Faith')}}selected{{/if}}>{{localize 'ALTERNITY.FX.TraditionFaith'}}</option>
+                            <option value="Super Power" {{#if (eq system.tradition 'Super Power')}}selected{{/if}}>{{localize 'ALTERNITY.FX.TraditionSuper'}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.FX.BroadSkill'}}</label>
+                        <select name="system.broadSkill">
+                            <option value="Biokinesis" {{#if (eq system.broadSkill 'Biokinesis')}}selected{{/if}}>Biokinesis</option>
+                            <option value="Extrasensory Perception" {{#if (eq system.broadSkill 'Extrasensory Perception')}}selected{{/if}}>Extrasensory Perception</option>
+                            <option value="Psychoportation" {{#if (eq system.broadSkill 'Psychoportation')}}selected{{/if}}>Psychoportation</option>
+                            <option value="Telekinesis" {{#if (eq system.broadSkill 'Telekinesis')}}selected{{/if}}>Telekinesis</option>
+                            <option value="Telepathy" {{#if (eq system.broadSkill 'Telepathy')}}selected{{/if}}>Telepathy</option>
+                            <option value="Arcane Magic" {{#if (eq system.broadSkill 'Arcane Magic')}}selected{{/if}}>Arcane Magic</option>
+                            <option value="Faith" {{#if (eq system.broadSkill 'Faith')}}selected{{/if}}>Faith</option>
+                            <option value="Super Power" {{#if (eq system.broadSkill 'Super Power')}}selected{{/if}}>Super Power</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.FX.LinkedAbility'}}</label>
+                        <select name="system.linkedAbility">
+                            <option value="STR" {{#if (eq system.linkedAbility 'STR')}}selected{{/if}}>STR</option>
+                            <option value="DEX" {{#if (eq system.linkedAbility 'DEX')}}selected{{/if}}>DEX</option>
+                            <option value="CON" {{#if (eq system.linkedAbility 'CON')}}selected{{/if}}>CON</option>
+                            <option value="INT" {{#if (eq system.linkedAbility 'INT')}}selected{{/if}}>INT</option>
+                            <option value="WIL" {{#if (eq system.linkedAbility 'WIL')}}selected{{/if}}>WIL</option>
+                            <option value="PER" {{#if (eq system.linkedAbility 'PER')}}selected{{/if}}>PER</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.FX.Rank'}}</label>
+                        <input type="number" name="system.rank" value="{{system.rank}}" data-dtype="Number" min="0" max="12"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.FX.Category'}}</label>
+                        <input type="text" name="system.category" value="{{system.category}}" data-dtype="String" placeholder="Conjure"/>
+                    </div>
+                </div>
+                <div class="alt-checkbox-row">
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.isBroadSkill" data-dtype="Boolean" {{#if system.isBroadSkill}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.FX.IsBroadSkill'}}
+                    </label>
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.cannotBeUsedUntrained" data-dtype="Boolean" {{#if system.cannotBeUsedUntrained}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.FX.CannotBeUsedUntrained'}}
+                    </label>
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.hasExtendedDuration" data-dtype="Boolean" {{#if system.hasExtendedDuration}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.FX.ExtendedDuration'}}
+                    </label>
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.requiresVisualRange" data-dtype="Boolean" {{#if system.requiresVisualRange}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.FX.VisualRange'}}
+                    </label>
+                </div>
+
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.FX.Energy'}}</h3>
+                <div class="grid grid-3col">
+                    {{!-- 0 = use the flat table (2 for a broad skill use, 1 for a specialty). --}}
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.FX.EnergyOverride'}}</label>
+                        <input type="number" name="system.energyCostOverride" value="{{system.energyCostOverride}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.FX.Maintenance'}}</label>
+                        <input type="text" name="system.maintenanceCost" value="{{system.maintenanceCost}}" data-dtype="String" placeholder="1 point per round"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.FX.BaseCost'}}</label>
+                        <input type="number" name="system.baseCost" value="{{system.baseCost}}" data-dtype="Number" min="0" max="15"/>
+                    </div>
+                </div>
+
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.FX.Targeting'}}</h3>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.FX.RangeShort'}}</label>
+                        <input type="number" name="system.range.short" value="{{system.range.short}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.FX.RangeMedium'}}</label>
+                        <input type="number" name="system.range.medium" value="{{system.range.medium}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.FX.RangeLong'}}</label>
+                        <input type="number" name="system.range.long" value="{{system.range.long}}" data-dtype="Number" min="0"/>
+                    </div>
+                </div>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.FX.Area'}}</label>
+                        <input type="text" name="system.area" value="{{system.area}}" data-dtype="String" placeholder="2 m diameter"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.FX.Target'}}</label>
+                        <input type="text" name="system.target" value="{{system.target}}" data-dtype="String" placeholder="One creature"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.FX.Duration'}}</label>
+                        <input type="text" name="system.duration" value="{{system.duration}}" data-dtype="String" placeholder="d4 rounds"/>
+                    </div>
+                </div>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.FX.Resistance'}}</label>
+                        <select name="system.resistance">
+                            <option value="None" {{#if (eq system.resistance 'None')}}selected{{/if}}>&mdash;</option>
+                            <option value="Will" {{#if (eq system.resistance 'Will')}}selected{{/if}}>Will</option>
+                            <option value="Dexterity" {{#if (eq system.resistance 'Dexterity')}}selected{{/if}}>Dexterity</option>
+                            <option value="Strength" {{#if (eq system.resistance 'Strength')}}selected{{/if}}>Strength</option>
+                            <option value="Constitution" {{#if (eq system.resistance 'Constitution')}}selected{{/if}}>Constitution</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.FX.MentalCombat'}}</label>
+                        <select name="system.mentalCombatClass">
+                            <option value="None" {{#if (eq system.mentalCombatClass 'None')}}selected{{/if}}>&mdash;</option>
+                            <option value="Assault" {{#if (eq system.mentalCombatClass 'Assault')}}selected{{/if}}>{{localize 'ALTERNITY.FX.MentalAssault'}}</option>
+                            <option value="Subversion" {{#if (eq system.mentalCombatClass 'Subversion')}}selected{{/if}}>{{localize 'ALTERNITY.FX.MentalSubversion'}}</option>
+                            <option value="Trap" {{#if (eq system.mentalCombatClass 'Trap')}}selected{{/if}}>{{localize 'ALTERNITY.FX.MentalTrap'}}</option>
+                            <option value="Defense" {{#if (eq system.mentalCombatClass 'Defense')}}selected{{/if}}>{{localize 'ALTERNITY.FX.MentalDefense'}}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.FX.Damage'}}</h3>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.FX.DamageType'}}</label>
+                        <select name="system.damageType">
+                            <option value="None" {{#if (eq system.damageType 'None')}}selected{{/if}}>&mdash;</option>
+                            <option value="LI" {{#if (eq system.damageType 'LI')}}selected{{/if}}>LI</option>
+                            <option value="HI" {{#if (eq system.damageType 'HI')}}selected{{/if}}>HI</option>
+                            <option value="En" {{#if (eq system.damageType 'En')}}selected{{/if}}>En</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Roll.Ordinary'}}</label>
+                        <input type="text" name="system.damage.ordinary" value="{{system.damage.ordinary}}" data-dtype="String" placeholder="d4s"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Roll.Good'}}</label>
+                        <input type="text" name="system.damage.good" value="{{system.damage.good}}" data-dtype="String" placeholder="d4+2s"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Roll.Amazing'}}</label>
+                        <input type="text" name="system.damage.amazing" value="{{system.damage.amazing}}" data-dtype="String" placeholder="d4w"/>
+                    </div>
+                </div>
+
+                {{!-- Every catalogued power spells out what each degree of success
+                      does — this is the most important text on the card. --}}
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.FX.Outcomes'}}</h3>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.Roll.Ordinary'}}</label>
+                    <textarea name="system.outcomes.ordinary" data-dtype="String" rows="2">{{system.outcomes.ordinary}}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.Roll.Good'}}</label>
+                    <textarea name="system.outcomes.good" data-dtype="String" rows="2">{{system.outcomes.good}}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.Roll.Amazing'}}</label>
+                    <textarea name="system.outcomes.amazing" data-dtype="String" rows="2">{{system.outcomes.amazing}}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.Roll.CriticalFailure'}}</label>
+                    <textarea name="system.criticalFailure" data-dtype="String" rows="2">{{system.criticalFailure}}</textarea>
+                </div>
+
+                {{!-- Rank benefits unlock automatically as rank rises; they cannot be
+                      pre-purchased, so unlocked/locked is derived from `rank`. --}}
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.FX.RankBenefits'}}</h3>
+                <div class="alt-item-array-table">
+                    {{!-- Bind to row.index (position in the stored array), NOT the
+                          loop index: these rows are displayed in rank order. --}}
+                    {{#each system.sortedRankBenefits as |row|}}
+                    <div class="alt-item-array-row{{#unless row.isUnlocked}} alt-item-array-row-locked{{/unless}}">
+                        <input type="number" name="system.rankBenefits.{{row.index}}.rank" value="{{row.rank}}" data-dtype="Number" min="0" max="12" class="alt-item-array-narrow" title="{{localize 'ALTERNITY.FX.Rank'}}"/>
+                        <input type="text" name="system.rankBenefits.{{row.index}}.name" value="{{row.name}}" data-dtype="String" placeholder="Increased Damage"/>
+                        <input type="text" name="system.rankBenefits.{{row.index}}.description" value="{{row.description}}" data-dtype="String" placeholder="At rank 5, damage becomes…"/>
+                        <a class="alt-item-array-delete" data-action="deleteArrayRow" data-array="rankBenefits" data-index="{{row.index}}" data-tooltip="{{localize 'ALTERNITY.DeleteRow'}}"><i class="fas fa-times"></i></a>
+                    </div>
+                    {{/each}}
+                    <a class="alt-item-array-add" data-action="addArrayRow" data-array="rankBenefits">+ {{localize 'ALTERNITY.FX.AddRankBenefit'}}</a>
+                </div>
+
+                {{!-- Trappings are a GM Guide Ch.16 concept; psionic powers have none. --}}
+                {{#unless (eq system.tradition 'Psionic')}}
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.FX.Trappings'}}</h3>
+                <div class="alt-checkbox-row">
+                    <label class="alt-checkbox-inline"><input type="checkbox" name="system.trappings.ritual" data-dtype="Boolean" {{#if system.trappings.ritual}}checked{{/if}}/> {{localize 'ALTERNITY.FX.TrappingRitual'}}</label>
+                    <label class="alt-checkbox-inline"><input type="checkbox" name="system.trappings.word" data-dtype="Boolean" {{#if system.trappings.word}}checked{{/if}}/> {{localize 'ALTERNITY.FX.TrappingWord'}}</label>
+                    <label class="alt-checkbox-inline"><input type="checkbox" name="system.trappings.will" data-dtype="Boolean" {{#if system.trappings.will}}checked{{/if}}/> {{localize 'ALTERNITY.FX.TrappingWill'}}</label>
+                    <label class="alt-checkbox-inline"><input type="checkbox" name="system.trappings.component" data-dtype="Boolean" {{#if system.trappings.component}}checked{{/if}}/> {{localize 'ALTERNITY.FX.TrappingComponent'}}</label>
+                    <label class="alt-checkbox-inline"><input type="checkbox" name="system.trappings.focus" data-dtype="Boolean" {{#if system.trappings.focus}}checked{{/if}}/> {{localize 'ALTERNITY.FX.TrappingFocus'}}</label>
+                    <label class="alt-checkbox-inline"><input type="checkbox" name="system.trappings.complexity" data-dtype="Boolean" {{#if system.trappings.complexity}}checked{{/if}}/> {{localize 'ALTERNITY.FX.TrappingComplexity'}}</label>
+                </div>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.FX.Limitations'}}</label>
+                    <input type="text" name="system.limitations" value="{{system.limitations}}" data-dtype="String"/>
+                </div>
+                {{/unless}}
+
+                <div class="alt-item-summary">
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.FX.BroadSkill'}}:</strong> {{system.broadSkill}} ({{system.skillTypeLabel}}, {{system.baseStepLabel}})</span>
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Score'}}:</strong> {{system.scoreDisplay}}</span>
+                    <span class="alt-item-summary-entry"><strong>{{system.energyLabel}}:</strong> {{system.energyCostDisplay}}</span>
+                    {{#if system.hasRange}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.FX.Range'}}:</strong> {{system.rangeDisplay}}</span>
+                    {{/if}}
+                    {{#if system.hasDamage}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.DamageFormula'}}:</strong> {{system.damageDisplay}}</span>
+                    {{/if}}
+                    {{#if system.hasResistance}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.FX.Resistance'}}:</strong> {{system.resistance}}</span>
+                    {{/if}}
+                    {{#if system.hasMaintenance}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.FX.Maintenance'}}:</strong> {{system.maintenanceCost}}</span>
+                    {{/if}}
+                    {{#if system.hasRankBenefits}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.FX.RankBenefits'}}:</strong> {{system.unlockedRankBenefitCount}} / {{system.sortedRankBenefits.length}}</span>
+                    {{/if}}
+                    {{#if system.hasBaseCost}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.FX.BaseCost'}}:</strong> {{system.baseCostDisplay}}</span>
+                    {{/if}}
+                </div>
+            {{/if}}
+
+            {{!-- ─── Mutation (PHB Ch.13 "Mutants") ────────────────────────── --}}
+            {{#if (eq document.type 'mutation')}}
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Mutation.Category'}}</label>
+                        <select name="system.category">
+                            <option value="Advantage" {{#if (eq system.category 'Advantage')}}selected{{/if}}>{{localize 'ALTERNITY.Mutation.Advantage'}}</option>
+                            <option value="Drawback" {{#if (eq system.category 'Drawback')}}selected{{/if}}>{{localize 'ALTERNITY.Mutation.Drawback'}}</option>
+                        </select>
+                    </div>
+                    {{!-- Both tier ladders are offered in one list; the summary flags a
+                          mismatch rather than the select hiding the wrong half, so an
+                          imported item with a bad tier is visible instead of silent. --}}
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Mutation.Tier'}}</label>
+                        <select name="system.tier">
+                            <option value="Ordinary" {{#if (eq system.tier 'Ordinary')}}selected{{/if}}>{{localize 'ALTERNITY.Quality.Ordinary'}} (1)</option>
+                            <option value="Good" {{#if (eq system.tier 'Good')}}selected{{/if}}>{{localize 'ALTERNITY.Quality.Good'}} (2)</option>
+                            <option value="Amazing" {{#if (eq system.tier 'Amazing')}}selected{{/if}}>{{localize 'ALTERNITY.Quality.Amazing'}} (4)</option>
+                            <option value="Slight" {{#if (eq system.tier 'Slight')}}selected{{/if}}>{{localize 'ALTERNITY.Mutation.TierSlight'}} (1)</option>
+                            <option value="Moderate" {{#if (eq system.tier 'Moderate')}}selected{{/if}}>{{localize 'ALTERNITY.Mutation.TierModerate'}} (2)</option>
+                            <option value="Extreme" {{#if (eq system.tier 'Extreme')}}selected{{/if}}>{{localize 'ALTERNITY.Mutation.TierExtreme'}} (4)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Mutation.LinkedAbility'}}</label>
+                        <select name="system.linkedAbility">
+                            <option value="STR" {{#if (eq system.linkedAbility 'STR')}}selected{{/if}}>STR</option>
+                            <option value="DEX" {{#if (eq system.linkedAbility 'DEX')}}selected{{/if}}>DEX</option>
+                            <option value="CON" {{#if (eq system.linkedAbility 'CON')}}selected{{/if}}>CON</option>
+                            <option value="INT" {{#if (eq system.linkedAbility 'INT')}}selected{{/if}}>INT</option>
+                            <option value="WIL" {{#if (eq system.linkedAbility 'WIL')}}selected{{/if}}>WIL</option>
+                            <option value="PER" {{#if (eq system.linkedAbility 'PER')}}selected{{/if}}>PER</option>
+                            <option value="Varies" {{#if (eq system.linkedAbility 'Varies')}}selected{{/if}}>{{localize 'ALTERNITY.Mutation.AbilityVaries'}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Mutation.Activation'}}</label>
+                        <select name="system.activationType">
+                            <option value="Passive" {{#if (eq system.activationType 'Passive')}}selected{{/if}}>{{localize 'ALTERNITY.Mutation.ActPassive'}}</option>
+                            <option value="Free" {{#if (eq system.activationType 'Free')}}selected{{/if}}>{{localize 'ALTERNITY.Mutation.ActFree'}}</option>
+                            <option value="Conscious" {{#if (eq system.activationType 'Conscious')}}selected{{/if}}>{{localize 'ALTERNITY.Mutation.ActConscious'}}</option>
+                            <option value="Wild" {{#if (eq system.activationType 'Wild')}}selected{{/if}}>{{localize 'ALTERNITY.Mutation.ActWild'}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Mutation.Origin'}}</label>
+                        <select name="system.origin">
+                            <option value="Unspecified" {{#if (eq system.origin 'Unspecified')}}selected{{/if}}>&mdash;</option>
+                            <option value="Engineered (community)" {{#if (eq system.origin 'Engineered (community)')}}selected{{/if}}>{{localize 'ALTERNITY.Mutation.OriginEngCommunity'}}</option>
+                            <option value="Engineered (individual)" {{#if (eq system.origin 'Engineered (individual)')}}selected{{/if}}>{{localize 'ALTERNITY.Mutation.OriginEngIndividual'}}</option>
+                            <option value="Natural (community)" {{#if (eq system.origin 'Natural (community)')}}selected{{/if}}>{{localize 'ALTERNITY.Mutation.OriginNatCommunity'}}</option>
+                            <option value="Natural (individual)" {{#if (eq system.origin 'Natural (individual)')}}selected{{/if}}>{{localize 'ALTERNITY.Mutation.OriginNatIndividual'}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="alt-checkbox-row">
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.isRepeatable" data-dtype="Boolean" {{#if system.isRepeatable}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.Mutation.IsRepeatable'}}
+                    </label>
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.requiresPsionics" data-dtype="Boolean" {{#if system.requiresPsionics}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.Mutation.RequiresPsionics'}}
+                    </label>
+                </div>
+
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.Cybertech.Benefits'}}</h3>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.AbilityModifier'}}</label>
+                        <select name="system.abilityModifier.ability">
+                            <option value="None" {{#if (eq system.abilityModifier.ability 'None')}}selected{{/if}}>&mdash;</option>
+                            <option value="STR" {{#if (eq system.abilityModifier.ability 'STR')}}selected{{/if}}>STR</option>
+                            <option value="DEX" {{#if (eq system.abilityModifier.ability 'DEX')}}selected{{/if}}>DEX</option>
+                            <option value="CON" {{#if (eq system.abilityModifier.ability 'CON')}}selected{{/if}}>CON</option>
+                            <option value="INT" {{#if (eq system.abilityModifier.ability 'INT')}}selected{{/if}}>INT</option>
+                            <option value="WIL" {{#if (eq system.abilityModifier.ability 'WIL')}}selected{{/if}}>WIL</option>
+                            <option value="PER" {{#if (eq system.abilityModifier.ability 'PER')}}selected{{/if}}>PER</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.AbilityModifierValue'}}</label>
+                        <input type="number" name="system.abilityModifier.value" value="{{system.abilityModifier.value}}" data-dtype="Number"/>
+                    </div>
+                    <div class="form-group">
+                        <label class="alt-checkbox-inline">
+                            <input type="checkbox" name="system.abilityModifier.isPermanent" data-dtype="Boolean" {{#if system.abilityModifier.isPermanent}}checked{{/if}}/>
+                            {{localize 'ALTERNITY.Mutation.IsPermanent'}}
+                        </label>
+                    </div>
+                </div>
+                {{!-- Improved / Enhanced / Hyper Durability each hit a different track. --}}
+                <div class="grid grid-4col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.BonusStun'}}</label>
+                        <input type="number" name="system.durabilityBonus.stun" value="{{system.durabilityBonus.stun}}" data-dtype="Number"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.BonusWound'}}</label>
+                        <input type="number" name="system.durabilityBonus.wound" value="{{system.durabilityBonus.wound}}" data-dtype="Number"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.BonusMortal'}}</label>
+                        <input type="number" name="system.durabilityBonus.mortal" value="{{system.durabilityBonus.mortal}}" data-dtype="Number"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Mutation.BonusFatigue'}}</label>
+                        <input type="number" name="system.durabilityBonus.fatigue" value="{{system.durabilityBonus.fatigue}}" data-dtype="Number"/>
+                    </div>
+                </div>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.ArmorLI'}}</label>
+                        <input type="text" name="system.armorProtection.li" value="{{system.armorProtection.li}}" data-dtype="String" placeholder="d4+1"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.ArmorHI'}}</label>
+                        <input type="text" name="system.armorProtection.hi" value="{{system.armorProtection.hi}}" data-dtype="String" placeholder="d4"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.ArmorEN'}}</label>
+                        <input type="text" name="system.armorProtection.en" value="{{system.armorProtection.en}}" data-dtype="String" placeholder="d4-1"/>
+                    </div>
+                </div>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cybertech.ActionCheckModifier'}}</label>
+                        <input type="number" name="system.actionCheckModifier" value="{{system.actionCheckModifier}}" data-dtype="Number" min="-5" max="5"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Mutation.SkillModifierSkills'}}</label>
+                        <input type="text" name="system.skillModifier.skills" value="{{system.skillModifier.skills}}" data-dtype="String" placeholder="Athletics, Melee Weapons"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Mutation.SkillModifierValue'}}</label>
+                        <input type="number" name="system.skillModifier.value" value="{{system.skillModifier.value}}" data-dtype="Number" min="-5" max="5"/>
+                    </div>
+                </div>
+
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.Mutation.Attack'}}</h3>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Mutation.AttackSkill'}}</label>
+                        <input type="text" name="system.attack.skill" value="{{system.attack.skill}}" data-dtype="String" placeholder="Unarmed Attack-brawl"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Mutation.AttackBonus'}}</label>
+                        <input type="number" name="system.attack.attackBonus" value="{{system.attack.attackBonus}}" data-dtype="Number" min="-5" max="5"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.FX.DamageType'}}</label>
+                        <select name="system.attack.damageType">
+                            <option value="None" {{#if (eq system.attack.damageType 'None')}}selected{{/if}}>&mdash;</option>
+                            <option value="LI" {{#if (eq system.attack.damageType 'LI')}}selected{{/if}}>LI</option>
+                            <option value="HI" {{#if (eq system.attack.damageType 'HI')}}selected{{/if}}>HI</option>
+                            <option value="En" {{#if (eq system.attack.damageType 'En')}}selected{{/if}}>En</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Roll.Ordinary'}}</label>
+                        <input type="text" name="system.attack.damage.ordinary" value="{{system.attack.damage.ordinary}}" data-dtype="String" placeholder="d6+2s"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Roll.Good'}}</label>
+                        <input type="text" name="system.attack.damage.good" value="{{system.attack.damage.good}}" data-dtype="String" placeholder="d4w"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Roll.Amazing'}}</label>
+                        <input type="text" name="system.attack.damage.amazing" value="{{system.attack.damage.amazing}}" data-dtype="String" placeholder="d4+2w"/>
+                    </div>
+                </div>
+                <div class="alt-checkbox-row">
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.attack.isRetractable" data-dtype="Boolean" {{#if system.attack.isRetractable}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.Mutation.IsRetractable'}}
+                    </label>
+                </div>
+
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.FX.Outcomes'}}</h3>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.Roll.Ordinary'}}</label>
+                    <textarea name="system.outcomes.ordinary" data-dtype="String" rows="2">{{system.outcomes.ordinary}}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.Roll.Good'}}</label>
+                    <textarea name="system.outcomes.good" data-dtype="String" rows="2">{{system.outcomes.good}}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.Roll.Amazing'}}</label>
+                    <textarea name="system.outcomes.amazing" data-dtype="String" rows="2">{{system.outcomes.amazing}}</textarea>
+                </div>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Roll.Marginal'}}</label>
+                        <input type="text" name="system.outcomes.marginal" value="{{system.outcomes.marginal}}" data-dtype="String"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Roll.CriticalFailure'}}</label>
+                        <input type="text" name="system.outcomes.criticalFailure" value="{{system.outcomes.criticalFailure}}" data-dtype="String"/>
+                    </div>
+                </div>
+
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.Mutation.UseCost'}}</h3>
+                <div class="grid grid-4col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.FX.Duration'}}</label>
+                        <input type="text" name="system.duration" value="{{system.duration}}" data-dtype="String" placeholder="d4+1 rounds"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Mutation.FatigueCost'}}</label>
+                        <input type="text" name="system.fatigueCost" value="{{system.fatigueCost}}" data-dtype="String" placeholder="1"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Mutation.Cooldown'}}</label>
+                        <input type="text" name="system.cooldown" value="{{system.cooldown}}" data-dtype="String" placeholder="3d8 hours"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Mutation.UsesPerDay'}}</label>
+                        <input type="number" name="system.usesPerDay" value="{{system.usesPerDay}}" data-dtype="Number" min="0"/>
+                    </div>
+                </div>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Mutation.GrantedSkill'}}</label>
+                        <input type="text" name="system.grantedSkill.skill" value="{{system.grantedSkill.skill}}" data-dtype="String"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Mutation.GrantedSkillRank'}}</label>
+                        <input type="number" name="system.grantedSkill.rank" value="{{system.grantedSkill.rank}}" data-dtype="Number" min="0"/>
+                    </div>
+                </div>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Mutation.Prerequisites'}}</label>
+                        <input type="text" name="system.prerequisites" value="{{system.prerequisites}}" data-dtype="String"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Mutation.IncompatibleWith'}}</label>
+                        <input type="text" name="system.incompatibleWith" value="{{system.incompatibleWith}}" data-dtype="String"/>
+                    </div>
+                </div>
+
+                <div class="alt-item-summary">
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Mutation.Cost'}}:</strong> {{system.costDisplay}} ({{system.pointPool}})</span>
+                    {{#if system.hasTierMismatch}}
+                        <span class="alt-item-summary-entry alt-item-warning"><strong>&#9888;</strong> {{localize 'ALTERNITY.Mutation.TierMismatch'}}</span>
+                    {{/if}}
+                    {{#if system.isAdvantage}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Mutation.MaxPerCharacter'}}:</strong> {{system.maxPerCharacter}}</span>
+                    {{/if}}
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Mutation.Untrained'}}:</strong> {{system.scoreDisplay}} (+d4)</span>
+                    {{#if system.hasAbilityModifier}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Cybertech.AbilityModifier'}}:</strong> {{system.abilityModifierDisplay}}</span>
+                    {{/if}}
+                    {{#if system.hasDurabilityBonus}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Cybertech.Durability'}}:</strong> {{system.durabilityDisplay}}</span>
+                    {{/if}}
+                    {{#if system.hasArmorProtection}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Cybertech.Armor'}}:</strong> {{system.armorDisplay}}</span>
+                    {{/if}}
+                    {{#if system.hasActionCheckModifier}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Cybertech.ActionCheckModifier'}}:</strong> {{system.actionCheckDisplay}}</span>
+                    {{/if}}
+                    {{#if system.hasSkillModifier}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Mutation.SkillModifier'}}:</strong> {{system.skillModifierDisplay}}</span>
+                    {{/if}}
+                    {{#if system.hasAttack}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.DamageFormula'}}:</strong> {{system.attackDamageDisplay}}</span>
+                    {{/if}}
+                    {{#if system.hasUseCost}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Mutation.UseCost'}}:</strong> {{system.useCostDisplay}}</span>
+                    {{/if}}
+                    {{#if system.hasGrantedSkill}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Mutation.GrantedSkill'}}:</strong> {{system.grantedSkillDisplay}}</span>
+                    {{/if}}
+                </div>
+            {{/if}}
+
+            {{!-- ─── Achievement Benefit (PHB Ch.8, Table P29) ─────────────── --}}
+            {{#if (eq document.type 'achievementBenefit')}}
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.AchievementBenefit.Type'}}</label>
+                        <select name="system.benefitType">
+                            <option value="Action Check Bonus" {{#if (eq system.benefitType 'Action Check Bonus')}}selected{{/if}}>{{localize 'ALTERNITY.AchievementBenefit.TypeActionCheckBonus'}}</option>
+                            <option value="Action Check Increase" {{#if (eq system.benefitType 'Action Check Increase')}}selected{{/if}}>{{localize 'ALTERNITY.AchievementBenefit.TypeActionCheckIncrease'}}</option>
+                            <option value="Extra Action" {{#if (eq system.benefitType 'Extra Action')}}selected{{/if}}>{{localize 'ALTERNITY.AchievementBenefit.TypeExtraAction'}}</option>
+                            <option value="Ability Score Increase" {{#if (eq system.benefitType 'Ability Score Increase')}}selected{{/if}}>{{localize 'ALTERNITY.AchievementBenefit.TypeAbilityIncrease'}}</option>
+                            <option value="Durability Increase" {{#if (eq system.benefitType 'Durability Increase')}}selected{{/if}}>{{localize 'ALTERNITY.AchievementBenefit.TypeDurabilityIncrease'}}</option>
+                            <option value="Psionic Energy Increase" {{#if (eq system.benefitType 'Psionic Energy Increase')}}selected{{/if}}>{{localize 'ALTERNITY.AchievementBenefit.TypePsionicEnergy'}}</option>
+                            <option value="Monetary Award" {{#if (eq system.benefitType 'Monetary Award')}}selected{{/if}}>{{localize 'ALTERNITY.AchievementBenefit.TypeMonetary'}}</option>
+                            <option value="New Perk" {{#if (eq system.benefitType 'New Perk')}}selected{{/if}}>{{localize 'ALTERNITY.AchievementBenefit.TypeNewPerk'}}</option>
+                            <option value="Remove Flaw" {{#if (eq system.benefitType 'Remove Flaw')}}selected{{/if}}>{{localize 'ALTERNITY.AchievementBenefit.TypeRemoveFlaw'}}</option>
+                            <option value="Acquire Contact" {{#if (eq system.benefitType 'Acquire Contact')}}selected{{/if}}>{{localize 'ALTERNITY.AchievementBenefit.TypeAcquireContact'}}</option>
+                        </select>
+                    </div>
+                    {{!-- Stored on the item, not read off the actor: the same benefit
+                          genuinely costs each profession a different number of skill
+                          points and unlocks at a different level (Table P29). --}}
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.AchievementBenefit.Profession'}}</label>
+                        <select name="system.profession">
+                            <option value="Combat Spec" {{#if (eq system.profession 'Combat Spec')}}selected{{/if}}>Combat Spec</option>
+                            <option value="Diplomat" {{#if (eq system.profession 'Diplomat')}}selected{{/if}}>Diplomat</option>
+                            <option value="Free Agent" {{#if (eq system.profession 'Free Agent')}}selected{{/if}}>Free Agent</option>
+                            <option value="Tech Op" {{#if (eq system.profession 'Tech Op')}}selected{{/if}}>Tech Op</option>
+                            <option value="Mindwalker" {{#if (eq system.profession 'Mindwalker')}}selected{{/if}}>Mindwalker</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-4col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.AchievementBenefit.Cost'}}</label>
+                        <input type="number" name="system.cost" value="{{system.cost}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.AchievementBenefit.MinLevel'}}</label>
+                        <input type="number" name="system.minLevel" value="{{system.minLevel}}" data-dtype="Number" min="1"/>
+                    </div>
+                    {{!-- 0 = no printed limit (Acquire Contact). --}}
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.AchievementBenefit.MaxPurchases'}}</label>
+                        <input type="number" name="system.maxPurchases" value="{{system.maxPurchases}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.AchievementBenefit.TimesPurchased'}}</label>
+                        <input type="number" name="system.timesPurchased" value="{{system.timesPurchased}}" data-dtype="Number" min="0"/>
+                    </div>
+                </div>
+                <div class="alt-checkbox-row">
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.costIsDoubleFlawValue" data-dtype="Boolean" {{#if system.costIsDoubleFlawValue}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.AchievementBenefit.CostIsDoubleFlaw'}}
+                    </label>
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.onePerLevel" data-dtype="Boolean" {{#if system.onePerLevel}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.AchievementBenefit.OnePerLevel'}}
+                    </label>
+                </div>
+
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.AchievementBenefit.Effect'}}</h3>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.AchievementBenefit.EffectTarget'}}</label>
+                        <select name="system.effectTarget">
+                            <option value="None" {{#if (eq system.effectTarget 'None')}}selected{{/if}}>&mdash;</option>
+                            <option value="ActionCheckStep" {{#if (eq system.effectTarget 'ActionCheckStep')}}selected{{/if}}>{{localize 'ALTERNITY.AchievementBenefit.TargetActionStep'}}</option>
+                            <option value="ActionCheckScore" {{#if (eq system.effectTarget 'ActionCheckScore')}}selected{{/if}}>{{localize 'ALTERNITY.AchievementBenefit.TargetActionScore'}}</option>
+                            <option value="ActionsPerRound" {{#if (eq system.effectTarget 'ActionsPerRound')}}selected{{/if}}>{{localize 'ALTERNITY.AchievementBenefit.TargetActionsPerRound'}}</option>
+                            <option value="AbilityScore" {{#if (eq system.effectTarget 'AbilityScore')}}selected{{/if}}>{{localize 'ALTERNITY.AchievementBenefit.TargetAbility'}}</option>
+                            <option value="StunRating" {{#if (eq system.effectTarget 'StunRating')}}selected{{/if}}>{{localize 'ALTERNITY.AchievementBenefit.TargetStun'}}</option>
+                            <option value="WoundRating" {{#if (eq system.effectTarget 'WoundRating')}}selected{{/if}}>{{localize 'ALTERNITY.AchievementBenefit.TargetWound'}}</option>
+                            <option value="MortalRating" {{#if (eq system.effectTarget 'MortalRating')}}selected{{/if}}>{{localize 'ALTERNITY.AchievementBenefit.TargetMortal'}}</option>
+                            <option value="FatigueRating" {{#if (eq system.effectTarget 'FatigueRating')}}selected{{/if}}>{{localize 'ALTERNITY.AchievementBenefit.TargetFatigue'}}</option>
+                            <option value="PsionicEnergy" {{#if (eq system.effectTarget 'PsionicEnergy')}}selected{{/if}}>{{localize 'ALTERNITY.AchievementBenefit.TargetPsionicEnergy'}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.AchievementBenefit.EffectAbility'}}</label>
+                        <select name="system.effectAbility">
+                            <option value="None" {{#if (eq system.effectAbility 'None')}}selected{{/if}}>&mdash;</option>
+                            <option value="STR" {{#if (eq system.effectAbility 'STR')}}selected{{/if}}>STR</option>
+                            <option value="DEX" {{#if (eq system.effectAbility 'DEX')}}selected{{/if}}>DEX</option>
+                            <option value="CON" {{#if (eq system.effectAbility 'CON')}}selected{{/if}}>CON</option>
+                            <option value="INT" {{#if (eq system.effectAbility 'INT')}}selected{{/if}}>INT</option>
+                            <option value="WIL" {{#if (eq system.effectAbility 'WIL')}}selected{{/if}}>WIL</option>
+                            <option value="PER" {{#if (eq system.effectAbility 'PER')}}selected{{/if}}>PER</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.AchievementBenefit.EffectValue'}}</label>
+                        <input type="number" name="system.effectValue" value="{{system.effectValue}}" data-dtype="Number"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.AchievementBenefit.Prerequisites'}}</label>
+                    <input type="text" name="system.prerequisites" value="{{system.prerequisites}}" data-dtype="String" placeholder="Not above the species maximum"/>
+                </div>
+
+                <div class="alt-item-summary">
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.AchievementBenefit.Cost'}}:</strong> {{system.costDisplay}}</span>
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.AchievementBenefit.Requires'}}:</strong> {{system.levelDisplay}}</span>
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.AchievementBenefit.Purchases'}}:</strong> {{system.purchasesDisplay}}</span>
+                    {{#if system.hasEffect}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.AchievementBenefit.Effect'}}:</strong> {{system.effectDisplay}}{{#if system.isPurchased}} ({{localize 'ALTERNITY.AchievementBenefit.TotalApplied'}}: {{system.totalEffectValue}}){{/if}}</span>
+                    {{/if}}
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.AchievementBenefit.Status'}}:</strong> {{system.statusLabel}}</span>
+                </div>
+            {{/if}}
+
             {{!-- Shared inventory fields, only for the types whose schema defines them --}}
             {{#if (or (eq document.type 'computer') (eq document.type 'personalEquipment'))}}
             <div class="form-group">
