@@ -332,7 +332,7 @@
                     <input type="text" name="system.weapons.{{idx}}.damageAmazing" value="{{row.damageAmazing}}" placeholder="d6+3w" title="{{localize 'ALTERNITY.Spaceship.DamageAmazing'}}" />
                     <select name="system.weapons.{{idx}}.damageType" title="{{localize 'ALTERNITY.Spaceship.DamageType'}}">
                         {{#each ../damageTypeChoices as |choice|}}
-                        <option value="{{choice}}" {{#if (eq row.damageType choice)}}selected{{/if}}>{{localize (concat 'ALTERNITY.DamageType.' choice)}}</option>
+                        <option value="{{choice}}" {{#if (eq row.damageType choice)}}selected{{/if}}>{{localize (concat 'ALTERNITY.DamageTypeAbbr.' choice)}}</option>
                         {{/each}}
                     </select>
                     <select name="system.weapons.{{idx}}.firepower" title="{{localize 'ALTERNITY.Spaceship.FirepowerHint'}}">
