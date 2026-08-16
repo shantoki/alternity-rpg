@@ -95,7 +95,13 @@
         </div>
         {{/each}}
 
-        {{!-- Last resort points (PHB Ch.2). Five boxes is the printed ceiling. --}}
+        {{!-- Last resort points (PHB Ch.2). Five boxes is the printed ceiling,
+              because a Free Agent can reach that many.
+
+              Max is an input rather than a derived value: it comes from Table P6
+              (keyed to Personality), and that table is an image in the available
+              scans whose numerals did not survive OCR. Without this input the
+              track has no pips and no way to get any. --}}
         <div class="{{@root.alt}}-last-resort">
             <span class="{{@root.alt}}-bar-name">{{localize 'ALTERNITY.LastResort.Label'}}</span>
             <div class="{{@root.alt}}-last-resort-track">
@@ -104,8 +110,18 @@
                         data-action="setLastResort" data-value="{{add @index 1}}"
                         title="{{localize 'ALTERNITY.LastResort.Label'}} {{add @index 1}}"></button>
                 {{/each}}
+                {{#unless lastResort.pips.length}}
+                <span class="{{@root.alt}}-last-resort-hint">{{localize 'ALTERNITY.LastResort.SetMax'}}</span>
+                {{/unless}}
             </div>
-            <span class="{{@root.alt}}-last-resort-values">{{lastResort.value}} / {{lastResort.max}}</span>
+            <label class="{{@root.alt}}-last-resort-field">{{localize 'ALTERNITY.LastResort.Max'}}
+                <input type="number" min="0" max="5" value="{{lastResort.max}}"
+                       data-action="editLastResort" data-field="max" />
+            </label>
+            <label class="{{@root.alt}}-last-resort-field">{{localize 'ALTERNITY.LastResort.Cost'}}
+                <input type="number" min="0" value="{{lastResort.cost}}"
+                       data-action="editLastResort" data-field="cost" />
+            </label>
         </div>
     </section>
 

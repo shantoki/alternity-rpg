@@ -907,6 +907,29 @@
     font-size: 11px;
     color: var(--alt-color-text-muted);
 }
+/* Max/Cost come from Table P6, which is unrecoverable from the scans, so both
+   are entered by hand. Kept narrow so the row stays on one line. */
+.alt-last-resort-field {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 9px;
+    text-transform: uppercase;
+    color: var(--alt-color-text-muted);
+    white-space: nowrap;
+}
+.alt-last-resort-field input {
+    width: 34px;
+    text-align: center;
+}
+/* Shown instead of the pip row while max is still 0, so an empty track reads as
+   "not configured" rather than "broken". */
+.alt-last-resort-hint {
+    font-size: 9px;
+    font-style: italic;
+    color: var(--alt-color-text-muted);
+    opacity: 0.7;
+}
 
 /* ── Damage track bar tints ─────────────────────────────────────────────── */
 /* Escalating severity across the four tracks; fatigue reads as a caution

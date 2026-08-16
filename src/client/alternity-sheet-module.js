@@ -506,6 +506,22 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
                 await saveAlternityState(this.actor, this._altState);
                 this.render();
             }
+        } else if (action === 'editLastResort') {
+            // `max` and `cost` come from Table P6, which did not survive OCR, so
+            // they are entered rather than derived. Spent points are clamped to
+            // the new maximum: lowering max below the current value would
+            // otherwise leave the track showing more spent pips than it has.
+            const field = input.dataset.field;
+            if (field === 'max' || field === 'cost') {
+                const raw = Math.max(0, safeInt(input.value, 0));
+                this._altState.lastResort[field] = field === 'max' ? Math.min(5, raw) : raw;
+                this._altState.lastResort.value = Math.min(
+                    this._altState.lastResort.value,
+                    this._altState.lastResort.max
+                );
+                await saveAlternityState(this.actor, this._altState);
+                this.render();
+            }
         } else if (action === 'editAbility') {
             this._altState.setAbilityScore(input.dataset.ability, safeInt(input.value, 0));
             await saveAlternityState(this.actor, this._altState);

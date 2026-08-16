@@ -50,6 +50,7 @@
   "ALTERNITY.LastResort.Cost": "Last Resort Cost",
   "ALTERNITY.LastResort.Max": "Maximum",
   "ALTERNITY.LastResort.None": "No last resort points remaining.",
+  "ALTERNITY.LastResort.SetMax": "set a maximum →",
   "ALTERNITY.TechPoints": "Tech Points",
   "ALTERNITY.PsiPoints": "Psi Points",
   "ALTERNITY.Incapacitated": "Incapacitated",
