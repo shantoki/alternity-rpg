@@ -566,4 +566,249 @@ describe('Alternity System Unit Tests', () => {
             expect(() => AlternityMathService.calculateActiveMemory(7, [{ name: 'Bad', slots: -2 }])).toThrow();
         });
     });
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Spaceship compartments (GM Guide Ch.11 / PHB Ch.12)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    describe('AlternityMathService — Spaceship Compartments', () => {
+
+        it('should expand durability into the printed stun/wound/mortal triple', () => {
+            // Every published compartment is printed this way: the trader's
+            // "C1 = Command 8/8/4" is durability 4 written out three ways.
+            const r = AlternityMathService.calculateCompartmentRatings(4);
+            expect(r.stun).toBe(8);
+            expect(r.wound).toBe(8);
+            expect(r.mortal).toBe(4);
+        });
+
+        it('should reproduce every compartment printed on the PHB stock ships', () => {
+            // Durability -> "stun/wound/mortal" exactly as the statblocks print it.
+            const printed = [
+                [3, '6/6/3'], [8, '16/16/8'], [5, '10/10/5'], [2, '4/4/2'],
+                [10, '20/20/10'], [7, '14/14/7'], [6, '12/12/6'], [9, '18/18/9'],
+            ];
+            for (const [durability, expected] of printed) {
+                const r = AlternityMathService.calculateCompartmentRatings(durability);
+                expect(`${r.stun}/${r.wound}/${r.mortal}`).toBe(expected);
+            }
+        });
+
+        it('should flag compartments over the 10-point cap without rejecting them', () => {
+            expect(AlternityMathService.calculateCompartmentRatings(10).isOversized).toBe(false);
+            expect(AlternityMathService.calculateCompartmentRatings(11).isOversized).toBe(true);
+        });
+
+        it('should penalise systems only once damage exceeds half a track', () => {
+            // Durability 4 -> 8/8/4. Exactly half is not "more than half".
+            const half = AlternityMathService.calculateCompartmentStatus(4, { stun: 4 });
+            expect(half.isStunImpaired).toBe(false);
+            expect(half.systemPenalty).toBe(0);
+
+            const over = AlternityMathService.calculateCompartmentStatus(4, { stun: 5 });
+            expect(over.isStunImpaired).toBe(true);
+            expect(over.systemPenalty).toBe(1);
+        });
+
+        it('should accumulate stun, wound and mortal penalties', () => {
+            const s = AlternityMathService.calculateCompartmentStatus(4, { stun: 5, wound: 5, mortal: 2 });
+            // +1 stun over half, +1 wound over half, +1 per mortal point.
+            expect(s.systemPenalty).toBe(4);
+            // Durability checks use the original stun rating — twice durability.
+            expect(s.durabilityCheckScore).toBe(8);
+        });
+
+        it('should apply a damage-control bonus to the mortal check, not the penalty', () => {
+            const s = AlternityMathService.calculateCompartmentStatus(
+                4, { mortal: 2 }, { damageControlBonus: -2 }
+            );
+            expect(s.systemPenalty).toBe(2);
+            expect(s.mortalCheckStep).toBe(0);
+        });
+
+        it('should mark a compartment destroyed once its mortal points are gone', () => {
+            expect(AlternityMathService.calculateCompartmentStatus(4, { mortal: 3 }).isDestroyed).toBe(false);
+            expect(AlternityMathService.calculateCompartmentStatus(4, { mortal: 4 }).isDestroyed).toBe(true);
+        });
+
+        it('should derive secondary damage at the book rate', () => {
+            expect(AlternityMathService.calculateSecondaryDamage('stun', 9)).toMatchObject({ stun: 0, wound: 0 });
+            expect(AlternityMathService.calculateSecondaryDamage('wound', 7)).toMatchObject({ stun: 3, wound: 0 });
+            expect(AlternityMathService.calculateSecondaryDamage('mortal', 5)).toMatchObject({ stun: 2, wound: 2 });
+        });
+
+        it('should reject a damage grade the compartment tracks do not have', () => {
+            // 'critical' belongs to the Warships model, not this one.
+            expect(() => AlternityMathService.calculateSecondaryDamage('critical', 4)).toThrow();
+        });
+    });
+
+    describe('AlternityMathService — Firepower vs Ship Toughness', () => {
+
+        it('should leave Amazing firepower undegraded against a ship', () => {
+            const r = AlternityMathService.calculateFirepowerDegrade('mortal', 'Amazing');
+            expect(r.finalGrade).toBe('mortal');
+            expect(r.steps).toBe(0);
+        });
+
+        it('should degrade Good firepower one grade against a ship', () => {
+            expect(AlternityMathService.calculateFirepowerDegrade('mortal', 'Good').finalGrade).toBe('wound');
+            expect(AlternityMathService.calculateFirepowerDegrade('wound', 'Good').finalGrade).toBe('stun');
+            expect(AlternityMathService.calculateFirepowerDegrade('stun', 'Good').isNegated).toBe(true);
+        });
+
+        it('should degrade Ordinary firepower twice against a ship', () => {
+            // The book's own example: a 9mm pistol must score an Amazing hit just to
+            // inflict stun damage on a hull.
+            expect(AlternityMathService.calculateFirepowerDegrade('mortal', 'Ordinary').finalGrade).toBe('stun');
+            expect(AlternityMathService.calculateFirepowerDegrade('wound', 'Ordinary').isNegated).toBe(true);
+            expect(AlternityMathService.calculateFirepowerDegrade('stun', 'Ordinary').isNegated).toBe(true);
+        });
+
+        it('should never upgrade damage for exceeding the target toughness', () => {
+            // Upgrading is a Warships-only rule; the core ladder only degrades.
+            const r = AlternityMathService.calculateFirepowerDegrade('wound', 'Amazing', 'Ordinary');
+            expect(r.finalGrade).toBe('wound');
+            expect(r.steps).toBe(0);
+        });
+
+        it('should reject classes outside the Marginal..Amazing ladder', () => {
+            expect(() => AlternityMathService.calculateFirepowerDegrade('wound', 'Heavy')).toThrow();
+            expect(() => AlternityMathService.calculateFirepowerDegrade('critical', 'Good')).toThrow();
+        });
+    });
+
+    describe('AlternityMathService — Compartment Hit Table', () => {
+
+        /** "1-2, 3-5, ..." — the shape the statblocks print. */
+        const asPrinted = (table) =>
+            table.ranges.map(r => (r.low === r.high ? `${r.low}` : `${r.low}-${r.high}`)).join('; ');
+
+        it('should reproduce the Random damage lines printed on the stock ships', () => {
+            // Transcribed from PHB Ch.12. These are the only columns of Table G50
+            // that survive anywhere in the corpus.
+            expect(asPrinted(AlternityMathService.calculateCompartmentHitTable(1)))
+                .toBe('1-20');                                          // escape pod
+            expect(asPrinted(AlternityMathService.calculateCompartmentHitTable(2)))
+                .toBe('1-7; 8-20');                                     // launch, space fighter
+            expect(asPrinted(AlternityMathService.calculateCompartmentHitTable(4)))
+                .toBe('1-2; 3-5; 6-12; 13-20');                         // STG shuttle, cutter
+            expect(asPrinted(AlternityMathService.calculateCompartmentHitTable(6)))
+                .toBe('1-2; 3-4; 5-7; 8-10; 11-15; 16-20');             // trader, yacht
+            expect(asPrinted(AlternityMathService.calculateCompartmentHitTable(8)))
+                .toBe('1; 2; 3-4; 5-6; 7-9; 10-12; 13-16; 17-20');      // system liner
+            expect(asPrinted(AlternityMathService.calculateCompartmentHitTable(10)))
+                .toBe('1; 2; 3; 4; 5-6; 7-8; 9-10; 11-13; 14-16; 17-20'); // transport
+        });
+
+        it('should mark the printed columns as transcribed, not generated', () => {
+            for (const count of [1, 2, 4, 6, 8, 10]) {
+                expect(AlternityMathService.calculateCompartmentHitTable(count).isDerived).toBe(false);
+            }
+        });
+
+        it('should generate — and flag — a table for counts the book never prints', () => {
+            for (const count of [3, 5, 7, 9, 11, 12]) {
+                const table = AlternityMathService.calculateCompartmentHitTable(count);
+                expect(table.isDerived).toBe(true);
+                expect(table.ranges).toHaveLength(count);
+                // Whatever it generates must still tile 1-20 exactly once, or hit
+                // rolls would silently fall through a gap during play.
+                expect(table.ranges[0].low).toBe(1);
+                expect(table.ranges[count - 1].high).toBe(20);
+                for (let i = 1; i < count; i++) {
+                    expect(table.ranges[i].low).toBe(table.ranges[i - 1].high + 1);
+                }
+            }
+        });
+
+        it('should keep the outer compartments the easiest to hit', () => {
+            // The asymmetry is the point: low-numbered spaces are buried deep in the
+            // hull, which is why designers put cargo holds at the high numbers.
+            for (const count of [2, 3, 4, 6, 8, 10]) {
+                const widths = AlternityMathService.calculateCompartmentHitTable(count)
+                    .ranges.map(r => r.high - r.low + 1);
+                for (let i = 1; i < widths.length; i++) {
+                    expect(widths[i]).toBeGreaterThanOrEqual(widths[i - 1]);
+                }
+            }
+        });
+    });
+
+    describe('AlternityMathService — Resolving a Compartment Hit', () => {
+
+        /** A six-compartment trader, using the printed table. */
+        const trader = (destroyed = []) =>
+            AlternityMathService.calculateCompartmentHitTable(6).ranges.map((r, i) => ({
+                hitLow: r.low, hitHigh: r.high, isDestroyed: destroyed.includes(i),
+            }));
+
+        it('should map a roll onto the compartment whose band contains it', () => {
+            expect(AlternityMathService.resolveCompartmentHit(trader(), 9).resolvedIndex).toBe(3);
+            expect(AlternityMathService.resolveCompartmentHit(trader(), 1).resolvedIndex).toBe(0);
+            expect(AlternityMathService.resolveCompartmentHit(trader(), 20).resolvedIndex).toBe(5);
+        });
+
+        it('should let the sensors operator shift the roll', () => {
+            // A 5 sits in C3's band; the book's example shifts a Good result by +2.
+            const r = AlternityMathService.resolveCompartmentHit(trader(), 5, { sensorShift: 2 });
+            expect(r.adjustedRoll).toBe(7);
+            expect(r.resolvedIndex).toBe(2);
+        });
+
+        it('should clamp a shifted roll to the die rather than falling off the table', () => {
+            expect(AlternityMathService.resolveCompartmentHit(trader(), 19, { sensorShift: 3 }).adjustedRoll).toBe(20);
+        });
+
+        it('should roll damage down to the next lower-numbered surviving compartment', () => {
+            // The book's own example: with C2 destroyed, the next hit there lands on C1.
+            const r = AlternityMathService.resolveCompartmentHit(trader([1]), 3);
+            expect(r.struckIndex).toBe(1);
+            expect(r.resolvedIndex).toBe(0);
+            expect(r.walkedPast).toEqual([1]);
+        });
+
+        it('should wrap around to the highest-numbered compartment past C1', () => {
+            // "If compartment 1 is destroyed, the next hit ... is applied to
+            // compartment 6, the ship's highest-numbered compartment."
+            const r = AlternityMathService.resolveCompartmentHit(trader([0, 1]), 3);
+            expect(r.resolvedIndex).toBe(5);
+            expect(r.walkedPast).toEqual([1, 0]);
+        });
+
+        it('should report an all-wrecked ship instead of looping forever', () => {
+            const r = AlternityMathService.resolveCompartmentHit(trader([0, 1, 2, 3, 4, 5]), 9);
+            expect(r.allDestroyed).toBe(true);
+            expect(r.resolvedIndex).toBe(-1);
+        });
+
+        it('should report a roll that no band covers', () => {
+            const gapped = [{ hitLow: 1, hitHigh: 5, isDestroyed: false }];
+            expect(AlternityMathService.resolveCompartmentHit(gapped, 12).resolvedIndex).toBe(-1);
+        });
+    });
+
+    describe('AlternityMathService — Ship Armor & Support', () => {
+
+        it('should charge armor against the whole hull, rounded down', () => {
+            expect(AlternityMathService.calculateArmorDurabilityCost(24, 'Light').cost).toBe(0);
+            expect(AlternityMathService.calculateArmorDurabilityCost(24, 'Moderate').cost).toBe(2);
+            expect(AlternityMathService.calculateArmorDurabilityCost(24, 'Heavy').cost).toBe(4);
+            // 30 durability, moderate armor = 3 — the Endurance-class figure the
+            // StarDrive statblocks print as "Moderate neutronite (3 dur)".
+            expect(AlternityMathService.calculateArmorDurabilityCost(30, 'Moderate').cost).toBe(3);
+        });
+
+        it('should leave the rest of the hull available for compartments', () => {
+            const r = AlternityMathService.calculateArmorDurabilityCost(40, 'Heavy');
+            expect(r.cost).toBe(8);
+            expect(r.available).toBe(32);
+        });
+
+        it('should size life support and damage control at one unit per 20 durability', () => {
+            expect(AlternityMathService.calculateSupportUnitsRequired(20).units).toBe(1);
+            expect(AlternityMathService.calculateSupportUnitsRequired(21).units).toBe(2);
+            expect(AlternityMathService.calculateSupportUnitsRequired(0).units).toBe(0);
+        });
+    });
 });

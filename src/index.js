@@ -16,6 +16,7 @@ import {
     NpcData,
     VehicleData,
     WarshipData,
+    SpaceshipData,
     WeaponData,
     ArmorData,
     SkillData,
@@ -56,6 +57,7 @@ Hooks.once('init', async () => {
     CONFIG.Actor.dataModels.npc       = NpcData;
     CONFIG.Actor.dataModels.vehicle   = VehicleData;
     CONFIG.Actor.dataModels.warship   = WarshipData;
+    CONFIG.Actor.dataModels.spaceship = SpaceshipData;
 
     CONFIG.Item.dataModels = CONFIG.Item.dataModels ?? {};
     CONFIG.Item.dataModels.weapon = WeaponData;
@@ -97,6 +99,13 @@ Hooks.once('init', async () => {
         warship: {
             bar: ['damage.stun', 'damage.wound', 'damage.mortal', 'damage.critical'],
             value: ['shipStatus'],
+        },
+        // A core-rules spaceship has no ship-wide damage track — every hit lands on
+        // a named compartment — so the only bar offered is the derived hull-integrity
+        // summary. The real tracks live on the sheet, one set per compartment.
+        spaceship: {
+            bar: ['hullIntegrity'],
+            value: ['shipStatus', 'totalDurability', 'destroyedCompartments', 'maneuverRating'],
         },
     };
 

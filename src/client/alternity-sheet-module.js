@@ -16,6 +16,19 @@ import {
 } from '../data/alternity-actor-data.js';
 import { AlternityMathService, SUCCESS_DEGREES, DIFFICULTY_DCS, SITUATION_DIE_SCALE } from '../services/alternity-math.js';
 import { SHIP_TOUGHNESS_CLASSES, SHIP_HULL_TYPES, SHIP_STATUS_EFFECTS } from '../data/WarshipData.js';
+import {
+    SPACESHIP_HULL_TYPES,
+    SPACESHIP_ARMOR_GRADES,
+    SHIP_STATIONS,
+    SHIP_SYSTEM_CATEGORIES,
+    SHIP_COMPUTER_QUALITIES,
+    SHIP_DAMAGE_TYPES,
+    WEAPON_ARCS,
+    DAMAGE_CONTROL_BONUS,
+    FTL_DRIVE_TYPES,
+    COMPARTMENT_KINDS,
+    FIREPOWER_CLASSES,
+} from '../data/SpaceshipData.js';
 import { renderTemplate, Roll, ChatMessage } from '../module-info.js';
 
 // ---------------------------------------------------------------------------
@@ -62,6 +75,16 @@ function fmtMod(value) {
 
 function safeInt(val, fallback = 0) {
     const n = parseInt(val, 10);
+    return isFinite(n) ? n : fallback;
+}
+
+/**
+ * Like safeInt, but keeps the fractional part. Ship acceleration is printed as
+ * low as 0.001 Mpp and cruising speed as 1.5 AU/hr, so those fields cannot be
+ * rounded on the way in.
+ */
+function safeFloat(val, fallback = 0) {
+    const n = parseFloat(val);
     return isFinite(n) ? n : fallback;
 }
 
@@ -1120,6 +1143,341 @@ class AlternityWarshipSheet extends foundry.applications.api.HandlebarsApplicati
 }
 
 // ---------------------------------------------------------------------------
+// AlternitySpaceshipSheet
+// ---------------------------------------------------------------------------
+
+/**
+ * Default rows for each of the spaceship's inline tables. Keyed by the schema
+ * field name so `data-array="weapons"` on a button is all the markup needs.
+ */
+const SPACESHIP_ARRAY_FIELDS = Object.freeze({
+    compartments: {
+        label: '', kind: 'Cargo', durability: 4,
+        damage: { stun: 0, wound: 0, mortal: 0 },
+        hitLow: 0, hitHigh: 0, hasLifeSupport: true, damageControl: 'None', systemsText: '',
+    },
+    weapons: {
+        name: '', compartment: 0, arc: 'Fore', range: '',
+        damageOrdinary: '', damageGood: '', damageAmazing: '',
+        damageType: 'lowImpact', firepower: 'Amazing', actionsPerRound: 1,
+        durabilityCost: 0, powerReq: 0, isOffline: false, notes: '',
+    },
+    defenses: {
+        name: '', compartment: 0, isActive: false, effectText: '',
+        durabilityCost: 0, powerReq: 0, isOffline: false, notes: '',
+    },
+    systems: {
+        name: '', compartment: 0, category: 'Misc', range: '',
+        durabilityCost: 0, powerReq: 0, isOffline: false, notes: '',
+    },
+    stations: {
+        role: 'Helm', compartment: 0, crewName: '', skillName: '', skillScore: '',
+    },
+});
+
+/** Which compartment tracks the +/- buttons can touch. */
+const COMPARTMENT_TRACKS = Object.freeze(['stun', 'wound', 'mortal']);
+
+class AlternitySpaceshipSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
+    static DEFAULT_OPTIONS = foundry.utils.mergeObject(super.DEFAULT_OPTIONS, {
+        classes: [NS, `${NS}-sheet-app`, `${NS}-spaceship-sheet`],
+        tag: "form",
+        window: { resizable: true, width: 760, height: 820 },
+        actions: {
+            addShipRow:            this._onAddShipRowAction,
+            deleteShipRow:         this._onDeleteShipRowAction,
+            setCompartmentDamage:  this._onSetCompartmentDamageAction,
+            clearCompartmentDamage: this._onClearCompartmentDamageAction,
+            rollHitLocation:       this._onRollHitLocationAction,
+            fillHitTable:          this._onFillHitTableAction,
+            rollShipWeapon:        this._onRollShipWeaponAction,
+        }
+    });
+
+    static PARTS = {
+        sheet: { template: "systems/alternity-v2/templates/actor/actor-spaceship-sheet.hbs" }
+    };
+
+    async _prepareContext(options) {
+        const context = await super._prepareContext(options);
+        const system = this.document.system;
+
+        context.actor = this.document;
+        context.system = system;
+        context.alt = NS;
+
+        // ── Choice lists ────────────────────────────────────────────────────
+        context.hullCategoryChoices = ['Civilian', 'Military'];
+        context.hullTypeChoices     = SPACESHIP_HULL_TYPES;
+        context.compartmentKinds    = COMPARTMENT_KINDS;
+        context.armorGradeChoices   = SPACESHIP_ARMOR_GRADES;
+        context.damageControlChoices = Object.keys(DAMAGE_CONTROL_BONUS);
+        context.ftlChoices          = Object.entries(FTL_DRIVE_TYPES)
+            .map(([key, cfg]) => ({ key, ...cfg }));
+        context.stationChoices      = SHIP_STATIONS;
+        context.systemCategoryChoices = SHIP_SYSTEM_CATEGORIES;
+        context.computerQualityChoices = SHIP_COMPUTER_QUALITIES;
+        context.damageTypeChoices   = SHIP_DAMAGE_TYPES;
+        context.arcChoices          = WEAPON_ARCS;
+        context.firepowerChoices    = FIREPOWER_CLASSES;
+        context.trackKeys           = COMPARTMENT_TRACKS;
+
+        // ── Compartments ────────────────────────────────────────────────────
+        // `compartmentDetails` is built in prepareDerivedData and already carries the
+        // derived ratings, penalties and percentages. Only the presentation bits
+        // (localised labels, per-track rows for the bar loop) are added here.
+        context.compartments = (system.compartmentDetails ?? []).map((c) => ({
+            ...c,
+            tracks: COMPARTMENT_TRACKS.map((key) => ({
+                key,
+                label:     game.i18n.localize(`ALTERNITY.${key.charAt(0).toUpperCase()}${key.slice(1)}`),
+                damage:    c.damage?.[key] ?? 0,
+                rating:    c.ratings?.[key] ?? 0,
+                remaining: c.remaining?.[key] ?? 0,
+                pct:       c[`${key}Pct`] ?? 0,
+            })),
+            hitRangeLabel: c.hitHigh > c.hitLow ? `${c.hitLow}-${c.hitHigh}` : `${c.hitLow}`,
+        }));
+
+        // A compartment picker for the systems/stations tables, so a row points at a
+        // real compartment instead of a number typed from memory.
+        context.compartmentOptions = context.compartments.map((c) => ({
+            number: c.number,
+            label:  `C${c.number} — ${c.label || c.kind}`,
+        }));
+
+        // ── Hull budget ─────────────────────────────────────────────────────
+        context.hullBudget = {
+            hullSize:    system.hullSize,
+            armorCost:   system.armorDurabilityCost,
+            available:   system.durabilityAvailable,
+            assigned:    system.totalDurability,
+            unassigned:  system.durabilityUnassigned,
+            isOver:      system.isOverDurability,
+            countLimit:  system.compartmentLimit,
+            count:       system.compartmentCount,
+            isOverCount: system.isOverCompartmentLimit,
+        };
+
+        context.hitTableCoverage = system.hitTableCoverage;
+        context.ftlStarfall = FTL_DRIVE_TYPES[system.ftl?.driveType]?.starfall ?? '';
+
+        return context;
+    }
+
+    _onRender(context, options) {
+        this.element.addEventListener('change', (e) => {
+            const input = e.target;
+            if (!input.name) return;
+
+            const value = input.type === 'checkbox' ? input.checked
+                : input.type === 'number' ? safeFloat(input.value, 0)
+                : input.value;
+
+            // Paths that reach into one of the inline tables (`system.weapons.2.arc`)
+            // are rewritten into a whole-array update. Foundry's ArrayField replaces
+            // rather than merges, so submitting the indexed path alone risks writing
+            // back an array holding only the edited row. Read-modify-write on a clone
+            // is unambiguous, and matches what the row buttons already do.
+            const arrayPath = /^system\.(\w+)\.(\d+)\.(.+)$/.exec(input.name);
+            if (arrayPath && Object.hasOwn(SPACESHIP_ARRAY_FIELDS, arrayPath[1])) {
+                const [, arrayKey, indexText, fieldPath] = arrayPath;
+                const rows = foundry.utils.deepClone(this.document.system[arrayKey] ?? []);
+                const row = rows[Number(indexText)];
+                if (!row) return;
+                foundry.utils.setProperty(row, fieldPath, value);
+                this.document.update({ [`system.${arrayKey}`]: rows });
+                return;
+            }
+
+            this.document.update({ [input.name]: value });
+        });
+    }
+
+    // -----------------------------------------------------------------------
+    // Row management
+    // -----------------------------------------------------------------------
+
+    static async _onAddShipRowAction(event, target) {
+        const arrayKey = target.dataset.array;
+        const defaults = SPACESHIP_ARRAY_FIELDS[arrayKey];
+        if (!defaults) return;
+        const current = foundry.utils.getProperty(this.document.system, arrayKey) ?? [];
+        await this.document.update({
+            [`system.${arrayKey}`]: [...current, foundry.utils.deepClone(defaults)],
+        });
+    }
+
+    static async _onDeleteShipRowAction(event, target) {
+        const arrayKey = target.dataset.array;
+        const idx = safeInt(target.dataset.index, -1);
+        if (idx < 0 || !SPACESHIP_ARRAY_FIELDS[arrayKey]) return;
+        const current = foundry.utils.getProperty(this.document.system, arrayKey) ?? [];
+        await this.document.update({ [`system.${arrayKey}`]: current.filter((_, i) => i !== idx) });
+    }
+
+    // -----------------------------------------------------------------------
+    // Compartment damage
+    // -----------------------------------------------------------------------
+
+    static async _onSetCompartmentDamageAction(event, target) {
+        const idx = safeInt(target.dataset.index, -1);
+        const track = target.dataset.track;
+        const delta = safeInt(target.dataset.delta, 0);
+        if (idx < 0 || !COMPARTMENT_TRACKS.includes(track)) return;
+
+        const compartments = foundry.utils.deepClone(this.document.system.compartments ?? []);
+        const compartment = compartments[idx];
+        if (!compartment) return;
+
+        // Clamp to the derived rating rather than letting damage run past the track.
+        // Excess stun becoming wound (and wound becoming mortal) is a judged call the
+        // GM makes at the table, so it is not applied automatically here.
+        const ratings = AlternityMathService.calculateCompartmentRatings(compartment.durability);
+        compartment.damage = compartment.damage ?? { stun: 0, wound: 0, mortal: 0 };
+        compartment.damage[track] = Math.min(
+            ratings[track],
+            Math.max(0, (compartment.damage[track] ?? 0) + delta)
+        );
+
+        await this.document.update({ 'system.compartments': compartments });
+    }
+
+    static async _onClearCompartmentDamageAction(event, target) {
+        const idx = safeInt(target.dataset.index, -1);
+        if (idx < 0) return;
+        const compartments = foundry.utils.deepClone(this.document.system.compartments ?? []);
+        if (!compartments[idx]) return;
+        compartments[idx].damage = { stun: 0, wound: 0, mortal: 0 };
+        await this.document.update({ 'system.compartments': compartments });
+    }
+
+    // -----------------------------------------------------------------------
+    // Hit location
+    // -----------------------------------------------------------------------
+
+    /**
+     * Roll d20 on the ship's own hit table and report which compartment eats it.
+     * A `data-sensor-shift` on the button carries the sensors operator's adjustment
+     * (Ordinary/Good/Amazing on a System Operation-sensors check = +1/+2/+3).
+     */
+    static async _onRollHitLocationAction(event, target) {
+        const compartments = this.document.system.compartmentDetails ?? [];
+        if (!compartments.length) {
+            ui.notifications?.warn(game.i18n.localize('ALTERNITY.Spaceship.NoCompartments'));
+            return;
+        }
+
+        const sensorShift = safeInt(target.dataset.sensorShift, 0);
+        const roll = await new Roll('1d20').evaluate();
+        const result = AlternityMathService.resolveCompartmentHit(
+            compartments, roll.total, { sensorShift }
+        );
+
+        let flavor;
+        if (result.allDestroyed) {
+            flavor = game.i18n.localize('ALTERNITY.Spaceship.AllCompartmentsWrecked');
+        } else if (result.resolvedIndex === -1) {
+            // Only reachable when the d20 bands don't tile 1-20 — the sheet warns
+            // about that above the compartment list, but say so here too.
+            flavor = game.i18n.format('ALTERNITY.Spaceship.NoCompartmentForRoll', {
+                roll: result.adjustedRoll,
+            });
+        } else {
+            const hit = compartments[result.resolvedIndex];
+            const name = `C${hit.number} — ${hit.label || hit.kind}`;
+            flavor = result.walkedPast.length
+                ? game.i18n.format('ALTERNITY.Spaceship.HitAfterWreck', {
+                    compartment: name,
+                    wrecked: result.walkedPast.map((i) => `C${i + 1}`).join(', '),
+                })
+                : game.i18n.format('ALTERNITY.Spaceship.HitCompartment', { compartment: name });
+        }
+
+        await roll.toMessage({
+            speaker: ChatMessage.getSpeaker({ actor: this.document }),
+            flavor,
+        });
+    }
+
+    /**
+     * Fill every compartment's d20 band from Table G50.
+     *
+     * Overwrites whatever is there, so it is the "I'm designing a ship" button, not
+     * the "I'm transcribing a statblock" one — a published ship's Random damage line
+     * should be typed in as printed.
+     */
+    static async _onFillHitTableAction(event, target) {
+        const compartments = foundry.utils.deepClone(this.document.system.compartments ?? []);
+        if (!compartments.length) return;
+
+        const table = AlternityMathService.calculateCompartmentHitTable(compartments.length);
+        table.ranges.forEach((range, i) => {
+            if (!compartments[i]) return;
+            compartments[i].hitLow  = range.low;
+            compartments[i].hitHigh = range.high;
+        });
+
+        await this.document.update({ 'system.compartments': compartments });
+
+        if (table.isDerived) {
+            ui.notifications?.info(game.i18n.format('ALTERNITY.Spaceship.HitTableDerived', {
+                count: compartments.length,
+            }));
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Weapons
+    // -----------------------------------------------------------------------
+
+    /**
+     * Roll one damage grade for a ship weapon. Which grade fires is decided by the
+     * gunner's own skill check on their character sheet, so the button carries the
+     * grade (`data-grade="good"`) rather than the sheet guessing.
+     */
+    static async _onRollShipWeaponAction(event, target) {
+        const idx = safeInt(target.dataset.index, -1);
+        const grade = target.dataset.grade ?? 'ordinary';
+        const weapon = this.document.system.weapons?.[idx];
+        if (!weapon) return;
+
+        const formulaKey = `damage${grade.charAt(0).toUpperCase()}${grade.slice(1)}`;
+        const formula = weapon[formulaKey];
+        if (!formula) {
+            ui.notifications?.warn(game.i18n.format('ALTERNITY.Spaceship.NoDamageFormula', {
+                weapon: weapon.name || game.i18n.localize('ALTERNITY.Spaceship.Weapon'),
+                grade,
+            }));
+            return;
+        }
+
+        // Alternity damage codes carry a trailing grade letter ("d6+2s"), which is
+        // notation, not dice — strip it before handing the string to Roll.
+        const roll = await new Roll(String(formula).replace(/[swm]\s*$/i, '')).evaluate();
+
+        // Against a spaceship's Amazing toughness the weapon's firepower decides
+        // whether this damage lands at all, so show the result of that comparison.
+        const degrade = AlternityMathService.calculateFirepowerDegrade(
+            grade === 'amazing' ? 'mortal' : grade === 'good' ? 'wound' : 'stun',
+            weapon.firepower
+        );
+
+        await roll.toMessage({
+            speaker: ChatMessage.getSpeaker({ actor: this.document }),
+            flavor: game.i18n.format('ALTERNITY.Spaceship.WeaponRoll', {
+                weapon: weapon.name || game.i18n.localize('ALTERNITY.Spaceship.Weapon'),
+                grade,
+                firepower: weapon.firepower,
+                versusShip: degrade.isNegated
+                    ? game.i18n.localize('ALTERNITY.Spaceship.DegradedToNothing')
+                    : game.i18n.format('ALTERNITY.Spaceship.DegradedTo', { grade: degrade.finalGrade }),
+            }),
+        });
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Registration
 // ---------------------------------------------------------------------------
 
@@ -1161,6 +1519,7 @@ async function registerAlternitySheet() {
     ActorsCollection.registerSheet('alternity-v2', AlternityNpcSheet, { types: ['npc'], makeDefault: true, label: 'Alternity NPC Sheet' });
     ActorsCollection.registerSheet('alternity-v2', AlternityVehicleSheet, { types: ['vehicle'], makeDefault: true, label: 'Alternity Vehicle Sheet' });
     ActorsCollection.registerSheet('alternity-v2', AlternityWarshipSheet, { types: ['warship'], makeDefault: true, label: 'Alternity Warship Sheet' });
+    ActorsCollection.registerSheet('alternity-v2', AlternitySpaceshipSheet, { types: ['spaceship'], makeDefault: true, label: 'Alternity Spaceship Sheet' });
 }
 
 export {
@@ -1170,6 +1529,7 @@ export {
     AlternityNpcSheet,
     AlternityVehicleSheet,
     AlternityWarshipSheet,
+    AlternitySpaceshipSheet,
     registerAlternitySheet,
     pct,
     fmtMod,

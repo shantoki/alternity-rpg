@@ -3,6 +3,7 @@ export * from './CharacterData.js';
 export * from './NpcData.js';
 export * from './VehicleData.js';
 export * from './WarshipData.js';
+export * from './SpaceshipData.js';
 export * from './WeaponData.js';
 export * from './ArmorData.js';
 export * from './SkillData.js';

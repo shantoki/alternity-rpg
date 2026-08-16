@@ -30,7 +30,8 @@
       "character": {},
       "npc": {},
       "vehicle": {},
-      "warship": {}
+      "warship": {},
+      "spaceship": {}
     },
     "Item": {
       "weapon": {},

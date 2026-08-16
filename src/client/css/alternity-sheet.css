@@ -1498,3 +1498,241 @@
     font-size: 11px;
 }
 
+
+/* ── Spaceship sheet ──────────────────────────────────────────────────────── */
+/*
+ * Deliberately its own class family rather than reusing `.alt-warship-*`. The two
+ * sheets look alike but model different rules, and borrowing a class that carries
+ * another component's layout assumptions is what silently broke the last-resort
+ * label. Where the layouts genuinely coincide, the selectors are grouped instead.
+ */
+
+.alt-ship-table-section { margin-bottom: 12px; }
+.alt-ship-table-section h3 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--alt-color-primary);
+    border-bottom: 1px solid var(--alt-color-border);
+    padding-bottom: 2px;
+    margin-bottom: 4px;
+}
+.alt-ship-table-section textarea {
+    width: 100%;
+    resize: vertical;
+    margin-bottom: 6px;
+}
+
+.alt-section-tools { display: inline-flex; gap: 4px; flex: 0 0 auto; }
+.alt-section-tools button { font-size: 10px; padding: 1px 6px; white-space: nowrap; }
+
+.alt-ship-table { display: flex; flex-direction: column; gap: 4px; }
+
+.alt-ship-table-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 6px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--alt-color-border);
+    border-radius: var(--alt-radius);
+}
+.alt-ship-table-row input[type="text"],
+.alt-ship-table-row select { flex: 1 1 auto; min-width: 0; }
+/* Numeric fields carry at most two digits — let the text fields have the room. */
+.alt-ship-table-row input[type="number"] { flex: 0 0 46px; min-width: 0; }
+.alt-ship-table-row.is-offline { opacity: 0.55; border-color: var(--alt-color-danger); }
+
+.alt-ship-roll-group { display: inline-flex; gap: 2px; flex: 0 0 auto; }
+.alt-ship-roll-group button { padding: 0 5px; font-size: 10px; font-weight: bold; }
+
+.alt-ship-inline-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    flex: 0 0 auto;
+    font-size: 10px;
+    white-space: nowrap;
+    color: var(--alt-color-text-muted);
+}
+.alt-ship-inline-toggle input { flex: 0 0 auto; }
+
+/* ── Hull budget strip ─────────────────────────────────────────────────────── */
+.alt-hull-budget {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 6px 14px;
+    padding: 6px 8px;
+    margin-bottom: 10px;
+    background: var(--alt-color-surface);
+    border: 1px solid var(--alt-color-border);
+    border-radius: var(--alt-radius);
+}
+.alt-budget-field,
+.alt-budget-readout {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 0 0 auto;
+    min-width: 0;
+}
+.alt-budget-field label,
+.alt-budget-readout label {
+    font-size: 9px;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: var(--alt-color-text-muted);
+    white-space: nowrap;
+}
+.alt-budget-field input { width: 58px; height: 20px; }
+.alt-budget-readout strong { font-size: 13px; }
+.alt-budget-over { color: var(--alt-color-danger); }
+
+.alt-toughness-badge {
+    padding: 2px 8px;
+    border-radius: var(--alt-radius);
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border: 1px solid var(--alt-color-border);
+    color: var(--alt-color-text-muted);
+    white-space: nowrap;
+}
+
+/*
+ * The spaceship status ladder is its own vocabulary — Operational/Damaged/Derelict/
+ * Destroyed — and does not overlap the warship's Nominal/Shaken/Disabled/Crippled,
+ * so both sets can share `.alt-ship-status-badge` without colliding.
+ */
+.alt-ship-status--Unbuilt     { background: rgba(0, 0, 0, 0.3); color: var(--alt-color-text-muted); }
+.alt-ship-status--Operational { background: rgba(74, 217, 122, 0.15); color: var(--alt-color-success); }
+.alt-ship-status--Damaged     { background: rgba(217, 164, 74, 0.15); color: var(--alt-color-warning); }
+.alt-ship-status--Derelict    { background: rgba(217, 74, 74, 0.15); color: var(--alt-color-danger); }
+
+.alt-ship-warning {
+    margin: 4px 0;
+    padding: 4px 8px;
+    font-size: 10px;
+    color: var(--alt-color-warning);
+    background: rgba(217, 164, 74, 0.1);
+    border-left: 3px solid var(--alt-color-warning);
+    border-radius: 0 var(--alt-radius) var(--alt-radius) 0;
+}
+.alt-ship-warning span { display: block; }
+
+/* ── Compartments ──────────────────────────────────────────────────────────── */
+.alt-compartment-list { display: flex; flex-direction: column; gap: 6px; }
+
+.alt-compartment {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--alt-color-border);
+    border-radius: var(--alt-radius);
+    padding: 6px 8px;
+}
+.alt-compartment.is-destroyed {
+    opacity: 0.55;
+    border-color: var(--alt-color-danger);
+    border-style: dashed;
+}
+
+.alt-compartment-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 6px;
+    min-width: 0;
+}
+.alt-compartment-number {
+    flex: 0 0 auto;
+    font-weight: bold;
+    font-size: 12px;
+    color: var(--alt-color-primary);
+    min-width: 26px;
+}
+.alt-compartment-kind  { flex: 0 0 108px; min-width: 0; }
+.alt-compartment-label { flex: 1 1 120px; min-width: 60px; }
+
+.alt-compartment-dur,
+.alt-compartment-hit {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    flex: 0 0 auto;
+}
+.alt-compartment-dur label,
+.alt-compartment-hit label {
+    font-size: 9px;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: var(--alt-color-text-muted);
+    white-space: nowrap;
+}
+.alt-compartment-dur input { width: 40px; height: 20px; }
+.alt-compartment-hit input { width: 36px; height: 20px; }
+
+.alt-compartment-penalty {
+    flex: 0 0 auto;
+    font-size: 10px;
+    font-weight: bold;
+    color: var(--alt-color-danger);
+    white-space: nowrap;
+}
+
+.alt-compartment-head button {
+    flex: 0 0 auto;
+    padding: 0 5px;
+    font-size: 11px;
+}
+
+/* Three tracks side by side so a compartment's whole state reads in one line. */
+.alt-compartment-tracks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 4px 10px;
+    margin-top: 6px;
+}
+.alt-compartment-track { min-width: 0; }
+.alt-compartment-track-name {
+    flex: 0 0 auto;
+    font-size: 9px;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: var(--alt-color-text-muted);
+    white-space: nowrap;
+}
+/* Bars fill as the compartment is chewed up, so they use damage colours throughout. */
+.alt-compartment-track.bar--stun   .alt-bar-fill { background: #4a90d9; }
+.alt-compartment-track.bar--wound  .alt-bar-fill { background: #d9a44a; }
+.alt-compartment-track.bar--mortal .alt-bar-fill { background: #c8503c; }
+
+.alt-compartment-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 12px;
+    margin-top: 6px;
+    padding-top: 5px;
+    border-top: 1px solid var(--alt-color-border);
+    min-width: 0;
+}
+.alt-compartment-toggle,
+.alt-compartment-dc,
+.alt-compartment-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex: 0 0 auto;
+    font-size: 10px;
+    color: var(--alt-color-text-muted);
+    white-space: nowrap;
+}
+.alt-compartment-dc label { font-size: 9px; text-transform: uppercase; font-weight: bold; }
+.alt-compartment-dc select { width: 84px; height: 20px; }
+.alt-compartment-check strong { color: var(--alt-color-text); }
+.alt-compartment-systems { flex: 1 1 160px; min-width: 80px; }
+
+.alt-stat-box--wide { grid-column: span 2; }

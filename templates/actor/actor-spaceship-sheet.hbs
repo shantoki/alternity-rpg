@@ -1,0 +1,463 @@
+<form class="{{cssClass}} {{alt}}-sheet {{alt}}-spaceship-sheet" autocomplete="off">
+
+    {{!-- ═══ Header ════════════════════════════════════════════════════════ --}}
+    <header class="{{alt}}-sheet-header">
+        <div class="{{alt}}-sheet-portrait">
+            <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
+        </div>
+        <div class="{{alt}}-sheet-identity">
+            <h1 class="{{alt}}-sheet-name">
+                <input name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'Name'}}" spellcheck="false" />
+            </h1>
+            <div class="{{alt}}-sheet-meta">
+                <div class="{{alt}}-meta-field">
+                    <label>{{localize 'ALTERNITY.Spaceship.HullType'}}</label>
+                    <input type="text" name="system.hullType" value="{{system.hullType}}" list="alt-spaceship-hull-list" />
+                    <datalist id="alt-spaceship-hull-list">
+                        {{#each hullTypeChoices.Civilian as |choice|}}<option value="{{choice}}">{{/each}}
+                        {{#each hullTypeChoices.Military as |choice|}}<option value="{{choice}}">{{/each}}
+                    </datalist>
+                </div>
+                <div class="{{alt}}-meta-field">
+                    <label>{{localize 'ALTERNITY.Spaceship.HullCategory'}}</label>
+                    <select name="system.hullCategory">
+                        {{#each hullCategoryChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq ../system.hullCategory choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="{{alt}}-meta-field">
+                    <label>{{localize 'ALTERNITY.ProgressLevel'}}</label>
+                    <input type="number" name="system.progressLevel" value="{{system.progressLevel}}" min="0" max="9" />
+                </div>
+                <span class="{{alt}}-ship-status-badge {{alt}}-ship-status--{{system.shipStatus}}"
+                      title="{{localize (concat 'ALTERNITY.Spaceship.Status.' system.shipStatus 'Hint')}}">
+                    {{localize (concat 'ALTERNITY.Spaceship.Status.' system.shipStatus)}}
+                </span>
+                <span class="{{alt}}-toughness-badge" title="{{localize 'ALTERNITY.Spaceship.ToughnessHint'}}">
+                    {{localize 'ALTERNITY.Spaceship.Toughness'}}: {{system.toughness}}
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="{{alt}}-sheet-body">
+
+        {{!-- ═══ Hull budget ═══════════════════════════════════════════════ --}}
+        <section class="{{alt}}-hull-budget">
+            <div class="{{alt}}-budget-field">
+                <label title="{{localize 'ALTERNITY.Spaceship.HullSizeHint'}}">{{localize 'ALTERNITY.Spaceship.HullSize'}}</label>
+                <input type="number" name="system.hullSize" value="{{system.hullSize}}" min="0" />
+            </div>
+            <div class="{{alt}}-budget-field">
+                <label title="{{localize 'ALTERNITY.Spaceship.CompartmentLimitHint'}}">{{localize 'ALTERNITY.Spaceship.CompartmentLimit'}}</label>
+                <input type="number" name="system.compartmentLimit" value="{{system.compartmentLimit}}" min="1" />
+            </div>
+            <div class="{{alt}}-budget-readout">
+                <label>{{localize 'ALTERNITY.Spaceship.ArmorCost'}}</label>
+                <strong>{{hullBudget.armorCost}}</strong>
+            </div>
+            <div class="{{alt}}-budget-readout">
+                <label>{{localize 'ALTERNITY.Spaceship.Assigned'}}</label>
+                <strong>{{hullBudget.assigned}} / {{hullBudget.available}}</strong>
+            </div>
+            <div class="{{alt}}-budget-readout">
+                <label>{{localize 'ALTERNITY.Spaceship.Unassigned'}}</label>
+                <strong class="{{#if hullBudget.isOver}}{{alt}}-budget-over{{/if}}">{{hullBudget.unassigned}}</strong>
+            </div>
+            <div class="{{alt}}-budget-readout">
+                <label>{{localize 'ALTERNITY.Spaceship.Compartments'}}</label>
+                <strong class="{{#if hullBudget.isOverCount}}{{alt}}-budget-over{{/if}}">{{hullBudget.count}} / {{hullBudget.countLimit}}</strong>
+            </div>
+        </section>
+
+        {{#if hullBudget.isOver}}
+        <p class="{{alt}}-ship-warning">{{localize 'ALTERNITY.Spaceship.WarnOverDurability'}}</p>
+        {{/if}}
+        {{#if hullBudget.isOverCount}}
+        <p class="{{alt}}-ship-warning">{{localize 'ALTERNITY.Spaceship.WarnOverCompartments'}}</p>
+        {{/if}}
+        {{#unless system.hasCommandCompartment}}
+        <p class="{{alt}}-ship-warning">{{localize 'ALTERNITY.Spaceship.WarnNoCommand'}}</p>
+        {{/unless}}
+        {{#unless system.hasEngineeringCompartment}}
+        <p class="{{alt}}-ship-warning">{{localize 'ALTERNITY.Spaceship.WarnNoEngineering'}}</p>
+        {{/unless}}
+
+        {{!-- ═══ Performance ═══════════════════════════════════════════════ --}}
+        <section class="{{alt}}-stats-grid">
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Spaceship.ManeuverRatingHint'}}">{{localize 'ALTERNITY.Spaceship.ManeuverRating'}}</label>
+                <input type="number" name="system.maneuverRating" value="{{system.maneuverRating}}" min="-3" max="3" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Spaceship.AccelerationHint'}}">{{localize 'ALTERNITY.Spaceship.Acceleration'}}</label>
+                <input type="number" name="system.acceleration" value="{{system.acceleration}}" min="0" step="0.001" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Spaceship.CruisingSpeedHint'}}">{{localize 'ALTERNITY.Spaceship.CruisingSpeed'}}</label>
+                <input type="number" name="system.cruisingSpeed" value="{{system.cruisingSpeed}}" min="0" step="0.01" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Spaceship.EngineType'}}</label>
+                <input type="text" name="system.engineType" value="{{system.engineType}}" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Spaceship.MovementPointsHint'}}">{{localize 'ALTERNITY.Spaceship.MovementPoints'}}</label>
+                <input type="number" name="system.movementPoints" value="{{system.movementPoints}}" min="0" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Spaceship.FTLDrive'}}</label>
+                <select name="system.ftl.driveType">
+                    {{#each ftlChoices as |choice|}}
+                    <option value="{{choice.key}}" {{#if (eq ../system.ftl.driveType choice.key)}}selected{{/if}}>{{choice.label}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Spaceship.DrivespaceHint'}}">{{localize 'ALTERNITY.Spaceship.Drivespace'}}</label>
+                <input type="number" name="system.ftl.drivespace" value="{{system.ftl.drivespace}}" min="0" step="0.1" />
+            </div>
+            {{#if ftlStarfall}}
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Spaceship.Starfall'}}</label>
+                <strong>{{ftlStarfall}}</strong>
+            </div>
+            {{/if}}
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Spaceship.PowerGeneratedHint'}}">{{localize 'ALTERNITY.Spaceship.PowerGenerated'}}</label>
+                <input type="number" name="system.power.generated" value="{{system.power.generated}}" min="0" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Spaceship.PowerRequiredHint'}}">{{localize 'ALTERNITY.Spaceship.PowerRequired'}}</label>
+                <strong class="{{#if system.isPowerDeficit}}{{alt}}-power-deficit{{/if}}">{{system.powerRequired}}</strong>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Spaceship.PowerSurplus'}}</label>
+                <strong class="{{#if system.isPowerDeficit}}{{alt}}-power-deficit{{/if}}">{{system.powerSurplus}}</strong>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Spaceship.PowerPlant'}}</label>
+                <input type="text" name="system.power.plantText" value="{{system.power.plantText}}" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Spaceship.BerthingHint'}}">{{localize 'ALTERNITY.Spaceship.Berthing'}}</label>
+                <div class="{{alt}}-crew-fields">
+                    <input type="number" name="system.crewAboard" value="{{system.crewAboard}}" min="0" />
+                    <span>/</span>
+                    <input type="number" name="system.berthing" value="{{system.berthing}}" min="0" />
+                </div>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Spaceship.Cost'}}</label>
+                <input type="text" name="system.cost" value="{{system.cost}}" />
+            </div>
+        </section>
+
+        {{!-- ═══ Armor & computer ═════════════════════════════════════════ --}}
+        <section class="{{alt}}-stats-grid">
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Spaceship.ArmorGradeHint'}}">{{localize 'ALTERNITY.Spaceship.ArmorGrade'}}</label>
+                <select name="system.armor.grade">
+                    {{#each armorGradeChoices as |choice|}}
+                    <option value="{{choice}}" {{#if (eq ../system.armor.grade choice)}}selected{{/if}}>{{choice}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Spaceship.ArmorMaterial'}}</label>
+                <input type="text" name="system.armor.material" value="{{system.armor.material}}" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Spaceship.ArmorLI'}}</label>
+                <input type="text" name="system.armor.lowImpact" value="{{system.armor.lowImpact}}" placeholder="d6+1" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Spaceship.ArmorHI'}}</label>
+                <input type="text" name="system.armor.highImpact" value="{{system.armor.highImpact}}" placeholder="d6+1" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Spaceship.ArmorEn'}}</label>
+                <input type="text" name="system.armor.energy" value="{{system.armor.energy}}" placeholder="d6" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Spaceship.ComputerCoreHint'}}">{{localize 'ALTERNITY.Spaceship.ComputerCore'}}</label>
+                <select name="system.computer.coreQuality">
+                    {{#each computerQualityChoices as |choice|}}
+                    <option value="{{choice}}" {{#if (eq ../system.computer.coreQuality choice)}}selected{{/if}}>{{choice}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="{{alt}}-stat-box {{alt}}-stat-box--wide">
+                <label>{{localize 'ALTERNITY.Spaceship.DedicatedComputers'}}</label>
+                <input type="text" name="system.computer.dedicatedText" value="{{system.computer.dedicatedText}}"
+                       placeholder="{{localize 'ALTERNITY.Spaceship.DedicatedComputersHint'}}" />
+            </div>
+        </section>
+
+        {{!-- ═══ Compartments ═════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.Spaceship.Compartments'}}
+                <span class="{{alt}}-section-tools">
+                    <button type="button" data-action="rollHitLocation" title="{{localize 'ALTERNITY.Spaceship.RollHitHint'}}">
+                        {{localize 'ALTERNITY.Spaceship.RollHit'}}
+                    </button>
+                    <button type="button" data-action="fillHitTable" title="{{localize 'ALTERNITY.Spaceship.FillHitTableHint'}}">
+                        {{localize 'ALTERNITY.Spaceship.FillHitTable'}}
+                    </button>
+                    <button type="button" data-action="addShipRow" data-array="compartments" title="{{localize 'ALTERNITY.Spaceship.AddCompartment'}}">+</button>
+                </span>
+            </h3>
+
+            {{#unless hitTableCoverage.isComplete}}
+            <p class="{{alt}}-ship-warning">
+                {{localize 'ALTERNITY.Spaceship.WarnHitTable'}}
+                {{#if hitTableCoverage.missing.length}}
+                <span>{{localize 'ALTERNITY.Spaceship.HitTableMissing'}}: {{#each hitTableCoverage.missing}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}.</span>
+                {{/if}}
+                {{#if hitTableCoverage.duplicated.length}}
+                <span>{{localize 'ALTERNITY.Spaceship.HitTableDuplicated'}}: {{#each hitTableCoverage.duplicated}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}.</span>
+                {{/if}}
+            </p>
+            {{/unless}}
+
+            <div class="{{alt}}-compartment-list">
+                {{#each compartments as |c|}}
+                <article class="{{alt}}-compartment {{#if c.isDestroyed}}is-destroyed{{/if}}">
+
+                    <header class="{{alt}}-compartment-head">
+                        <span class="{{alt}}-compartment-number">C{{c.number}}</span>
+                        <select name="system.compartments.{{c.index}}.kind" class="{{alt}}-compartment-kind">
+                            {{#each ../compartmentKinds as |choice|}}
+                            <option value="{{choice}}" {{#if (eq c.kind choice)}}selected{{/if}}>{{choice}}</option>
+                            {{/each}}
+                        </select>
+                        <input type="text" name="system.compartments.{{c.index}}.label" value="{{c.label}}"
+                               class="{{alt}}-compartment-label" placeholder="{{localize 'ALTERNITY.Spaceship.CompartmentLabel'}}" />
+
+                        <span class="{{alt}}-compartment-dur" title="{{localize 'ALTERNITY.Spaceship.DurabilityHint'}}">
+                            <label>{{localize 'ALTERNITY.Spaceship.Durability'}}</label>
+                            <input type="number" name="system.compartments.{{c.index}}.durability" value="{{c.durability}}" min="0" max="40" />
+                        </span>
+
+                        <span class="{{alt}}-compartment-hit" title="{{localize 'ALTERNITY.Spaceship.HitRangeHint'}}">
+                            <label>d20</label>
+                            <input type="number" name="system.compartments.{{c.index}}.hitLow" value="{{c.hitLow}}" min="0" max="20" />
+                            <span>–</span>
+                            <input type="number" name="system.compartments.{{c.index}}.hitHigh" value="{{c.hitHigh}}" min="0" max="20" />
+                        </span>
+
+                        {{#if c.systemPenalty}}
+                        <span class="{{alt}}-compartment-penalty" title="{{localize 'ALTERNITY.Spaceship.SystemPenaltyHint'}}">
+                            {{fmtMod c.systemPenalty}} {{localize 'ALTERNITY.Spaceship.SystemPenalty'}}
+                        </span>
+                        {{/if}}
+
+                        <button type="button" data-action="clearCompartmentDamage" data-index="{{c.index}}"
+                                title="{{localize 'ALTERNITY.Spaceship.ClearDamage'}}">⟲</button>
+                        <button type="button" data-action="deleteShipRow" data-array="compartments" data-index="{{c.index}}">✕</button>
+                    </header>
+
+                    {{#if c.isOversized}}
+                    <p class="{{alt}}-ship-warning">{{localize 'ALTERNITY.Spaceship.WarnOversizedCompartment'}}</p>
+                    {{/if}}
+
+                    <div class="{{alt}}-compartment-tracks">
+                        {{#each c.tracks as |t|}}
+                        <div class="{{../../alt}}-compartment-track bar--{{t.key}}">
+                            <div class="{{../../alt}}-bar-label">
+                                <span class="{{../../alt}}-compartment-track-name">{{t.label}}</span>
+                                <span class="{{../../alt}}-bar-values">{{t.damage}} / {{t.rating}}</span>
+                                <span class="{{../../alt}}-damage-quick">
+                                    <button type="button" data-action="setCompartmentDamage" data-index="{{c.index}}" data-track="{{t.key}}" data-delta="-1">−</button>
+                                    <button type="button" data-action="setCompartmentDamage" data-index="{{c.index}}" data-track="{{t.key}}" data-delta="1">+</button>
+                                </span>
+                            </div>
+                            <div class="{{../../alt}}-bar-track"><div class="{{../../alt}}-bar-fill" style="width: {{t.pct}}%"></div></div>
+                        </div>
+                        {{/each}}
+                    </div>
+
+                    <div class="{{alt}}-compartment-foot">
+                        <label class="{{alt}}-compartment-toggle" title="{{localize 'ALTERNITY.Spaceship.LifeSupportHint'}}">
+                            <input type="checkbox" name="system.compartments.{{c.index}}.hasLifeSupport" {{#if c.hasLifeSupport}}checked{{/if}} />
+                            <span>{{localize 'ALTERNITY.Spaceship.LifeSupport'}}</span>
+                        </label>
+                        <span class="{{alt}}-compartment-dc" title="{{localize 'ALTERNITY.Spaceship.DamageControlHint'}}">
+                            <label>{{localize 'ALTERNITY.Spaceship.DamageControl'}}</label>
+                            <select name="system.compartments.{{c.index}}.damageControl">
+                                {{#each ../damageControlChoices as |choice|}}
+                                <option value="{{choice}}" {{#if (eq c.damageControl choice)}}selected{{/if}}>{{choice}}</option>
+                                {{/each}}
+                            </select>
+                        </span>
+                        <span class="{{alt}}-compartment-check" title="{{localize 'ALTERNITY.Spaceship.DurabilityCheckHint'}}">
+                            {{localize 'ALTERNITY.Spaceship.DurabilityCheck'}}: <strong>{{c.durabilityCheckScore}}</strong>
+                        </span>
+                        <input type="text" name="system.compartments.{{c.index}}.systemsText" value="{{c.systemsText}}"
+                               class="{{alt}}-compartment-systems" placeholder="{{localize 'ALTERNITY.Spaceship.SystemsHousedHint'}}" />
+                    </div>
+                </article>
+                {{else}}
+                <p class="{{alt}}-empty-state">{{localize 'ALTERNITY.Spaceship.NoCompartments'}}</p>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Weapons ══════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.Spaceship.Weapons'}}
+                <button type="button" data-action="addShipRow" data-array="weapons">+</button>
+            </h3>
+            <div class="{{alt}}-ship-table">
+                {{#each system.weapons as |row idx|}}
+                <div class="{{../alt}}-ship-table-row {{#if row.isOffline}}is-offline{{/if}}">
+                    <input type="text" name="system.weapons.{{idx}}.name" value="{{row.name}}" placeholder="{{localize 'ALTERNITY.Name'}}" />
+                    <select name="system.weapons.{{idx}}.compartment" title="{{localize 'ALTERNITY.Spaceship.Compartment'}}">
+                        <option value="0" {{#if (eq row.compartment 0)}}selected{{/if}}>—</option>
+                        {{#each ../compartmentOptions as |opt|}}
+                        <option value="{{opt.number}}" {{#if (eq row.compartment opt.number)}}selected{{/if}}>{{opt.label}}</option>
+                        {{/each}}
+                    </select>
+                    <select name="system.weapons.{{idx}}.arc" title="{{localize 'ALTERNITY.Spaceship.Arc'}}">
+                        {{#each ../arcChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.arc choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                    <input type="text" name="system.weapons.{{idx}}.range" value="{{row.range}}" placeholder="5/10/15 Mm" title="{{localize 'ALTERNITY.Spaceship.Range'}}" />
+                    <input type="text" name="system.weapons.{{idx}}.damageOrdinary" value="{{row.damageOrdinary}}" placeholder="d6+2s" title="{{localize 'ALTERNITY.Spaceship.DamageOrdinary'}}" />
+                    <input type="text" name="system.weapons.{{idx}}.damageGood" value="{{row.damageGood}}" placeholder="d6+1w" title="{{localize 'ALTERNITY.Spaceship.DamageGood'}}" />
+                    <input type="text" name="system.weapons.{{idx}}.damageAmazing" value="{{row.damageAmazing}}" placeholder="d6+3w" title="{{localize 'ALTERNITY.Spaceship.DamageAmazing'}}" />
+                    <select name="system.weapons.{{idx}}.damageType" title="{{localize 'ALTERNITY.Spaceship.DamageType'}}">
+                        {{#each ../damageTypeChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.damageType choice)}}selected{{/if}}>{{localize (concat 'ALTERNITY.DamageType.' choice)}}</option>
+                        {{/each}}
+                    </select>
+                    <select name="system.weapons.{{idx}}.firepower" title="{{localize 'ALTERNITY.Spaceship.FirepowerHint'}}">
+                        {{#each ../firepowerChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.firepower choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                    <input type="number" name="system.weapons.{{idx}}.powerReq" value="{{row.powerReq}}" min="0" title="{{localize 'ALTERNITY.Spaceship.PowerReq'}}" />
+                    <span class="{{../alt}}-ship-roll-group">
+                        <button type="button" data-action="rollShipWeapon" data-index="{{idx}}" data-grade="ordinary" title="{{localize 'ALTERNITY.Spaceship.DamageOrdinary'}}">O</button>
+                        <button type="button" data-action="rollShipWeapon" data-index="{{idx}}" data-grade="good" title="{{localize 'ALTERNITY.Spaceship.DamageGood'}}">G</button>
+                        <button type="button" data-action="rollShipWeapon" data-index="{{idx}}" data-grade="amazing" title="{{localize 'ALTERNITY.Spaceship.DamageAmazing'}}">A</button>
+                    </span>
+                    <button type="button" data-action="deleteShipRow" data-array="weapons" data-index="{{idx}}">✕</button>
+                </div>
+                {{else}}
+                <p class="{{alt}}-empty-state">{{localize 'ALTERNITY.Spaceship.NoWeapons'}}</p>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Defenses ═════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.Spaceship.Defenses'}}
+                <button type="button" data-action="addShipRow" data-array="defenses">+</button>
+            </h3>
+            <div class="{{alt}}-ship-table">
+                {{#each system.defenses as |row idx|}}
+                <div class="{{../alt}}-ship-table-row {{#if row.isOffline}}is-offline{{/if}}">
+                    <input type="text" name="system.defenses.{{idx}}.name" value="{{row.name}}" placeholder="{{localize 'ALTERNITY.Name'}}" />
+                    <select name="system.defenses.{{idx}}.compartment" title="{{localize 'ALTERNITY.Spaceship.Compartment'}}">
+                        <option value="0" {{#if (eq row.compartment 0)}}selected{{/if}}>—</option>
+                        {{#each ../compartmentOptions as |opt|}}
+                        <option value="{{opt.number}}" {{#if (eq row.compartment opt.number)}}selected{{/if}}>{{opt.label}}</option>
+                        {{/each}}
+                    </select>
+                    <input type="text" name="system.defenses.{{idx}}.effectText" value="{{row.effectText}}" placeholder="{{localize 'ALTERNITY.Details'}}" />
+                    <label class="{{../alt}}-ship-inline-toggle" title="{{localize 'ALTERNITY.Spaceship.ActiveDefenseHint'}}">
+                        <input type="checkbox" name="system.defenses.{{idx}}.isActive" {{#if row.isActive}}checked{{/if}} />
+                        <span>{{localize 'ALTERNITY.Spaceship.ActiveDefense'}}</span>
+                    </label>
+                    <input type="number" name="system.defenses.{{idx}}.powerReq" value="{{row.powerReq}}" min="0" title="{{localize 'ALTERNITY.Spaceship.PowerReq'}}" />
+                    <button type="button" data-action="deleteShipRow" data-array="defenses" data-index="{{idx}}">✕</button>
+                </div>
+                {{else}}
+                <p class="{{alt}}-empty-state">{{localize 'ALTERNITY.Spaceship.NoDefenses'}}</p>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Systems ══════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.Spaceship.Systems'}}
+                <button type="button" data-action="addShipRow" data-array="systems">+</button>
+            </h3>
+            <div class="{{alt}}-ship-table">
+                {{#each system.systems as |row idx|}}
+                <div class="{{../alt}}-ship-table-row {{#if row.isOffline}}is-offline{{/if}}">
+                    <select name="system.systems.{{idx}}.category">
+                        {{#each ../systemCategoryChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.category choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                    <input type="text" name="system.systems.{{idx}}.name" value="{{row.name}}" placeholder="{{localize 'ALTERNITY.Name'}}" />
+                    <select name="system.systems.{{idx}}.compartment" title="{{localize 'ALTERNITY.Spaceship.Compartment'}}">
+                        <option value="0" {{#if (eq row.compartment 0)}}selected{{/if}}>—</option>
+                        {{#each ../compartmentOptions as |opt|}}
+                        <option value="{{opt.number}}" {{#if (eq row.compartment opt.number)}}selected{{/if}}>{{opt.label}}</option>
+                        {{/each}}
+                    </select>
+                    <input type="text" name="system.systems.{{idx}}.range" value="{{row.range}}" placeholder="{{localize 'ALTERNITY.Spaceship.Range'}}" />
+                    <input type="number" name="system.systems.{{idx}}.durabilityCost" value="{{row.durabilityCost}}" min="0" title="{{localize 'ALTERNITY.Spaceship.DurabilityCost'}}" />
+                    <input type="number" name="system.systems.{{idx}}.powerReq" value="{{row.powerReq}}" min="0" title="{{localize 'ALTERNITY.Spaceship.PowerReq'}}" />
+                    <label class="{{../alt}}-ship-inline-toggle" title="{{localize 'ALTERNITY.Spaceship.OfflineHint'}}">
+                        <input type="checkbox" name="system.systems.{{idx}}.isOffline" {{#if row.isOffline}}checked{{/if}} />
+                        <span>{{localize 'ALTERNITY.Spaceship.Offline'}}</span>
+                    </label>
+                    <button type="button" data-action="deleteShipRow" data-array="systems" data-index="{{idx}}">✕</button>
+                </div>
+                {{else}}
+                <p class="{{alt}}-empty-state">{{localize 'ALTERNITY.Spaceship.NoSystems'}}</p>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Command crew ═════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.Spaceship.CommandCrew'}}
+                <button type="button" data-action="addShipRow" data-array="stations">+</button>
+            </h3>
+            <div class="{{alt}}-ship-table">
+                {{#each system.stations as |row idx|}}
+                <div class="{{../alt}}-ship-table-row">
+                    <select name="system.stations.{{idx}}.role">
+                        {{#each ../stationChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.role choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                    <select name="system.stations.{{idx}}.compartment" title="{{localize 'ALTERNITY.Spaceship.Compartment'}}">
+                        <option value="0" {{#if (eq row.compartment 0)}}selected{{/if}}>—</option>
+                        {{#each ../compartmentOptions as |opt|}}
+                        <option value="{{opt.number}}" {{#if (eq row.compartment opt.number)}}selected{{/if}}>{{opt.label}}</option>
+                        {{/each}}
+                    </select>
+                    <input type="text" name="system.stations.{{idx}}.crewName" value="{{row.crewName}}" placeholder="{{localize 'ALTERNITY.Spaceship.CrewName'}}" />
+                    <input type="text" name="system.stations.{{idx}}.skillName" value="{{row.skillName}}" placeholder="{{localize 'ALTERNITY.Spaceship.SkillName'}}" />
+                    <input type="text" name="system.stations.{{idx}}.skillScore" value="{{row.skillScore}}" placeholder="9/4/2" title="{{localize 'ALTERNITY.Spaceship.SkillScoreHint'}}" />
+                    <button type="button" data-action="deleteShipRow" data-array="stations" data-index="{{idx}}">✕</button>
+                </div>
+                {{else}}
+                <p class="{{alt}}-empty-state">{{localize 'ALTERNITY.Spaceship.NoStations'}}</p>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Notes ════════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>{{localize 'ALTERNITY.Description'}}</h3>
+            <textarea name="system.description" rows="3">{{system.description}}</textarea>
+            <h3>{{localize 'ALTERNITY.Notes'}}</h3>
+            <textarea name="system.notes" rows="3">{{system.notes}}</textarea>
+        </section>
+
+    </main>
+</form>
