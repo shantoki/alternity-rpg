@@ -340,6 +340,8 @@ class AlternityCharacterState {
         abilitySets   = [],
         specialRules  = [],
         durability    = {},
+        lastResort    = {},
+        species       = '',
         abilityScores = {},
         skills        = {},
         customSkills  = [],
@@ -376,6 +378,9 @@ class AlternityCharacterState {
         this.profession = String(profession);
         this.career     = String(career);
         this.background = String(background);
+        // Kept on the state (not just actor.system.details) because the durability
+        // derivation reads it — Weren get CON x1.5.
+        this.species    = String(species);
         this.actionsPerRound = Number(actionsPerRound);
         this.armor      = { ...armor };
 
@@ -392,13 +397,37 @@ class AlternityCharacterState {
 
         // Durability tracks (Authentic Fastplay)
         const con = this.abilityScores.CON;
+        // Ratings come from AlternityMathService rather than being figured here —
+        // the CON -> stun/wound/mortal/fatigue derivation is game math, and the
+        // Weren "Superior Durability" case has to land before the halving.
+        const ratings = AlternityMathService.calculateDurabilityRatings(con, {
+            isWeren: String(species ?? '').toLowerCase().includes('weren'),
+        });
+
         this.durability = {
-            stun:       Number(durability.stun       ?? 0),
-            stunMax:    con,
-            wound:      Number(durability.wound      ?? 0),
-            woundMax:   con,
-            mortal:     Number(durability.mortal     ?? 0),
-            mortalMax:  Math.ceil(con / 2),
+            stun:        Number(durability.stun    ?? 0),
+            stunMax:     ratings.stun,
+            wound:       Number(durability.wound   ?? 0),
+            woundMax:    ratings.wound,
+            mortal:      Number(durability.mortal  ?? 0),
+            mortalMax:   ratings.mortal,
+            // The fourth track (PHB "the four types of damage"). Absent until now,
+            // which left every fatigue-costing rule in the system — FX energy
+            // overspend, mutation activation, cybertech activation — with nowhere
+            // to write to.
+            fatigue:     Number(durability.fatigue ?? 0),
+            fatigueMax:  ratings.fatigue,
+        };
+
+        // Last resort points (PHB Ch.2 "Last Resorts", Table P6). Max is keyed to
+        // Personality, but Table P6's numerals are an image in the available scans
+        // and did not survive OCR — so `max` is stored and GM-entered rather than
+        // derived, and only the two rules that *did* survive are enforced:
+        // a Free Agent's maximum is 1 higher, and 5 is the ceiling.
+        this.lastResort = {
+            value: Number(lastResort.value ?? 0),
+            max:   Number(lastResort.max   ?? 0),
+            cost:  Number(lastResort.cost  ?? 0),
         };
 
         this.skills = {};
@@ -552,11 +581,16 @@ class AlternityCharacterState {
         if (!ABILITIES.includes(ability)) throw new Error(`[AlternityCharacterState] Unknown ability "${ability}".`);
         this.abilityScores[ability] = Math.min(14, Math.max(4, Math.round(Number(value))));
         
-        // Update durability maximums
+        // Update durability maximums. Routed through the math service so the
+        // four ratings can never drift from the constructor's derivation.
         if (ability === 'CON') {
-            this.durability.stunMax = this.abilityScores.CON;
-            this.durability.woundMax = this.abilityScores.CON;
-            this.durability.mortalMax = Math.ceil(this.abilityScores.CON / 2);
+            const ratings = AlternityMathService.calculateDurabilityRatings(this.abilityScores.CON, {
+                isWeren: String(this.species ?? '').toLowerCase().includes('weren'),
+            });
+            this.durability.stunMax    = ratings.stun;
+            this.durability.woundMax   = ratings.wound;
+            this.durability.mortalMax  = ratings.mortal;
+            this.durability.fatigueMax = ratings.fatigue;
         }
 
         // Update psionic energy max
@@ -579,8 +613,15 @@ class AlternityCharacterState {
      */
     getDamageStepPenalty() {
         let penalty = WOUND_PENALTIES[this.woundLevel] ?? 0;
-        // Dazed effect: +1 step per Mortal box
-        penalty += this.durability.mortal;
+        // "Dazed" (PHB Ch.3, under *Fatigue Damage*): "For every fatigue box
+        // marked, a character receives a +1 step penalty to all subsequent
+        // actions he attempts."
+        //
+        // This used to read `this.durability.mortal`, which charged the penalty
+        // against the wrong track — mortally wounded heroes were penalised for
+        // damage that carries no Dazed effect, while fatigue (which does) was not
+        // tracked at all. Wound-level penalties above already cover mortal damage.
+        penalty += this.durability.fatigue;
         return penalty;
     }
 
@@ -653,6 +694,8 @@ class AlternityCharacterState {
             abilitySets:   this.abilitySets.map(a => a.serialize()),
             specialRules:  this.specialRules.map(r => r.serialize ? r.serialize() : r),
             durability:    { ...this.durability },
+            lastResort:    { ...this.lastResort },
+            species:       this.species,
             abilityScores: { ...this.abilityScores },
             skills:        Object.fromEntries(Object.entries(this.skills).map(([id, s]) => [id, { rank: s.rank }])),
             customSkills:  this.customSkills.map(s => ({ ...s })),

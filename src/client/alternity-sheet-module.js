@@ -238,6 +238,7 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
                 purchaseBenefit: this._onPurchaseBenefitAction,
                 refundBenefit:   this._onRefundBenefitAction,
                 setPsionicEnergy: this._onPsionicPipAction,
+                setLastResort:   this._onLastResortPipAction,
                 editState:      this._onEditStateAction
             }
         });
@@ -322,9 +323,36 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
         context.skillsByAbility = skillsByAbility;
         context.psionicHierarchy = psionicHierarchy;
         context.state           = state;
-        context.durability = Object.entries(state.resources || {}).map(([key, val]) => ({
-            label: key, current: val?.value || 0, max: val?.max || 0, pct: pct(val?.value || 0, val?.max || 0)
-        }));
+        // The four damage tracks (PHB Ch.3). This used to map over
+        // `state.resources`, which AlternityCharacterState has never had — so it
+        // always produced an empty array and the bars at the top of the sheet
+        // rendered nothing at all.
+        //
+        // `label` is localized here rather than in the template: the markup used
+        // `{{localize (concat 'ALTERNITY.' dur.label)}}`, and no `concat` helper is
+        // registered in this codebase, so those labels resolved to nothing even
+        // when the array was populated.
+        const DURABILITY_TRACKS = [
+            { key: 'stun',    labelKey: 'ALTERNITY.Durability.Stun' },
+            { key: 'wound',   labelKey: 'ALTERNITY.Durability.Wound' },
+            { key: 'mortal',  labelKey: 'ALTERNITY.Durability.Mortal' },
+            { key: 'fatigue', labelKey: 'ALTERNITY.Durability.Fatigue' },
+        ];
+        context.durability = DURABILITY_TRACKS.map(({ key, labelKey }) => {
+            const current = state.durability?.[key] ?? 0;
+            const max     = state.durability?.[`${key}Max`] ?? 0;
+            return { key, label: game.i18n.localize(labelKey), current, max, pct: pct(current, max) };
+        });
+
+        // Last resort points (PHB Ch.2). `max` is GM-entered — Table P6 did not
+        // survive OCR — so the track renders whatever maximum the sheet holds.
+        const lr = state.lastResort ?? { value: 0, max: 0, cost: 0 };
+        context.lastResort = {
+            ...lr,
+            // Five boxes is the ceiling the book prints, because a Free Agent can
+            // reach that many.
+            pips: [...Array(Math.min(5, Math.max(0, lr.max))).keys()].map(i => i < lr.value),
+        };
 
         context.inventory = {
             weapons: this.document.items.filter(i => i.type === 'weapon'),
@@ -556,6 +584,26 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
         if (!this._altState.psionics) return;
         this._altState.psionics.energy.value = (this._altState.psionics.energy.value === val) ? val - 1 : val;
         this._altState.psionics.energy.value = Math.max(0, this._altState.psionics.energy.value);
+        await saveAlternityState(this.actor, this._altState);
+        this.render();
+    }
+
+    /**
+     * Spend or restore a last resort point (PHB Ch.2 "Last Resorts").
+     *
+     * Same click-to-toggle behaviour as the psionic energy track: clicking the
+     * pip you are already at steps back down by one, so a mis-click is undoable
+     * without a separate control.
+     */
+    static async _onLastResortPipAction(event, target) {
+        const val = safeInt(target.dataset.value, 0);
+        if (!this._altState.lastResort) return;
+        const current = this._altState.lastResort.value;
+        const next    = (current === val) ? val - 1 : val;
+        this._altState.lastResort.value = Math.min(
+            this._altState.lastResort.max,
+            Math.max(0, next)
+        );
         await saveAlternityState(this.actor, this._altState);
         this.render();
     }
@@ -1067,6 +1115,18 @@ async function registerAlternitySheet() {
     Handlebars.registerHelper('and', (a, b) => a && b);
     Handlebars.registerHelper('or', (a, b) => a || b);
     Handlebars.registerHelper('includes', (arr, val) => Array.isArray(arr) && arr.includes(val));
+    /**
+     * String concatenation, used to build localization keys from a prefix and a
+     * runtime value — `{{localize (concat 'ALTERNITY.' woundLevel)}}`.
+     *
+     * Five call sites across actor-sheet, actor-npc-sheet and the roll card have
+     * always used this helper, but it was never registered: Handlebars resolves
+     * an unknown sub-expression to undefined, so `localize` received undefined and
+     * rendered nothing. That silently blanked the wound-level readout at the top
+     * of both actor sheets, every wound-pip tooltip, and the roll card's phase
+     * label. The trailing options object Handlebars appends is dropped.
+     */
+    Handlebars.registerHelper('concat', (...args) => args.slice(0, -1).join(''));
     
     await foundry.applications.handlebars.loadTemplates([
         "systems/alternity-v2/templates/actor/ability-card.hbs"

@@ -52,30 +52,60 @@
 
     {{!-- NPC Resources --}}
     <section class="{{alt}}-resources">
-        <div class="{{alt}}-resource-bar bar--stamina">
+        {{!-- The four damage tracks a supporting-cast statblock prints as
+              `Durability: 9/9/5/5` (stun/wound/mortal/fatigue). These were
+              formerly two bars named stamina/vitality, which are not game terms —
+              they were stun and wound all along. --}}
+        <div class="{{alt}}-resource-bar bar--stun">
             <div class="{{alt}}-bar-label">
-                <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.Stamina'}}</span>
+                <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.Durability.Stun'}}</span>
                 <span class="{{alt}}-bar-values">
-                    <input type="number" name="system.stamina.value" value="{{system.stamina.value}}" min="0" />
+                    <input type="number" name="system.durability.stun.value" value="{{system.durability.stun.value}}" data-dtype="Number" min="0" />
                     <span>/</span>
-                    <input type="number" name="system.stamina.max" value="{{system.stamina.max}}" min="0" />
+                    <input type="number" name="system.durability.stun.max" value="{{system.durability.stun.max}}" data-dtype="Number" min="0" />
                 </span>
             </div>
             <div class="{{alt}}-bar-track">
-                <div class="{{alt}}-bar-fill" style="width: {{pct system.stamina.value system.stamina.max}}"></div>
+                <div class="{{alt}}-bar-fill" style="width: {{pct system.durability.stun.value system.durability.stun.max}}"></div>
             </div>
         </div>
-        <div class="{{alt}}-resource-bar bar--vitality">
+        <div class="{{alt}}-resource-bar bar--wound">
             <div class="{{alt}}-bar-label">
-                <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.Vitality'}}</span>
+                <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.Durability.Wound'}}</span>
                 <span class="{{alt}}-bar-values">
-                    <input type="number" name="system.vitality.value" value="{{system.vitality.value}}" min="0" />
+                    <input type="number" name="system.durability.wound.value" value="{{system.durability.wound.value}}" data-dtype="Number" min="0" />
                     <span>/</span>
-                    <input type="number" name="system.vitality.max" value="{{system.vitality.max}}" min="0" />
+                    <input type="number" name="system.durability.wound.max" value="{{system.durability.wound.max}}" data-dtype="Number" min="0" />
                 </span>
             </div>
             <div class="{{alt}}-bar-track">
-                <div class="{{alt}}-bar-fill" style="width: {{pct system.vitality.value system.vitality.max}}"></div>
+                <div class="{{alt}}-bar-fill" style="width: {{pct system.durability.wound.value system.durability.wound.max}}"></div>
+            </div>
+        </div>
+        <div class="{{alt}}-resource-bar bar--mortal">
+            <div class="{{alt}}-bar-label">
+                <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.Durability.Mortal'}}</span>
+                <span class="{{alt}}-bar-values">
+                    <input type="number" name="system.durability.mortal.value" value="{{system.durability.mortal.value}}" data-dtype="Number" min="0" />
+                    <span>/</span>
+                    <input type="number" name="system.durability.mortal.max" value="{{system.durability.mortal.max}}" data-dtype="Number" min="0" />
+                </span>
+            </div>
+            <div class="{{alt}}-bar-track">
+                <div class="{{alt}}-bar-fill" style="width: {{pct system.durability.mortal.value system.durability.mortal.max}}"></div>
+            </div>
+        </div>
+        <div class="{{alt}}-resource-bar bar--fatigue">
+            <div class="{{alt}}-bar-label">
+                <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.Durability.Fatigue'}}</span>
+                <span class="{{alt}}-bar-values">
+                    <input type="number" name="system.durability.fatigue.value" value="{{system.durability.fatigue.value}}" data-dtype="Number" min="0" />
+                    <span>/</span>
+                    <input type="number" name="system.durability.fatigue.max" value="{{system.durability.fatigue.max}}" data-dtype="Number" min="0" />
+                </span>
+            </div>
+            <div class="{{alt}}-bar-track">
+                <div class="{{alt}}-bar-fill" style="width: {{pct system.durability.fatigue.value system.durability.fatigue.max}}"></div>
             </div>
         </div>
     </section>

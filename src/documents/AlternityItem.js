@@ -480,8 +480,27 @@ export class AlternityItem extends Item {
             const altState = await actor.getAltState?.() ?? await getAlternityState(actor);
             if (!altState) return null;
 
+            // `resources` is what SystemEffectItem's `resource` prerequisite reads
+            // (see alternity-item-template.js). It used to spread
+            // `altState.resources`, a property AlternityCharacterState has never
+            // had, so the snapshot was always empty and every resource
+            // prerequisite silently saw 0 and failed.
+            //
+            // Remaining points are reported, not damage taken: a prerequisite asks
+            // "does this character have N left?", and the durability tracks count
+            // upward as damage accumulates.
+            const dur = altState.durability ?? {};
+            const remaining = (v, max) => Math.max(0, (max ?? 0) - (v ?? 0));
             const snapshot = {
-                resources:  { ...altState.resources },
+                resources: {
+                    stun:       remaining(dur.stun,    dur.stunMax),
+                    wound:      remaining(dur.wound,   dur.woundMax),
+                    mortal:     remaining(dur.mortal,  dur.mortalMax),
+                    fatigue:    remaining(dur.fatigue, dur.fatigueMax),
+                    psionicEnergy: altState.psionics?.energy?.value ?? 0,
+                    lastResort:    altState.lastResort?.value ?? 0,
+                    techPoints:    actor.system?.techPoints?.value ?? 0,
+                },
                 woundLevel: altState.woundLevel,
                 skills:     {}, // populated below
             };

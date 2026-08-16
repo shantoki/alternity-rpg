@@ -15,12 +15,14 @@
  *   store that AlternityCharacterState reads from / writes to via actor flags.
  *
  * Field groups:
- *   - abilities     : Six core ability score modifiers (STR/DEX/CON/INT/WIL/PER)
- *   - resources     : Stamina, Vitality, Tech Points, Psi Points (current + max)
+ *   - abilities     : Six core ability scores (STR/DEX/CON/INT/WIL/PER)
+ *   - durability    : The four damage tracks — stun, wound, mortal, fatigue
+ *   - lastResort    : Last resort points (current / max / buy-back cost)
+ *   - resources     : Tech Points, Psi Points (current + max)
  *   - biography     : Free-text actor description
  *   - details       : Species, career, focus, level, XP
  *   - woundLevel    : Current wound state string
- *   - bleedRate     : Vitality lost per round when Bleeding
+ *   - bleedRate     : Mortal points lost per round when Bleeding
  */
 
 const { fields } = foundry.data;
@@ -97,9 +99,44 @@ export class CharacterData extends foundry.abstract.TypeDataModel {
                 per: abilityField(),
             }),
 
+            /**
+             * ── Durability ───────────────────────────────────────────────
+             * The four damage tracks the Player's Handbook actually defines:
+             * "The four types of damage are stun damage, wound damage, mortal
+             * damage, and fatigue damage." Stun and wound rate at the CON score,
+             * mortal and fatigue at half of it (rounded up) — all four are
+             * derived by AlternityMathService.calculateDurabilityRatings().
+             *
+             * This replaces the former `stamina` / `vitality` pools, which were
+             * not Alternity mechanics at all: "vitality" appears once in the
+             * whole PHB (as prose), and "Stamina" is a *skill*
+             * (Stamina-endurance), not a resource. They were in fact stun and
+             * wound under the wrong names — AlternityActor._syncSystemFromState()
+             * has always written `state.durability.stun` into `system.stamina` —
+             * so migrateData() below can carry the values across losslessly.
+             */
+            durability: new fields.SchemaField({
+                stun:    resourceSchema(0, 10),
+                wound:   resourceSchema(0, 10),
+                mortal:  resourceSchema(0, 5),
+                fatigue: resourceSchema(0, 5),
+            }),
+
+            /**
+             * Last resort points (PHB Ch.2 "Last Resorts", Table P6).
+             * `max` is keyed to Personality, but Table P6 is an image in the
+             * available scans and its numerals did not survive OCR, so it is
+             * stored rather than derived. A Free Agent's maximum is 1 higher than
+             * the table shows, and 5 is the hard ceiling. `cost` is the skill
+             * points needed to buy a spent point back between adventures.
+             */
+            lastResort: new fields.SchemaField({
+                value: new fields.NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0, max: 5 }),
+                max:   new fields.NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0, max: 5 }),
+                cost:  new fields.NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+            }, { initial: { value: 0, max: 0, cost: 0 } }),
+
             // ── Resource pools ───────────────────────────────────────────
-            stamina:    resourceSchema(20, 20),
-            vitality:   resourceSchema(10, 10),
             techPoints: resourceSchema(0, 0),
             psiPoints:  resourceSchema(0, 0),
 
@@ -294,6 +331,29 @@ export class CharacterData extends foundry.abstract.TypeDataModel {
             source.woundLevel = source.wound.level;
             delete source.wound;
         }
+
+        // v1.0 → v1.1: stamina/vitality → durability.stun/durability.wound.
+        //
+        // These were never separate mechanics: _syncSystemFromState() wrote
+        // state.durability.stun into system.stamina and .wound into
+        // system.vitality, so this is a rename, not a conversion, and the values
+        // carry over exactly. Mortal and fatigue had no home in the old schema —
+        // mortal is restored from AlternityCharacterState on the next sync, and
+        // fatigue starts empty because it was never tracked anywhere.
+        //
+        // Guarded on the target being absent so re-running this can't clobber
+        // newer data with stale legacy keys.
+        if (source.stamina && !source.durability?.stun) {
+            source.durability = source.durability ?? {};
+            source.durability.stun = { ...source.stamina };
+        }
+        if (source.vitality && !source.durability?.wound) {
+            source.durability = source.durability ?? {};
+            source.durability.wound = { ...source.vitality };
+        }
+        delete source.stamina;
+        delete source.vitality;
+
         return super.migrateData(source);
     }
 }

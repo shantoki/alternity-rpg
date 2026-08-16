@@ -53,12 +53,32 @@ describe('Alternity System Unit Tests', () => {
             expect(state.getDamageStepPenalty()).toBe(2);
             expect(state.getWoundPenalty()).toBe(2);
 
-            // Set to Healthy but add 1 Mortal box: +1 penalty (Dazed)
+            // Mortal damage sets the wound level but carries NO Dazed penalty.
+            // This assertion used to expect +1, matching an implementation that
+            // charged Dazed against the mortal track. The PHB puts Dazed under
+            // *Fatigue Damage*: "For every fatigue box marked, a character
+            // receives a +1 step penalty to all subsequent actions he attempts."
             state.setWoundLevel('Healthy');
             state.applyDamage(1, 'mortal');
             expect(state.woundLevel).toBe('Bleeding'); // Mortal damage causes Bleeding
-            expect(state.getDamageStepPenalty()).toBe(1); // 0 (Bleeding) + 1 (Mortal box)
+            expect(state.getDamageStepPenalty()).toBe(0); // 0 (Bleeding) + 0 (no fatigue)
             expect(state.getWoundPenalty()).toBe(0); // Just the wound level penalty
+        });
+
+        it('should apply the Dazed penalty per marked fatigue box, not per mortal box', () => {
+            const state = new AlternityCharacterState({ actorId: 'test-actor-dazed', abilityScores: { CON: 10 } });
+
+            // CON 10 -> stun/wound 10, mortal/fatigue 5 (half, rounded up).
+            expect(state.durability.fatigueMax).toBe(5);
+            expect(state.durability.mortalMax).toBe(5);
+
+            state.durability.fatigue = 3;
+            expect(state.getDamageStepPenalty()).toBe(3);
+
+            // Mortal damage on its own contributes nothing to the step penalty.
+            state.durability.fatigue = 0;
+            state.durability.mortal  = 3;
+            expect(state.getDamageStepPenalty()).toBe(0);
         });
 
         it('should correctly calculate resistance modifiers', () => {
@@ -436,6 +456,47 @@ describe('Alternity System Unit Tests', () => {
             expect(() => AlternityMathService.calculateCyberTolerance('12')).toThrow();
             expect(() => AlternityMathService.calculateCyberTolerance(12, 'nope')).toThrow();
             expect(() => AlternityMathService.calculateCyberTolerance(12, [{ name: 'Bad', size: -2 }])).toThrow();
+        });
+    });
+
+    describe('AlternityMathService — Durability Ratings', () => {
+        it('should rate stun/wound at CON and mortal/fatigue at half, rounded up', () => {
+            // PHB Ch.2: "stun and wound damage equal to his Constitution score,
+            // and ... mortal and fatigue damage equal to half his Constitution
+            // score, rounded up."
+            const r = AlternityMathService.calculateDurabilityRatings(9);
+            expect(r).toMatchObject({ stun: 9, wound: 9, mortal: 5, fatigue: 5 });
+        });
+
+        it('should match the printed 9/9/5/5 and 10/10/5/5 statblock runs', () => {
+            // Ramos Epoupin, CON 9 -> 9/9/5/5 (StarDrive Campaign Setting).
+            const con9 = AlternityMathService.calculateDurabilityRatings(9);
+            expect([con9.stun, con9.wound, con9.mortal, con9.fatigue]).toEqual([9, 9, 5, 5]);
+            // Cole Tipton, CON 10 -> 10/10/5/5 (Mindwalking).
+            const con10 = AlternityMathService.calculateDurabilityRatings(10);
+            expect([con10.stun, con10.wound, con10.mortal, con10.fatigue]).toEqual([10, 10, 5, 5]);
+        });
+
+        it('should always keep mortal and fatigue equal to each other', () => {
+            for (let con = 0; con <= 30; con++) {
+                const r = AlternityMathService.calculateDurabilityRatings(con);
+                expect(r.mortal).toBe(r.fatigue);
+                expect(r.stun).toBe(r.wound);
+            }
+        });
+
+        it('should give weren CON x1.5 before halving (Superior Durability)', () => {
+            // CON 16 -> base 24 -> 24/24/12/12. Halving the *inflated* score is the
+            // point: halving first would give 8, not 12.
+            const r = AlternityMathService.calculateDurabilityRatings(16, { isWeren: true });
+            expect([r.stun, r.wound, r.mortal, r.fatigue]).toEqual([24, 24, 12, 12]);
+            expect(r.modifierTrace.some(m => m.source === 'Weren')).toBe(true);
+        });
+
+        it('should reject invalid Constitution scores', () => {
+            expect(() => AlternityMathService.calculateDurabilityRatings(-1)).toThrow();
+            expect(() => AlternityMathService.calculateDurabilityRatings('9')).toThrow();
+            expect(() => AlternityMathService.calculateDurabilityRatings(NaN)).toThrow();
         });
     });
 

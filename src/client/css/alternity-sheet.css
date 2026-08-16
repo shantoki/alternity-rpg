@@ -880,6 +880,42 @@
     box-shadow: 0 0 5px var(--alt-color-primary);
 }
 
+/* ── Last resort points (PHB Ch.2) ──────────────────────────────────────── */
+/* Five boxes is the printed ceiling, because a Free Agent can reach that many. */
+.alt-last-resort {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+.alt-last-resort-track { display: flex; gap: 4px; }
+.alt-last-resort-pip {
+    width: 14px;
+    height: 14px;
+    border: 1px solid var(--alt-color-accent, #d9a44a);
+    background: transparent;
+    cursor: pointer;
+    border-radius: 2px;
+    padding: 0;
+}
+/* Marked = spent, matching the hero sheet's "check the box when used". */
+.alt-last-resort-pip.active {
+    background: var(--alt-color-accent, #d9a44a);
+    box-shadow: 0 0 5px var(--alt-color-accent, #d9a44a);
+}
+.alt-last-resort-values {
+    font-size: 11px;
+    color: var(--alt-color-text-muted);
+}
+
+/* ── Damage track bar tints ─────────────────────────────────────────────── */
+/* Escalating severity across the four tracks; fatigue reads as a caution
+   colour because every marked box is a +1 step penalty (the Dazed rule). */
+.alt-resource-bar.bar--stun    .alt-bar-fill { background: #4a90d9; }
+.alt-resource-bar.bar--wound   .alt-bar-fill { background: #d9a44a; }
+.alt-resource-bar.bar--mortal  .alt-bar-fill { background: #c8503c; }
+.alt-resource-bar.bar--fatigue .alt-bar-fill { background: #8a7fd9; }
+
 .alt-psionic-loss-box ul {
     list-style: none;
     margin: 4px 0 0 0;

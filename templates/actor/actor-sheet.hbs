@@ -74,22 +74,39 @@
             <span class="{{@root.alt}}-penalty-label">{{localize 'ALTERNITY.StepPenalty'}}:</span>
             <span class="{{@root.alt}}-penalty-value">{{fmtMod woundPenalty}}</span>
         </div>
-        {{#each durability as |dur key|}}
-        <div class="{{@root.alt}}-resource-bar bar--{{key}}" data-resource="{{key}}">
+        {{!-- `dur.key` / `dur.label` come precomputed from _prepareContext: the
+              loop key was previously used as the resource id (it is an array, so
+              that was the numeric index) and the label went through a `concat`
+              helper that does not exist in this codebase. --}}
+        {{#each durability as |dur|}}
+        <div class="{{@root.alt}}-resource-bar bar--{{dur.key}}" data-resource="{{dur.key}}">
             <div class="{{@root.alt}}-bar-label">
-                <span class="{{@root.alt}}-bar-name">{{localize (concat 'ALTERNITY.' dur.label)}}</span>
+                <span class="{{@root.alt}}-bar-name">{{dur.label}}</span>
                 <span class="{{@root.alt}}-bar-values"><input type="number" class="{{@root.alt}}-bar-current"
                            value="{{dur.current}}" min="0" max="{{dur.max}}"
-                           data-action="editResource" data-resource="{{key}}" data-field="current"
-                           aria-label="{{localize (concat 'ALTERNITY.' dur.label)}} current" /><span class="{{@root.alt}}-bar-sep">/</span><span class="{{@root.alt}}-bar-max">{{dur.max}}</span></span>
+                           data-action="editResource" data-resource="{{dur.key}}" data-field="current"
+                           aria-label="{{dur.label}} current" /><span class="{{@root.alt}}-bar-sep">/</span><span class="{{@root.alt}}-bar-max">{{dur.max}}</span></span>
             </div>
             <div class="{{@root.alt}}-bar-track">
                 <div class="{{@root.alt}}-bar-fill" style="width: {{dur.pct}}" aria-valuenow="{{dur.current}}"
                      aria-valuemax="{{dur.max}}" role="progressbar"
-                     aria-label="{{localize (concat 'ALTERNITY.' dur.label)}}"></div>
+                     aria-label="{{dur.label}}"></div>
             </div>
         </div>
         {{/each}}
+
+        {{!-- Last resort points (PHB Ch.2). Five boxes is the printed ceiling. --}}
+        <div class="{{@root.alt}}-last-resort">
+            <span class="{{@root.alt}}-bar-name">{{localize 'ALTERNITY.LastResort.Label'}}</span>
+            <div class="{{@root.alt}}-last-resort-track">
+                {{#each lastResort.pips as |spent|}}
+                <button type="button" class="{{@root.alt}}-last-resort-pip {{#if spent}}active{{/if}}"
+                        data-action="setLastResort" data-value="{{add @index 1}}"
+                        title="{{localize 'ALTERNITY.LastResort.Label'}} {{add @index 1}}"></button>
+                {{/each}}
+            </div>
+            <span class="{{@root.alt}}-last-resort-values">{{lastResort.value}} / {{lastResort.max}}</span>
+        </div>
     </section>
 
     <div class="{{@root.alt}}-wound-track">

@@ -70,9 +70,31 @@ export class NpcData extends foundry.abstract.TypeDataModel {
                 per: abilityField(),
             }, { initial: { str: 10, dex: 10, con: 10, int: 10, wil: 10, per: 10 } }),
 
-            // ── Resource pools ───────────────────────────────────────────
-            stamina:  resourceSchema(20, 20),
-            vitality: resourceSchema(10, 10),
+            /**
+             * ── Durability ───────────────────────────────────────────────
+             * Identical to a hero's. The Gamemaster Guide is explicit that
+             * supporting cast are not simplified here: "These supporting cast
+             * members receive the same number of stun, wound, fatigue, and mortal
+             * points as a hero with the same Constitution score." Printed in
+             * statblocks as a four-value run, e.g. `Durability: 9/9/5/5`.
+             *
+             * Replaces the former stamina/vitality pools — see the note in
+             * CharacterData for why those were never Alternity mechanics.
+             */
+            durability: new fields.SchemaField({
+                stun:    resourceSchema(0, 10),
+                wound:   resourceSchema(0, 10),
+                mortal:  resourceSchema(0, 5),
+                fatigue: resourceSchema(0, 5),
+            }),
+
+            // Supporting cast can hold last resort points too (PHB Ch.3:
+            // "Heroes and members of the supporting cast can have last resort
+            // points"). Statblocks print it as `Last resorts: N`.
+            lastResort: new fields.SchemaField({
+                value: new fields.NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0, max: 5 }),
+                max:   new fields.NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0, max: 5 }),
+            }, { initial: { value: 0, max: 0 } }),
 
             // ── Wound state ──────────────────────────────────────────────
             woundLevel: new fields.StringField({
@@ -198,6 +220,20 @@ export class NpcData extends foundry.abstract.TypeDataModel {
             source.woundLevel = source.wound.level;
             delete source.wound;
         }
+
+        // stamina/vitality → durability.stun/.wound. A rename, not a conversion —
+        // see the fuller note in CharacterData.migrateData().
+        if (source.stamina && !source.durability?.stun) {
+            source.durability = source.durability ?? {};
+            source.durability.stun = { ...source.stamina };
+        }
+        if (source.vitality && !source.durability?.wound) {
+            source.durability = source.durability ?? {};
+            source.durability.wound = { ...source.vitality };
+        }
+        delete source.stamina;
+        delete source.vitality;
+
         return super.migrateData(source);
     }
 }

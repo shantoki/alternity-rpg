@@ -80,12 +80,14 @@ Hooks.once('init', async () => {
 
     // ── 4. Token attribute bars ─────────────────────────────────────────────
     CONFIG.Actor.trackableAttributes = {
+        // Bars point at the real damage tracks. These used to read `stamina` and
+        // `vitality`, which were stun and wound under names the game doesn't use.
         character: {
-            bar: ['stamina', 'vitality'],
-            value: ['woundLevel', 'system.initiativeModifier'],
+            bar: ['durability.stun', 'durability.wound', 'durability.mortal', 'durability.fatigue'],
+            value: ['woundLevel', 'system.initiativeModifier', 'lastResort.value'],
         },
         npc: {
-            bar: ['stamina', 'vitality'],
+            bar: ['durability.stun', 'durability.wound', 'durability.mortal', 'durability.fatigue'],
             value: ['woundLevel'],
         },
         vehicle: {
@@ -128,10 +130,9 @@ Hooks.on('createActor', async (actor) => {
 Hooks.on('updateActor', async (actor, changes) => {
     if (!['character', 'npc'].includes(actor.type)) return;
 
-    const touchesHealth = (
-        changes.system?.stamina  !== undefined ||
-        changes.system?.vitality !== undefined
-    );
+    // Any of the four damage tracks changing means the wound level may need
+    // recomputing. This used to watch `system.stamina` / `system.vitality`.
+    const touchesHealth = changes.system?.durability !== undefined;
     if (!touchesHealth) return;
 
     try {
@@ -139,11 +140,15 @@ Hooks.on('updateActor', async (actor, changes) => {
         const state = await getAlternityState(actor);
         if (!state) return;
 
-        if (changes.system?.stamina?.value !== undefined) {
-            state.resources.stamina = changes.system.stamina.value;
-        }
-        if (changes.system?.vitality?.value !== undefined) {
-            state.resources.vitality = changes.system.vitality.value;
+        // Write straight onto state.durability. The previous version assigned to
+        // `state.resources.stamina` / `.vitality` — but AlternityCharacterState
+        // has no `resources` property at all, so this threw a TypeError on every
+        // health edit and was swallowed by the catch below. Editing a token bar
+        // has never actually propagated back into the durability state.
+        const tracks = ['stun', 'wound', 'mortal', 'fatigue'];
+        for (const track of tracks) {
+            const next = changes.system.durability?.[track]?.value;
+            if (next !== undefined) state.durability[track] = next;
         }
 
         state._recalculateWoundLevel();

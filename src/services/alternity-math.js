@@ -511,6 +511,71 @@ const AlternityMathService = {
     },
 
     // -----------------------------------------------------------------------
+    // calculateDurabilityRatings
+    // -----------------------------------------------------------------------
+
+    /**
+     * Derive the four durability ratings from a Constitution score
+     * (Player's Handbook Ch.2 "Durability"; Ch.3 "Damage").
+     *
+     * The book states it twice, unambiguously: "A hero can withstand a number of
+     * points of stun and wound damage equal to his Constitution score, and a
+     * number of points of mortal and fatigue damage equal to half his
+     * Constitution score, rounded up."
+     *
+     * **Fatigue is a full fourth damage track**, not a derived condition — the
+     * PHB lists "the four types of damage" as stun, wound, mortal and fatigue,
+     * and the Gamemaster Guide prints supporting-cast durability as a four-value
+     * run (`9/9/5/5`). Every fatigue box marked also costs +1 step on all
+     * subsequent actions (the "Dazed" rule), which is why it is tracked here
+     * rather than folded into stun.
+     *
+     * @param {number} constitutionScore
+     * @param {object}  [options]
+     * @param {boolean} [options.isWeren] - Weren "Superior Durability": CON x1.5,
+     *        rounded down (PHB Ch.2). Applied before the halving.
+     * @returns {{
+     *   stun: number, wound: number, mortal: number, fatigue: number,
+     *   base: number, modifierTrace: object[]
+     * }}
+     */
+    calculateDurabilityRatings(constitutionScore, options = {}) {
+        if (typeof constitutionScore !== 'number' || !isFinite(constitutionScore) || constitutionScore < 0) {
+            throw new Error(
+                '[AlternityMathService.calculateDurabilityRatings] constitutionScore must be a finite number ≥ 0.'
+            );
+        }
+
+        const isWeren = !!options.isWeren;
+        // Weren durability is figured from an inflated Constitution, so the
+        // multiplier has to land before the mortal/fatigue halving rather than
+        // being applied to each of the four results.
+        const base = isWeren
+            ? Math.floor(Math.floor(constitutionScore) * 1.5)
+            : Math.floor(constitutionScore);
+
+        const modifierTrace = [
+            this.buildModifier('Constitution', Math.floor(constitutionScore), 'Base durability'),
+        ];
+        if (isWeren) {
+            modifierTrace.push(
+                this.buildModifier('Weren', base - Math.floor(constitutionScore), 'Superior Durability (CON x1.5)')
+            );
+        }
+
+        const half = Math.ceil(base / 2);
+
+        return {
+            stun:    base,
+            wound:   base,
+            mortal:  half,
+            fatigue: half,
+            base,
+            modifierTrace,
+        };
+    },
+
+    // -----------------------------------------------------------------------
     // calculateActiveMemory
     // -----------------------------------------------------------------------
 

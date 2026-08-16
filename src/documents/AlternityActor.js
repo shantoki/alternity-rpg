@@ -123,11 +123,14 @@ export class AlternityActor extends Actor {
         // Derived speed: 30ft base − speed penalty
         sys.speed = Math.max(0, 30 - sys.totalSpeedPenalty);
 
-        // Stamina / Vitality percent for progress bars
-        sys.staminaPct  = this._resourcePct(sys.stamina);
-        sys.vitalityPct = this._resourcePct(sys.vitality);
-        sys.tpPct       = this._resourcePct(sys.techPoints);
-        sys.ppPct       = this._resourcePct(sys.psiPoints);
+        // Durability track percentages for the progress bars (stun/wound/mortal/
+        // fatigue — the four types of damage the PHB defines).
+        sys.stunPct    = this._resourcePct(sys.durability?.stun);
+        sys.woundPct   = this._resourcePct(sys.durability?.wound);
+        sys.mortalPct  = this._resourcePct(sys.durability?.mortal);
+        sys.fatiguePct = this._resourcePct(sys.durability?.fatigue);
+        sys.tpPct      = this._resourcePct(sys.techPoints);
+        sys.ppPct      = this._resourcePct(sys.psiPoints);
 
         // Wound penalty (already derived by CharacterData.prepareDerivedData;
         // refresh here in case armorBonus changed woundLevel via applyDamage)
@@ -144,8 +147,10 @@ export class AlternityActor extends Actor {
         sys.resistanceModifier = AlternityMathService.calculateResistanceModifier(
             sys.abilities?.dex ?? 0, 'DEX'
         ) + (sys.defenseBonus ?? 0);
-        sys.staminaPct = this._resourcePct(sys.stamina);
-        sys.vitalityPct = this._resourcePct(sys.vitality);
+        sys.stunPct    = this._resourcePct(sys.durability?.stun);
+        sys.woundPct   = this._resourcePct(sys.durability?.wound);
+        sys.mortalPct  = this._resourcePct(sys.durability?.mortal);
+        sys.fatiguePct = this._resourcePct(sys.durability?.fatigue);
         sys.isIncapacitated = sys.woundLevel === 'Out';
     }
 
@@ -223,15 +228,29 @@ export class AlternityActor extends Actor {
         // vehicles and warships don't use AlternityCharacterState
         if (this.type === 'vehicle' || this.type === 'warship') return;
 
+        // All four damage tracks now mirror across, not just the two that used to
+        // hide behind the `stamina`/`vitality` names. Mortal previously had no
+        // system-side home at all, so token bars could never show it.
         const updates = {
-            'system.woundLevel':        state.woundLevel,
-            'system.stamina.value':     state.durability.stun,
-            'system.stamina.max':       state.durability.stunMax,
-            'system.vitality.value':    state.durability.wound,
-            'system.vitality.max':      state.durability.woundMax,
+            'system.woundLevel':                 state.woundLevel,
+            'system.durability.stun.value':      state.durability.stun,
+            'system.durability.stun.max':        state.durability.stunMax,
+            'system.durability.wound.value':     state.durability.wound,
+            'system.durability.wound.max':       state.durability.woundMax,
+            'system.durability.mortal.value':    state.durability.mortal,
+            'system.durability.mortal.max':      state.durability.mortalMax,
+            'system.durability.fatigue.value':   state.durability.fatigue,
+            'system.durability.fatigue.max':     state.durability.fatigueMax,
             'system.psionics.energy.value': state.psionics.energy.value,
             'system.psionics.energy.max':   state.psionics.energy.max,
         };
+
+        // Last resort points live on both layers for the same reason durability
+        // does: the state owns them, system mirrors them for native display.
+        if (state.lastResort) {
+            updates['system.lastResort.value'] = state.lastResort.value;
+            updates['system.lastResort.max']   = state.lastResort.max;
+        }
 
         // Sync ability scores if present on this actor type
         if (this.type === 'character' || this.type === 'npc') {
