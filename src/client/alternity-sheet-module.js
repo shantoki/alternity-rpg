@@ -88,6 +88,47 @@ function safeFloat(val, fallback = 0) {
     return isFinite(n) ? n : fallback;
 }
 
+/**
+ * Write one changed form field back onto a document.
+ *
+ * The subtlety is array rows. A binding like `system.weapons.2.arc` expands to
+ * `{system: {weapons: {2: {arc: …}}}}`, and Foundry's ArrayField *replaces* rather
+ * than merges — so submitting that path on its own risks writing back an array
+ * whose only populated slot is the edited row, silently discarding every other
+ * row on the sheet. Sheets that submit the whole form (ApplicationV2's
+ * `form.submitOnChange`, which the item sheet uses) are unaffected, because every
+ * row is present in the payload. The ship sheets listen for individual `change`
+ * events instead, so they need the array path rewritten into a read-modify-write
+ * over a clone of the full array.
+ *
+ * @param {Document} document  - The document to update.
+ * @param {HTMLElement} input  - The element that changed; must carry a `name`.
+ * @param {object} arrayFields - Map whose keys are the document's array-valued
+ *                               schema fields (the row-defaults table works).
+ * @returns {Promise<Document>|undefined}
+ */
+function applySheetFieldChange(document, input, arrayFields = {}) {
+    if (!input?.name) return undefined;
+
+    // Only `type="number"` inputs are coerced. String-typed schema fields are
+    // always bound to `type="text"`, so this can't turn a dice code into a number.
+    const value = input.type === 'checkbox' ? input.checked
+        : input.type === 'number' ? safeFloat(input.value, 0)
+        : input.value;
+
+    const arrayPath = /^system\.(\w+)\.(\d+)\.(.+)$/.exec(input.name);
+    if (arrayPath && Object.hasOwn(arrayFields, arrayPath[1])) {
+        const [, arrayKey, indexText, fieldPath] = arrayPath;
+        const rows = foundry.utils.deepClone(document.system[arrayKey] ?? []);
+        const row = rows[Number(indexText)];
+        if (!row) return undefined;
+        foundry.utils.setProperty(row, fieldPath, value);
+        return document.update({ [`system.${arrayKey}`]: rows });
+    }
+
+    return document.update({ [input.name]: value });
+}
+
 // ---------------------------------------------------------------------------
 // AlternityRollComponent
 // ---------------------------------------------------------------------------
@@ -1095,11 +1136,7 @@ class AlternityWarshipSheet extends foundry.applications.api.HandlebarsApplicati
 
     _onRender(context, options) {
         this.element.addEventListener('change', (e) => {
-            const input = e.target;
-            if (input.name) {
-                const val = input.type === 'checkbox' ? input.checked : input.value;
-                this.document.update({ [input.name]: val });
-            }
+            applySheetFieldChange(this.document, e.target, WARSHIP_ARRAY_FIELDS);
         });
     }
 
@@ -1267,30 +1304,7 @@ class AlternitySpaceshipSheet extends foundry.applications.api.HandlebarsApplica
 
     _onRender(context, options) {
         this.element.addEventListener('change', (e) => {
-            const input = e.target;
-            if (!input.name) return;
-
-            const value = input.type === 'checkbox' ? input.checked
-                : input.type === 'number' ? safeFloat(input.value, 0)
-                : input.value;
-
-            // Paths that reach into one of the inline tables (`system.weapons.2.arc`)
-            // are rewritten into a whole-array update. Foundry's ArrayField replaces
-            // rather than merges, so submitting the indexed path alone risks writing
-            // back an array holding only the edited row. Read-modify-write on a clone
-            // is unambiguous, and matches what the row buttons already do.
-            const arrayPath = /^system\.(\w+)\.(\d+)\.(.+)$/.exec(input.name);
-            if (arrayPath && Object.hasOwn(SPACESHIP_ARRAY_FIELDS, arrayPath[1])) {
-                const [, arrayKey, indexText, fieldPath] = arrayPath;
-                const rows = foundry.utils.deepClone(this.document.system[arrayKey] ?? []);
-                const row = rows[Number(indexText)];
-                if (!row) return;
-                foundry.utils.setProperty(row, fieldPath, value);
-                this.document.update({ [`system.${arrayKey}`]: rows });
-                return;
-            }
-
-            this.document.update({ [input.name]: value });
+            applySheetFieldChange(this.document, e.target, SPACESHIP_ARRAY_FIELDS);
         });
     }
 
