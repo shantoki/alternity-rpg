@@ -31,7 +31,8 @@
       "npc": {},
       "vehicle": {},
       "warship": {},
-      "spaceship": {}
+      "spaceship": {},
+      "robot": {}
     },
     "Item": {
       "weapon": {},

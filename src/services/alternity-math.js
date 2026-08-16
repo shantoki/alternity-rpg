@@ -143,6 +143,137 @@ const COMPARTMENT_KINDS = Object.freeze([
     'Electronics', 'Cargo', 'Crew',
 ]);
 
+// ---------------------------------------------------------------------------
+// Robots (7Foundry, Ivo Elezović)
+// ---------------------------------------------------------------------------
+/*
+ * Robot construction comes from `7Foundry.md`, a fan supplement, rather than the
+ * official *Dataware*. That is a deliberate choice: Dataware's robot tables D17
+ * (ability limits), D18 (hardware) and D19 (the entire point-buy parts list) are
+ * destroyed in the source scan — D19 is the single biggest loss in the corpus —
+ * whereas 7Foundry's tables are intact and it ships eight fully worked builds
+ * that double as test fixtures.
+ */
+
+/**
+ * Table 3.1 (Robot Sizes) and Table 3.2 (Robot Size Consequences), merged.
+ *
+ *   factor          the `h` in CP = h x (30 - CON); also scales weight and prices
+ *   minCon/maxCon   Constitution range the chassis supports
+ *   maxStr/maxDex   hard ability ceilings for the chassis
+ *   movement        STR+DEX modifier for Table P8 combat movement rates
+ *   dexResistance   size bonus/penalty to the DEX resistance modifier
+ *   strResistance   size bonus/penalty to the STR resistance modifier
+ *   stealth         step modifier to Stealth checks (negative = easier to hide)
+ *   canUseLimbs     diminutive robots are too small for limbs
+ *   needsCabling    diminutive robots' runs are too short to need cabling
+ */
+const ROBOT_SIZES = Object.freeze({
+    Diminutive: Object.freeze({
+        label: 'Diminutive', progressLevel: 7, factor: 0.4, minCon: 3, maxCon: 6,
+        maxStr: 8, maxDex: 18, movement: -6, dexResistance: 3, strResistance: -2,
+        stealth: -3, weight: '0.5-5 kg', weightRoll: 'd12', canUseLimbs: false, needsCabling: false,
+    }),
+    Tiny: Object.freeze({
+        label: 'Tiny', progressLevel: 6, factor: 1, minCon: 4, maxCon: 8,
+        maxStr: 10, maxDex: 17, movement: -4, dexResistance: 2, strResistance: -1,
+        stealth: -2, weight: '5-25 kg', weightRoll: '2d12', canUseLimbs: true, needsCabling: true,
+    }),
+    Small: Object.freeze({
+        label: 'Small', progressLevel: 5, factor: 3, minCon: 5, maxCon: 10,
+        maxStr: 12, maxDex: 16, movement: -2, dexResistance: 1, strResistance: 0,
+        stealth: -1, weight: '20-100 kg', weightRoll: '3d12', canUseLimbs: true, needsCabling: true,
+    }),
+    Medium: Object.freeze({
+        label: 'Medium', progressLevel: 5, factor: 5, minCon: 6, maxCon: 12,
+        maxStr: 14, maxDex: 14, movement: 0, dexResistance: 0, strResistance: 0,
+        stealth: 0, weight: '40-200 kg', weightRoll: '4d12', canUseLimbs: true, needsCabling: true,
+    }),
+    Large: Object.freeze({
+        label: 'Large', progressLevel: 5, factor: 10, minCon: 7, maxCon: 14,
+        maxStr: 16, maxDex: 13, movement: 2, dexResistance: -1, strResistance: 0,
+        stealth: 1, weight: '130-500 kg', weightRoll: '5d12', canUseLimbs: true, needsCabling: true,
+    }),
+    Huge: Object.freeze({
+        label: 'Huge', progressLevel: 5, factor: 30, minCon: 8, maxCon: 16,
+        maxStr: 18, maxDex: 12, movement: 4, dexResistance: -2, strResistance: 1,
+        stealth: 2, weight: '400-10000 kg', weightRoll: '', canUseLimbs: true, needsCabling: true,
+    }),
+});
+
+/**
+ * Table 4.5 (Processors and Relevant Info), keyed `PL<n>-<Quality>`.
+ *
+ * The processor is the robot's single most constraining component: it caps
+ * Intelligence, Will and Personality outright, caps usable skill ranks, sets the
+ * action check modifier, and hands out the active memory slots that are the
+ * robot's fourth budget.
+ *
+ *   mact    maximum active memory slots (null = unlimited, PL9 brains)
+ *   mrnk    maximum usable ranks in any one skill
+ *   mint/mwil/mper   highest ability score the processor can support
+ *   maxActionsPerRound  ceiling on actions per round, whatever the formula says
+ */
+const ROBOT_PROCESSORS = Object.freeze({
+    'PL5-Marginal': { progressLevel: 5, quality: 'Marginal', mact: 2,  mrnk: 0,  mint: 6,  mwil: 3,  mper: 1,  chassisPoints: 1, powerPoints: 1,  maxActionsPerRound: 1, actionCheckModifier: '+d12', cost: '$100' },
+    'PL5-Ordinary': { progressLevel: 5, quality: 'Ordinary', mact: 3,  mrnk: 1,  mint: 7,  mwil: 4,  mper: 2,  chassisPoints: 2, powerPoints: 3,  maxActionsPerRound: 2, actionCheckModifier: '+d8',  cost: '$200' },
+    'PL5-Good':     { progressLevel: 5, quality: 'Good',     mact: 5,  mrnk: 3,  mint: 8,  mwil: 5,  mper: 3,  chassisPoints: 3, powerPoints: 6,  maxActionsPerRound: 3, actionCheckModifier: '+d6',  cost: '$300' },
+    'PL5-Amazing':  { progressLevel: 5, quality: 'Amazing',  mact: 7,  mrnk: 5,  mint: 9,  mwil: 6,  mper: 4,  chassisPoints: 5, powerPoints: 8,  maxActionsPerRound: 3, actionCheckModifier: '+d4',  cost: '$500' },
+    'PL6-Marginal': { progressLevel: 6, quality: 'Marginal', mact: 3,  mrnk: 1,  mint: 8,  mwil: 5,  mper: 3,  chassisPoints: 1, powerPoints: 1,  maxActionsPerRound: 3, actionCheckModifier: '+d8',  cost: '$400' },
+    'PL6-Ordinary': { progressLevel: 6, quality: 'Ordinary', mact: 5,  mrnk: 3,  mint: 9,  mwil: 6,  mper: 4,  chassisPoints: 2, powerPoints: 2,  maxActionsPerRound: 3, actionCheckModifier: '+d6',  cost: '$1K' },
+    'PL6-Good':     { progressLevel: 6, quality: 'Good',     mact: 7,  mrnk: 5,  mint: 10, mwil: 7,  mper: 5,  chassisPoints: 3, powerPoints: 4,  maxActionsPerRound: 4, actionCheckModifier: '+d4',  cost: '$2K' },
+    'PL6-Amazing':  { progressLevel: 6, quality: 'Amazing',  mact: 9,  mrnk: 7,  mint: 11, mwil: 8,  mper: 6,  chassisPoints: 4, powerPoints: 5,  maxActionsPerRound: 4, actionCheckModifier: '+d0',  cost: '$3K' },
+    'PL7-Marginal': { progressLevel: 7, quality: 'Marginal', mact: 4,  mrnk: 2,  mint: 12, mwil: 7,  mper: 5,  chassisPoints: 1, powerPoints: 1,  maxActionsPerRound: 3, actionCheckModifier: '+d6',  cost: '$2K' },
+    'PL7-Ordinary': { progressLevel: 7, quality: 'Ordinary', mact: 7,  mrnk: 5,  mint: 13, mwil: 8,  mper: 6,  chassisPoints: 1, powerPoints: 1,  maxActionsPerRound: 3, actionCheckModifier: '+d4',  cost: '$3K' },
+    'PL7-Good':     { progressLevel: 7, quality: 'Good',     mact: 10, mrnk: 8,  mint: 14, mwil: 9,  mper: 7,  chassisPoints: 2, powerPoints: 2,  maxActionsPerRound: 4, actionCheckModifier: '+d0',  cost: '$5K' },
+    'PL7-Amazing':  { progressLevel: 7, quality: 'Amazing',  mact: 13, mrnk: 11, mint: 15, mwil: 10, mper: 8,  chassisPoints: 3, powerPoints: 3,  maxActionsPerRound: 4, actionCheckModifier: '-d4',  cost: '$10K' },
+    'PL8-Marginal': { progressLevel: 8, quality: 'Marginal', mact: 7,  mrnk: 5,  mint: 12, mwil: 10, mper: 8,  chassisPoints: 1, powerPoints: 1,  maxActionsPerRound: 3, actionCheckModifier: '+d4',  cost: '$2K' },
+    'PL8-Ordinary': { progressLevel: 8, quality: 'Ordinary', mact: 10, mrnk: 8,  mint: 14, mwil: 11, mper: 9,  chassisPoints: 1, powerPoints: 1,  maxActionsPerRound: 3, actionCheckModifier: '+d0',  cost: '$5K' },
+    'PL8-Good':     { progressLevel: 8, quality: 'Good',     mact: 15, mrnk: 12, mint: 15, mwil: 12, mper: 10, chassisPoints: 1, powerPoints: 2,  maxActionsPerRound: 4, actionCheckModifier: '-d4',  cost: '$15K' },
+    'PL8-Amazing':  { progressLevel: 8, quality: 'Amazing',  mact: 18, mrnk: 12, mint: 16, mwil: 13, mper: 11, chassisPoints: 2, powerPoints: 3,  maxActionsPerRound: 4, actionCheckModifier: '-d6',  cost: '$25K' },
+    // "The quantum processor has no limit on maximum active memory slots."
+    'PL9-Positronic': { progressLevel: 9, quality: 'Positronic', mact: null, mrnk: 12, mint: 20, mwil: 16, mper: 14, chassisPoints: 2, powerPoints: 5, maxActionsPerRound: 4, actionCheckModifier: '-d8',  cost: '$40K' },
+    'PL9-Quantum':    { progressLevel: 9, quality: 'Quantum',    mact: null, mrnk: 12, mint: 22, mwil: 17, mper: 15, chassisPoints: 3, powerPoints: 5, maxActionsPerRound: 4, actionCheckModifier: '-d12', cost: '$100K' },
+});
+
+/**
+ * Table 4.8 (Cabling and Relevant Info).
+ *
+ * Cabling matters twice: it imposes its own ceiling on actions per round (so a
+ * fast processor in a serially-wired chassis is wasted), and its `powerModifier`
+ * is the step modifier on the System Operation-engineering check to Power Boost.
+ *
+ * `powerModifier: null` means the cabling cannot carry power at all — optic
+ * cables are not wires, and nerves are cells.
+ *
+ * Note: the worked CIMDR-13 build in Ch.6 prints Parallel's power modifier as +2,
+ * where this table prints +1. The table is followed here; the example appears to
+ * have copied Serial's value.
+ */
+const ROBOT_CABLING = Object.freeze({
+    Serial:     { label: 'Serial',        progressLevel: 5, chassisPercent: 5,  costPerPoint: 10,   maxActionsPerRound: 1, powerModifier: 2 },
+    Parallel:   { label: 'Parallel',      progressLevel: 5, chassisPercent: 10, costPerPoint: 10,   maxActionsPerRound: 2, powerModifier: 1 },
+    Optic:      { label: 'Optic',         progressLevel: 5, chassisPercent: 5,  costPerPoint: 50,   maxActionsPerRound: 4, powerModifier: null },
+    UltraWide:  { label: 'Ultra-Wide',    progressLevel: 6, chassisPercent: 10, costPerPoint: 100,  maxActionsPerRound: 4, powerModifier: 0 },
+    WaveBased:  { label: 'Wave-Based',    progressLevel: 6, chassisPercent: 5,  costPerPoint: 300,  maxActionsPerRound: 3, powerModifier: -1 },
+    Gravitic:   { label: 'Gravitic',      progressLevel: 7, chassisPercent: 5,  costPerPoint: 500,  maxActionsPerRound: 4, powerModifier: -1 },
+    Pulse:      { label: 'Pulse',         progressLevel: 8, chassisPercent: 0,  costPerPoint: 1500, maxActionsPerRound: 4, powerModifier: -2 },
+    Nerves:     { label: 'Nerves',        progressLevel: 8, chassisPercent: 0,  costPerPoint: 0,    maxActionsPerRound: 3, powerModifier: null },
+    None:       { label: 'None',          progressLevel: 5, chassisPercent: 0,  costPerPoint: 0,    maxActionsPerRound: null, powerModifier: null },
+});
+
+/** The chassis-percentage denominations a system's cost may be paid in. */
+const CHASSIS_FACTORS = Object.freeze([10, 5, 1]);
+
+/** Every robot runs a background OS, which permanently occupies one memory slot. */
+const ROBOT_OS_MEMORY_SLOTS = 1;
+
+/** Each limb costs 5% of the chassis and gives 5% back inside the limb. */
+const ROBOT_LIMB_PERCENT = 5;
+
+/** Base skill points before Intelligence: "30 + (3 x INT)", as for any humanoid. */
+const ROBOT_BASE_SKILL_POINTS = 30;
+
 /**
  * Situation Die Steps Scale (Fastplay Accurate).
  * Index maps total step to [sign, dieLabel, formula]
@@ -1458,6 +1589,414 @@ const AlternityMathService = {
         };
     },
 
+    // -----------------------------------------------------------------------
+    // calculateChassisPoints
+    // -----------------------------------------------------------------------
+
+    /**
+     * Resolve a robot's Chassis Point budget and its percentage denominations
+     * (7Foundry Ch.3.5, Table 3.3).
+     *
+     *   CP = h x (30 - CON)
+     *
+     * Note the sign: Chassis Points run *inverse* to Constitution. A tougher robot
+     * is more densely packed and has less room inside it, so durability is bought
+     * directly at the cost of installable space. That trade is the central design
+     * tension of the whole system.
+     *
+     * The three factors are what the statblocks actually quote ("170 Chassis
+     * Points, 10%=17CP, 5%=9CP, 1%=2CP"), because system costs are paid in those
+     * denominations rather than computed per system — see decomposeChassisPercent.
+     *
+     * @param {string} sizeKey       - A key of ROBOT_SIZES.
+     * @param {number} constitution  - The robot's CON score.
+     * @returns {{
+     *   chassisPoints: number,
+     *   sizeFactor:    number,
+     *   factors:       { ten: number, five: number, one: number },
+     *   isConOutOfRange: boolean,
+     *   size:          object,
+     *   modifierTrace: object[],
+     * }}
+     */
+    calculateChassisPoints(sizeKey, constitution) {
+        const size = ROBOT_SIZES[sizeKey];
+        if (!size) {
+            throw new Error(
+                `[AlternityMathService.calculateChassisPoints] sizeKey must be one of ` +
+                `${Object.keys(ROBOT_SIZES).join(', ')}. Received "${sizeKey}".`
+            );
+        }
+        const con = Math.max(0, Math.floor(Number(constitution) || 0));
+        const chassisPoints = Math.max(0, Math.round(size.factor * (30 - con)));
+
+        // Percentages are rounded half up. Computed as (cp * pct) / 100 rather than
+        // cp * 0.05 so the halves land exactly instead of drifting in binary float.
+        const factorOf = (pct) => Math.round((chassisPoints * pct) / 100);
+
+        return {
+            chassisPoints,
+            sizeFactor: size.factor,
+            factors: { ten: factorOf(10), five: factorOf(5), one: factorOf(1) },
+            isConOutOfRange: con < size.minCon || con > size.maxCon,
+            size,
+            modifierTrace: [
+                this.buildModifier('Size Factor', size.factor, `${size.label} chassis, h = ${size.factor}`),
+                this.buildModifier('Constitution', -con, `CP = h x (30 - ${con}) — durability costs space`),
+                this.buildModifier('Chassis Points', chassisPoints, `${size.factor} x ${30 - con} = ${chassisPoints}`),
+            ],
+        };
+    },
+
+    // -----------------------------------------------------------------------
+    // decomposeChassisPercent
+    // -----------------------------------------------------------------------
+
+    /**
+     * Break a chassis-space percentage into the **minimum number** of 10/5/1%
+     * factors, and price it (7Foundry Ch.3.5).
+     *
+     * This is the rule that makes robot construction non-arithmetic. Space is paid
+     * in denominations, and because each denomination is separately rounded, buying
+     * six 5% systems is not the same as buying 30% of the chassis:
+     *
+     *   medium chassis, CON 8 -> 110 CP, so 10% = 11, 5% = 6, 1% = 1
+     *   six wheels at 5% each = 30% = three 10% factors = 33 CP, not 6 x 6 = 36
+     *
+     * Greedy resolution is provably minimal here because each denomination divides
+     * the next (10 = 2x5, 5 = 5x1).
+     *
+     * @param {number} percent - Total chassis percentage to pay for.
+     * @param {{ ten: number, five: number, one: number }} factors - From calculateChassisPoints.
+     * @returns {{
+     *   percent:       number,
+     *   counts:        { ten: number, five: number, one: number },
+     *   factorCount:   number,
+     *   chassisPoints: number,
+     *   modifierTrace: object[],
+     * }}
+     */
+    decomposeChassisPercent(percent, factors = { ten: 0, five: 0, one: 0 }) {
+        const pct = Math.max(0, Math.round(Number(percent) || 0));
+
+        const ten  = Math.floor(pct / 10);
+        const five = Math.floor((pct % 10) / 5);
+        const one  = pct % 5;
+
+        const chassisPoints =
+            ten * (factors.ten ?? 0) + five * (factors.five ?? 0) + one * (factors.one ?? 0);
+
+        const modifierTrace = [];
+        if (ten)  modifierTrace.push(this.buildModifier('10% factors', ten * (factors.ten ?? 0), `${ten} x ${factors.ten ?? 0} CP`));
+        if (five) modifierTrace.push(this.buildModifier('5% factors',  five * (factors.five ?? 0), `${five} x ${factors.five ?? 0} CP`));
+        if (one)  modifierTrace.push(this.buildModifier('1% factors',  one * (factors.one ?? 0),  `${one} x ${factors.one ?? 0} CP`));
+
+        return {
+            percent: pct,
+            counts: { ten, five, one },
+            factorCount: ten + five + one,
+            chassisPoints,
+            modifierTrace,
+        };
+    },
+
+    // -----------------------------------------------------------------------
+    // calculateRobotActionCheck
+    // -----------------------------------------------------------------------
+
+    /**
+     * Resolve a robot's action check scores (7Foundry Ch.5.5).
+     *
+     * A robot's action check leans on Intelligence rather than splitting evenly
+     * with Dexterity, because what governs its reaction time is how fast it
+     * processes what it sees:
+     *
+     *   AC = (2 x INT + DEX) / 3, rounded to the nearest value
+     *
+     * versus the biological hero's `(INT + DEX) / 2`. Everything after that — the
+     * profession bonus and the split into phases — is identical to any other hero,
+     * so it is derived here the same way AlternityCharacterState does it.
+     *
+     * @param {number} intelligence
+     * @param {number} dexterity
+     * @param {object} [options]
+     * @param {string} [options.profession=''] - Profession name; supplies the bonus.
+     * @param {number} [options.bonus=null]    - Explicit bonus, overriding profession.
+     * @returns {{
+     *   base: number, bonus: number,
+     *   marginal: number, ordinary: number, good: number, amazing: number,
+     *   modifierTrace: object[],
+     * }}
+     */
+    calculateRobotActionCheck(intelligence, dexterity, options = {}) {
+        const { profession = '', bonus = null } = options;
+        const int = Math.max(0, Math.floor(Number(intelligence) || 0));
+        const dex = Math.max(0, Math.floor(Number(dexterity) || 0));
+
+        const base = Math.round((2 * int + dex) / 3);
+
+        let professionBonus = bonus;
+        if (professionBonus === null) {
+            const prof = String(profession).toLowerCase();
+            if (prof.includes('combat')) professionBonus = 3;
+            else if (prof.includes('free') || prof.includes('agent')) professionBonus = 2;
+            else if (prof.includes('diplomat') || prof.includes('tech')) professionBonus = 1;
+            else professionBonus = 0;
+        }
+
+        const ordinary = base + professionBonus;
+
+        return {
+            base,
+            bonus: professionBonus,
+            marginal: ordinary + 1,
+            ordinary,
+            good:    Math.floor(ordinary / 2),
+            amazing: Math.floor(ordinary / 4),
+            modifierTrace: [
+                this.buildModifier('Intelligence', 2 * int, `2 x INT ${int}`),
+                this.buildModifier('Dexterity', dex, `DEX ${dex}`),
+                this.buildModifier('Base', base, `(2 x ${int} + ${dex}) / 3, rounded`),
+                this.buildModifier('Profession', professionBonus, professionBonus
+                    ? `${profession || 'Profession'} bonus`
+                    : 'No profession bonus'),
+            ],
+        };
+    },
+
+    // -----------------------------------------------------------------------
+    // calculateRobotActionsPerRound
+    // -----------------------------------------------------------------------
+
+    /**
+     * Resolve how many actions a robot gets per round (7Foundry Ch.5.5).
+     *
+     *   A/R = (INT + DEX) / 8, minimum 1
+     *
+     * Nothing like the biological hero's WIL/CON derivation — for a robot it is
+     * processor speed and actuator response, not stamina and nerve.
+     *
+     * Two hardware ceilings then apply, and both are easy to trip: the processor's
+     * own MA/R, and the cabling's, so a fast brain in a serially-wired chassis
+     * still only acts once. The worked CIMDR-13 build lands on 2 as
+     * min(2 by formula, 3 from a Good PL5 processor, 2 from Parallel cabling).
+     *
+     * @param {number} intelligence
+     * @param {number} dexterity
+     * @param {object} [options]
+     * @param {number|null} [options.processorMax=null] - Processor MA/R ceiling.
+     * @param {number|null} [options.cablingMax=null]   - Cabling MA/R ceiling.
+     * @returns {{
+     *   actionsPerRound: number, formulaValue: number,
+     *   cappedBy: string|null, modifierTrace: object[],
+     * }}
+     */
+    calculateRobotActionsPerRound(intelligence, dexterity, options = {}) {
+        const { processorMax = null, cablingMax = null } = options;
+        const int = Math.max(0, Math.floor(Number(intelligence) || 0));
+        const dex = Math.max(0, Math.floor(Number(dexterity) || 0));
+
+        const formulaValue = Math.max(1, Math.round((int + dex) / 8));
+        const modifierTrace = [
+            this.buildModifier('Formula', formulaValue, `(INT ${int} + DEX ${dex}) / 8, minimum 1`),
+        ];
+
+        let actionsPerRound = formulaValue;
+        let cappedBy = null;
+
+        if (processorMax !== null && processorMax < actionsPerRound) {
+            actionsPerRound = processorMax;
+            cappedBy = 'processor';
+            modifierTrace.push(this.buildModifier('Processor', processorMax, 'Processor MA/R ceiling'));
+        }
+        if (cablingMax !== null && cablingMax < actionsPerRound) {
+            actionsPerRound = cablingMax;
+            cappedBy = 'cabling';
+            modifierTrace.push(this.buildModifier('Cabling', cablingMax, 'Cabling MA/R ceiling'));
+        }
+
+        return { actionsPerRound: Math.max(1, actionsPerRound), formulaValue, cappedBy, modifierTrace };
+    },
+
+    // -----------------------------------------------------------------------
+    // calculateRobotDurability
+    // -----------------------------------------------------------------------
+
+    /**
+     * Resolve a robot's damage tracks (7Foundry Ch.3.5).
+     *
+     *   stun = wound = CON,  mortal = ceil(CON / 2)
+     *
+     * "Robots do not have a fatigue rating, except when specifically stated" — a
+     * machine does not get tired — so unlike `calculateDurabilityRatings` for
+     * biological heroes this returns no fatigue track. Biological and
+     * synthetic-tissue actuators are the stated exception.
+     *
+     * @param {number} constitution
+     * @param {object}  [options]
+     * @param {boolean} [options.hasFatigueTrack=false] - Biological/synthetic tissue.
+     * @returns {{ stun: number, wound: number, mortal: number, fatigue: number|null, modifierTrace: object[] }}
+     */
+    calculateRobotDurability(constitution, options = {}) {
+        const { hasFatigueTrack = false } = options;
+        const con = Math.max(0, Math.floor(Number(constitution) || 0));
+        const mortal = Math.ceil(con / 2);
+
+        return {
+            stun: con,
+            wound: con,
+            mortal,
+            fatigue: hasFatigueTrack ? mortal : null,
+            modifierTrace: [
+                this.buildModifier('Constitution', con, `Stun and wound both equal CON ${con}`),
+                this.buildModifier('Mortal', mortal, `Half of CON ${con}, rounded up`),
+                this.buildModifier('Fatigue', 0, hasFatigueTrack
+                    ? 'Biological or synthetic tissue — this chassis does fatigue'
+                    : 'Robots have no fatigue track'),
+            ],
+        };
+    },
+
+    // -----------------------------------------------------------------------
+    // calculateRobotSkillPoints
+    // -----------------------------------------------------------------------
+
+    /**
+     * Resolve a robot's skill point budget (7Foundry Ch.5.3).
+     *
+     *   SP = 30 + (3 x INT), then the net of any perks bought and flaws taken
+     *
+     * Identical to a standard humanoid. Verified against the CIMDR-13 build:
+     * INT 8 gives 54, and a +2 perk/flaw balance brings it to 56.
+     *
+     * @param {number} intelligence
+     * @param {number} [perkFlawBalance=0] - Net SP from perks (negative) and flaws (positive).
+     * @param {number} [spent=0]           - Skill points already committed.
+     * @returns {{
+     *   total: number, spent: number, remaining: number,
+     *   isOverspent: boolean, modifierTrace: object[],
+     * }}
+     */
+    calculateRobotSkillPoints(intelligence, perkFlawBalance = 0, spent = 0) {
+        const int = Math.max(0, Math.floor(Number(intelligence) || 0));
+        const balance = Math.round(Number(perkFlawBalance) || 0);
+        const used = Math.max(0, Math.round(Number(spent) || 0));
+        const total = ROBOT_BASE_SKILL_POINTS + 3 * int + balance;
+
+        return {
+            total,
+            spent: used,
+            remaining: total - used,
+            isOverspent: used > total,
+            modifierTrace: [
+                this.buildModifier('Base', ROBOT_BASE_SKILL_POINTS, 'Every hero starts with 30'),
+                this.buildModifier('Intelligence', 3 * int, `3 x INT ${int}`),
+                this.buildModifier('Perks & Flaws', balance, 'Net of perks bought and flaws taken'),
+            ],
+        };
+    },
+
+    // -----------------------------------------------------------------------
+    // calculateRobotMemoryLoad
+    // -----------------------------------------------------------------------
+
+    /**
+     * Resolve a robot's active memory usage (7Foundry Ch.4.3).
+     *
+     * A robot's skills *are* programs, and the processor's active memory is what
+     * decides how many it can hold at once:
+     *   - the background OS permanently occupies one slot
+     *   - every broad skill costs one slot
+     *   - every specialty skill costs one slot **per rank loaded**
+     *
+     * Partial loads are legal — a robot with 8 ranks in two skills and 10 free
+     * slots can hold 5 ranks of each — which is why entries carry `ranksLoaded`
+     * separately from the ranks they own. Hardware such as boost, accelerator and
+     * targeting chipsets reserves further slots while active.
+     *
+     * A robot that cannot hold everything at once is not misbuilt; it just has to
+     * spend actions swapping skills in and out mid-scene, which the CIMDR-13's
+     * designer notes is "very, very slow".
+     *
+     * @param {number|null} maxSlots - Processor Mact; null means unlimited (PL9).
+     * @param {Array<{name?: string, isBroad?: boolean, ranksLoaded?: number, isLoaded?: boolean}>} [entries]
+     * @param {object} [options]
+     * @param {number} [options.reservedSlots=0] - Slots held by chipsets and coprocessors.
+     * @param {boolean} [options.hasAI=false]    - An installed AI fills every slot.
+     * @returns {{
+     *   max: number, used: number, remaining: number,
+     *   isFull: boolean, isOverloaded: boolean, isUnlimited: boolean,
+     *   osSlots: number, skillSlots: number, reservedSlots: number,
+     *   modifierTrace: object[],
+     * }}
+     */
+    calculateRobotMemoryLoad(maxSlots, entries = [], options = {}) {
+        const { reservedSlots = 0, hasAI = false } = options;
+        if (!Array.isArray(entries)) {
+            throw new Error('[AlternityMathService.calculateRobotMemoryLoad] entries must be an array.');
+        }
+
+        const isUnlimited = maxSlots === null || maxSlots === undefined;
+        const max = isUnlimited ? Infinity : Math.max(0, Math.floor(Number(maxSlots) || 0));
+
+        const modifierTrace = [
+            this.buildModifier('Operating System', ROBOT_OS_MEMORY_SLOTS, 'The background OS always holds one slot'),
+        ];
+
+        let skillSlots = 0;
+        for (const entry of entries) {
+            if (entry?.isLoaded === false) continue;
+            // A broad skill is one slot flat; a specialty costs a slot per loaded rank.
+            const slots = entry?.isBroad
+                ? 1
+                : Math.max(0, Math.floor(Number(entry?.ranksLoaded) || 0));
+            if (slots <= 0) continue;
+            skillSlots += slots;
+            modifierTrace.push(this.buildModifier(
+                entry?.name || 'Skill', slots,
+                entry?.isBroad ? 'Broad skill — one slot' : `${slots} rank${slots === 1 ? '' : 's'} loaded`
+            ));
+        }
+
+        const reserved = Math.max(0, Math.floor(Number(reservedSlots) || 0));
+        if (reserved) {
+            modifierTrace.push(this.buildModifier('Hardware', reserved, 'Chipsets and coprocessors holding slots'));
+        }
+
+        // "When an AI is loaded it fills up all the memory slots the processor had."
+        // Nothing else can be held, and slot-hungry hardware stops working entirely.
+        if (hasAI) {
+            modifierTrace.push(this.buildModifier('Installed AI', 0, 'An AI occupies every slot the processor has'));
+            return {
+                max: isUnlimited ? Infinity : max,
+                used: isUnlimited ? Infinity : max,
+                remaining: 0,
+                isFull: true,
+                isOverloaded: false,
+                isUnlimited,
+                osSlots: ROBOT_OS_MEMORY_SLOTS,
+                skillSlots,
+                reservedSlots: reserved,
+                modifierTrace,
+            };
+        }
+
+        const used = ROBOT_OS_MEMORY_SLOTS + skillSlots + reserved;
+
+        return {
+            max: isUnlimited ? Infinity : max,
+            used,
+            remaining: isUnlimited ? Infinity : max - used,
+            isFull: !isUnlimited && used === max,
+            isOverloaded: !isUnlimited && used > max,
+            isUnlimited,
+            osSlots: ROBOT_OS_MEMORY_SLOTS,
+            skillSlots,
+            reservedSlots: reserved,
+            modifierTrace,
+        };
+    },
+
 };
 
 // ---------------------------------------------------------------------------
@@ -1481,4 +2020,11 @@ export {
     SPACESHIP_TOUGHNESS,
     MAX_COMPARTMENT_DURABILITY,
     SHIP_ARMOR_DURABILITY_FRACTION,
+    ROBOT_SIZES,
+    ROBOT_PROCESSORS,
+    ROBOT_CABLING,
+    CHASSIS_FACTORS,
+    ROBOT_OS_MEMORY_SLOTS,
+    ROBOT_LIMB_PERCENT,
+    ROBOT_BASE_SKILL_POINTS,
 };

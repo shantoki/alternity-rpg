@@ -811,4 +811,272 @@ describe('Alternity System Unit Tests', () => {
             expect(AlternityMathService.calculateSupportUnitsRequired(0).units).toBe(0);
         });
     });
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Robots (7Foundry)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    describe('AlternityMathService — Robot Chassis Points', () => {
+
+        it('should match the book worked examples of CP = h x (30 - CON)', () => {
+            // "a 'tiny' robot with 5 CON would have: 1 x (30-5) = 25 Chassis Points,
+            //  while a 'huge' robot with 15 CON would have: 30 x (30 - 15) = 450"
+            expect(AlternityMathService.calculateChassisPoints('Tiny', 5).chassisPoints).toBe(25);
+            expect(AlternityMathService.calculateChassisPoints('Huge', 15).chassisPoints).toBe(450);
+        });
+
+        it('should reproduce Table 3.3 including its rounded percentage factors', () => {
+            // size, CON -> [CP, 10%, 5%, 1%], transcribed from the printed table.
+            const rows = [
+                ['Diminutive', 3, [11, 1, 1, 0]],
+                ['Diminutive', 6, [10, 1, 1, 0]],
+                ['Tiny',       4, [26, 3, 1, 0]],
+                ['Tiny',       8, [22, 2, 1, 0]],
+                ['Small',      5, [75, 8, 4, 1]],
+                ['Small',      7, [69, 7, 3, 1]],
+                ['Medium',     8, [110, 11, 6, 1]],
+                ['Medium',     9, [105, 11, 5, 1]],
+                ['Medium',    12, [90, 9, 5, 1]],
+                ['Large',      9, [210, 21, 11, 2]],
+                ['Large',     13, [170, 17, 9, 2]],
+                ['Huge',       9, [630, 63, 32, 6]],
+                ['Huge',      13, [510, 51, 26, 5]],
+                ['Huge',      15, [450, 45, 23, 5]],
+            ];
+            for (const [size, con, [cp, ten, five, one]] of rows) {
+                const r = AlternityMathService.calculateChassisPoints(size, con);
+                expect([r.chassisPoints, r.factors.ten, r.factors.five, r.factors.one])
+                    .toEqual([cp, ten, five, one]);
+            }
+        });
+
+        it('should round half up, as every other .5 cell in Table 3.3 does', () => {
+            // Table 3.3 prints 10% of a tiny CON 5 chassis (25 CP) as 2, but every
+            // other half-value in the table rounds up — 5.5 to 6, 10.5 to 11,
+            // 22.5 to 23, 31.5 to 32, 7.5 to 8, 4.5 to 5, 8.5 to 9. That single cell
+            // is treated as a slip in the supplement rather than a second rule.
+            expect(AlternityMathService.calculateChassisPoints('Tiny', 5).factors.ten).toBe(3);
+        });
+
+        it('should flag a Constitution the chassis size cannot support', () => {
+            // Table 3.1: a medium chassis supports CON 6-12.
+            expect(AlternityMathService.calculateChassisPoints('Medium', 8).isConOutOfRange).toBe(false);
+            expect(AlternityMathService.calculateChassisPoints('Medium', 13).isConOutOfRange).toBe(true);
+            expect(AlternityMathService.calculateChassisPoints('Medium', 5).isConOutOfRange).toBe(true);
+        });
+
+        it('should reject an unknown chassis size', () => {
+            expect(() => AlternityMathService.calculateChassisPoints('Gigantic', 10)).toThrow();
+        });
+    });
+
+    describe('AlternityMathService — Chassis Percentage Denominations', () => {
+
+        it('should use the minimum number of factors', () => {
+            // "if a system requires, for example, 16% Chassis Points ... always
+            //  translate the percent using a minimum number of factors: 10%+5%+1%.
+            //  8% would be calculated using 5%+1%+1%+1%."
+            const sixteen = AlternityMathService.decomposeChassisPercent(16);
+            expect(sixteen.counts).toEqual({ ten: 1, five: 1, one: 1 });
+            expect(sixteen.factorCount).toBe(3);
+
+            const eight = AlternityMathService.decomposeChassisPercent(8);
+            expect(eight.counts).toEqual({ ten: 0, five: 1, one: 3 });
+            expect(eight.factorCount).toBe(4);
+        });
+
+        it('should price six 5% wheels as three 10% factors, not six 5% ones', () => {
+            // The book's own worked example: a medium chassis with CON 8 has
+            // 10% = 11 CP, so six wheels totalling 30% cost 33 CP.
+            const { factors } = AlternityMathService.calculateChassisPoints('Medium', 8);
+            expect(factors).toEqual({ ten: 11, five: 6, one: 1 });
+
+            const wheels = AlternityMathService.decomposeChassisPercent(6 * 5, factors);
+            expect(wheels.chassisPoints).toBe(33);
+            // Paying in 5% coins would have cost more — the rule is not a rounding
+            // convenience, it changes the price.
+            expect(6 * factors.five).toBe(36);
+        });
+
+        it('should price the CIMDR-13 two legs exactly as the statblock prints them', () => {
+            // "Limbs | 2 Legs | -17/+17". Two limbs at 5% each = 10% = one factor.
+            const { factors } = AlternityMathService.calculateChassisPoints('Large', 13);
+            expect(AlternityMathService.decomposeChassisPercent(2 * 5, factors).chassisPoints).toBe(17);
+        });
+
+        it('should cost nothing for a zero percentage', () => {
+            const r = AlternityMathService.decomposeChassisPercent(0, { ten: 11, five: 6, one: 1 });
+            expect(r.chassisPoints).toBe(0);
+            expect(r.factorCount).toBe(0);
+        });
+    });
+
+    describe('AlternityMathService — Robot Derived Stats', () => {
+
+        it('should weight the action check toward Intelligence', () => {
+            // AC = (2 x INT + DEX) / 3 — the book's three worked examples.
+            expect(AlternityMathService.calculateRobotActionCheck(4, 2).base).toBe(3);
+            expect(AlternityMathService.calculateRobotActionCheck(13, 11).base).toBe(12);
+            expect(AlternityMathService.calculateRobotActionCheck(16, 16).base).toBe(16);
+        });
+
+        it('should reproduce the CIMDR-13 action check line in full', () => {
+            // "Action check: 8. Profession bonus is +3.
+            //  Marginal: 12+, Ordinary: 11, Good: 5, Amazing: 2"
+            const r = AlternityMathService.calculateRobotActionCheck(8, 7, { profession: 'Combat Spec' });
+            expect(r.base).toBe(8);
+            expect(r.bonus).toBe(3);
+            expect([r.marginal, r.ordinary, r.good, r.amazing]).toEqual([12, 11, 5, 2]);
+        });
+
+        it('should differ from the biological formula for the same scores', () => {
+            // A hero with INT 13 / DEX 11 checks at (13+11)/2 = 12; so does this
+            // robot, but move the same total toward DEX and they diverge.
+            expect(AlternityMathService.calculateRobotActionCheck(11, 13).base).toBe(12);
+            expect(AlternityMathService.calculateRobotActionCheck(16, 4).base).toBe(12);
+            // The biological score for INT 16 / DEX 4 would be 10, not 12.
+        });
+
+        it('should accept an explicit profession bonus over the derived one', () => {
+            // "Robots without profession benefits ... do not gain any increase."
+            const r = AlternityMathService.calculateRobotActionCheck(8, 7, {
+                profession: 'Combat Spec', bonus: 0,
+            });
+            expect(r.ordinary).toBe(8);
+        });
+
+        it('should derive actions per round from INT + DEX, floored at 1', () => {
+            expect(AlternityMathService.calculateRobotActionsPerRound(5, 1).actionsPerRound).toBe(1);
+            expect(AlternityMathService.calculateRobotActionsPerRound(16, 18).actionsPerRound).toBe(4);
+            expect(AlternityMathService.calculateRobotActionsPerRound(8, 7).formulaValue).toBe(2);
+        });
+
+        it('should let the cabling cap a fast brain', () => {
+            // The CIMDR-13: 2 by formula, 3 from a Good PL5 processor, 2 from
+            // Parallel cabling — the cabling is what actually binds.
+            const r = AlternityMathService.calculateRobotActionsPerRound(8, 7, {
+                processorMax: 3, cablingMax: 2,
+            });
+            expect(r.actionsPerRound).toBe(2);
+
+            const wired = AlternityMathService.calculateRobotActionsPerRound(16, 18, {
+                processorMax: 4, cablingMax: 1,
+            });
+            expect(wired.actionsPerRound).toBe(1);
+            expect(wired.cappedBy).toBe('cabling');
+        });
+
+        it('should report the processor when that is the binding ceiling', () => {
+            const r = AlternityMathService.calculateRobotActionsPerRound(16, 18, {
+                processorMax: 2, cablingMax: 4,
+            });
+            expect(r.actionsPerRound).toBe(2);
+            expect(r.cappedBy).toBe('processor');
+        });
+
+        it('should give robots no fatigue track', () => {
+            // "Thus, a robot with constitution score of 13 would have 13 stun
+            //  points, 13 wound points and 7 mortal points."
+            const r = AlternityMathService.calculateRobotDurability(13);
+            expect([r.stun, r.wound, r.mortal]).toEqual([13, 13, 7]);
+            expect(r.fatigue).toBeNull();
+        });
+
+        it('should give a biological chassis its fatigue track back', () => {
+            expect(AlternityMathService.calculateRobotDurability(13, { hasFatigueTrack: true }).fatigue).toBe(7);
+        });
+
+        it('should budget skill points as 30 + 3 x INT plus the perk/flaw balance', () => {
+            // CIMDR-13: "Skill points gained: 54 + 2 (perk/flaw) = 56SP"
+            expect(AlternityMathService.calculateRobotSkillPoints(8).total).toBe(54);
+            expect(AlternityMathService.calculateRobotSkillPoints(8, 2).total).toBe(56);
+
+            const overspent = AlternityMathService.calculateRobotSkillPoints(8, 2, 60);
+            expect(overspent.remaining).toBe(-4);
+            expect(overspent.isOverspent).toBe(true);
+        });
+    });
+
+    describe('AlternityMathService — Robot Active Memory', () => {
+
+        it('should always charge a slot for the operating system', () => {
+            const r = AlternityMathService.calculateRobotMemoryLoad(5, []);
+            expect(r.used).toBe(1);
+            expect(r.remaining).toBe(4);
+        });
+
+        it('should charge one slot per broad skill and one per loaded rank', () => {
+            // The CIMDR-13's Good PL5 processor gives 5 slots: "One slot is needed
+            // for OS, one for a broad skill, and three are left for a speciality."
+            const r = AlternityMathService.calculateRobotMemoryLoad(5, [
+                { name: 'Heavy Weapons', isBroad: true },
+                { name: 'Direct fire', isBroad: false, ranksLoaded: 3 },
+            ]);
+            expect(r.used).toBe(5);
+            expect(r.isFull).toBe(true);
+            expect(r.isOverloaded).toBe(false);
+        });
+
+        it('should allow a specialty skill to be part-loaded', () => {
+            // "A robot with 8 ranks in two skills but only 10 available active slots
+            //  ... could load 5 ranks from each skill."
+            const r = AlternityMathService.calculateRobotMemoryLoad(12, [
+                { name: 'Broad', isBroad: true },
+                { name: 'First',  ranksLoaded: 5 },
+                { name: 'Second', ranksLoaded: 5 },
+            ]);
+            expect(r.skillSlots).toBe(11);
+            expect(r.used).toBe(12);
+        });
+
+        it('should ignore skills that are not loaded', () => {
+            const r = AlternityMathService.calculateRobotMemoryLoad(5, [
+                { name: 'Stowed', ranksLoaded: 4, isLoaded: false },
+            ]);
+            expect(r.used).toBe(1);
+        });
+
+        it('should reserve slots for chipsets', () => {
+            // "an Amazing-quality boost chipset that managed to provide a -3 action
+            //  check modifier would require 3 memory slots."
+            const r = AlternityMathService.calculateRobotMemoryLoad(5, [], { reservedSlots: 3 });
+            expect(r.used).toBe(4);
+            expect(r.reservedSlots).toBe(3);
+        });
+
+        it('should report an overloaded processor', () => {
+            const r = AlternityMathService.calculateRobotMemoryLoad(3, [
+                { name: 'Broad', isBroad: true },
+                { name: 'Spec', ranksLoaded: 4 },
+            ]);
+            expect(r.isOverloaded).toBe(true);
+            expect(r.remaining).toBeLessThan(0);
+        });
+
+        it('should let an installed AI swallow every slot', () => {
+            // "When an AI is loaded it fills up all the memory slots the processor
+            //  had ... any hardware system that requires a memory slot can no
+            //  longer be used."
+            const r = AlternityMathService.calculateRobotMemoryLoad(10, [
+                { name: 'Broad', isBroad: true },
+            ], { hasAI: true });
+            expect(r.remaining).toBe(0);
+            expect(r.isFull).toBe(true);
+            expect(r.isOverloaded).toBe(false);
+        });
+
+        it('should never overload a PL9 brain', () => {
+            // The quantum processor has no limit on active memory slots.
+            const r = AlternityMathService.calculateRobotMemoryLoad(null, [
+                { name: 'Spec', ranksLoaded: 40 },
+            ]);
+            expect(r.isUnlimited).toBe(true);
+            expect(r.isOverloaded).toBe(false);
+            expect(r.remaining).toBe(Infinity);
+        });
+
+        it('should reject a non-array skill list', () => {
+            expect(() => AlternityMathService.calculateRobotMemoryLoad(5, 'nope')).toThrow();
+        });
+    });
 });

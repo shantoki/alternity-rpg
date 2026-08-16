@@ -1,0 +1,357 @@
+<form class="{{cssClass}} {{alt}}-sheet {{alt}}-robot-sheet" autocomplete="off">
+
+    {{!-- ═══ Header ════════════════════════════════════════════════════════ --}}
+    <header class="{{alt}}-sheet-header">
+        <div class="{{alt}}-sheet-portrait">
+            <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
+        </div>
+        <div class="{{alt}}-sheet-identity">
+            <h1 class="{{alt}}-sheet-name">
+                <input name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'Name'}}" spellcheck="false" />
+            </h1>
+            <div class="{{alt}}-sheet-meta">
+                <div class="{{alt}}-meta-field">
+                    <label title="{{localize 'ALTERNITY.Robot.SizeHint'}}">{{localize 'ALTERNITY.Robot.Size'}}</label>
+                    <select name="system.size">
+                        {{#each sizeChoices as |choice|}}
+                        <option value="{{choice.key}}" {{#if (eq ../system.size choice.key)}}selected{{/if}}>
+                            {{choice.label}} (h={{choice.factor}})
+                        </option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="{{alt}}-meta-field">
+                    <label>{{localize 'ALTERNITY.ProgressLevel'}}</label>
+                    <input type="number" name="system.progressLevel" value="{{system.progressLevel}}" min="5" max="9" />
+                </div>
+                <div class="{{alt}}-meta-field">
+                    <label>{{localize 'ALTERNITY.Robot.Profession'}}</label>
+                    <select name="system.profession">
+                        {{#each professionChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq ../system.profession choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <span class="{{alt}}-ship-status-badge {{alt}}-robot-status--{{system.status}}"
+                      title="{{localize (concat 'ALTERNITY.Robot.Status.' system.status 'Hint')}}">
+                    {{localize (concat 'ALTERNITY.Robot.Status.' system.status)}}
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="{{alt}}-sheet-body">
+
+        {{!-- ═══ The four budgets ══════════════════════════════════════════ --}}
+        <section class="{{alt}}-robot-budgets">
+            {{#each budgets as |b|}}
+            <div class="{{../alt}}-robot-budget {{#if b.isOver}}{{#if b.isSoft}}is-warning{{else}}is-over{{/if}}{{/if}}"
+                 title="{{b.hint}}">
+                <label>{{b.label}}</label>
+                <strong>{{b.used}} / {{b.max}}</strong>
+                <span class="{{../alt}}-robot-budget-free">{{b.free}} {{localize 'ALTERNITY.Robot.Free'}}</span>
+            </div>
+            {{/each}}
+        </section>
+
+        {{#if system.isOverChassis}}
+        <p class="{{alt}}-ship-warning">{{localize 'ALTERNITY.Robot.WarnOverChassis'}}</p>
+        {{/if}}
+        {{#if system.isPowerDeficit}}
+        <p class="{{alt}}-ship-warning">{{localize 'ALTERNITY.Robot.WarnPowerDeficit'}}</p>
+        {{/if}}
+        {{#if system.memory.isOverloaded}}
+        <p class="{{alt}}-ship-warning">{{localize 'ALTERNITY.Robot.WarnMemoryOverloaded'}}</p>
+        {{/if}}
+        {{#if system.skillPoints.isOverspent}}
+        <p class="{{alt}}-ship-warning">{{localize 'ALTERNITY.Robot.WarnSkillPointsOverspent'}}</p>
+        {{/if}}
+        {{#if system.isConOutOfRange}}
+        <p class="{{alt}}-ship-warning">{{localize 'ALTERNITY.Robot.WarnConOutOfRange'}}</p>
+        {{/if}}
+        {{#if limbsBlocked}}
+        <p class="{{alt}}-ship-warning">{{localize 'ALTERNITY.Robot.WarnDiminutiveLimbs'}}</p>
+        {{/if}}
+        {{#if system.overRankedSkills.length}}
+        <p class="{{alt}}-ship-warning">
+            {{localize 'ALTERNITY.Robot.WarnOverRanked'}}
+            {{#each system.overRankedSkills}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}.
+        </p>
+        {{/if}}
+
+        {{!-- ═══ Abilities ═════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-robot-abilities">
+            {{#each abilities as |a|}}
+            <div class="{{../alt}}-robot-ability {{#if a.isBreached}}is-breached{{/if}}">
+                <label>{{a.key}}</label>
+                <input type="number" name="system.abilities.{{a.key}}" value="{{a.value}}" min="1" />
+                {{#if a.cap}}
+                <span class="{{../alt}}-robot-ability-cap" title="{{a.capSource}}">max {{a.cap}}</span>
+                {{/if}}
+            </div>
+            {{/each}}
+        </section>
+
+        {{!-- ═══ Derived stats ═════════════════════════════════════════════ --}}
+        <section class="{{alt}}-stats-grid">
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Robot.ActionCheckHint'}}">{{localize 'ALTERNITY.Robot.ActionCheck'}}</label>
+                <strong>{{system.actionCheck.marginal}}+ / {{system.actionCheck.ordinary}} / {{system.actionCheck.good}} / {{system.actionCheck.amazing}}</strong>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Robot.ActionCheckModifierHint'}}">{{localize 'ALTERNITY.Robot.ActionCheckModifier'}}</label>
+                <strong>{{system.actionCheckModifier}}</strong>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Robot.ActionsPerRoundHint'}}">{{localize 'ALTERNITY.Robot.ActionsPerRound'}}</label>
+                <strong>{{system.actionsPerRound}}</strong>
+                {{#if system.actionsCappedBy}}
+                <span class="{{alt}}-robot-capped">{{localize 'ALTERNITY.Robot.CappedBy'}} {{system.actionsCappedBy}}</span>
+                {{/if}}
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Robot.MovementHint'}}">{{localize 'ALTERNITY.Robot.Movement'}}</label>
+                <strong>{{fmtMod system.movementModifier}}</strong>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Robot.ResistanceHint'}}">{{localize 'ALTERNITY.Robot.Resistance'}}</label>
+                <strong>STR {{fmtMod system.strResistanceModifier}} / DEX {{fmtMod system.dexResistanceModifier}}</strong>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Robot.Stealth'}}</label>
+                <strong>{{fmtMod system.stealthModifier}}</strong>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Robot.BrawlingHint'}}">{{localize 'ALTERNITY.Robot.Brawling'}}</label>
+                <input type="text" name="system.brawlingDamage" value="{{system.brawlingDamage}}" placeholder="d6s / d6+1s / d6+2s" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Robot.LastResortHint'}}">{{localize 'ALTERNITY.LastResort.Label'}}</label>
+                <strong class="{{alt}}-robot-none">{{localize 'ALTERNITY.Robot.NoLastResort'}}</strong>
+            </div>
+        </section>
+
+        {{!-- ═══ Hardware ══════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-stats-grid">
+            <div class="{{alt}}-stat-box {{alt}}-stat-box--wide">
+                <label title="{{localize 'ALTERNITY.Robot.ProcessorHint'}}">{{localize 'ALTERNITY.Robot.Processor'}}</label>
+                <select name="system.processor">
+                    {{#each processorChoices as |choice|}}
+                    <option value="{{choice.key}}" {{#if (eq ../system.processor choice.key)}}selected{{/if}}>{{choice.label}}</option>
+                    {{/each}}
+                </select>
+                {{#if processorInfo}}
+                <span class="{{alt}}-robot-hardware-note">
+                    {{localize 'ALTERNITY.Robot.Mact'}} {{#if processorInfo.mact}}{{processorInfo.mact}}{{else}}∞{{/if}} ·
+                    {{localize 'ALTERNITY.Robot.Mrnk'}} {{processorInfo.mrnk}} ·
+                    INT {{processorInfo.mint}} / WIL {{processorInfo.mwil}} / PER {{processorInfo.mper}} ·
+                    {{processorInfo.actionCheckModifier}} · {{processorInfo.cost}}
+                </span>
+                {{/if}}
+            </div>
+            <div class="{{alt}}-stat-box {{alt}}-stat-box--wide">
+                <label title="{{localize 'ALTERNITY.Robot.CablingHint'}}">{{localize 'ALTERNITY.Robot.Cabling'}}</label>
+                <select name="system.cabling">
+                    {{#each cablingChoices as |choice|}}
+                    <option value="{{choice.key}}" {{#if (eq ../system.cabling choice.key)}}selected{{/if}}>{{choice.label}}</option>
+                    {{/each}}
+                </select>
+                {{#if cablingInfo}}
+                <span class="{{alt}}-robot-hardware-note">
+                    {{localize 'ALTERNITY.Robot.MaxActions'}} {{#if cablingInfo.maxActionsPerRound}}{{cablingInfo.maxActionsPerRound}}{{else}}—{{/if}} ·
+                    {{localize 'ALTERNITY.Robot.PowerBoost'}}
+                    {{#if cablingInfo.canPowerBoost}}{{fmtMod cablingInfo.powerModifier}}{{else}}{{localize 'ALTERNITY.Robot.NoPowerBoost'}}{{/if}}
+                </span>
+                {{/if}}
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Robot.PowerGeneratedHint'}}">{{localize 'ALTERNITY.Robot.PowerGenerated'}}</label>
+                <input type="number" name="system.powerGenerated" value="{{system.powerGenerated}}" min="0" step="0.5" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Robot.LimbCountHint'}}">{{localize 'ALTERNITY.Robot.LimbCount'}}</label>
+                <input type="number" name="system.limbCount" value="{{system.limbCount}}" min="0" />
+                <span class="{{alt}}-robot-hardware-note">−{{system.limbChassisPoints}} / +{{system.limbChassisPoints}} CP</span>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Robot.ReservedSlotsHint'}}">{{localize 'ALTERNITY.Robot.ReservedSlots'}}</label>
+                <input type="number" name="system.reservedMemorySlots" value="{{system.reservedMemorySlots}}" min="0" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Robot.ChassisFactorsHint'}}">{{localize 'ALTERNITY.Robot.ChassisFactors'}}</label>
+                <strong>10%={{system.chassisFactors.ten}} · 5%={{system.chassisFactors.five}} · 1%={{system.chassisFactors.one}}</strong>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Robot.Weight'}}</label>
+                <input type="number" name="system.weight" value="{{system.weight}}" min="0" step="0.1" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Robot.Cost'}}</label>
+                <input type="text" name="system.cost" value="{{system.cost}}" />
+            </div>
+        </section>
+
+        {{!-- ═══ Toggles ═══════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-robot-toggles">
+            <label title="{{localize 'ALTERNITY.Robot.EmancipatedHint'}}">
+                <input type="checkbox" name="system.isEmancipated" {{#if system.isEmancipated}}checked{{/if}} />
+                <span>{{localize 'ALTERNITY.Robot.Emancipated'}}</span>
+            </label>
+            <label title="{{localize 'ALTERNITY.Robot.RestrainingBoltHint'}}">
+                <input type="checkbox" name="system.hasRestrainingBolt" {{#if system.hasRestrainingBolt}}checked{{/if}} />
+                <span>{{localize 'ALTERNITY.Robot.RestrainingBolt'}}</span>
+            </label>
+            <label title="{{localize 'ALTERNITY.Robot.FatigueTrackHint'}}">
+                <input type="checkbox" name="system.hasFatigueTrack" {{#if system.hasFatigueTrack}}checked{{/if}} />
+                <span>{{localize 'ALTERNITY.Robot.FatigueTrack'}}</span>
+            </label>
+            <label title="{{localize 'ALTERNITY.Robot.InstalledAIHint'}}">
+                <input type="checkbox" name="system.hasInstalledAI" {{#if system.hasInstalledAI}}checked{{/if}} />
+                <span>{{localize 'ALTERNITY.Robot.InstalledAI'}}</span>
+            </label>
+        </section>
+
+        {{!-- ═══ Damage ════════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.Robot.Durability'}}
+                <button type="button" data-action="clearRobotDamage" title="{{localize 'ALTERNITY.Robot.ClearDamage'}}">⟲</button>
+            </h3>
+            <div class="{{alt}}-resources">
+                {{#each tracks as |t|}}
+                <div class="{{../alt}}-resource-bar bar--{{t.key}}">
+                    <div class="{{../alt}}-bar-label">
+                        <span class="{{../alt}}-compartment-track-name">{{t.label}}</span>
+                        <span class="{{../alt}}-bar-values">{{t.value}} / {{t.max}}</span>
+                        <span class="{{../alt}}-damage-quick">
+                            <button type="button" data-action="setRobotDamage" data-track="{{t.key}}" data-delta="-1">−</button>
+                            <button type="button" data-action="setRobotDamage" data-track="{{t.key}}" data-delta="1">+</button>
+                        </span>
+                    </div>
+                    <div class="{{../alt}}-bar-track"><div class="{{../alt}}-bar-fill" style="width: {{t.pct}}%"></div></div>
+                </div>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Systems ═══════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.Robot.Systems'}}
+                <button type="button" data-action="addRobotRow" data-array="systems">+</button>
+            </h3>
+            <div class="{{alt}}-ship-table">
+                {{#each systemRows as |row|}}
+                <div class="{{../alt}}-ship-table-row {{#if row.isOffline}}is-offline{{/if}}">
+                    <select name="system.systems.{{row.index}}.category">
+                        {{#each ../systemCategoryChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.category choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                    <input type="text" name="system.systems.{{row.index}}.name" value="{{row.name}}" placeholder="{{localize 'ALTERNITY.Name'}}" />
+                    <input type="number" name="system.systems.{{row.index}}.quantity" value="{{row.quantity}}" min="0" title="{{localize 'ALTERNITY.Robot.QuantityHint'}}" />
+                    <select name="system.systems.{{row.index}}.costMode" title="{{localize 'ALTERNITY.Robot.CostModeHint'}}">
+                        {{#each ../costModeChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.costMode choice)}}selected{{/if}}>{{localize (concat 'ALTERNITY.Robot.CostMode.' choice)}}</option>
+                        {{/each}}
+                    </select>
+                    {{#if (eq row.costMode 'percent')}}
+                    <input type="number" name="system.systems.{{row.index}}.chassisPercent" value="{{row.chassisPercent}}" min="0" title="{{localize 'ALTERNITY.Robot.ChassisPercentHint'}}" />
+                    {{else}}
+                    <input type="number" name="system.systems.{{row.index}}.chassisPoints" value="{{row.chassisPoints}}" min="0" title="{{localize 'ALTERNITY.Robot.ChassisPointsColumnHint'}}" />
+                    {{/if}}
+                    <span class="{{../alt}}-robot-resolved" title="{{localize 'ALTERNITY.Robot.ResolvedHint'}}">
+                        {{row.resolvedChassisPoints}} CP
+                        {{#if row.isDenominationRounded}}
+                        <em title="{{localize 'ALTERNITY.Robot.DenominationHint'}}">({{row.unitByUnitPoints}}?)</em>
+                        {{/if}}
+                    </span>
+                    <input type="number" name="system.systems.{{row.index}}.powerPoints" value="{{row.powerPoints}}" step="0.5" title="{{localize 'ALTERNITY.Robot.PowerPointsHint'}}" />
+                    <input type="text" name="system.systems.{{row.index}}.cost" value="{{row.cost}}" placeholder="$" />
+                    <label class="{{../alt}}-ship-inline-toggle" title="{{localize 'ALTERNITY.Robot.OfflineHint'}}">
+                        <input type="checkbox" name="system.systems.{{row.index}}.isOffline" {{#if row.isOffline}}checked{{/if}} />
+                        <span>{{localize 'ALTERNITY.Spaceship.Offline'}}</span>
+                    </label>
+                    <button type="button" data-action="deleteRobotRow" data-array="systems" data-index="{{row.index}}">✕</button>
+                </div>
+                {{else}}
+                <p class="{{alt}}-empty-state">{{localize 'ALTERNITY.Robot.NoSystems'}}</p>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Skills / programs ═════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.Robot.Skills'}}
+                <span class="{{alt}}-section-tools">
+                    <span class="{{alt}}-robot-hardware-note" title="{{localize 'ALTERNITY.Robot.MemoryHint'}}">
+                        {{localize 'ALTERNITY.Robot.Memory'}}
+                        {{system.memory.used}} / {{#if system.memory.isUnlimited}}∞{{else}}{{system.memory.max}}{{/if}}
+                    </span>
+                    <button type="button" data-action="addRobotRow" data-array="skills">+</button>
+                </span>
+            </h3>
+            <div class="{{alt}}-ship-table">
+                {{#each skillRows as |row|}}
+                <div class="{{../alt}}-ship-table-row {{#if row.isOverRanked}}is-over-ranked{{/if}}">
+                    <input type="text" name="system.skills.{{row.index}}.name" value="{{row.name}}" placeholder="{{localize 'ALTERNITY.Name'}}" />
+                    <label class="{{../alt}}-ship-inline-toggle" title="{{localize 'ALTERNITY.Robot.BroadHint'}}">
+                        <input type="checkbox" name="system.skills.{{row.index}}.isBroad" {{#if row.isBroad}}checked{{/if}} />
+                        <span>{{localize 'ALTERNITY.Robot.Broad'}}</span>
+                    </label>
+                    <input type="number" name="system.skills.{{row.index}}.rank" value="{{row.rank}}" min="0" title="{{localize 'ALTERNITY.Robot.RankHint'}}" />
+                    <input type="number" name="system.skills.{{row.index}}.ranksLoaded" value="{{row.ranksLoaded}}" min="0" title="{{localize 'ALTERNITY.Robot.RanksLoadedHint'}}" />
+                    <input type="number" name="system.skills.{{row.index}}.skillPointCost" value="{{row.skillPointCost}}" min="0" title="{{localize 'ALTERNITY.Robot.SkillPointCostHint'}}" />
+                    <span class="{{../alt}}-robot-resolved" title="{{localize 'ALTERNITY.Robot.SlotsHint'}}">{{row.slots}} {{localize 'ALTERNITY.Robot.Slots'}}</span>
+                    <button type="button" data-action="loadAllRanks" data-index="{{row.index}}" title="{{localize 'ALTERNITY.Robot.LoadAllHint'}}">
+                        {{#if row.isLoaded}}⏏{{else}}⭳{{/if}}
+                    </button>
+                    <button type="button" data-action="deleteRobotRow" data-array="skills" data-index="{{row.index}}">✕</button>
+                </div>
+                {{else}}
+                <p class="{{alt}}-empty-state">{{localize 'ALTERNITY.Robot.NoSkills'}}</p>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Perks & flaws ═════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.Robot.PerksFlaws'}}
+                <span class="{{alt}}-section-tools">
+                    <span class="{{alt}}-robot-hardware-note">{{localize 'ALTERNITY.Robot.Balance'}} {{fmtMod system.perkFlawBalance}} SP</span>
+                    <button type="button" data-action="addRobotRow" data-array="perksFlaws">+</button>
+                </span>
+            </h3>
+            <div class="{{alt}}-ship-table">
+                {{#each perkFlawRows as |row|}}
+                <div class="{{../alt}}-ship-table-row">
+                    <select name="system.perksFlaws.{{row.index}}.kind">
+                        <option value="Perk" {{#if (eq row.kind 'Perk')}}selected{{/if}}>{{localize 'ALTERNITY.Robot.Perk'}}</option>
+                        <option value="Flaw" {{#if (eq row.kind 'Flaw')}}selected{{/if}}>{{localize 'ALTERNITY.Robot.Flaw'}}</option>
+                    </select>
+                    <input type="text" name="system.perksFlaws.{{row.index}}.name" value="{{row.name}}" placeholder="{{localize 'ALTERNITY.Name'}}" />
+                    <input type="number" name="system.perksFlaws.{{row.index}}.skillPointChange" value="{{row.skillPointChange}}" title="{{localize 'ALTERNITY.Robot.SkillPointChangeHint'}}" />
+                    <input type="text" name="system.perksFlaws.{{row.index}}.notes" value="{{row.notes}}" placeholder="{{localize 'ALTERNITY.Details'}}" />
+                    <button type="button" data-action="deleteRobotRow" data-array="perksFlaws" data-index="{{row.index}}">✕</button>
+                </div>
+                {{else}}
+                <p class="{{alt}}-empty-state">{{localize 'ALTERNITY.Robot.NoPerksFlaws'}}</p>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Notes ═════════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>{{localize 'ALTERNITY.Robot.Concept'}}</h3>
+            <input type="text" class="{{alt}}-robot-concept" name="system.concept" value="{{system.concept}}" placeholder="{{localize 'ALTERNITY.Robot.ConceptHint'}}" />
+            <input type="text" class="{{alt}}-robot-concept" name="system.shape" value="{{system.shape}}" placeholder="{{localize 'ALTERNITY.Robot.ShapeHint'}}" />
+            <h3>{{localize 'ALTERNITY.Description'}}</h3>
+            <textarea name="system.description" rows="3">{{system.description}}</textarea>
+            <h3>{{localize 'ALTERNITY.Notes'}}</h3>
+            <textarea name="system.notes" rows="3">{{system.notes}}</textarea>
+        </section>
+
+    </main>
+</form>

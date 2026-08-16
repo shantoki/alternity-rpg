@@ -29,6 +29,15 @@ import {
     COMPARTMENT_KINDS,
     FIREPOWER_CLASSES,
 } from '../data/SpaceshipData.js';
+import {
+    ROBOT_SIZES,
+    ROBOT_PROCESSORS,
+    ROBOT_CABLING,
+    ROBOT_ABILITIES,
+    ROBOT_PROFESSIONS,
+    ROBOT_SYSTEM_CATEGORIES,
+    CHASSIS_COST_MODES,
+} from '../data/RobotData.js';
 import { renderTemplate, Roll, ChatMessage } from '../module-info.js';
 
 // ---------------------------------------------------------------------------
@@ -1492,6 +1501,231 @@ class AlternitySpaceshipSheet extends foundry.applications.api.HandlebarsApplica
 }
 
 // ---------------------------------------------------------------------------
+// AlternityRobotSheet
+// ---------------------------------------------------------------------------
+
+const ROBOT_ARRAY_FIELDS = Object.freeze({
+    systems: {
+        name: '', category: 'Miscellaneous', quantity: 1, costMode: 'points',
+        chassisPoints: 0, chassisPercent: 0, powerPoints: 0, cost: '', notes: '', isOffline: false,
+    },
+    skills: {
+        name: '', isBroad: false, rank: 0, ranksLoaded: 0, isLoaded: true,
+        skillPointCost: 0, ability: '',
+    },
+    perksFlaws: { name: '', kind: 'Perk', skillPointChange: 0, notes: '' },
+});
+
+/** The tracks the +/- buttons can touch. Fatigue only exists on some chassis. */
+const ROBOT_TRACKS = Object.freeze(['stun', 'wound', 'mortal', 'fatigue']);
+
+class AlternityRobotSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
+    static DEFAULT_OPTIONS = foundry.utils.mergeObject(super.DEFAULT_OPTIONS, {
+        classes: [NS, `${NS}-sheet-app`, `${NS}-robot-sheet`],
+        tag: "form",
+        window: { resizable: true, width: 760, height: 840 },
+        actions: {
+            addRobotRow:      this._onAddRobotRowAction,
+            deleteRobotRow:   this._onDeleteRobotRowAction,
+            setRobotDamage:   this._onSetRobotDamageAction,
+            clearRobotDamage: this._onClearRobotDamageAction,
+            loadAllRanks:     this._onLoadAllRanksAction,
+        }
+    });
+
+    static PARTS = {
+        sheet: { template: "systems/alternity-v2/templates/actor/actor-robot-sheet.hbs" }
+    };
+
+    async _prepareContext(options) {
+        const context = await super._prepareContext(options);
+        const system = this.document.system;
+
+        context.actor = this.document;
+        context.system = system;
+        context.alt = NS;
+
+        // ── Choice lists ────────────────────────────────────────────────────
+        context.sizeChoices = Object.entries(ROBOT_SIZES).map(([key, cfg]) => ({ key, ...cfg }));
+        context.processorChoices = Object.entries(ROBOT_PROCESSORS).map(([key, cfg]) => ({
+            key,
+            label: `PL${cfg.progressLevel} ${cfg.quality}`,
+            ...cfg,
+        }));
+        context.cablingChoices = Object.entries(ROBOT_CABLING).map(([key, cfg]) => ({ key, ...cfg }));
+        context.professionChoices = ROBOT_PROFESSIONS;
+        context.systemCategoryChoices = ROBOT_SYSTEM_CATEGORIES;
+        context.costModeChoices = CHASSIS_COST_MODES;
+        context.abilityKeys = ROBOT_ABILITIES;
+
+        // ── Abilities, each with the ceiling its hardware imposes ───────────
+        context.abilities = ROBOT_ABILITIES.map((key) => ({
+            key,
+            label: game.i18n.localize(`ALTERNITY.Ability.${key}`),
+            value: system.abilities?.[key] ?? 0,
+            cap: system.abilityCaps?.[key] ?? null,
+            isBreached: (system.abilityBreaches ?? []).includes(key),
+            // Which component is doing the capping — worth naming, because the
+            // fix is different: a bigger chassis versus a better processor.
+            capSource: ['STR', 'DEX', 'CON'].includes(key)
+                ? game.i18n.localize('ALTERNITY.Robot.CapChassis')
+                : game.i18n.localize('ALTERNITY.Robot.CapProcessor'),
+        }));
+
+        // ── The four budgets, in one shape the template can loop over ───────
+        const memory = system.memory ?? {};
+        context.budgets = [
+            {
+                key: 'chassis',
+                label: game.i18n.localize('ALTERNITY.Robot.ChassisPoints'),
+                used: system.chassisSpent, max: system.chassisPoints,
+                free: system.chassisFree, isOver: system.isOverChassis,
+                hint: game.i18n.localize('ALTERNITY.Robot.ChassisPointsHint'),
+            },
+            {
+                key: 'power',
+                label: game.i18n.localize('ALTERNITY.Robot.Power'),
+                used: system.powerConsumed, max: system.powerGenerated,
+                free: system.powerSurplus, isOver: system.isPowerDeficit,
+                // Deliberately a warning rather than an error: an over-drawn robot
+                // is legal, it just has to shut things down.
+                isSoft: true,
+                hint: game.i18n.localize('ALTERNITY.Robot.PowerHint'),
+            },
+            {
+                key: 'memory',
+                label: game.i18n.localize('ALTERNITY.Robot.Memory'),
+                used: memory.used, max: memory.isUnlimited ? '∞' : memory.max,
+                free: memory.isUnlimited ? '∞' : memory.remaining,
+                isOver: memory.isOverloaded,
+                hint: game.i18n.localize('ALTERNITY.Robot.MemoryHint'),
+            },
+            {
+                key: 'skillPoints',
+                label: game.i18n.localize('ALTERNITY.Robot.SkillPoints'),
+                used: system.skillPoints?.spent, max: system.skillPoints?.total,
+                free: system.skillPoints?.remaining, isOver: system.skillPoints?.isOverspent,
+                hint: game.i18n.localize('ALTERNITY.Robot.SkillPointsHint'),
+            },
+        ];
+
+        // ── Damage tracks ───────────────────────────────────────────────────
+        context.tracks = ROBOT_TRACKS
+            // A robot has no fatigue track unless it was built with biological or
+            // synthetic-tissue actuators, so the row is omitted rather than zeroed.
+            .filter((key) => key !== 'fatigue' || system.hasFatigue)
+            .map((key) => {
+                const track = system.durability?.[key] ?? { value: 0, max: 0 };
+                return {
+                    key,
+                    label: game.i18n.localize(`ALTERNITY.${key.charAt(0).toUpperCase()}${key.slice(1)}`),
+                    value: track.value, max: track.max,
+                    pct: pct(track.value, track.max),
+                };
+            });
+
+        context.systemRows = system.systemDetails ?? [];
+        context.skillRows  = (system.skills ?? []).map((skill, index) => ({
+            ...skill,
+            index,
+            isOverRanked: system.maxSkillRank !== null && !skill.isBroad
+                && (skill.rank ?? 0) > system.maxSkillRank,
+            // Slots this skill is holding right now.
+            slots: skill.isLoaded === false ? 0
+                : skill.isBroad ? 1 : (skill.ranksLoaded ?? 0),
+        }));
+        context.perkFlawRows = (system.perksFlaws ?? []).map((row, index) => ({ ...row, index }));
+
+        context.limbsBlocked = system.hasIllegalLimbs;
+        context.processorInfo = system.processorInfo;
+        // `powerModifier: null` means the cabling physically cannot carry power —
+        // optic cables are not wires, nerves are cells — which is a different thing
+        // from a modifier of 0. Resolved here because Handlebars cannot tell a null
+        // apart from a zero in an {{#if}}.
+        context.cablingInfo = system.cablingInfo
+            ? { ...system.cablingInfo, canPowerBoost: system.cablingInfo.powerModifier !== null }
+            : null;
+
+        return context;
+    }
+
+    _onRender(context, options) {
+        this.element.addEventListener('change', (e) => {
+            applySheetFieldChange(this.document, e.target, ROBOT_ARRAY_FIELDS);
+        });
+    }
+
+    // -----------------------------------------------------------------------
+    // Row management
+    // -----------------------------------------------------------------------
+
+    static async _onAddRobotRowAction(event, target) {
+        const arrayKey = target.dataset.array;
+        const defaults = ROBOT_ARRAY_FIELDS[arrayKey];
+        if (!defaults) return;
+        const current = foundry.utils.getProperty(this.document.system, arrayKey) ?? [];
+        await this.document.update({
+            [`system.${arrayKey}`]: [...current, foundry.utils.deepClone(defaults)],
+        });
+    }
+
+    static async _onDeleteRobotRowAction(event, target) {
+        const arrayKey = target.dataset.array;
+        const idx = safeInt(target.dataset.index, -1);
+        if (idx < 0 || !ROBOT_ARRAY_FIELDS[arrayKey]) return;
+        const current = foundry.utils.getProperty(this.document.system, arrayKey) ?? [];
+        await this.document.update({ [`system.${arrayKey}`]: current.filter((_, i) => i !== idx) });
+    }
+
+    // -----------------------------------------------------------------------
+    // Damage
+    // -----------------------------------------------------------------------
+
+    static async _onSetRobotDamageAction(event, target) {
+        const track = target.dataset.track;
+        const delta = safeInt(target.dataset.delta, 0);
+        if (!ROBOT_TRACKS.includes(track)) return;
+
+        const max = this.document.system.durability?.[track]?.max ?? 0;
+        const current = this.document.system.damage?.[track] ?? 0;
+        await this.document.update({
+            [`system.damage.${track}`]: Math.min(max, Math.max(0, current + delta)),
+        });
+    }
+
+    static async _onClearRobotDamageAction() {
+        await this.document.update({
+            'system.damage': { stun: 0, wound: 0, mortal: 0, fatigue: 0 },
+        });
+    }
+
+    // -----------------------------------------------------------------------
+    // Memory
+    // -----------------------------------------------------------------------
+
+    /**
+     * Load a skill fully into active memory, or unload it entirely.
+     *
+     * Partial loads are legal and often necessary — the whole point of the memory
+     * budget is that a robot frequently cannot hold its own kit at once — so the
+     * ranks field stays editable. This is just the common case as one click.
+     */
+    static async _onLoadAllRanksAction(event, target) {
+        const idx = safeInt(target.dataset.index, -1);
+        if (idx < 0) return;
+        const skills = foundry.utils.deepClone(this.document.system.skills ?? []);
+        const skill = skills[idx];
+        if (!skill) return;
+
+        const isFullyLoaded = skill.isLoaded && (skill.isBroad || skill.ranksLoaded >= skill.rank);
+        skill.isLoaded = !isFullyLoaded;
+        skill.ranksLoaded = isFullyLoaded ? 0 : (skill.rank ?? 0);
+
+        await this.document.update({ 'system.skills': skills });
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Registration
 // ---------------------------------------------------------------------------
 
@@ -1534,6 +1768,7 @@ async function registerAlternitySheet() {
     ActorsCollection.registerSheet('alternity-v2', AlternityVehicleSheet, { types: ['vehicle'], makeDefault: true, label: 'Alternity Vehicle Sheet' });
     ActorsCollection.registerSheet('alternity-v2', AlternityWarshipSheet, { types: ['warship'], makeDefault: true, label: 'Alternity Warship Sheet' });
     ActorsCollection.registerSheet('alternity-v2', AlternitySpaceshipSheet, { types: ['spaceship'], makeDefault: true, label: 'Alternity Spaceship Sheet' });
+    ActorsCollection.registerSheet('alternity-v2', AlternityRobotSheet, { types: ['robot'], makeDefault: true, label: 'Alternity Robot Sheet' });
 }
 
 export {
@@ -1544,6 +1779,7 @@ export {
     AlternityVehicleSheet,
     AlternityWarshipSheet,
     AlternitySpaceshipSheet,
+    AlternityRobotSheet,
     registerAlternitySheet,
     pct,
     fmtMod,

@@ -17,6 +17,7 @@ import {
     VehicleData,
     WarshipData,
     SpaceshipData,
+    RobotData,
     WeaponData,
     ArmorData,
     SkillData,
@@ -58,6 +59,7 @@ Hooks.once('init', async () => {
     CONFIG.Actor.dataModels.vehicle   = VehicleData;
     CONFIG.Actor.dataModels.warship   = WarshipData;
     CONFIG.Actor.dataModels.spaceship = SpaceshipData;
+    CONFIG.Actor.dataModels.robot     = RobotData;
 
     CONFIG.Item.dataModels = CONFIG.Item.dataModels ?? {};
     CONFIG.Item.dataModels.weapon = WeaponData;
@@ -106,6 +108,14 @@ Hooks.once('init', async () => {
         spaceship: {
             bar: ['hullIntegrity'],
             value: ['shipStatus', 'totalDurability', 'destroyedCompartments', 'maneuverRating'],
+        },
+        // Robot damage tracks are derived from CON rather than stored as value/max
+        // pairs, so `durability.*` is rebuilt in prepareDerivedData purely so the
+        // token bars have something to point at. The fatigue bar is only meaningful
+        // on a biological or synthetic-tissue chassis; it reads 0/0 otherwise.
+        robot: {
+            bar: ['durability.stun', 'durability.wound', 'durability.mortal', 'durability.fatigue'],
+            value: ['status', 'actionsPerRound', 'chassisFree', 'powerSurplus'],
         },
     };
 

@@ -1736,3 +1736,161 @@
 .alt-compartment-systems { flex: 1 1 160px; min-width: 80px; }
 
 .alt-stat-box--wide { grid-column: span 2; }
+
+/* ── Robot sheet ──────────────────────────────────────────────────────────── */
+/*
+ * The robot's defining feature is that it is built against four budgets at once,
+ * so those get the most prominent strip on the sheet — above the abilities, since
+ * changing an ability moves three of the four.
+ */
+
+.alt-robot-budgets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.alt-robot-budget {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 8px;
+    min-width: 0;
+    background: var(--alt-color-surface);
+    border: 1px solid var(--alt-color-border);
+    border-radius: var(--alt-radius);
+}
+.alt-robot-budget label {
+    font-size: 9px;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: var(--alt-color-primary);
+    white-space: nowrap;
+}
+.alt-robot-budget strong { font-size: 15px; }
+.alt-robot-budget-free {
+    font-size: 9px;
+    color: var(--alt-color-text-muted);
+    white-space: nowrap;
+}
+/* Over a hard budget is an error; over the power budget is only a warning,
+   because an over-drawn robot is a legal build that has to shed load. */
+.alt-robot-budget.is-over {
+    border-color: var(--alt-color-danger);
+    background: rgba(217, 74, 74, 0.12);
+}
+.alt-robot-budget.is-over strong { color: var(--alt-color-danger); }
+.alt-robot-budget.is-warning {
+    border-color: var(--alt-color-warning);
+    background: rgba(217, 164, 74, 0.12);
+}
+.alt-robot-budget.is-warning strong { color: var(--alt-color-warning); }
+
+/* ── Abilities ─────────────────────────────────────────────────────────────── */
+.alt-robot-abilities {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+}
+@media (max-width: 620px) {
+    .alt-robot-abilities { grid-template-columns: repeat(3, 1fr); }
+}
+
+.alt-robot-ability {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 4px;
+    min-width: 0;
+    background: var(--alt-color-surface);
+    border: 1px solid var(--alt-color-border);
+    border-radius: var(--alt-radius);
+}
+.alt-robot-ability label {
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--alt-color-primary);
+}
+.alt-robot-ability input {
+    width: 46px;
+    text-align: center;
+    font-size: 15px;
+}
+.alt-robot-ability-cap {
+    font-size: 9px;
+    color: var(--alt-color-text-muted);
+    white-space: nowrap;
+}
+/* A score the hardware cannot actually support. */
+.alt-robot-ability.is-breached { border-color: var(--alt-color-danger); }
+.alt-robot-ability.is-breached input,
+.alt-robot-ability.is-breached .alt-robot-ability-cap { color: var(--alt-color-danger); }
+
+/* ── Misc readouts ─────────────────────────────────────────────────────────── */
+.alt-robot-hardware-note {
+    font-size: 9px;
+    color: var(--alt-color-text-muted);
+    text-align: center;
+    line-height: 1.4;
+}
+.alt-robot-capped {
+    font-size: 9px;
+    color: var(--alt-color-warning);
+    white-space: nowrap;
+}
+.alt-robot-none { color: var(--alt-color-text-muted); font-style: italic; }
+
+.alt-robot-resolved {
+    flex: 0 0 auto;
+    font-size: 10px;
+    font-weight: bold;
+    white-space: nowrap;
+    color: var(--alt-color-text-muted);
+}
+/* The unit-by-unit price, shown when grouping actually changed it. */
+.alt-robot-resolved em {
+    font-style: normal;
+    color: var(--alt-color-warning);
+    font-weight: normal;
+}
+
+.alt-robot-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin-bottom: 12px;
+    padding: 6px 8px;
+    background: var(--alt-color-surface);
+    border: 1px solid var(--alt-color-border);
+    border-radius: var(--alt-radius);
+}
+.alt-robot-toggles label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    white-space: nowrap;
+    color: var(--alt-color-text-muted);
+}
+
+.alt-robot-concept { width: 100%; margin-bottom: 4px; }
+
+/* Ranks above the processor's Mrnk are bought but unusable. */
+.alt-ship-table-row.is-over-ranked {
+    border-color: var(--alt-color-warning);
+}
+
+/*
+ * The robot status ladder is its own vocabulary and shares no member with the
+ * warship's or the spaceship's, so all three can use `.alt-ship-status-badge`.
+ */
+.alt-robot-status--Operational { background: rgba(74, 217, 122, 0.15); color: var(--alt-color-success); }
+.alt-robot-status--Strained    { background: rgba(217, 164, 74, 0.15); color: var(--alt-color-warning); }
+.alt-robot-status--Shutdown,
+.alt-robot-status--Disabled    { background: rgba(217, 74, 74, 0.15); color: var(--alt-color-danger); }
+.alt-robot-status--Destroyed   { background: rgba(0, 0, 0, 0.4); color: var(--alt-color-text-muted); }
