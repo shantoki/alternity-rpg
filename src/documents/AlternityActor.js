@@ -33,7 +33,7 @@ import {
     ABILITY_TYPES,
 } from '../data/alternity-actor-data.js';
 import { AlternityMathService } from '../services/alternity-math.js';
-import { AlternityRollService } from '../services/alternity-roll-service.js';
+import { AlternityRollService, layeredArmorLines } from '../services/alternity-roll-service.js';
 import { Actor, Roll, ChatMessage, Hooks, game, renderTemplate } from '../module-info.js';
 
 // ---------------------------------------------------------------------------
@@ -615,11 +615,10 @@ export class AlternityActor extends Actor {
             context,
         });
 
-        const modifierTrace = [...(options.armorTrace ?? []).filter(
-            // The winning armour line is already in the resolution's own trace; only
-            // the discarded layers are worth carrying across.
-            (line) => line.value === 0
-        ), ...resolved.modifierTrace];
+        // The winning armour line is already in the resolution's own trace; only the
+        // discarded layers are worth carrying across. Shared with the statblock path
+        // in `_applyTrackDamage` so the two cannot explain a layered hit differently.
+        const modifierTrace = [...layeredArmorLines(options.armorTrace), ...resolved.modifierTrace];
 
         // The secondary basis is the *post-degrade, pre-armour* primary. Passing the
         // raw roll instead would overstate it on a degraded hit, and passing the

@@ -60,6 +60,25 @@ function _whisperTo(whisper) {
     return whisper ? { whisper: ChatMessage.getWhisperRecipients('GM') } : {};
 }
 
+/**
+ * The protections that lost the layering roll, out of an armour roll's trace.
+ *
+ * `selectBestArmorRoll` traces the winner at its negative value and every discarded
+ * layer at 0, and only the winning value reaches the math service — so the discarded
+ * lines have to be re-attached to whatever trace the damage resolution produced, or a
+ * layered target shows several dice with only one of them accounted for.
+ *
+ * Exported through both apply paths (`AlternityActor.applyAlternityDamage` and
+ * `_applyTrackDamage`) rather than done once at the card, so the same explanation
+ * reaches the `alternity:damageApplied` hook as well.
+ *
+ * @param {object[]} [trace]
+ * @returns {object[]}
+ */
+export function layeredArmorLines(trace) {
+    return (trace ?? []).filter((line) => line && line.value === 0);
+}
+
 // ---------------------------------------------------------------------------
 // AlternityRollService
 // ---------------------------------------------------------------------------
@@ -567,8 +586,13 @@ export const AlternityRollService = {
      * @param {object} config
      * @param {Actor}  config.actor
      * @param {string} config.damageForm - 'LI' | 'HI' | 'En'.
+     * Each roll comes back paired with the protection that made it. Two anonymous
+     * dice on a chat card do not tell a player whether their implant rolled at all,
+     * which is the whole question a layered defence raises.
+     *
      * @returns {Promise<{
-     *   value: number, source: string, rolls: Roll[], toughness: string,
+     *   value: number, source: string, toughness: string,
+     *   rolls: Array<{source: string, roll: Roll}>,
      *   considered: object[], modifierTrace: object[],
      * }>}
      */
@@ -618,7 +642,7 @@ export const AlternityRollService = {
 
             const roll = new Roll(parsed.formula);
             await roll.evaluate();
-            rolls.push(roll);
+            rolls.push({ source: rating.source, roll });
             candidates.push({ source: rating.source, value: roll.total });
         }
 
@@ -745,8 +769,14 @@ export const AlternityRollService = {
             armorSource: armor.source,
             secondaryLabel: secondaryParts.join(' + '),
             // Rendered here rather than in the template: `Roll#render` is async and
-            // Handlebars helpers are not.
-            rollHtml:    await Promise.all(armor.rolls.map((r) => r.render())),
+            // Handlebars helpers are not. Each block is labelled with the protection
+            // that rolled it, and `isWinner` marks the one that counted — with several
+            // layers rolling, an unlabelled pile of dice answers nothing.
+            armorRolls: await Promise.all(armor.rolls.map(async ({ source, roll }) => ({
+                source,
+                isWinner: source === armor.source,
+                html: await roll.render(),
+            }))),
             trace:       outcome.modifierTrace ?? [],
             name,
         });
@@ -755,7 +785,7 @@ export const AlternityRollService = {
             speaker: ChatMessage.getSpeaker({ actor: target }),
             content,
             style: _rollStyle(),
-            rolls: armor.rolls,
+            rolls: armor.rolls.map((r) => r.roll),
             flags: { [NAMESPACE]: { mitigation: { targetUuid: target.uuid, rawDamage, damageForm } } },
         });
     },
@@ -832,19 +862,27 @@ export const AlternityRollService = {
 
         if (Object.keys(updates).length) await actor.update(updates);
 
+        // The layering rule's discarded rolls are not part of the resolution — the
+        // math service is only ever handed the winning value — so they have to be
+        // carried across from the armour roll. Without this a layered target showed
+        // two dice on the card and an explanation for only one of them, which reads
+        // as "it didn't roll the others". `AlternityActor.applyAlternityDamage` does
+        // the same for the hero path; a test covers both so they cannot drift.
+        const modifierTrace = [...layeredArmorLines(options.armorTrace), ...resolved.modifierTrace];
+
         Hooks.callAll('alternity:damageApplied', actor, {
             rawDamage: total,
             finalDamage: resolved.primary,
             mitigated: resolved.mitigated,
             damageType: damageForm,
             category: resolved.grade,
-            modifierTrace: resolved.modifierTrace,
+            modifierTrace,
             woundLevelChanged: false,
             newWoundLevel: actor.system?.woundLevel ?? actor.system?.status ?? null,
             source: name ?? null,
         });
 
-        return resolved;
+        return { ...resolved, modifierTrace };
     },
 
     // -----------------------------------------------------------------------

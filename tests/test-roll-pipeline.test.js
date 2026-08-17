@@ -588,7 +588,7 @@ describe('Armour mitigation', () => {
 
             const result = await AlternityRollService.rollArmorProtection({ actor: target, damageForm: 'LI' });
             expect(result.rolls).toHaveLength(1);
-            expect(result.rolls[0].formula).toBe('1d6-3');
+            expect(result.rolls[0].roll.formula).toBe('1d6-3');
             expect(result.value).toBe(1);
             expect(result.source).toBe('Battle Vest');
         });
@@ -617,6 +617,47 @@ describe('Armour mitigation', () => {
             expect(result.value).toBe(4);
             expect(result.source).toBe('ALTERNITY.Armor.Natural');
             expect(result.considered).toHaveLength(2);
+        });
+
+        it('should roll every layer, not just the one that ends up counting', async () => {
+            const target = makeActor({
+                type: 'creature',
+                system: { naturalArmor: { li: 'd4', hi: '', en: '' } },
+                items: [
+                    armorItem('Battle Vest', { li: 'd6', hi: '', en: '' }),
+                    { id: 'cyb', name: 'Dermal Plating', type: 'cybertech',
+                        system: { isInstalled: true, armorProtection: { li: 'd8', hi: '', en: '' } } },
+                ],
+            });
+            queueRolls([2, 7, 4]);
+
+            const result = await AlternityRollService.rollArmorProtection({ actor: target, damageForm: 'LI' });
+            // Three protections, three dice — and each one names the protection that
+            // rolled it, because two anonymous dice cannot answer "did mine roll?".
+            expect(result.rolls).toHaveLength(3);
+            expect(result.rolls.map((r) => `${r.source} ${r.roll.formula}=${r.roll.total}`)).toEqual([
+                'Battle Vest 1d6=2',
+                'Dermal Plating 1d8=7',
+                'ALTERNITY.Armor.Natural 1d4=4',
+            ]);
+            expect(result.source).toBe('Dermal Plating');
+            expect(result.value).toBe(7);
+        });
+
+        it('should not roll a rating printed as a flat number', async () => {
+            const target = makeActor({
+                type: 'creature',
+                system: { naturalArmor: { li: '3', hi: '', en: '' } },
+                items: [armorItem('Battle Vest', { li: 'd6', hi: '', en: '' })],
+            });
+            queueRolls([2]);
+
+            const result = await AlternityRollService.rollArmorProtection({ actor: target, damageForm: 'LI' });
+            // One die for the vest; the flat 3 needs no roll but still competes — and
+            // wins here, which is why a card with fewer dice than layers is correct.
+            expect(result.rolls).toHaveLength(1);
+            expect(result.considered).toHaveLength(2);
+            expect(result.value).toBe(3);
         });
 
         it('should report the target\'s toughness, raised by what it wears', async () => {
@@ -746,6 +787,69 @@ describe('Armour mitigation', () => {
             });
             // The armour die itself is attached to the message, not just described.
             expect(chatLog[chatLog.length - 1].rolls).toHaveLength(1);
+        });
+
+        it('should account for every layer on the card, not only the winner', async () => {
+            // The bug this pins: the discarded rolls live in the armour roll's trace,
+            // not in the damage resolution, so a path that forgets to carry them across
+            // shows several dice and explains one — which reads as the other layers
+            // never having rolled at all.
+            const target = makeActor({
+                type: 'creature',
+                system: {
+                    naturalArmor: { li: 'd4', hi: '', en: '' },
+                    damage: { stun: { value: 0 }, wound: { value: 0 }, mortal: { value: 0 } },
+                    durability: { stun: { max: 30 }, wound: { max: 30 }, mortal: { max: 15 } },
+                },
+                items: [armorItem('Battle Vest', { li: 'd6', hi: '', en: '' })],
+            });
+            targetActor(target);
+            queueRolls([2, 4]); // vest 2, hide 4
+
+            await AlternityRollService.applyDamageToTargets({
+                total: 8, category: 'wound', damageType: 'LI', name: 'Sword',
+            });
+
+            const card = renderLog.find((r) => r.path.endsWith('armor-card.hbs'));
+            expect(card.context.armorRolls.map((r) => [r.source, r.isWinner])).toEqual([
+                ['Battle Vest', false],
+                ['ALTERNITY.Armor.Natural', true],
+            ]);
+            // Both layers appear in the breakdown: the winner at its value, the
+            // discarded one at 0 with the reason it did not count.
+            const trace = card.context.trace;
+            expect(trace.find((l) => l.source === 'Battle Vest')).toMatchObject({ value: 0 });
+            expect(trace.find((l) => l.source === 'ALTERNITY.Armor.Natural')).toMatchObject({ value: -4 });
+            // 8 wound, hide stops 4, and the 4 secondary stuns are untouched.
+            expect(target.updates[0]).toEqual({
+                'system.damage.stun.value': 4,
+                'system.damage.wound.value': 4,
+            });
+        });
+
+        it('should explain a layered hit the same way on both apply paths', async () => {
+            // The statblock path and the hero path assemble the trace separately, so
+            // they are asserted against each other rather than each on its own.
+            const discarded = { source: 'Battle Vest', value: 0, reason: 'lost the layering roll' };
+            const winner = { source: 'Dermal Plating', value: -5, reason: 'won' };
+
+            const statblock = makeActor({
+                type: 'creature',
+                system: {
+                    damage: { stun: { value: 0 }, wound: { value: 0 }, mortal: { value: 0 } },
+                    durability: { stun: { max: 30 }, wound: { max: 30 }, mortal: { max: 15 } },
+                },
+            });
+            const outcome = await AlternityRollService._applyTrackDamage(statblock, 8, 'LI', {
+                category: 'wound', context: 'Test', armorRoll: 5,
+                armorSource: 'Dermal Plating', armorTrace: [winner, discarded],
+            });
+
+            // The discarded layer is carried across; the winner is not duplicated,
+            // because the resolution already traces the value it was handed.
+            expect(outcome.modifierTrace.filter((l) => l.source === 'Battle Vest')).toHaveLength(1);
+            expect(outcome.modifierTrace.filter((l) => l.source === 'Dermal Plating')).toHaveLength(1);
+            expect(outcome.modifierTrace.find((l) => l.source === 'Dermal Plating').value).toBe(-5);
         });
 
         it('should stay quiet when nothing reduced the damage', async () => {

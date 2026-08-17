@@ -1309,6 +1309,32 @@
     margin: 5px 0;
 }
 
+/* One armour roll on the mitigation card, labelled with the protection that made it.
+   Several can appear at once when a defence is layered, and only one of them counts —
+   the winner is marked so the card answers "did my implant roll?" on sight. */
+.alt-armor-roll {
+    margin: 4px 0;
+    padding-left: 6px;
+    border-left: 2px solid var(--alt-color-border);
+    opacity: 0.6;
+}
+
+.alt-armor-roll.is-winner {
+    border-left-color: var(--alt-color-primary);
+    opacity: 1;
+}
+
+.alt-armor-roll-source {
+    display: block;
+    font-size: 9px;
+    text-transform: uppercase;
+    color: var(--alt-color-text-muted);
+}
+
+.alt-armor-roll.is-winner .alt-armor-roll-source {
+    color: var(--alt-color-primary);
+}
+
 .alt-roll-breakdown {
     margin-top: 8px;
     font-size: 11px;

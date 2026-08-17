@@ -35,8 +35,15 @@
         <p class="alt-roll-note">{{localize "ALTERNITY.Armor.SecondaryNote"}}: {{secondaryLabel}}</p>
         {{/if}}
 
-        {{#each rollHtml}}
-        <div class="alt-roll-rendered">{{{this}}}</div>
+        {{!-- One block per protection that rolled, named, so a layered defence shows
+              plainly that every layer rolled and which one counted. A rating printed
+              as a flat number has no die and so has no block here; it still appears in
+              the breakdown below. --}}
+        {{#each armorRolls}}
+        <div class="alt-armor-roll {{#if this.isWinner}}is-winner{{/if}}">
+            <span class="alt-armor-roll-source">{{this.source}}</span>
+            <div class="alt-roll-rendered">{{{this.html}}}</div>
+        </div>
         {{/each}}
 
         {{#if trace.length}}
