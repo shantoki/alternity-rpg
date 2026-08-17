@@ -36,6 +36,7 @@ import {
 
 // ── Logic / hooks ───────────────────────────────────────────────────────────
 import { initializeAlternityHooks } from '../module_hooks/alt-mechanics.js';
+import { initializeDamageFormMigration } from './migrations/damage-forms.js';
 
 // ── Client sheet ────────────────────────────────────────────────────────────
 import { registerAlternitySheet } from './client/alternity-sheet-module.js';
@@ -141,6 +142,13 @@ Hooks.once('init', async () => {
 
     // ── 5. Hook listeners ───────────────────────────────────────────────────
     initializeAlternityHooks();
+
+    // ── 5b. World migrations ────────────────────────────────────────────────
+    // Registers its own `ready` listener. Needed because `migrateData` only fixes
+    // a document's in-memory copy: a stored value that is no longer a legal
+    // `choices` entry makes every future save of that document fail, so it has to
+    // be written back to the database once.
+    initializeDamageFormMigration();
 
     // ── 6. Character sheet ──────────────────────────────────────────────────
     await registerAlternitySheet();

@@ -106,6 +106,8 @@
   "ALTERNITY.Modifier.ArmorPenaltyReason": "Check penalty from worn armour",
   "ALTERNITY.Modifier.Resistance": "Resistance",
   "ALTERNITY.Modifier.ResistanceReason": "{target}'s resistance modifier",
+  "ALTERNITY.Migration.DamageForms": "Alternity: updated {items} item(s) to the LI/HI/En damage forms. Check any armour-piercing weapons — they need marking as HI by hand.",
+  "ALTERNITY.Migration.DamageFormsFailed": "Alternity: the damage form migration failed. See the console; it will retry on the next world load.",
   "ALTERNITY.Close": "Close",
   "ALTERNITY.Roll.UnnamedSkill": "Skill",
   "ALTERNITY.DamageCategoryHint": "Only used for a damage code written without a trailing s/w/m.",
