@@ -841,5 +841,78 @@
   "ALTERNITY.Npc.Tactics": "Tactics",
   "ALTERNITY.Npc.Biography": "Biography",
 
-  "ALTERNITY.Npc.WarnMarginalNonprofessional": "Marginal characters are nonprofessionals by definition, so this profession grants no action check bonus. Raise the quality tier, or set a bonus override."
+  "ALTERNITY.Npc.WarnMarginalNonprofessional": "Marginal characters are nonprofessionals by definition, so this profession grants no action check bonus. Raise the quality tier, or set a bonus override.",
+
+  "ALTERNITY.Movement.crawl": "Crawl",
+
+  "ALTERNITY.Creature.Category": "Kind",
+  "ALTERNITY.Creature.CategoryName.Animal": "Animal",
+  "ALTERNITY.Creature.CategoryName.Alien": "Alien",
+  "ALTERNITY.Creature.CategoryName.Construct": "Construct",
+  "ALTERNITY.Creature.CategoryName.Other": "Other",
+  "ALTERNITY.Creature.Species": "Species",
+  "ALTERNITY.Creature.SpeciesHint": "A large brown bear, or possibly a small grizzly…",
+
+  "ALTERNITY.Creature.RangeHint": "The die expression printed beside the score, so an individual can be rolled off the species average. Free text — it is never parsed.",
+  "ALTERNITY.Creature.Animal": "Animal",
+  "ALTERNITY.Creature.AnimalScaleHint": "The Animal-scale score, used for anything a creature of this kind could plausibly attempt. Zero means this creature is not on the animal scale at all.",
+  "ALTERNITY.Creature.AnimalScaleNote": "Intelligence and Personality run on two scales at once. The low score is the real one — no dog is as intelligent as a human — while the Animal score covers what a creature of this kind can actually manage: negotiating a maze, reading a gesture, working a pack.",
+
+  "ALTERNITY.Creature.Durability": "Durability",
+  "ALTERNITY.Creature.DurabilityHint": "Stun / wound / mortal / fatigue. Derived from Constitution, then scaled by the size multiplier.",
+  "ALTERNITY.Creature.Multiplier": "Size ×",
+  "ALTERNITY.Creature.MultiplierHint": "A flat multiplier on each durability rating. 1.5 reproduces the bear, buffalo and elephant exactly; everything else in the compendium sits at 1. Note this is not the weren rule, which multiplies Constitution instead and can differ by a point.",
+  "ALTERNITY.Creature.Damage": "Damage",
+  "ALTERNITY.Creature.ClearDamage": "Clear all damage",
+
+  "ALTERNITY.Creature.ActionCheck": "Action Check",
+  "ALTERNITY.Creature.ActionCheckHint": "Entered as printed, not derived — the book warns that creature statistics are purposely modified. Good and Amazing follow from this value normally.",
+  "ALTERNITY.Creature.TunedActionCheck": "Hand-tuned: the hero formula would give",
+  "ALTERNITY.Creature.ActionsPerRound": "Actions / Round",
+  "ALTERNITY.Creature.ActionsPerRoundHint": "As printed.",
+  "ALTERNITY.Creature.ReactionScore": "Reaction Score",
+  "ALTERNITY.Creature.ReactionScoreHint": "The number is one less than the actions per round, which holds across every printed compendium entry. The degree is set here.",
+  "ALTERNITY.Creature.ReactionNote": "Manoeuvre",
+  "ALTERNITY.Creature.ReactionNoteHint": "A second reaction score for one specific move, as the buffalo prints “(Charge: Good/1)”.",
+
+  "ALTERNITY.Creature.Attacks": "Attacks",
+  "ALTERNITY.Creature.NoAttacks": "No attacks.",
+  "ALTERNITY.Creature.AttackName": "Bite, claws, gore…",
+  "ALTERNITY.Creature.AttackScoreHint": "The Ordinary attack score. Good and Amazing follow from it.",
+  "ALTERNITY.Creature.AttackScoreRunHint": "Ordinary / Good / Amazing — half and a quarter of the score, rounded down.",
+  "ALTERNITY.Creature.ModeHint": "The second half of the printed type code — the “O” in “LI/O”. Carried through as printed.",
+
+  "ALTERNITY.Creature.Defenses": "Defenses",
+  "ALTERNITY.Creature.DefensesHint": "A creature resists with two flat modifiers rather than per-ability ones, plus whatever natural armour it has.",
+  "ALTERNITY.Creature.ResistanceMelee": "vs Melee",
+  "ALTERNITY.Creature.ResistanceRanged": "vs Ranged",
+  "ALTERNITY.Creature.ResistanceHint": "The step penalty an attacker takes. Leave empty for “no resistance modifier”, which the compendium prints as a distinct statement from a modifier of zero.",
+  "ALTERNITY.Creature.NoResistance": "none",
+  "ALTERNITY.Creature.Armor": "Armour",
+  "ALTERNITY.Creature.NaturalArmorHint": "Natural armour as the compendium prints it — a die expression per damage type, such as “d4-2”. Free text, since forms like that are not dice Foundry could roll unaided.",
+  "ALTERNITY.Creature.None": "none",
+
+  "ALTERNITY.Creature.Movement": "Movement",
+  "ALTERNITY.Creature.Skills": "Skills",
+  "ALTERNITY.Creature.NoSkills": "No skills.",
+  "ALTERNITY.Creature.SkillsNote": "Absolute scores, not ranks",
+  "ALTERNITY.Creature.SkillScoreHint": "The score itself, as printed in brackets. A creature cannot learn new skills or improve the ones it has, so there is no rank and no cost.",
+  "ALTERNITY.Creature.Specialty": "Specialty",
+  "ALTERNITY.Creature.SpecialtyHint": "Renders indented under the broad skill above it, the way the compendium prints “Athletics [16]-climb [18]”.",
+
+  "ALTERNITY.Creature.Behaviour": "Behaviour",
+  "ALTERNITY.Creature.BehaviourHint": "Animals rarely attack on sight and few fight to the death. What does this one actually do?",
+
+  "ALTERNITY.Creature.Status.Unharmed": "Unharmed",
+  "ALTERNITY.Creature.Status.UnharmedHint": "No damage taken.",
+  "ALTERNITY.Creature.Status.Wounded": "Wounded",
+  "ALTERNITY.Creature.Status.WoundedHint": "Once an animal takes substantial wound damage it is likely to break off the fight and move away.",
+  "ALTERNITY.Creature.Status.Unconscious": "Unconscious",
+  "ALTERNITY.Creature.Status.UnconsciousHint": "The stun track is full.",
+  "ALTERNITY.Creature.Status.Disabled": "Disabled",
+  "ALTERNITY.Creature.Status.DisabledHint": "The wound track is full.",
+  "ALTERNITY.Creature.Status.Dead": "Dead",
+  "ALTERNITY.Creature.Status.DeadHint": "The mortal track is full.",
+
+  "TYPES.Actor.creature": "Creature"
 }

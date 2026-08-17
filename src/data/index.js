@@ -6,6 +6,7 @@ export * from './WarshipData.js';
 export * from './SpaceshipData.js';
 export * from './RobotData.js';
 export * from './AIData.js';
+export * from './CreatureData.js';
 export * from './WeaponData.js';
 export * from './ArmorData.js';
 export * from './SkillData.js';

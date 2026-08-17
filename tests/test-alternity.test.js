@@ -1460,6 +1460,102 @@ describe('Alternity System Unit Tests', () => {
         });
     });
 
+    // -----------------------------------------------------------------------
+    // Creatures
+    //
+    // The Animal Compendium is the regression suite. The book warns that creature
+    // statistics "don't always play by the rules" — so the point of these tests is
+    // to pin down exactly which stats DO hold (durability, the score runs) and to
+    // record that the action check does not.
+    // -----------------------------------------------------------------------
+
+    describe('AlternityMathService — Creature Durability', () => {
+
+        // [name, CON, multiplier, printed run]
+        const COMPENDIUM = [
+            ['Bear',      16, 1.5, '24/24/12/12'],
+            ['Buffalo',    14, 1.5, '21/21/10/10'],
+            ['Elephant',   18, 1.5, '27/27/13/13'],
+            ['Cat, great', 12, 1,   '12/12/6/6'],
+            ['Crocodile',  14, 1,   '14/14/7/7'],
+            ['Dog',         9, 1,   '9/9/5/5'],
+            ['Horse',      14, 1,   '14/14/7/7'],
+        ];
+
+        it.each(COMPENDIUM)('should reproduce the printed durability for the %s', (name, con, multiplier, run) => {
+            expect(AlternityMathService.calculateCreatureDurability(con, { multiplier }).run).toBe(run);
+        });
+
+        it('should scale each rating, not Constitution', () => {
+            // The distinction is real and shows up on an odd Constitution. The
+            // buffalo (CON 14, x1.5) prints mortal 10 — floor(7 x 1.5) — whereas
+            // multiplying Constitution first would give ceil(21 / 2) = 11.
+            const creature = AlternityMathService.calculateCreatureDurability(14, { multiplier: 1.5 });
+            expect(creature.mortal).toBe(10);
+
+            // The weren rule genuinely is the other one: "use the character's
+            // Constitution score x 1.5". Both are followed as written.
+            const weren = AlternityMathService.calculateDurabilityRatings(14, { isWeren: true });
+            expect(weren.mortal).toBe(11);
+        });
+
+        it('should leave an unmultiplied creature on the hero ratings', () => {
+            const r = AlternityMathService.calculateCreatureDurability(9);
+            expect(r).toMatchObject({ stun: 9, wound: 9, mortal: 5, fatigue: 5, multiplier: 1 });
+            expect(r.base).toEqual({ stun: 9, wound: 9, mortal: 5, fatigue: 5 });
+        });
+
+        it('should reject a multiplier of zero or less', () => {
+            expect(() => AlternityMathService.calculateCreatureDurability(10, { multiplier: 0 })).toThrow();
+            expect(() => AlternityMathService.calculateCreatureDurability(10, { multiplier: -1 })).toThrow();
+        });
+    });
+
+    describe('AlternityMathService — Score Runs', () => {
+
+        it('should expand a score the way every printed run does', () => {
+            // Attack lines from the compendium: the great ape's pummel and the
+            // buffalo's charge.
+            expect(AlternityMathService.calculateScoreRun(18).label).toBe('18/9/4');
+            expect(AlternityMathService.calculateScoreRun(16).label).toBe('16/8/4');
+            expect(AlternityMathService.calculateScoreRun(13).label).toBe('13/6/3');
+            // Action check runs.
+            expect(AlternityMathService.calculateScoreRun(11).label).toBe('11/5/2');
+            expect(AlternityMathService.calculateScoreRun(8).label).toBe('8/4/2');
+        });
+
+        it('should floor a zero score rather than going negative', () => {
+            expect(AlternityMathService.calculateScoreRun(0)).toMatchObject({ ordinary: 0, good: 0, amazing: 0 });
+            expect(AlternityMathService.calculateScoreRun(-5).ordinary).toBe(0);
+        });
+    });
+
+    describe('Creature action checks are entered, not derived', () => {
+
+        it('should confirm the hero formula does not reproduce the printed values', () => {
+            // This is the book's own warning made concrete: "some numbers are
+            // purposely modified". If a future change ever tries to derive a
+            // creature's action check, these are the counter-examples.
+            const derived = (dex, int) => AlternityMathService
+                .calculateActionCheckScore(dex, int, { isNonprofessional: true }).ordinary;
+
+            // Dog: DEX 11, INT 3 — prints 13.
+            expect(derived(11, 3)).toBe(7);
+            // Bear: DEX 8, INT 2 — prints 11.
+            expect(derived(8, 2)).toBe(5);
+            // Elephant: DEX 4, INT 3 — prints 9.
+            expect(derived(4, 3)).toBe(3);
+        });
+
+        it('should still expand a printed score into the normal run', () => {
+            // The runs themselves are internally consistent in every entry, which
+            // is why only the Ordinary value is stored.
+            for (const [score, run] of [[11, '11/5/2'], [13, '13/6/3'], [9, '9/4/2'], [8, '8/4/2']]) {
+                expect(AlternityMathService.calculateScoreRun(score).label).toBe(run);
+            }
+        });
+    });
+
     describe('AI hardware table', () => {
 
         it('should cap skill rank one below the slot count, and never above 12', () => {

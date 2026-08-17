@@ -1978,3 +1978,78 @@
 .alt-ai-status--Disabled    { background: rgba(217, 74, 74, 0.15); color: var(--alt-color-danger); }
 .alt-ai-status--Restorable  { background: rgba(217, 164, 74, 0.2); color: var(--alt-color-warning); }
 .alt-ai-status--Destroyed   { background: rgba(0, 0, 0, 0.4); color: var(--alt-color-text-muted); }
+
+/* ═══ Creature sheet ═════════════════════════════════════════════════════════ */
+
+/*
+ * Wider cells than the other ability blocks, because every creature score carries a
+ * printed range formula beside it and Intelligence and Personality carry a second
+ * Animal-scale score as well.
+ */
+.alt-creature-abilities {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+}
+@media (max-width: 640px) {
+    .alt-creature-abilities { grid-template-columns: repeat(2, 1fr); }
+}
+
+.alt-creature-ability {
+    display: grid;
+    grid-template-columns: auto 52px 1fr;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 6px;
+    background: var(--alt-color-surface);
+    border: 1px solid var(--alt-color-border);
+    border-radius: var(--alt-radius);
+}
+.alt-creature-ability > label {
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--alt-color-primary);
+}
+.alt-creature-ability-score { text-align: center; font-size: 14px; }
+.alt-creature-ability-range {
+    font-size: 10px;
+    color: var(--alt-color-text-muted);
+    min-width: 0;
+}
+
+/* The Animal-scale score sits on its own row spanning the whole cell. */
+.alt-creature-animal {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-top: 3px;
+    border-top: 1px dashed var(--alt-color-border);
+}
+.alt-creature-animal label {
+    font-size: 9px;
+    text-transform: uppercase;
+    color: var(--alt-color-text-muted);
+}
+.alt-creature-animal input { width: 46px; text-align: center; }
+
+/* The `O` in `LI/O` is one character wide in print; no need for more here. */
+.alt-creature-mode { width: 34px; text-align: center; }
+
+/* A specialty renders indented under the broad skill it follows. */
+.alt-ship-table-row.is-specialty {
+    margin-left: 18px;
+    border-left: 2px solid var(--alt-color-border);
+}
+
+.alt-creature-status--Unharmed    { background: rgba(74, 217, 122, 0.15); color: var(--alt-color-success); }
+.alt-creature-status--Wounded     { background: rgba(217, 164, 74, 0.15); color: var(--alt-color-warning); }
+.alt-creature-status--Unconscious,
+.alt-creature-status--Disabled    { background: rgba(217, 74, 74, 0.15); color: var(--alt-color-danger); }
+.alt-creature-status--Dead        { background: rgba(0, 0, 0, 0.4); color: var(--alt-color-text-muted); }
+
+/* Lets the Species field take the slack in the header meta row. */
+.alt-meta-field--grow { flex: 1 1 auto; min-width: 0; }
+.alt-meta-field--grow input { width: 100%; }

@@ -19,6 +19,7 @@ import {
     SpaceshipData,
     RobotData,
     AIData,
+    CreatureData,
     WeaponData,
     ArmorData,
     SkillData,
@@ -62,6 +63,7 @@ Hooks.once('init', async () => {
     CONFIG.Actor.dataModels.spaceship = SpaceshipData;
     CONFIG.Actor.dataModels.robot     = RobotData;
     CONFIG.Actor.dataModels.ai        = AIData;
+    CONFIG.Actor.dataModels.creature  = CreatureData;
 
     CONFIG.Item.dataModels = CONFIG.Item.dataModels ?? {};
     CONFIG.Item.dataModels.weapon = WeaponData;
@@ -126,6 +128,14 @@ Hooks.once('init', async () => {
         ai: {
             bar: ['durability.stun', 'durability.wound', 'durability.mortal'],
             value: ['status', 'actionsPerRound', 'gridMovementRate', 'gridSkillScore.ordinary'],
+        },
+        // A creature's damage is stored under `damage.*` and its maxima derive from
+        // Constitution, so `durability.*` is rebuilt in prepareDerivedData to give the
+        // token bars a value/max pair. Large creatures carry a flat multiplier on
+        // every rating, which is why the maxima are not simply Constitution.
+        creature: {
+            bar: ['durability.stun', 'durability.wound', 'durability.mortal', 'durability.fatigue'],
+            value: ['status', 'woundLevel', 'actionsPerRound', 'actionCheck.ordinary'],
         },
     };
 

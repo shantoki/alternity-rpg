@@ -46,6 +46,12 @@ import {
     NPC_DAMAGE_TYPES,
 } from '../data/NpcData.js';
 import {
+    CREATURE_CATEGORIES,
+    DAMAGE_TYPES,
+    CREATURE_ABILITIES,
+    ANIMAL_SCALE_ABILITIES,
+} from '../data/CreatureData.js';
+import {
     AI_QUALITIES,
     AI_PROCESSORS,
     AI_AVATAR_PROGRAMS,
@@ -2028,6 +2034,165 @@ class AlternityAISheet extends foundry.applications.api.HandlebarsApplicationMix
 }
 
 // ---------------------------------------------------------------------------
+// AlternityCreatureSheet
+// ---------------------------------------------------------------------------
+
+const CREATURE_ARRAY_FIELDS = Object.freeze({
+    attacks: {
+        name: '', score: 0, damageOrdinary: '', damageGood: '', damageAmazing: '',
+        damageType: 'LI', mode: 'O', notes: '',
+    },
+    skills: { name: '', score: 0, isSpecialty: false },
+});
+
+const CREATURE_TRACKS = Object.freeze(['stun', 'wound', 'mortal', 'fatigue']);
+
+class AlternityCreatureSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
+    static DEFAULT_OPTIONS = foundry.utils.mergeObject(super.DEFAULT_OPTIONS, {
+        classes: [NS, `${NS}-sheet-app`, `${NS}-creature-sheet`],
+        tag: "form",
+        window: { resizable: true, width: 680, height: 820 },
+        actions: {
+            addCreatureRow:      this._onAddCreatureRowAction,
+            deleteCreatureRow:   this._onDeleteCreatureRowAction,
+            setCreatureDamage:   this._onSetCreatureDamageAction,
+            clearCreatureDamage: this._onClearCreatureDamageAction,
+        }
+    });
+
+    static PARTS = {
+        sheet: { template: "systems/alternity-v2/templates/actor/actor-creature-sheet.hbs" }
+    };
+
+    async _prepareContext(options) {
+        const context = await super._prepareContext(options);
+        const system = this.document.system;
+
+        context.actor = this.document;
+        context.system = system;
+        context.alt = NS;
+
+        // ── Choice lists ────────────────────────────────────────────────────
+        context.categoryChoices = CREATURE_CATEGORIES;
+        context.reactionDegreeChoices = REACTION_DEGREES;
+        context.damageTypeChoices = DAMAGE_TYPES;
+
+        // ── Abilities, with their printed range and the animal scale ────────
+        context.abilities = CREATURE_ABILITIES.map((key) => ({
+            key,
+            label: game.i18n.localize(`ALTERNITY.Ability.${key.toUpperCase()}`),
+            value: system.abilities?.[key] ?? 0,
+            range: system.abilityRanges?.[key] ?? '',
+            // Only Intelligence and Personality carry a second scale.
+            hasAnimalScale: ANIMAL_SCALE_ABILITIES.includes(key),
+            animalValue: system.animalScale?.[key] ?? 0,
+        }));
+
+        // ── Damage tracks ───────────────────────────────────────────────────
+        context.tracks = CREATURE_TRACKS.map((key) => {
+            const track = system.durability?.[key] ?? { value: 0, max: 0 };
+            return {
+                key,
+                label: game.i18n.localize(`ALTERNITY.${key.charAt(0).toUpperCase()}${key.slice(1)}`),
+                value: track.value, max: track.max,
+                pct: pct(track.value, track.max),
+            };
+        });
+
+        // ── Defenses ────────────────────────────────────────────────────────
+        // A null resistance is not zero: the compendium prints "no resistance
+        // modifier vs. ranged attacks", which is a different statement from +0.
+        context.resistances = ['melee', 'ranged'].map((key) => {
+            const value = system.resistance?.[key];
+            return {
+                key,
+                label: game.i18n.localize(`ALTERNITY.Creature.Resistance${key === 'melee' ? 'Melee' : 'Ranged'}`),
+                hint: game.i18n.localize('ALTERNITY.Creature.ResistanceHint'),
+                value: value ?? null,
+                display: value === null || value === undefined
+                    ? game.i18n.localize('ALTERNITY.Creature.NoResistance')
+                    : fmtMod(value),
+            };
+        });
+
+        context.armorSlots = [
+            { key: 'li', label: 'LI', value: system.naturalArmor?.li ?? '' },
+            { key: 'hi', label: 'HI', value: system.naturalArmor?.hi ?? '' },
+            { key: 'en', label: 'En', value: system.naturalArmor?.en ?? '' },
+        ];
+
+        // ── Movement ────────────────────────────────────────────────────────
+        context.movementKeys = ['sprint', 'run', 'walk', 'crawl', 'easySwim', 'swim', 'glide', 'fly']
+            .map((key) => ({
+                key,
+                label: game.i18n.localize(`ALTERNITY.Movement.${key}`),
+                value: system.movement?.[key] ?? 0,
+            }));
+        context.movementSummary = (system.movementRates ?? [])
+            .map((r) => `${game.i18n.localize(`ALTERNITY.Movement.${r.key}`)} ${r.value}`)
+            .join(', ');
+
+        context.attackRows = system.attackRows ?? [];
+        context.skillRows  = system.skillRows ?? [];
+
+        return context;
+    }
+
+    _onRender(context, options) {
+        this.element.addEventListener('change', (e) => {
+            applySheetFieldChange(this.document, e.target, CREATURE_ARRAY_FIELDS);
+        });
+    }
+
+    // -----------------------------------------------------------------------
+    // Row management
+    // -----------------------------------------------------------------------
+
+    static async _onAddCreatureRowAction(event, target) {
+        const arrayKey = target.dataset.array;
+        const defaults = CREATURE_ARRAY_FIELDS[arrayKey];
+        if (!defaults) return;
+        const current = foundry.utils.getProperty(this.document.system, arrayKey) ?? [];
+        await this.document.update({
+            [`system.${arrayKey}`]: [...current, foundry.utils.deepClone(defaults)],
+        });
+    }
+
+    static async _onDeleteCreatureRowAction(event, target) {
+        const arrayKey = target.dataset.array;
+        const idx = safeInt(target.dataset.index, -1);
+        if (idx < 0 || !CREATURE_ARRAY_FIELDS[arrayKey]) return;
+        const current = foundry.utils.getProperty(this.document.system, arrayKey) ?? [];
+        await this.document.update({ [`system.${arrayKey}`]: current.filter((_, i) => i !== idx) });
+    }
+
+    // -----------------------------------------------------------------------
+    // Damage
+    // -----------------------------------------------------------------------
+
+    static async _onSetCreatureDamageAction(event, target) {
+        const track = target.dataset.track;
+        const delta = safeInt(target.dataset.delta, 0);
+        if (!CREATURE_TRACKS.includes(track)) return;
+
+        const max = this.document.system.durability?.[track]?.max ?? 0;
+        const current = this.document.system.damage?.[track]?.value ?? 0;
+        await this.document.update({
+            [`system.damage.${track}.value`]: Math.min(max, Math.max(0, current + delta)),
+        });
+    }
+
+    static async _onClearCreatureDamageAction() {
+        await this.document.update({
+            'system.damage.stun.value': 0,
+            'system.damage.wound.value': 0,
+            'system.damage.mortal.value': 0,
+            'system.damage.fatigue.value': 0,
+        });
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Registration
 // ---------------------------------------------------------------------------
 
@@ -2072,6 +2237,7 @@ async function registerAlternitySheet() {
     ActorsCollection.registerSheet('alternity-v2', AlternitySpaceshipSheet, { types: ['spaceship'], makeDefault: true, label: 'Alternity Spaceship Sheet' });
     ActorsCollection.registerSheet('alternity-v2', AlternityRobotSheet, { types: ['robot'], makeDefault: true, label: 'Alternity Robot Sheet' });
     ActorsCollection.registerSheet('alternity-v2', AlternityAISheet, { types: ['ai'], makeDefault: true, label: 'Alternity AI Sheet' });
+    ActorsCollection.registerSheet('alternity-v2', AlternityCreatureSheet, { types: ['creature'], makeDefault: true, label: 'Alternity Creature Sheet' });
 }
 
 export {
@@ -2084,6 +2250,7 @@ export {
     AlternitySpaceshipSheet,
     AlternityRobotSheet,
     AlternityAISheet,
+    AlternityCreatureSheet,
     registerAlternitySheet,
     pct,
     fmtMod,

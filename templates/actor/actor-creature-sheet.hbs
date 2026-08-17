@@ -1,0 +1,235 @@
+{{!--
+    Creature record sheet.
+
+    Follows the Animal Compendium's own layout: the ability block with its range
+    formulas, the statblock run, then Attacks / Defenses / Skills as the book heads
+    them. Nothing here is a hero — no profession, no last resort, no gear.
+
+    Root is a plain <div>: the ApplicationV2 root is already a <form>.
+--}}
+<div class="{{cssClass}} {{alt}}-sheet {{alt}}-creature-sheet">
+
+    {{!-- ═══ Header ════════════════════════════════════════════════════════ --}}
+    <header class="{{alt}}-sheet-header">
+        <div class="{{alt}}-sheet-portrait">
+            <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
+        </div>
+        <div class="{{alt}}-sheet-identity">
+            <h1 class="{{alt}}-sheet-name">
+                <input name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'Name'}}" spellcheck="false" />
+            </h1>
+            <div class="{{alt}}-sheet-meta">
+                <div class="{{alt}}-meta-field">
+                    <label>{{localize 'ALTERNITY.Creature.Category'}}</label>
+                    <select name="system.category">
+                        {{#each categoryChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq ../system.category choice)}}selected{{/if}}>{{localize (concat 'ALTERNITY.Creature.CategoryName.' choice)}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="{{alt}}-meta-field {{alt}}-meta-field--grow">
+                    <label>{{localize 'ALTERNITY.Creature.Species'}}</label>
+                    <input type="text" name="system.species" value="{{system.species}}" placeholder="{{localize 'ALTERNITY.Creature.SpeciesHint'}}" />
+                </div>
+                <span class="{{alt}}-ship-status-badge {{alt}}-creature-status--{{system.status}}"
+                      title="{{localize (concat 'ALTERNITY.Creature.Status.' system.status 'Hint')}}">
+                    {{localize (concat 'ALTERNITY.Creature.Status.' system.status)}}
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="{{alt}}-sheet-body">
+
+        {{!-- ═══ Abilities, each with its printed range ════════════════════ --}}
+        <section class="{{alt}}-creature-abilities">
+            {{#each abilities as |a|}}
+            <div class="{{../alt}}-creature-ability">
+                <label title="{{a.label}}">{{a.key}}</label>
+                <input class="{{../alt}}-creature-ability-score" type="number" name="system.abilities.{{a.key}}" value="{{a.value}}" min="0" max="40" />
+                <input class="{{../alt}}-creature-ability-range" type="text" name="system.abilityRanges.{{a.key}}"
+                       value="{{a.range}}" placeholder="d4+12" title="{{localize 'ALTERNITY.Creature.RangeHint'}}" />
+                {{#if a.hasAnimalScale}}
+                <span class="{{../alt}}-creature-animal">
+                    <label title="{{localize 'ALTERNITY.Creature.AnimalScaleHint'}}">{{localize 'ALTERNITY.Creature.Animal'}}</label>
+                    <input type="number" name="system.animalScale.{{a.key}}" value="{{a.animalValue}}" min="0" max="40" />
+                </span>
+                {{/if}}
+            </div>
+            {{/each}}
+        </section>
+        {{#if system.isAnimalScaled}}
+        <p class="{{alt}}-npc-tier-hint">{{localize 'ALTERNITY.Creature.AnimalScaleNote'}}</p>
+        {{/if}}
+
+        {{!-- ═══ The printed statblock run ═════════════════════════════════ --}}
+        <section class="{{alt}}-stats-grid">
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Creature.DurabilityHint'}}">{{localize 'ALTERNITY.Creature.Durability'}}</label>
+                <strong>{{system.durabilityRun}}</strong>
+                {{#if system.hasDurabilityMultiplier}}
+                <span class="{{alt}}-ai-note">× {{system.durabilityMultiplier}}</span>
+                {{/if}}
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Creature.MultiplierHint'}}">{{localize 'ALTERNITY.Creature.Multiplier'}}</label>
+                <input type="number" name="system.durabilityMultiplier" value="{{system.durabilityMultiplier}}" min="0.1" step="0.1" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Creature.ActionCheckHint'}}">{{localize 'ALTERNITY.Creature.ActionCheck'}}</label>
+                <input type="number" name="system.actionCheckScore" value="{{system.actionCheckScore}}" min="0" />
+                <span class="{{alt}}-ai-note">
+                    {{system.actionCheck.marginal}}+ / {{system.actionCheck.ordinary}} / {{system.actionCheck.good}} / {{system.actionCheck.amazing}}
+                </span>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Creature.ActionsPerRoundHint'}}">{{localize 'ALTERNITY.Creature.ActionsPerRound'}}</label>
+                <input type="number" name="system.actionsPerRound" value="{{system.actionsPerRound}}" min="1" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Creature.ReactionScoreHint'}}">{{localize 'ALTERNITY.Creature.ReactionScore'}}</label>
+                <select name="system.reactionDegree">
+                    {{#each reactionDegreeChoices as |choice|}}
+                    <option value="{{choice}}" {{#if (eq ../system.reactionDegree choice)}}selected{{/if}}>{{choice}}</option>
+                    {{/each}}
+                </select>
+                <span class="{{alt}}-ai-note">/ {{system.reactionScore.number}}</span>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Creature.ReactionNoteHint'}}">{{localize 'ALTERNITY.Creature.ReactionNote'}}</label>
+                <input type="text" name="system.reactionNote" value="{{system.reactionNote}}" placeholder="Charge: Good/1" />
+            </div>
+        </section>
+
+        {{#if system.actionCheckIsTuned}}
+        <p class="{{alt}}-ship-warning is-soft">
+            {{localize 'ALTERNITY.Creature.TunedActionCheck'}} {{system.derivedActionCheck}}.
+        </p>
+        {{/if}}
+
+        {{!-- ═══ Damage ════════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.Creature.Damage'}}
+                <button type="button" data-action="clearCreatureDamage" title="{{localize 'ALTERNITY.Creature.ClearDamage'}}">⟲</button>
+            </h3>
+            <div class="{{alt}}-resources">
+                {{#each tracks as |t|}}
+                <div class="{{../alt}}-resource-bar bar--{{t.key}}">
+                    <div class="{{../alt}}-bar-label">
+                        <span class="{{../alt}}-compartment-track-name">{{t.label}}</span>
+                        <span class="{{../alt}}-bar-values">{{t.value}} / {{t.max}}</span>
+                        <span class="{{../alt}}-damage-quick">
+                            <button type="button" data-action="setCreatureDamage" data-track="{{t.key}}" data-delta="-1">−</button>
+                            <button type="button" data-action="setCreatureDamage" data-track="{{t.key}}" data-delta="1">+</button>
+                        </span>
+                    </div>
+                    <div class="{{../alt}}-bar-track"><div class="{{../alt}}-bar-fill" style="width: {{t.pct}}%"></div></div>
+                </div>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Attacks ═══════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.Creature.Attacks'}}
+                <button type="button" data-action="addCreatureRow" data-array="attacks">+</button>
+            </h3>
+            <div class="{{alt}}-ship-table">
+                {{#each attackRows as |row|}}
+                <div class="{{../alt}}-ship-table-row">
+                    <input type="text" name="system.attacks.{{row.index}}.name" value="{{row.name}}" placeholder="{{localize 'ALTERNITY.Creature.AttackName'}}" />
+                    <input type="number" name="system.attacks.{{row.index}}.score" value="{{row.score}}" min="0" title="{{localize 'ALTERNITY.Creature.AttackScoreHint'}}" />
+                    <span class="{{../alt}}-robot-resolved" title="{{localize 'ALTERNITY.Creature.AttackScoreRunHint'}}">{{row.scoreRun}}</span>
+                    <input type="text" name="system.attacks.{{row.index}}.damageOrdinary" value="{{row.damageOrdinary}}" placeholder="d4+1s" title="{{localize 'ALTERNITY.DegreeOrdinary'}}" />
+                    <input type="text" name="system.attacks.{{row.index}}.damageGood" value="{{row.damageGood}}" placeholder="d4w" title="{{localize 'ALTERNITY.DegreeGood'}}" />
+                    <input type="text" name="system.attacks.{{row.index}}.damageAmazing" value="{{row.damageAmazing}}" placeholder="d6+2w" title="{{localize 'ALTERNITY.DegreeAmazing'}}" />
+                    <select name="system.attacks.{{row.index}}.damageType">
+                        {{#each ../damageTypeChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.damageType choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                    <input class="{{../alt}}-creature-mode" type="text" name="system.attacks.{{row.index}}.mode" value="{{row.mode}}" title="{{localize 'ALTERNITY.Creature.ModeHint'}}" />
+                    <button type="button" data-action="deleteCreatureRow" data-array="attacks" data-index="{{row.index}}">✕</button>
+                </div>
+                {{else}}
+                <p class="{{alt}}-empty-state">{{localize 'ALTERNITY.Creature.NoAttacks'}}</p>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Defenses ══════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3 title="{{localize 'ALTERNITY.Creature.DefensesHint'}}">{{localize 'ALTERNITY.Creature.Defenses'}}</h3>
+            <div class="{{alt}}-stats-grid">
+                {{#each resistances as |r|}}
+                <div class="{{../alt}}-stat-box">
+                    <label title="{{r.hint}}">{{r.label}}</label>
+                    <input type="number" name="system.resistance.{{r.key}}" value="{{r.value}}" placeholder="{{localize 'ALTERNITY.Creature.NoResistance'}}" />
+                    <span class="{{../alt}}-ai-note">{{r.display}}</span>
+                </div>
+                {{/each}}
+                {{#each armorSlots as |slot|}}
+                <div class="{{../alt}}-stat-box">
+                    <label title="{{localize 'ALTERNITY.Creature.NaturalArmorHint'}}">{{localize 'ALTERNITY.Creature.Armor'}} {{slot.label}}</label>
+                    <input type="text" name="system.naturalArmor.{{slot.key}}" value="{{slot.value}}" placeholder="{{localize 'ALTERNITY.Creature.None'}}" />
+                </div>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Movement ══════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.Creature.Movement'}}
+                {{#if movementSummary}}
+                <span class="{{alt}}-robot-hardware-note">{{movementSummary}}</span>
+                {{/if}}
+            </h3>
+            <div class="{{alt}}-stats-grid">
+                {{#each movementKeys as |m|}}
+                <div class="{{../alt}}-stat-box">
+                    <label>{{m.label}}</label>
+                    <input type="number" name="system.movement.{{m.key}}" value="{{m.value}}" min="0" />
+                </div>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Skills ════════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.Creature.Skills'}}
+                <span class="{{alt}}-section-tools">
+                    <span class="{{alt}}-robot-hardware-note">{{localize 'ALTERNITY.Creature.SkillsNote'}}</span>
+                    <button type="button" data-action="addCreatureRow" data-array="skills">+</button>
+                </span>
+            </h3>
+            <div class="{{alt}}-ship-table">
+                {{#each skillRows as |row|}}
+                <div class="{{../alt}}-ship-table-row {{#if row.isSpecialty}}is-specialty{{/if}}">
+                    <input type="text" name="system.skills.{{row.index}}.name" value="{{row.name}}" placeholder="{{localize 'ALTERNITY.Name'}}" />
+                    <input type="number" name="system.skills.{{row.index}}.score" value="{{row.score}}" min="0" title="{{localize 'ALTERNITY.Creature.SkillScoreHint'}}" />
+                    <label class="{{../alt}}-ship-inline-toggle" title="{{localize 'ALTERNITY.Creature.SpecialtyHint'}}">
+                        <input type="checkbox" name="system.skills.{{row.index}}.isSpecialty" data-dtype="Boolean" {{#if row.isSpecialty}}checked{{/if}} />
+                        <span>{{localize 'ALTERNITY.Creature.Specialty'}}</span>
+                    </label>
+                    <button type="button" data-action="deleteCreatureRow" data-array="skills" data-index="{{row.index}}">✕</button>
+                </div>
+                {{else}}
+                <p class="{{alt}}-empty-state">{{localize 'ALTERNITY.Creature.NoSkills'}}</p>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Notes ═════════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3 title="{{localize 'ALTERNITY.Creature.BehaviourHint'}}">{{localize 'ALTERNITY.Creature.Behaviour'}}</h3>
+            <textarea name="system.behaviour" rows="3">{{system.behaviour}}</textarea>
+            <h3>{{localize 'ALTERNITY.Description'}}</h3>
+            <textarea name="system.description" rows="3">{{system.description}}</textarea>
+        </section>
+
+    </main>
+</div>

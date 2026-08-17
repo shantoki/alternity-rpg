@@ -33,7 +33,8 @@
       "warship": {},
       "spaceship": {},
       "robot": {},
-      "ai": {}
+      "ai": {},
+      "creature": {}
     },
     "Item": {
       "weapon": {},

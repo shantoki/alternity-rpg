@@ -505,6 +505,30 @@ const SUPPORTING_CAST_ROLES = Object.freeze([
 /** Degrees a reaction score can be pitched at, worst to best. */
 const REACTION_DEGREES = Object.freeze(['Marginal', 'Ordinary', 'Good', 'Amazing']);
 
+// ---------------------------------------------------------------------------
+// Creatures (Gamemaster Guide Ch.19: Animal & Alien Statistics)
+// ---------------------------------------------------------------------------
+//
+// The one chassis in the corpus that genuinely is not a hero. The book opens by
+// warning that it does not obey its own derivations:
+//
+//   "However, they don't always 'play by the rules' in terms of statistics that are
+//    derived from other statistics. ... Don't be [surprised] when you see apparent
+//    inaccuracies such as these in the descriptions that follow — some numbers are
+//    purposely modified to yield a clearer picture of what a certain type of
+//    creature is."
+//
+// So creature action checks and attack scores are entered as printed, not derived.
+// The dog is the clearest case: DEX 11 and INT 3 would give an action check of 7,
+// and it prints 13. Durability is the one stat that does hold, across all seven
+// fully printed compendium entries.
+
+/** What kind of thing this is. The chapter covers animals and nonhumanoid aliens. */
+const CREATURE_CATEGORIES = Object.freeze(['Animal', 'Alien', 'Construct', 'Other']);
+
+/** Natural armour and attack damage are quoted per damage type. */
+const DAMAGE_TYPES = Object.freeze(['LI', 'HI', 'En']);
+
 /**
  * Situation Die Steps Scale (Fastplay Accurate).
  * Index maps total step to [sign, dieLabel, formula]
@@ -2299,6 +2323,94 @@ const AlternityMathService = {
     },
 
     // -----------------------------------------------------------------------
+    // calculateScoreRun
+    // -----------------------------------------------------------------------
+
+    /**
+     * Expand any single score into the Ordinary/Good/Amazing run the books print.
+     *
+     * The same halve-and-quarter rule drives every score run in Alternity — skill
+     * scores, action checks, attack scores, Grid skill scores — so attack lines like
+     * `Bite 16/8/4` and `Charge 13/6/3` need only their Ordinary value stored.
+     *
+     * @param {number} score
+     * @returns {{ ordinary: number, good: number, amazing: number, label: string }}
+     */
+    calculateScoreRun(score) {
+        const ordinary = Math.max(0, Math.floor(Number(score) || 0));
+        const good = Math.floor(ordinary / 2);
+        const amazing = Math.floor(ordinary / 4);
+        return { ordinary, good, amazing, label: `${ordinary}/${good}/${amazing}` };
+    },
+
+    // -----------------------------------------------------------------------
+    // calculateCreatureDurability
+    // -----------------------------------------------------------------------
+
+    /**
+     * Resolve a creature's four durability ratings.
+     *
+     * Creatures start from the hero rule — stun and wound equal Constitution, mortal
+     * and fatigue are half of it rounded up — and large ones then carry a flat
+     * multiplier. Verified against all seven fully printed compendium entries: the
+     * bear (CON 16, x1.5) gives 24/24/12/12, the buffalo (CON 14, x1.5) 21/21/10/10,
+     * the elephant (CON 18, x1.5) 27/27/13/13, and the great cat, crocodile, dog and
+     * horse all sit at x1.
+     *
+     * **This is not the weren rule, and the difference is real.** Weren "Superior
+     * Durability" says to "use the character's Constitution score x 1.5" — the
+     * multiplier lands on Constitution, and the halving happens afterwards. Here the
+     * multiplier lands on each finished rating instead. On an odd Constitution the
+     * two disagree: a weren with CON 14 gets mortal 11 (half of 21, rounded up),
+     * while the buffalo at the same Constitution prints 10. Both are followed as
+     * written rather than unified, because each reproduces its own source exactly.
+     *
+     * @param {number} constitution
+     * @param {object} [options]
+     * @param {number} [options.multiplier=1] - Flat multiplier on each rating.
+     * @returns {{
+     *   stun: number, wound: number, mortal: number, fatigue: number,
+     *   base: object, multiplier: number, run: string, modifierTrace: object[],
+     * }}
+     */
+    calculateCreatureDurability(constitution, options = {}) {
+        const { multiplier = 1 } = options;
+        // Deliberately not `Number(multiplier) || 1`: zero is falsy, so that idiom
+        // would silently turn a multiplier of 0 into 1 instead of rejecting it.
+        const mult = multiplier === null || multiplier === undefined ? 1 : Number(multiplier);
+        if (!Number.isFinite(mult) || mult <= 0) {
+            throw new Error(
+                '[AlternityMathService.calculateCreatureDurability] multiplier must be a finite number > 0. ' +
+                `Received ${JSON.stringify(multiplier)}.`
+            );
+        }
+
+        // The hero ratings first, unmultiplied.
+        const base = this.calculateDurabilityRatings(
+            Math.max(0, Math.floor(Number(constitution) || 0))
+        );
+
+        const scale = (value) => Math.floor(value * mult);
+        const stun = scale(base.stun);
+        const wound = scale(base.wound);
+        const mortal = scale(base.mortal);
+        const fatigue = scale(base.fatigue);
+
+        return {
+            stun, wound, mortal, fatigue,
+            base: { stun: base.stun, wound: base.wound, mortal: base.mortal, fatigue: base.fatigue },
+            multiplier: mult,
+            run: `${stun}/${wound}/${mortal}/${fatigue}`,
+            modifierTrace: [
+                this.buildModifier('Constitution', base.stun, 'Stun and wound both equal CON'),
+                this.buildModifier('Multiplier', mult, mult === 1
+                    ? 'No size multiplier'
+                    : `Each rating multiplied by ${mult}, rounded down`),
+            ],
+        };
+    },
+
+    // -----------------------------------------------------------------------
     // calculateReactionScore
     // -----------------------------------------------------------------------
 
@@ -2669,4 +2781,6 @@ export {
     NPC_QUALITY_TIERS,
     SUPPORTING_CAST_ROLES,
     REACTION_DEGREES,
+    CREATURE_CATEGORIES,
+    DAMAGE_TYPES,
 };
