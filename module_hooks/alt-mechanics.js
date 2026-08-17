@@ -4,9 +4,13 @@
  * defined in src/services/alternity-math.js and data models from src/data/.
  */
 
-import { Hooks, Roll, ChatMessage, game } from "../src/module-info.js";
+import { Hooks, game, fromUuid } from "../src/module-info.js";
 import { AlternityMathService } from "../src/services/alternity-math.js";
-import { AlternityCharacterState, getAlternityState } from "../src/data/alternity-actor-data.js";
+import { AlternityRollService } from "../src/services/alternity-roll-service.js";
+import { getAlternityState } from "../src/data/alternity-actor-data.js";
+
+/** Flag scope shared with the roll service and the sheets. */
+const NAMESPACE = 'alternity-v2';
 
 /**
  * Initializes all necessary event listeners for the module. This should be called early in the game load cycle (e.g., in a 'ready' hook).
@@ -21,55 +25,35 @@ export function initializeAlternityHooks() {
     });
 
     // 2. Ability Check Resolution (Async)
-    // Assembles modifiers from actor state (wound, stances) and performs the math resolution.
+    //
+    // Resolution only. This listener used to *assemble* the actor's wound penalty
+    // and active stances as well — but it fires after the dice have been rolled, so
+    // those modifiers were traced onto the card and then had no effect on the
+    // outcome, because the situation die they should have chosen was already cast.
+    // Collecting them is now AlternityRollService.collectActorModifiers' job, called
+    // by rollSkill before the formula is built. Re-adding them here would double
+    // every wound penalty in the game.
     Hooks.on("alternity:resolveAbilityCheck", async (actor, rollOptions) => {
         const altState = await getAlternityState(actor);
         if (!altState) return;
 
-        const modifiers = rollOptions.modifiers || [];
+        // The caller supplies the scores and base step; fall back to the state for a
+        // caller that only knows the skill id.
+        const scores = rollOptions.scores ?? altState.getSkillScores(rollOptions.skillId);
+        const baseStep = rollOptions.baseStep ?? altState.getSkillBaseStep(rollOptions.skillId);
 
-        // A. Wound penalties
-        const woundPenalty = altState.getWoundPenalty();
-        if (woundPenalty !== 0) {
-            modifiers.push(AlternityMathService.buildModifier(
-                game.i18n.localize("ALTERNITY.Modifier.WoundPenalty"),
-                woundPenalty,
-                game.i18n.localize("ALTERNITY.Modifier.WoundPenaltyReason")
-            ));
-        }
-
-        // B. Active stances/passives/actions
-        const activeAbilities = altState.getActiveAbilities();
-        for (const ability of activeAbilities) {
-            const trigger = ability.triggerCondition;
-            // Basic context filtering
-            if (trigger.context && trigger.context !== rollOptions.context && trigger.context !== 'Any') continue;
-            
-            if (typeof ability.effectPayload.step === 'number' && ability.effectPayload.step !== 0) {
-                modifiers.push(AlternityMathService.buildModifier(
-                    ability.name,
-                    ability.effectPayload.step,
-                    `Ability: ${ability.name}`
-                ));
-            }
-        }
-
-        // C. Triple scores and base step from state
-        const scores = altState.getSkillScores(rollOptions.skillId);
-        const baseStep = altState.getSkillBaseStep(rollOptions.skillId);
-
-        // D. Resolve via Math Service
-        // Note: AlternityActor.rollSkill currently only rolls 1d20 (control), 
-        // so situationRoll is passed as 0. 
+        // Both dice come from the caller. This used to hard-code `situation: 0`,
+        // which threw away the situation die on every roll made through this path.
         const result = AlternityMathService.resolveAbilityCheck(
             scores,
             baseStep,
-            modifiers,
+            rollOptions.modifiers ?? [],
             rollOptions.context,
-            { control: rollOptions.roll, situation: 0 }
+            { control: rollOptions.roll, situation: rollOptions.situationRoll ?? 0 }
         );
 
-        // E. Sync results back to the rollOptions object for the caller
+        rollOptions.scores        = scores;
+        rollOptions.baseStep      = baseStep;
         rollOptions.adjustedValue = result.finalValue;
         rollOptions.modifierTrace = result.modifierTrace;
         rollOptions.succeeded     = result.succeeded;
@@ -124,11 +108,92 @@ export function initializeAlternityHooks() {
         console.log(`[Alternity] Damage applied to ${actor.name}: ${data.finalDamage} ${data.category} damage.`);
     });
 
+    // 5. Chat card buttons
+    //
+    // Chat message content is rendered outside any ApplicationV2, so Foundry's
+    // own `data-action` dispatcher never reaches it. The cards therefore mark
+    // their buttons `data-alt-action` and are wired here.
+    //
+    // Both hook names are registered: v13+ fires `renderChatMessageHTML` with a
+    // bare HTMLElement, while v12 fires `renderChatMessage` with a jQuery object.
+    // This system supports both, so the handler normalises whichever it receives.
+    const bindCardButtons = (message, element) => {
+        const root = element?.[0] ?? element;
+        if (!(root instanceof HTMLElement)) return;
+        root.querySelectorAll('[data-alt-action]').forEach((button) => {
+            button.addEventListener('click', (event) => onChatCardAction(event, message));
+        });
+    };
+    Hooks.on("renderChatMessageHTML", bindCardButtons);
+    Hooks.on("renderChatMessage", bindCardButtons);
+
     console.log("Alternity System Hooks: All core hooks successfully attached.");
 }
 
-/** Simple check to see if the options suggest a combat action. */
-function alternityIsCombatRelevant(options) {
-    // Check for key identifiers in the options object provided by Foundry
-    return !!options.damage || !!options.attack;
+/**
+ * Handle a click on one of the Alternity chat cards.
+ *
+ * Everything the buttons need was stashed in the message's own flags when the
+ * card was posted — including the *resolved* damage grade and code, not the
+ * three-column run — so a card stays usable after the sheet that produced it has
+ * been closed, and after a reload.
+ *
+ * Exported so it can be tested without a live chat log; the DOM listener in
+ * `initializeAlternityHooks` is a thin wrapper over it.
+ *
+ * @param {string} action - The button's `data-alt-action`.
+ * @param {ChatMessage} message
+ * @returns {Promise<object|null>} Whatever the underlying roll returned.
+ */
+export async function handleChatCardAction(action, message) {
+    const flags = message?.flags?.[NAMESPACE] ?? {};
+
+    if (action === 'rollDamage') {
+        const damage = flags.check?.damage;
+        if (!damage?.code) return null;
+
+        // A token uuid resolves to a TokenDocument, whose `.actor` is what the roll
+        // service wants; an Actor uuid resolves to the Actor itself.
+        const resolved = damage.actorUuid ? await fromUuid(damage.actorUuid) : null;
+
+        return AlternityRollService.rollDamage({
+            actor: resolved?.actor ?? resolved,
+            name: damage.name,
+            code: damage.code,
+            grade: damage.grade,
+            damageType: damage.damageType,
+            firepower: damage.firepower,
+            targetToughness: damage.targetToughness,
+            bonus: damage.bonus,
+            fallbackCategory: damage.fallbackCategory,
+            minimumOne: damage.minimumOne,
+            whisper: damage.whisper,
+        });
+    }
+
+    if (action === 'applyDamage') {
+        if (!flags.damage) return null;
+        return AlternityRollService.applyDamageToTargets(flags.damage);
+    }
+
+    return null;
+}
+
+/**
+ * DOM wrapper around `handleChatCardAction`. Disables the button for the duration
+ * so a double-click cannot roll damage twice, then re-enables it — a Gamemaster
+ * legitimately rolls the same grade again for a second target rather than redoing
+ * the attack check.
+ *
+ * @param {PointerEvent} event
+ * @param {ChatMessage}  message
+ */
+async function onChatCardAction(event, message) {
+    const button = event.currentTarget;
+    button.disabled = true;
+    try {
+        await handleChatCardAction(button.dataset?.altAction, message);
+    } finally {
+        button.disabled = false;
+    }
 }

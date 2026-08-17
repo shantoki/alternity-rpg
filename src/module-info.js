@@ -21,3 +21,13 @@ export const renderTemplate = (...args) => {
     return fn(...args);
 };
 
+/**
+ * Wrapped rather than re-exported as a const, for the same reason renderTemplate
+ * is: the global is resolved at call time, so this still works for modules that
+ * are imported before Foundry has finished populating its globals.
+ */
+export const fromUuid = (...args) => {
+    const fn = globalThis.foundry?.utils?.fromUuid || globalThis.fromUuid;
+    return fn(...args);
+};
+

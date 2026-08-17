@@ -45,7 +45,11 @@
         <section class="{{alt}}-creature-abilities">
             {{#each abilities as |a|}}
             <div class="{{../alt}}-creature-ability">
-                <label title="{{a.label}}">{{a.key}}</label>
+                {{!-- The label doubles as the feat-check roll button. --}}
+                <label title="{{a.label}} — {{localize 'ALTERNITY.Roll.FeatCheckHint'}}">
+                    <button type="button" class="{{../alt}}-ability-roll-btn" data-action="rollAbility"
+                            data-ability="{{a.key}}">{{a.key}}</button>
+                </label>
                 <input class="{{../alt}}-creature-ability-score" type="number" name="system.abilities.{{a.key}}" value="{{a.value}}" min="0" max="40" />
                 <input class="{{../alt}}-creature-ability-range" type="text" name="system.abilityRanges.{{a.key}}"
                        value="{{a.range}}" placeholder="d4+12" title="{{localize 'ALTERNITY.Creature.RangeHint'}}" />
@@ -151,6 +155,8 @@
                         {{/each}}
                     </select>
                     <input class="{{../alt}}-creature-mode" type="text" name="system.attacks.{{row.index}}.mode" value="{{row.mode}}" title="{{localize 'ALTERNITY.Creature.ModeHint'}}" />
+                    <button type="button" class="{{../alt}}-roll-btn" data-action="rollAttack" data-index="{{row.index}}"
+                            title="{{localize 'ALTERNITY.Roll.AttackHint'}}">⚔</button>
                     <button type="button" data-action="deleteCreatureRow" data-array="attacks" data-index="{{row.index}}">✕</button>
                 </div>
                 {{else}}
@@ -211,10 +217,13 @@
                 <div class="{{../alt}}-ship-table-row {{#if row.isSpecialty}}is-specialty{{/if}}">
                     <input type="text" name="system.skills.{{row.index}}.name" value="{{row.name}}" placeholder="{{localize 'ALTERNITY.Name'}}" />
                     <input type="number" name="system.skills.{{row.index}}.score" value="{{row.score}}" min="0" title="{{localize 'ALTERNITY.Creature.SkillScoreHint'}}" />
+                    <span class="{{../alt}}-robot-resolved" title="{{localize 'ALTERNITY.Roll.ScoresHint'}}">{{row.scoreRun}}</span>
                     <label class="{{../alt}}-ship-inline-toggle" title="{{localize 'ALTERNITY.Creature.SpecialtyHint'}}">
                         <input type="checkbox" name="system.skills.{{row.index}}.isSpecialty" data-dtype="Boolean" {{#if row.isSpecialty}}checked{{/if}} />
                         <span>{{localize 'ALTERNITY.Creature.Specialty'}}</span>
                     </label>
+                    <button type="button" class="{{../alt}}-roll-btn" data-action="rollSkill" data-index="{{row.index}}"
+                            title="{{localize 'ALTERNITY.Roll.SkillHint'}}">⬡</button>
                     <button type="button" data-action="deleteCreatureRow" data-array="skills" data-index="{{row.index}}">✕</button>
                 </div>
                 {{else}}
@@ -232,4 +241,21 @@
         </section>
 
     </main>
+
+    {{!-- The roll tray: mount point for the inline roll panel, plus the rolls that
+          come up every round. --}}
+    <footer class="{{alt}}-roll-tray">
+        <div class="{{alt}}-roll-mount" hidden></div>
+        <div class="{{alt}}-quick-roll-bar">
+            <button type="button" class="{{alt}}-quick-btn is-primary" data-action="rollActionCheck"
+                    title="{{localize 'ALTERNITY.Roll.ActionCheckHint'}}">
+                ⬡ {{localize 'ALTERNITY.Roll.ActionCheck'}}
+                <span class="{{alt}}-quick-btn-score">{{system.actionCheck.ordinary}}/{{system.actionCheck.good}}/{{system.actionCheck.amazing}}</span>
+            </button>
+            <button type="button" class="{{alt}}-quick-btn" data-action="rollDefence"
+                    title="{{localize 'ALTERNITY.Roll.DodgeUntrainedHint'}}">
+                🛡 {{localize 'ALTERNITY.Roll.Dodge'}}
+            </button>
+        </div>
+    </footer>
 </div>

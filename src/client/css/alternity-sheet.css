@@ -845,12 +845,23 @@
 .alt-item-stats { font-size: 10px; color: var(--alt-color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* ── Roll Tray (Fixed at bottom) ────────────────────────────────────────── */
+/* Every sheet root carries `.alt-sheet` (a full-height flex column) with the body
+   as the only growing child, so the tray pins itself to the bottom on all of them. */
 .alt-roll-tray {
     flex: 0 0 auto;
     background: var(--alt-color-surface);
     border-top: 1px solid var(--alt-color-border);
     padding: 6px 12px;
 }
+
+/* The panel is mounted into a fixed tray, so it is capped rather than allowed to
+   grow upward and squeeze the sheet body out of the window. */
+.alt-roll-mount {
+    max-height: 55vh;
+    overflow-y: auto;
+}
+
+.alt-roll-mount[hidden] { display: none; }
 
 .alt-quick-roll-bar {
     display: flex;
@@ -859,8 +870,34 @@
     gap: 8px;
 }
 
+.alt-quick-roll-bar { flex-wrap: wrap; }
 .alt-quick-roll-label { font-size: 10px; text-transform: uppercase; color: var(--alt-color-text-muted); }
 .alt-quick-btn { padding: 3px 8px; font-size: 10px; background: var(--alt-color-border); border: 1px solid var(--alt-color-border); color: white; cursor: pointer; border-radius: 2px; }
+.alt-quick-btn:hover:not(:disabled) { border-color: var(--alt-color-primary); }
+.alt-quick-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* The Action Check is the roll of the round, so it leads the tray. */
+.alt-quick-btn.is-primary { background: var(--alt-color-primary); border-color: var(--alt-color-primary); font-weight: bold; }
+.alt-quick-btn.is-small { padding: 3px 6px; font-weight: bold; }
+.alt-quick-btn-score { margin-left: 4px; opacity: 0.75; font-weight: normal; }
+
+/* An ability's label doubles as its feat-check button, so it has to read as a label
+   and behave as a button. */
+.alt-ability-roll-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    text-transform: inherit;
+    cursor: pointer;
+    border-bottom: 1px dotted var(--alt-color-text-muted);
+}
+
+.alt-ability-roll-btn:hover { color: var(--alt-color-primary); border-bottom-color: var(--alt-color-primary); }
+
+.alt-damage-grade-btns { display: inline-flex; gap: 2px; }
 
 /* ── Fix for Special tab ───────────────────────────────────────────────── */
 .alt-feature-toggles { display: flex; flex-direction: row; gap: 12px; margin-bottom: 10px; }
@@ -1040,15 +1077,67 @@
 .alt-roll-close:hover { color: var(--alt-color-danger); }
 
 .alt-roll-check-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
     font-weight: bold;
     margin-bottom: 8px;
-    text-align: center;
+}
+
+/* The triple score is the number the player is actually rolling under, so it gets
+   the emphasis; the base step is a footnote to it. */
+.alt-roll-check-scores {
+    font-family: var(--alt-font-heading);
+    font-size: 15px;
+    color: var(--alt-color-primary);
+    letter-spacing: 0.5px;
+}
+
+.alt-roll-check-basestep {
+    font-size: 10px;
+    font-weight: normal;
+    text-transform: uppercase;
+    color: var(--alt-color-text-muted);
+}
+
+/* Modifiers the actor is already carrying — read-only, and printed so the step
+   total is never a surprise once the dice land. */
+.alt-roll-standing {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+    font-size: 10px;
+}
+
+.alt-roll-standing-label {
+    text-transform: uppercase;
+    color: var(--alt-color-text-muted);
+}
+
+.alt-roll-standing-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.alt-roll-standing-list li {
+    padding: 1px 5px;
+    border: 1px solid var(--alt-color-border);
+    border-radius: 2px;
+    white-space: nowrap;
 }
 
 .alt-roll-steps {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 4px 8px;
     margin-bottom: 12px;
 }
 
@@ -1058,12 +1147,32 @@
     color: var(--alt-color-text-muted);
 }
 
-.alt-roll-step-select {
+.alt-roll-step-select,
+.alt-roll-condition-select,
+.alt-roll-range-select,
+.alt-roll-step-input {
     width: 100%;
 }
 
+.alt-roll-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.alt-roll-whisper-label {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    flex: 0 0 auto;
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--alt-color-text-muted);
+    white-space: nowrap;
+}
+
 .alt-roll-btn {
-    width: 100%;
+    flex: 1 1 auto;
     padding: 6px;
     background: var(--alt-color-primary);
     color: white;
@@ -1078,6 +1187,48 @@
 }
 
 .alt-roll-btn:hover { background: #5da5ed; }
+.alt-roll-btn:disabled { background: var(--alt-color-border); cursor: not-allowed; opacity: 0.5; }
+
+/* Inline row buttons (a skill row's ⬡, an attack row's ⚔) sit in a table and must
+   not stretch the way the panel's own full-width Roll button does. */
+.alt-ship-table-row .alt-roll-btn,
+.alt-compartment-check .alt-roll-btn,
+.alt-stat-box .alt-roll-btn,
+.alt-item-actions .alt-roll-btn,
+.alt-roll-btn.is-small {
+    flex: 0 0 auto;
+    width: auto;
+    padding: 0 6px;
+    font-size: 11px;
+    line-height: 18px;
+}
+
+/* The panel echoes the outcome so the roller does not have to look away from the
+   sheet to the chat log. */
+.alt-roll-outcome-slot {
+    margin-top: 8px;
+    padding: 4px 6px;
+    border-radius: 2px;
+    border: 1px solid var(--alt-color-border);
+    font-family: var(--alt-font-heading);
+    font-size: 13px;
+    text-align: center;
+}
+
+.alt-roll-note {
+    margin: 4px 0 0;
+    font-size: 10px;
+    font-style: italic;
+    color: var(--alt-color-text-muted);
+}
+
+/* ── Degree colours, shared by the panel and the chat card ──────────────── */
+.degree--marginal          { color: var(--alt-color-text-muted); }
+.degree--ordinary          { color: var(--alt-color-success); }
+.degree--good              { color: #5da5ed; }
+.degree--amazing           { color: var(--alt-color-primary); font-weight: bold; }
+.degree--failure           { color: var(--alt-color-text-muted); }
+.degree--critical-failure  { color: var(--alt-color-danger); font-weight: bold; }
 
 /* ── Roll Chat Cards ────────────────────────────────────────────────────── */
 .alt-roll-card {
@@ -1165,6 +1316,74 @@
 .alt-trace-total td {
     color: var(--alt-color-primary);
 }
+
+.alt-trace-step td { color: var(--alt-color-text-muted); font-family: monospace; }
+.alt-trace-total .alt-roll-note,
+.alt-trace-step .alt-roll-note { display: inline; margin-left: 6px; }
+
+/* A natural 20 on an Action Check still succeeds, but the Bad Luck Rule applies —
+   worth saying loudly, because it is easy to miss on an otherwise green card. */
+.alt-roll-badluck {
+    margin: 0 0 8px;
+    padding: 3px 6px;
+    border-left: 3px solid var(--alt-color-danger);
+    background: rgba(0, 0, 0, 0.15);
+    font-size: 11px;
+    font-style: italic;
+}
+
+/* ── Chat card action buttons ───────────────────────────────────────────── */
+/* These are bound by hand in module_hooks/alt-mechanics.js; see roll-card.hbs. */
+.alt-roll-card-buttons {
+    display: flex;
+    gap: 4px;
+    margin: 8px 0 0;
+}
+
+.alt-card-btn {
+    flex: 1 1 auto;
+    padding: 4px 6px;
+    background: var(--alt-color-primary);
+    color: white;
+    border: none;
+    border-radius: 2px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.alt-card-btn:hover:not(:disabled) { background: #5da5ed; }
+.alt-card-btn:disabled { opacity: 0.5; cursor: progress; }
+.alt-card-btn-detail { display: block; font-weight: normal; font-size: 10px; opacity: 0.8; }
+
+/* ── Damage card ────────────────────────────────────────────────────────── */
+.alt-damage-grade { font-style: normal; opacity: 0.75; margin-left: 4px; }
+
+.alt-damage-total {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 6px;
+    padding: 4px;
+    border-bottom: 2px solid var(--alt-color-border);
+    margin-bottom: 6px;
+}
+
+.alt-damage-value {
+    font-family: var(--alt-font-heading);
+    font-size: 24px;
+    line-height: 1;
+}
+
+.alt-damage-category { font-size: 12px; text-transform: uppercase; }
+.alt-damage-type,
+.alt-damage-firepower { font-size: 10px; color: var(--alt-color-text-muted); }
+
+/* The track the damage lands on is the single most important thing on the card,
+   so it is colour-coded to match the sheet's own damage bars. */
+.alt-damage-total.track--stun   { border-bottom-color: var(--alt-color-text-muted); }
+.alt-damage-total.track--wound  { border-bottom-color: var(--alt-color-danger); }
+.alt-damage-total.track--mortal { border-bottom-color: #ffffff; }
 
 /* ── Warship sheet ───────────────────────────────────────────────────────── */
 .bar--critical .alt-bar-fill { background: #ffffff; }

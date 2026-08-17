@@ -1,0 +1,45 @@
+{{!--
+    Damage result card. Buttons use `data-alt-action` and are bound by hand in
+    module_hooks/alt-mechanics.js — see roll-card.hbs for why.
+--}}
+<div class="alt-roll-card alt-damage-card">
+    <header class="alt-roll-card-header">
+        <span class="alt-roll-card-context">
+            {{name}}
+            {{#if gradeLabel}}<em class="alt-damage-grade">{{gradeLabel}}</em>{{/if}}
+        </span>
+        <span class="alt-roll-card-actor">{{code}}</span>
+    </header>
+
+    <div class="alt-roll-card-body">
+        <div class="alt-damage-total track--{{category}}">
+            <strong class="alt-damage-value">{{total}}</strong>
+            <span class="alt-damage-category">{{categoryLabel}}</span>
+            {{#if damageType}}<span class="alt-damage-type">{{damageType}}</span>{{/if}}
+            {{#if firepower}}<span class="alt-damage-firepower">{{firepower}}</span>{{/if}}
+        </div>
+
+        <div class="alt-roll-rendered">
+            {{{rollHtml}}}
+        </div>
+
+        {{#if degrade}}
+        {{!-- Firepower inferior to the target's toughness costs a grade. --}}
+        <p class="alt-roll-note">
+            {{#if degrade.isNegated}}
+                {{localize "ALTERNITY.Roll.DegradedToNothing"}}
+            {{else}}
+                {{localize "ALTERNITY.Roll.DegradedTo"}} {{degrade.finalGrade}}
+            {{/if}}
+        </p>
+        {{/if}}
+
+        <div class="alt-roll-card-buttons">
+            {{!-- Targets first, then controlled tokens; the handler decides. --}}
+            <button type="button" class="alt-card-btn" data-alt-action="applyDamage">
+                {{localize "ALTERNITY.Roll.ApplyDamage"}}
+            </button>
+        </div>
+        <p class="alt-roll-note">{{localize "ALTERNITY.Roll.ApplyHint"}}</p>
+    </div>
+</div>

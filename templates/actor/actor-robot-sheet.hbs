@@ -83,7 +83,11 @@
         <section class="{{alt}}-robot-abilities">
             {{#each abilities as |a|}}
             <div class="{{../alt}}-robot-ability {{#if a.isBreached}}is-breached{{/if}}">
-                <label>{{a.key}}</label>
+                {{!-- The label doubles as the feat-check roll button. --}}
+                <label title="{{a.label}} — {{localize 'ALTERNITY.Roll.FeatCheckHint'}}">
+                    <button type="button" class="{{../alt}}-ability-roll-btn" data-action="rollAbility"
+                            data-ability="{{a.key}}">{{a.key}}</button>
+                </label>
                 <input type="number" name="system.abilities.{{a.key}}" value="{{a.value}}" min="1" />
                 {{#if a.cap}}
                 <span class="{{../alt}}-robot-ability-cap" title="{{a.capSource}}">max {{a.cap}}</span>
@@ -307,6 +311,11 @@
                     <button type="button" data-action="loadAllRanks" data-index="{{row.index}}" title="{{localize 'ALTERNITY.Robot.LoadAllHint'}}">
                         {{#if row.isLoaded}}⏏{{else}}⭳{{/if}}
                     </button>
+                    {{!-- Disabled when the skill is swapped out of active memory: a
+                          robot cannot use what it is not currently holding. --}}
+                    <button type="button" class="{{../alt}}-roll-btn" data-action="rollSkill" data-index="{{row.index}}"
+                            {{#unless row.isLoaded}}disabled{{/unless}}
+                            title="{{localize 'ALTERNITY.Roll.SkillHint'}}">⬡</button>
                     <button type="button" data-action="deleteRobotRow" data-array="skills" data-index="{{row.index}}">✕</button>
                 </div>
                 {{else}}
@@ -354,4 +363,21 @@
         </section>
 
     </main>
+
+    {{!-- The roll tray: mount point for the inline roll panel, plus the rolls that
+          come up every round. --}}
+    <footer class="{{alt}}-roll-tray">
+        <div class="{{alt}}-roll-mount" hidden></div>
+        <div class="{{alt}}-quick-roll-bar">
+            <button type="button" class="{{alt}}-quick-btn is-primary" data-action="rollActionCheck"
+                    title="{{localize 'ALTERNITY.Roll.ActionCheckHint'}}">
+                ⬡ {{localize 'ALTERNITY.Roll.ActionCheck'}}
+                <span class="{{alt}}-quick-btn-score">{{system.actionCheck.ordinary}}/{{system.actionCheck.good}}/{{system.actionCheck.amazing}}</span>
+            </button>
+            <button type="button" class="{{alt}}-quick-btn" data-action="rollDefence"
+                    title="{{localize 'ALTERNITY.Roll.DodgeUntrainedHint'}}">
+                🛡 {{localize 'ALTERNITY.Roll.Dodge'}}
+            </button>
+        </div>
+    </footer>
 </form>

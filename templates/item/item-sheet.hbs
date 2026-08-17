@@ -78,17 +78,25 @@
                         {{selectOptions config.weaponTypes selected=system.weaponType}}
                     </select>
                 </div>
-                <div class="grid grid-2col">
+                {{!-- Damage is a three-column run, applied by the degree the attack
+                      check achieves (PHB Ch.11). Each code carries its own grade
+                      letter — "d4+1s" is stun, "d6+2w" is wound — so one weapon's
+                      three columns can land on three different tracks. --}}
+                <div class="grid grid-3col">
                     <div class="form-group">
-                        <label>{{localize 'ALTERNITY.DamageFormula'}}</label>
-                        <input type="text" name="system.damageFormula" value="{{system.damageFormula}}" data-dtype="String"/>
+                        <label title="{{localize 'ALTERNITY.Weapon.DamageRunHint'}}">{{localize 'ALTERNITY.DegreeOrdinary'}}</label>
+                        <input type="text" name="system.damageOrdinary" value="{{system.damageOrdinary}}" data-dtype="String" placeholder="d4+1s"/>
                     </div>
                     <div class="form-group">
-                        <label>{{localize 'ALTERNITY.Weapon.DamageBonus'}}</label>
-                        <input type="number" name="system.damageBonus" value="{{system.damageBonus}}" data-dtype="Number"/>
+                        <label title="{{localize 'ALTERNITY.Weapon.DamageRunHint'}}">{{localize 'ALTERNITY.DegreeGood'}}</label>
+                        <input type="text" name="system.damageGood" value="{{system.damageGood}}" data-dtype="String" placeholder="d4w"/>
+                    </div>
+                    <div class="form-group">
+                        <label title="{{localize 'ALTERNITY.Weapon.DamageRunHint'}}">{{localize 'ALTERNITY.DegreeAmazing'}}</label>
+                        <input type="text" name="system.damageAmazing" value="{{system.damageAmazing}}" data-dtype="String" placeholder="d6+2w"/>
                     </div>
                 </div>
-                <div class="grid grid-2col">
+                <div class="grid grid-3col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.DamageType'}}</label>
                         <select name="system.damageType">
@@ -96,16 +104,30 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>{{localize 'ALTERNITY.DamageCategory'}}</label>
-                        {{!-- Inline options on purpose: these mirror the schema's own
-                              `choices` and need no context.config key, so the sheet still
-                              renders if _prepareContext ever fails to supply one. --}}
-                        <select name="system.damageCategory">
-                            <option value="stun" {{#if (eq system.damageCategory 'stun')}}selected{{/if}}>{{localize 'ALTERNITY.Stun'}}</option>
-                            <option value="wound" {{#if (eq system.damageCategory 'wound')}}selected{{/if}}>{{localize 'ALTERNITY.Wound'}}</option>
-                            <option value="mortal" {{#if (eq system.damageCategory 'mortal')}}selected{{/if}}>{{localize 'ALTERNITY.Mortal'}}</option>
+                        <label title="{{localize 'ALTERNITY.Weapon.FirepowerHint'}}">{{localize 'ALTERNITY.Weapon.Firepower'}}</label>
+                        <select name="system.firepower">
+                            <option value="Marginal" {{#if (eq system.firepower 'Marginal')}}selected{{/if}}>Marginal</option>
+                            <option value="Ordinary" {{#if (eq system.firepower 'Ordinary')}}selected{{/if}}>Ordinary</option>
+                            <option value="Good" {{#if (eq system.firepower 'Good')}}selected{{/if}}>Good</option>
+                            <option value="Amazing" {{#if (eq system.firepower 'Amazing')}}selected{{/if}}>Amazing</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Weapon.DamageBonus'}}</label>
+                        <input type="number" name="system.damageBonus" value="{{system.damageBonus}}" data-dtype="Number"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label title="{{localize 'ALTERNITY.DamageCategoryHint'}}">{{localize 'ALTERNITY.DamageCategory'}}</label>
+                    {{!-- Only consulted for a damage code written without a grade
+                          letter. Inline options on purpose: these mirror the schema's own
+                          `choices` and need no context.config key, so the sheet still
+                          renders if _prepareContext ever fails to supply one. --}}
+                    <select name="system.damageCategory">
+                        <option value="stun" {{#if (eq system.damageCategory 'stun')}}selected{{/if}}>{{localize 'ALTERNITY.Stun'}}</option>
+                        <option value="wound" {{#if (eq system.damageCategory 'wound')}}selected{{/if}}>{{localize 'ALTERNITY.Wound'}}</option>
+                        <option value="mortal" {{#if (eq system.damageCategory 'mortal')}}selected{{/if}}>{{localize 'ALTERNITY.Mortal'}}</option>
+                    </select>
                 </div>
                 <div class="grid grid-2col">
                     <div class="form-group">
@@ -125,6 +147,19 @@
                     <select name="system.requiredSkill">
                         <option value="">&mdash;</option>
                         {{selectOptions config.skills selected=system.requiredSkill}}
+                    </select>
+                </div>
+                {{!-- Which row of Table P22 this weapon reads for its range-band step
+                      modifiers. A separate axis from Weapon Type: a rifle and a pistol
+                      are both "Ranged" and degrade over distance quite differently. --}}
+                <div class="form-group">
+                    <label title="{{localize 'ALTERNITY.Weapon.RangeClassHint'}}">{{localize 'ALTERNITY.Weapon.RangeClass'}}</label>
+                    <select name="system.rangeClass">
+                        <option value="Melee" {{#if (eq system.rangeClass 'Melee')}}selected{{/if}}>{{localize 'ALTERNITY.Weapon.RangeClassMelee'}}</option>
+                        <option value="Primitive" {{#if (eq system.rangeClass 'Primitive')}}selected{{/if}}>{{localize 'ALTERNITY.Weapon.RangeClassPrimitive'}}</option>
+                        <option value="Pistol" {{#if (eq system.rangeClass 'Pistol')}}selected{{/if}}>{{localize 'ALTERNITY.Weapon.RangeClassPistol'}}</option>
+                        <option value="Rifle" {{#if (eq system.rangeClass 'Rifle')}}selected{{/if}}>{{localize 'ALTERNITY.Weapon.RangeClassRifle'}}</option>
+                        <option value="SMG" {{#if (eq system.rangeClass 'SMG')}}selected{{/if}}>{{localize 'ALTERNITY.Weapon.RangeClassSMG'}}</option>
                     </select>
                 </div>
                 <div class="grid grid-3col">
@@ -157,7 +192,10 @@
                           the attack itself is a skill check rolled under the wielder's
                           (ability score + rank), which the character sheet resolves. --}}
                     <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Weapon.TotalAttackBonus'}}:</strong> {{fmtMod system.totalAttackBonus}} {{localize 'ALTERNITY.Steps'}}</span>
-                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.DamageFormula'}}:</strong> {{system.fullDamageFormula}}</span>
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Weapon.DamageRun'}}:</strong> {{system.damageRunLabel}}</span>
+                    {{#if system.damageBonusFormula}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Weapon.DamageBonus'}}:</strong> {{system.damageBonusFormula}}</span>
+                    {{/if}}
                     {{#if system.strengthDamageAdjustment}}
                         {{!-- Melee and thrown weapons only (PHB Table P9). --}}
                         <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Weapon.StrengthDamage'}}:</strong> {{fmtMod system.strengthDamageAdjustment}}</span>

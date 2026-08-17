@@ -77,7 +77,11 @@
                 <div class="{{alt}}-ai-ability-row">
                     {{#each abilities as |a|}}
                     <div class="{{../alt}}-robot-ability">
-                        <label title="{{a.label}}">{{a.key}}</label>
+                        {{!-- The label doubles as the feat-check roll button. --}}
+                        <label title="{{a.label}} — {{localize 'ALTERNITY.Roll.FeatCheckHint'}}">
+                            <button type="button" class="{{../alt}}-ability-roll-btn" data-action="rollAbility"
+                                    data-ability="{{a.key}}">{{a.key}}</button>
+                        </label>
                         <input type="number" name="system.abilities.{{a.key}}" value="{{a.value}}" min="1" />
                     </div>
                     {{/each}}
@@ -122,6 +126,8 @@
             <div class="{{alt}}-stat-box">
                 <label title="{{localize 'ALTERNITY.AI.GridSkillScoreHint'}}">{{localize 'ALTERNITY.AI.GridSkillScore'}}</label>
                 <strong>{{system.gridSkillScore.ordinary}} / {{system.gridSkillScore.good}} / {{system.gridSkillScore.amazing}}</strong>
+                <button type="button" class="{{alt}}-roll-btn" data-action="rollGridSkill"
+                        title="{{localize 'ALTERNITY.Roll.SkillHint'}}">⬡</button>
             </div>
             <div class="{{alt}}-stat-box">
                 <label title="{{localize 'ALTERNITY.AI.GridMovementHint'}}">{{localize 'ALTERNITY.AI.GridMovement'}}</label>
@@ -340,6 +346,11 @@
                     <button type="button" data-action="loadAllAIRanks" data-index="{{row.index}}" title="{{localize 'ALTERNITY.AI.LoadAllHint'}}">
                         {{#if row.isLoaded}}⏏{{else}}⭳{{/if}}
                     </button>
+                    {{!-- Disabled for a barred skill (an AI has no body to attempt it
+                          with) and for one swapped out of active memory. --}}
+                    <button type="button" class="{{../alt}}-roll-btn" data-action="rollSkill" data-index="{{row.index}}"
+                            {{#if row.isBarred}}disabled{{/if}}{{#unless row.isLoaded}} disabled{{/unless}}
+                            title="{{localize 'ALTERNITY.Roll.SkillHint'}}{{#if row.penalty}} ({{fmtMod row.penalty}}){{/if}}">⬡</button>
                     <button type="button" data-action="deleteAIRow" data-array="skills" data-index="{{row.index}}">✕</button>
                 </div>
                 {{else}}
@@ -387,4 +398,22 @@
         </section>
 
     </main>
+
+    {{!-- The roll tray. No dodge button: an AI's avatar defends with its Grid skill,
+          not with an Acrobatics-dodge it has no body to perform. --}}
+    <footer class="{{alt}}-roll-tray">
+        <div class="{{alt}}-roll-mount" hidden></div>
+        <div class="{{alt}}-quick-roll-bar">
+            <button type="button" class="{{alt}}-quick-btn is-primary" data-action="rollActionCheck"
+                    title="{{localize 'ALTERNITY.Roll.ActionCheckHint'}}">
+                ⬡ {{localize 'ALTERNITY.Roll.ActionCheck'}}
+                <span class="{{alt}}-quick-btn-score">{{system.actionCheck.ordinary}}/{{system.actionCheck.good}}/{{system.actionCheck.amazing}}</span>
+            </button>
+            <button type="button" class="{{alt}}-quick-btn" data-action="rollGridSkill"
+                    title="{{localize 'ALTERNITY.AI.GridSkillScoreHint'}}">
+                ⬢ {{localize 'ALTERNITY.AI.GridSkillScore'}}
+                <span class="{{alt}}-quick-btn-score">{{system.gridSkillScore.ordinary}}/{{system.gridSkillScore.good}}/{{system.gridSkillScore.amazing}}</span>
+            </button>
+        </div>
+    </footer>
 </div>

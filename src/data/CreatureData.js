@@ -304,7 +304,13 @@ export class CreatureData extends foundry.abstract.TypeDataModel {
         }));
 
         // ── Skills ──────────────────────────────────────────────────────────
-        this.skillRows = (this.skills ?? []).map((row, index) => ({ ...row, index }));
+        // `scoreRun` is added so a skill row reads the same way an attack row does:
+        // the sheet displays the triple, and its roll button parses it back.
+        this.skillRows = (this.skills ?? []).map((row, index) => ({
+            ...row,
+            index,
+            scoreRun: AlternityMathService.calculateScoreRun(row.score ?? 0).label,
+        }));
 
         // Only the rates a statblock would actually print.
         this.movementRates = Object.entries(this.movement ?? {})

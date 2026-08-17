@@ -73,7 +73,12 @@
         <section class="{{alt}}-robot-abilities">
             {{#each abilities as |a|}}
             <div class="{{../alt}}-robot-ability">
-                <label title="{{a.label}}">{{a.key}}</label>
+                {{!-- The label doubles as the feat-check roll button: a check made
+                      against a bare ability score is a feat check at +1 step. --}}
+                <label title="{{a.label}} — {{localize 'ALTERNITY.Roll.FeatCheckHint'}}">
+                    <button type="button" class="{{../alt}}-ability-roll-btn" data-action="rollAbility"
+                            data-ability="{{a.key}}">{{a.key}}</button>
+                </label>
                 <input type="number" name="system.abilities.{{a.key}}" value="{{a.value}}" min="0" max="30" />
             </div>
             {{/each}}
@@ -212,6 +217,8 @@
                         {{/each}}
                     </select>
                     <input type="text" name="system.attacks.{{row.index}}.range" value="{{row.range}}" placeholder="{{localize 'ALTERNITY.Npc.Range'}}" />
+                    <button type="button" class="{{../alt}}-roll-btn" data-action="rollAttack" data-index="{{row.index}}"
+                            title="{{localize 'ALTERNITY.Roll.AttackHint'}}">⚔</button>
                     <button type="button" data-action="deleteNpcRow" data-array="attacks" data-index="{{row.index}}">✕</button>
                 </div>
                 {{else}}
@@ -231,4 +238,21 @@
         </section>
 
     </main>
+
+    {{!-- The roll tray. Mount point for the inline roll panel, plus the two rolls
+          that come up every round. --}}
+    <footer class="{{alt}}-roll-tray">
+        <div class="{{alt}}-roll-mount" hidden></div>
+        <div class="{{alt}}-quick-roll-bar">
+            <button type="button" class="{{alt}}-quick-btn is-primary" data-action="rollActionCheck"
+                    title="{{localize 'ALTERNITY.Roll.ActionCheckHint'}}">
+                ⬡ {{localize 'ALTERNITY.Roll.ActionCheck'}}
+                <span class="{{alt}}-quick-btn-score">{{system.actionCheck.ordinary}}/{{system.actionCheck.good}}/{{system.actionCheck.amazing}}</span>
+            </button>
+            <button type="button" class="{{alt}}-quick-btn" data-action="rollDefence"
+                    title="{{localize 'ALTERNITY.Roll.DodgeUntrainedHint'}}">
+                🛡 {{localize 'ALTERNITY.Roll.Dodge'}}
+            </button>
+        </div>
+    </footer>
 </div>

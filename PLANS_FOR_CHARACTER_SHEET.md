@@ -38,12 +38,49 @@ Improve the layout and interactivity of the sheet.
 
 ## Phase 3: Advanced Automation & Integration
 - [ ] **Armor Mitigation in Rolls**: Integrate armor die rolls into the damage application flow.
+      Armour values can be die ranges (`d6-1`), and `applyAlternityDamage` currently
+      mitigates with a flat `damageResistance` number rather than rolling the die.
 - [ ] **Skill specialty highlighting**: Ensure specialty skills are visually distinct (italics as per PDF).
 - [ ] **Quick Action Buttons**: Add buttons for common actions (Recovery, First Aid check).
+- [ ] **Personal-scale firepower degrade**: `calculateFirepowerDegrade` exists and the
+      damage card reports it, but only when the caller knows the target's toughness.
+      Personal armour has no toughness field yet, so a weapon's firepower currently
+      has no effect against a person.
+
+## Phase 4: Rolling from the sheets — done
+Every sheet can now roll what it prints. The pipeline is:
+`sheet action → AlternityRollComponent (the inline panel) → AlternityRollService →
+AlternityMathService`, with the dice and the chat cards owned by the roll service and
+all arithmetic owned by the math service.
+
+- [x] **Skill checks** from the hero, creature, robot and AI sheets, and station
+      checks from the spaceship sheet.
+- [x] **Ability (feat) checks** — every ability label on every sheet is a roll button.
+- [x] **Action Checks** — hero, supporting cast, creature, robot and AI, with the
+      "an Action Check can never fail" rule and the Bad Luck Rule on a natural 20.
+- [x] **Attacks** — the check rolls the weapon's *governing specialty*, and the degree
+      it achieves picks which of three damage codes fires (PHB Ch.11). Weapons gained
+      `damageOrdinary`/`damageGood`/`damageAmazing` to make this possible; the old
+      single `damageFormula` is migrated into the Ordinary column.
+- [x] **Defence** — an Acrobatics-dodge check whose degree is stored on the defender
+      and spent by the next attack against them, plus the target's resistance modifier
+      entering the attacker's check automatically when a token is targeted.
+- [x] **Damage** — rolled at the achieved grade from the attack card, with the track
+      read off the code's own `s`/`w`/`m` letter, and an Apply button that writes to
+      the target's tracks (including secondary damage).
+- [x] **The situation die is actually rolled.** It previously was not: modifiers were
+      assembled after the dice were cast, so a wound penalty appeared in the trace and
+      changed nothing. See the notes in `alt-mechanics.js` and `AlternityActor.rollSkill`.
+
+Not done, deliberately: the **vehicle** sheet has no roll buttons, because `VehicleData`
+holds no skill, attack or action-check scores to roll — a vehicle is driven by a
+character's own Vehicle Operation check. The **warship** sheet rolls weapon damage but
+has no crew checks, for the same reason.
 
 ## Current Status
 - [x] Basic Ability/Skill management.
 - [x] Action Check & Durability tracking.
-- [x] Weapon rolling with damage.
+- [x] Weapon rolling with damage, at the grade the attack check earns.
 - [x] Wound penalties (Dazed effect) logic.
 - [x] Serialization/Deserialization.
+- [x] Rolling from every sheet that has something to roll (see Phase 4).

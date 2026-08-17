@@ -311,16 +311,16 @@ export class NpcData extends foundry.abstract.TypeDataModel {
         ) + (this.resistanceBonus ?? 0);
 
         // ── Attacks ─────────────────────────────────────────────────────
-        this.attackRows = (this.attacks ?? []).map((row, index) => {
-            const score = row.score ?? 0;
-            return {
-                ...row,
-                index,
-                scoreRun: `${score}/${Math.floor(score / 2)}/${Math.floor(score / 4)}`,
-                damageRun: [row.damageOrdinary, row.damageGood, row.damageAmazing]
-                    .filter(Boolean).join('/'),
-            };
-        });
+        // The run comes from the math service rather than being halved and quartered
+        // inline, so it cannot drift from every other score run in the system — and
+        // so the sheet's attack-roll button can parse back exactly what is printed.
+        this.attackRows = (this.attacks ?? []).map((row, index) => ({
+            ...row,
+            index,
+            scoreRun: AlternityMathService.calculateScoreRun(row.score ?? 0).label,
+            damageRun: [row.damageOrdinary, row.damageGood, row.damageAmazing]
+                .filter(Boolean).join('/'),
+        }));
 
         // Only the rates the statblock would actually print.
         this.movementRates = Object.entries(this.movement ?? {})

@@ -1,3 +1,10 @@
+{{!--
+    Result card for any Alternity check.
+
+    `data-alt-action` rather than `data-action`: chat message content is rendered
+    outside any ApplicationV2, so Foundry's own action dispatcher never sees these
+    buttons. They are bound by hand in module_hooks/alt-mechanics.js.
+--}}
 <div class="alt-roll-card">
     <header class="alt-roll-card-header">
         <span class="alt-roll-card-context">{{context}}</span>
@@ -9,7 +16,7 @@
                 <div class="alt-roll-outcome-group">
                     <span class="alt-roll-outcome">
                         {{#if succeeded}}
-                        <strong class="alt-outcome-success">
+                        <strong class="alt-outcome-success degree--{{lower degree}}">
                             {{#if (eq degree "Marginal")}}{{localize "ALTERNITY.Roll.Marginal"}}{{/if}}
                             {{#if (eq degree "Ordinary")}}{{localize "ALTERNITY.Roll.Ordinary"}}{{/if}}
                             {{#if (eq degree "Good")}}{{localize "ALTERNITY.Roll.Good"}}{{/if}}
@@ -32,11 +39,29 @@
             </div>
         </div>
 
+        {{#if badLuck}}
+        {{!-- A natural 20 on an Action Check still succeeds, but taints the round. --}}
+        <p class="alt-roll-badluck">{{localize "ALTERNITY.Roll.BadLuck"}}</p>
+        {{/if}}
+
         <div class="alt-roll-rendered">
             {{{rollHtml}}}
         </div>
-        
-        <details class="alt-roll-breakdown" open>
+
+        {{#if damage}}
+        {{!-- Which of the weapon's three columns the achieved degree unlocks. --}}
+        <div class="alt-roll-card-buttons">
+            <button type="button" class="alt-card-btn" data-alt-action="rollDamage">
+                {{localize "ALTERNITY.Roll.RollDamage"}}
+                <span class="alt-card-btn-detail">{{damage.code}} ({{damage.grade}})</span>
+            </button>
+        </div>
+        {{#if damage.usedFallback}}
+        <p class="alt-roll-note">{{localize "ALTERNITY.Roll.DamageGradeFallback"}}</p>
+        {{/if}}
+        {{/if}}
+
+        <details class="alt-roll-breakdown">
             <summary>{{localize "ALTERNITY.Roll.Breakdown"}}</summary>
             <table class="alt-trace-table">
                 <tbody>
@@ -51,9 +76,25 @@
                     {{/each}}
                 </tbody>
                 <tfoot>
+                    {{#if stepFormula}}
+                    <tr class="alt-trace-step">
+                        <td>{{localize "ALTERNITY.Roll.SituationDie"}}</td>
+                        <td colspan="2">
+                            {{stepFormula}}
+                            {{#if isStepClamped}}
+                                <em class="alt-roll-note">{{localize "ALTERNITY.Roll.StepClamped"}}</em>
+                            {{/if}}
+                        </td>
+                    </tr>
+                    {{/if}}
                     <tr class="alt-trace-total">
-                        <td>{{localize "ALTERNITY.Roll.FinalTarget"}}</td>
-                        <td colspan="2">{{adjustedValue}}</td>
+                        <td>{{localize "ALTERNITY.Roll.Result"}}</td>
+                        <td colspan="2">
+                            {{adjustedValue}}
+                            {{#if oga}}
+                                <span class="alt-roll-note">{{localize "ALTERNITY.Roll.VersusOrdinary"}} {{oga.ordinary}}</span>
+                            {{/if}}
+                        </td>
                     </tr>
                 </tfoot>
             </table>

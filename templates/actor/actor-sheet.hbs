@@ -266,10 +266,28 @@
                         <img src="{{item.img}}" data-action="editItem" data-item-id="{{item.id}}" title="Edit Item" />
                         <div class="{{@root.alt}}-item-info">
                             <span class="{{@root.alt}}-item-name">{{item.name}}</span>
-                            <span class="{{@root.alt}}-item-stats">{{item.system.weaponType}} | {{item.system.damageFormula}} {{item.system.damageType}} ({{item.system.damageCategory}})</span>
+                            <span class="{{@root.alt}}-item-stats">
+                                {{item.system.weaponType}} | {{item.system.damageRunLabel}} {{item.system.damageType}}
+                                {{#if item.system.usesRangeBands}}| {{item.system.rangeDisplay}}{{/if}}
+                            </span>
                         </div>
                         <div class="{{@root.alt}}-item-actions">
-                            <button type="button" class="{{@root.alt}}-roll-btn" data-action="rollWeapon" data-item-id="{{item.id}}" title="Attack">⚔</button>
+                            <button type="button" class="{{@root.alt}}-roll-btn" data-action="rollWeapon" data-item-id="{{item.id}}"
+                                    title="{{localize 'ALTERNITY.Roll.AttackHint'}}">⚔</button>
+                            {{!-- Damage straight off the row, for the cases the attack
+                                  card cannot cover: a check rolled physically at the
+                                  table, or a second target for the same shot. --}}
+                            <span class="{{@root.alt}}-damage-grade-btns">
+                                <button type="button" class="{{@root.alt}}-roll-btn is-small" data-action="rollWeaponDamage"
+                                        data-item-id="{{item.id}}" data-grade="ordinary"
+                                        title="{{localize 'ALTERNITY.DegreeOrdinary'}}">O</button>
+                                <button type="button" class="{{@root.alt}}-roll-btn is-small" data-action="rollWeaponDamage"
+                                        data-item-id="{{item.id}}" data-grade="good"
+                                        title="{{localize 'ALTERNITY.DegreeGood'}}">G</button>
+                                <button type="button" class="{{@root.alt}}-roll-btn is-small" data-action="rollWeaponDamage"
+                                        data-item-id="{{item.id}}" data-grade="amazing"
+                                        title="{{localize 'ALTERNITY.DegreeAmazing'}}">A</button>
+                            </span>
                             <button type="button" class="{{@root.alt}}-delete-btn" data-action="deleteItem" data-item-id="{{item.id}}" title="Delete">✕</button>
                         </div>
                     </div>
@@ -892,19 +910,30 @@
     <footer class="{{@root.alt}}-roll-tray">
         <div class="{{@root.alt}}-roll-mount" hidden></div>
         <div class="{{@root.alt}}-quick-roll-bar">
-            <span class="{{@root.alt}}-quick-roll-label">Quick roll:</span>
-            <button type="button" class="{{@root.alt}}-quick-btn" data-action="quickRoll" data-context="Combat"
-                    data-ability="DEX" {{#if isIncapacitated}}disabled{{/if}}
-                    title="Base 20 + DEX">⚔ Combat</button>
-            <button type="button" class="{{@root.alt}}-quick-btn" data-action="quickRoll" data-context="Perception"
-                    data-ability="PER" {{#if isIncapacitated}}disabled{{/if}}
-                    title="Base 20 + PER">👁 Perception</button>
-            <button type="button" class="{{@root.alt}}-quick-btn" data-action="quickRoll" data-context="Stealth"
-                    data-ability="DEX" {{#if isIncapacitated}}disabled{{/if}}
-                    title="Base 20 + DEX">🌑 Stealth</button>
-            <button type="button" class="{{@root.alt}}-quick-btn" data-action="quickRoll" data-context="Science"
-                    data-ability="INT" {{#if isIncapacitated}}disabled{{/if}}
-                    title="Base 20 + INT">🔬 Science</button>
+            {{!-- The two rolls that come up every round, then a feat check on each
+                  ability. The old bar advertised "Base 20 + DEX", which was a d20
+                  formula this system does not use — a feat check rolls under the
+                  ability score itself at +1 step. --}}
+            <button type="button" class="{{@root.alt}}-quick-btn is-primary" data-action="rollActionCheck"
+                    {{#if isIncapacitated}}disabled{{/if}}
+                    title="{{localize 'ALTERNITY.Roll.ActionCheckHint'}}">
+                ⬡ {{localize 'ALTERNITY.Roll.ActionCheck'}}
+                <span class="{{@root.alt}}-quick-btn-score">{{actionCheck.ordinary}}/{{actionCheck.good}}/{{actionCheck.amazing}}</span>
+            </button>
+            <button type="button" class="{{@root.alt}}-quick-btn" data-action="rollDefence"
+                    {{#if isIncapacitated}}disabled{{/if}}
+                    title="{{localize 'ALTERNITY.Roll.DodgeHint'}}">
+                🛡 {{localize 'ALTERNITY.Roll.Dodge'}}
+            </button>
+            <span class="{{@root.alt}}-quick-roll-label">{{localize 'ALTERNITY.Roll.FeatCheck'}}:</span>
+            {{#each abilities as |ab key|}}
+            <button type="button" class="{{@root.alt}}-quick-btn is-small" data-action="quickRoll"
+                    data-ability="{{key}}" data-context="{{localize 'ALTERNITY.Roll.FeatCheck'}}"
+                    {{#if @root.isIncapacitated}}disabled{{/if}}
+                    title="{{localize 'ALTERNITY.Roll.FeatCheckHint'}} — {{key}} {{ab.score}}">
+                {{key}}
+            </button>
+            {{/each}}
         </div>
     </footer>
 </form>

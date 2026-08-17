@@ -549,6 +549,85 @@ const SITUATION_DIE_SCALE = Object.freeze({
     '7':  [1,  '3d20', '+3d20'],
 });
 
+/** The lowest and highest step the scale above can express. */
+const MIN_STEP = -5;
+const MAX_STEP = 7;
+
+/**
+ * The three damage grades a personal-scale attack can inflict, least → most
+ * severe, and the single letters the books suffix onto a damage code to mark
+ * them ("d4+1s" is one stun grade, "d6+2w" one wound grade).
+ */
+const PERSONAL_DAMAGE_GRADES = Object.freeze(['stun', 'wound', 'mortal']);
+const DAMAGE_CODE_SUFFIXES = Object.freeze({ s: 'stun', w: 'wound', m: 'mortal' });
+
+/**
+ * Table P16 / Table P17 "Conditions" — the ladder a Gamemaster names a
+ * circumstance on, rather than computing steps directly. Table P17 adds the
+ * "Critical" tier beyond Extreme; both are offered so one picker covers both
+ * tables (see alternity-core-mechanics.md).
+ */
+const CONDITION_STEP_MODIFIERS = Object.freeze({
+    Amazing:  -3,
+    Good:     -2,
+    Ordinary: -1,
+    Marginal:  0,
+    Slight:    1,
+    Moderate:  2,
+    Extreme:   3,
+    Critical:  4,
+});
+
+/**
+ * Table P22 — Range Modifiers by Weapon Type. A weapon's range *class* is a
+ * different axis from its `weaponType` (Melee/Ranged/Thrown/Heavy): the table
+ * keys off what kind of gun it is, because a rifle degrades over distance far
+ * more gently than a pistol does.
+ *
+ * `Melee` carries no band modifiers at all — a melee weapon's range is
+ * "Personal", which the table does not rate — and is present so a weapon can
+ * say "this column does not apply to me" rather than defaulting to a gun.
+ * Flintlocks use the Pistol or Rifle row as appropriate (PHB Ch.11).
+ */
+const RANGE_BANDS = Object.freeze(['short', 'medium', 'long']);
+
+const RANGE_STEP_MODIFIERS = Object.freeze({
+    Melee:     null,
+    Primitive: Object.freeze({ short: -1, medium: 1, long: 2 }),
+    Pistol:    Object.freeze({ short: -1, medium: 1, long: 3 }),
+    Rifle:     Object.freeze({ short: -1, medium: 0, long: 1 }),
+    SMG:       Object.freeze({ short: -1, medium: 1, long: 3 }),
+});
+
+const RANGE_CLASSES = Object.freeze(Object.keys(RANGE_STEP_MODIFIERS));
+
+/**
+ * Dodge Defense (PHB; see alternity-core-mechanics.md "Dodge Defense"). A
+ * successful Acrobatics-dodge check adjusts the defender's STR/DEX resistance
+ * modifier against the next attack — i.e. it is a step *penalty* handed to the
+ * attacker, which is why the successful degrees are positive here.
+ *
+ * A Critical Failure is the one entry that runs the other way: the dodge goes
+ * so wrong it makes the defender easier to hit.
+ */
+const DODGE_STEP_ADJUSTMENTS = Object.freeze({
+    [SUCCESS_DEGREES.CRITICAL_FAILURE]: -2,
+    [SUCCESS_DEGREES.FAILURE]:           0,
+    [SUCCESS_DEGREES.ORDINARY]:          1,
+    [SUCCESS_DEGREES.GOOD]:              2,
+    [SUCCESS_DEGREES.AMAZING]:           3,
+});
+
+/**
+ * How many successes each degree contributes to a complex skill check
+ * (Table P17, bottom half), and how many the task's complexity demands.
+ */
+const COMPLEX_CHECK_SUCCESS_VALUES = Object.freeze({
+    [SUCCESS_DEGREES.ORDINARY]: 1,
+    [SUCCESS_DEGREES.GOOD]:     2,
+    [SUCCESS_DEGREES.AMAZING]:  3,
+});
+
 // ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------
@@ -559,12 +638,17 @@ const SITUATION_DIE_SCALE = Object.freeze({
  * @returns {{sign: number, die: string, formula: string}}
  */
 function _resolveStepDie(totalStep) {
-    const step = Math.min(7, Math.max(-5, totalStep));
+    const step = Math.min(MAX_STEP, Math.max(MIN_STEP, totalStep));
     const entry = SITUATION_DIE_SCALE[String(step)];
     return {
         sign: entry[0],
         die: entry[1],
-        formula: entry[2]
+        formula: entry[2],
+        // The step actually used, which is not the caller's step once the scale's
+        // ends are reached: a +9 total still rolls +3d20. Callers that build a
+        // Foundry formula need this rather than the unclamped total.
+        step,
+        isClamped: step !== totalStep,
     };
 }
 
@@ -644,13 +728,24 @@ const AlternityMathService = {
      *   scores:        object,       // The triple scores used
      *   modifierTrace: object[],     // Every contributor
      *   totalStep:     number,       // Net step value
-     *   stepDie:       object,       // {sign, die, formula}
-     *   succeeded:     boolean|null, 
-     *   degree:        string|null,  
+     *   stepDie:       object,       // {sign, die, formula, step, isClamped}
+     *   succeeded:     boolean|null,
+     *   degree:        string|null,
      *   result:        number|null,  // Combined roll result
+     *   finalValue:    number|null,  // Alias of `result` — see note below
+     *   margin:        number|null,  // Ordinary score minus result; negative on a miss
      *   controlRoll:   number|null,
      *   situationRoll: number|null,
      * }}
+     *
+     * `finalValue` and `margin` exist because callers (the hook layer, the roll
+     * component, the chat card) have always read them and this method has never
+     * returned them, so every roll card's breakdown footer rendered blank.
+     *
+     * In a roll-under system there is no "adjusted target": the target is the
+     * score triple and it never moves. What the modifiers adjust is the *roll*.
+     * So `finalValue` is the combined result the scores are compared against —
+     * the number that actually decides the outcome — not a shifted DC.
      */
     resolveAbilityCheck(scores, baseStep, modifiers, context, rolls = null) {
         if (!scores || typeof scores.ordinary !== 'number') {
@@ -678,16 +773,18 @@ const AlternityMathService = {
         let succeeded = null;
         let degree    = null;
         let result    = null;
+        let margin    = null;
         let controlRoll = null;
         let situationRoll = null;
 
         if (rolls !== null) {
             controlRoll = rolls.control;
             situationRoll = rolls.situation || 0;
-            
+
             result = controlRoll + (stepDie.sign * situationRoll);
             degree = _calculateDegree(result, scores, controlRoll);
             succeeded = degree !== SUCCESS_DEGREES.FAILURE && degree !== SUCCESS_DEGREES.CRITICAL_FAILURE;
+            margin = scores.ordinary - result;
         }
 
         console.log(
@@ -696,19 +793,270 @@ const AlternityMathService = {
             (rolls !== null ? `, result: ${result} (control: ${controlRoll}, sit: ${situationRoll}), succeeded: ${succeeded}, degree: ${degree}` : '')
         );
 
-        return { 
-            scores, 
-            modifierTrace, 
-            totalStep, 
-            stepDie, 
-            succeeded, 
-            degree, 
-            result, 
-            controlRoll, 
-            situationRoll 
+        return {
+            scores,
+            modifierTrace,
+            totalStep,
+            stepDie,
+            succeeded,
+            degree,
+            result,
+            finalValue: result,
+            margin,
+            controlRoll,
+            situationRoll
         };
     },
 
+
+    // -----------------------------------------------------------------------
+    // buildSituationFormula
+    // -----------------------------------------------------------------------
+
+    /**
+     * Build the dice formula for a check at a given total step.
+     *
+     * The control die is always a d20 and the situation die is added or
+     * subtracted from it, so the whole check is one Foundry Roll — which matters
+     * because it keeps both dice in a single rendered roll on the chat card
+     * rather than two unrelated ones.
+     *
+     * Returned alongside the formula are the term indices the control and
+     * situation dice occupy, so a caller reading the evaluated roll back apart
+     * does not have to guess at `roll.terms[2]`.
+     *
+     * @param {number} totalStep - Net step, clamped to the scale by the callee.
+     * @returns {{
+     *   formula:      string,
+     *   step:         number,
+     *   stepDie:      object,
+     *   hasSituation: boolean,
+     *   controlIndex: number,
+     *   situationIndex: number|null,
+     * }}
+     */
+    buildSituationFormula(totalStep) {
+        const stepDie = _resolveStepDie(Math.round(Number(totalStep) || 0));
+        // Step 0 is "+d0" — no situation die at all, not a zero-sided die.
+        const hasSituation = stepDie.step !== 0;
+
+        return {
+            formula: hasSituation ? `1d20${stepDie.formula}` : '1d20',
+            step: stepDie.step,
+            stepDie,
+            hasSituation,
+            controlIndex: 0,
+            // 1d20 + 1d4 parses to [Die, OperatorTerm, Die].
+            situationIndex: hasSituation ? 2 : null,
+        };
+    },
+
+    // -----------------------------------------------------------------------
+    // getConditionStepModifier / getRangeStepModifier
+    // -----------------------------------------------------------------------
+
+    /**
+     * Steps for a named circumstance on the Table P16 / P17 condition ladder.
+     * @param {string} condition
+     * @returns {number} 0 for an unknown name — an unrated circumstance is no modifier.
+     */
+    getConditionStepModifier(condition) {
+        return CONDITION_STEP_MODIFIERS[condition] ?? 0;
+    },
+
+    /**
+     * Steps for firing at a given range band (Table P22).
+     *
+     * @param {string} rangeClass - A RANGE_CLASSES key.
+     * @param {string} band       - 'short' | 'medium' | 'long'.
+     * @returns {{ steps: number, applies: boolean, modifierTrace: object[] }}
+     *          `applies` is false for melee weapons and unknown classes, which
+     *          have no band modifiers rather than a modifier of zero.
+     */
+    getRangeStepModifier(rangeClass, band) {
+        const table = RANGE_STEP_MODIFIERS[rangeClass];
+        if (!table || !RANGE_BANDS.includes(band)) {
+            return { steps: 0, applies: false, modifierTrace: [] };
+        }
+        const steps = table[band];
+        return {
+            steps,
+            applies: true,
+            modifierTrace: steps === 0 ? [] : [this.buildModifier(
+                'Range', steps, `${band} range for a ${rangeClass}-class weapon (Table P22)`
+            )],
+        };
+    },
+
+    // -----------------------------------------------------------------------
+    // parseDamageCode
+    // -----------------------------------------------------------------------
+
+    /**
+     * Split an Alternity damage code such as "d4+2w" into a dice formula and the
+     * track the damage lands on.
+     *
+     * The trailing letter is notation, not dice: `s`/`w`/`m` name the grade
+     * (stun / wound / mortal). Handing the raw string to Foundry's Roll would
+     * either throw or — worse — silently reinterpret it, so every damage roll in
+     * the system goes through here first.
+     *
+     * A bare die code with no suffix is read as wound damage, which is what the
+     * weapon tables mean when they omit the letter on a middle column.
+     *
+     * @param {string} code       - e.g. "d4+2w", "2d6", "d6+1s".
+     * @param {object} [options]
+     * @param {string} [options.fallbackCategory='wound'] - Grade for a suffixless code.
+     * @returns {{
+     *   formula:  string,   // Roll-safe formula ('' when the code is empty)
+     *   category: string,   // 'stun' | 'wound' | 'mortal'
+     *   isValid:  boolean,  // false when there is nothing to roll
+     *   hadSuffix: boolean,
+     *   raw:      string,
+     * }}
+     */
+    parseDamageCode(code, options = {}) {
+        const fallbackCategory = PERSONAL_DAMAGE_GRADES.includes(options.fallbackCategory)
+            ? options.fallbackCategory
+            : 'wound';
+        const raw = String(code ?? '').trim();
+
+        if (!raw) {
+            return { formula: '', category: fallbackCategory, isValid: false, hadSuffix: false, raw };
+        }
+
+        const suffixMatch = /([swm])\s*$/i.exec(raw);
+        const hadSuffix = suffixMatch !== null;
+        const category = hadSuffix
+            ? DAMAGE_CODE_SUFFIXES[suffixMatch[1].toLowerCase()]
+            : fallbackCategory;
+
+        // Strip the grade letter, then normalise the bare-die shorthand the books
+        // use: "d4+2" means one d4, and Foundry needs the count spelled out.
+        const body = (hadSuffix ? raw.slice(0, suffixMatch.index) : raw).trim();
+        const formula = body.replace(/(^|[^\d\w])d(\d)/gi, '$11d$2');
+
+        return {
+            formula,
+            category,
+            isValid: /\d/.test(formula),
+            hadSuffix,
+            raw,
+        };
+    },
+
+    // -----------------------------------------------------------------------
+    // parseScoreRun
+    // -----------------------------------------------------------------------
+
+    /**
+     * Read a score run as the compendia print it — "16/8/4" — or expand a single
+     * Ordinary value into the full triple.
+     *
+     * Statblock actors (supporting cast, creatures, ship stations) store scores
+     * as text precisely because the books sometimes print a run that does not
+     * obey the halve-and-quarter rule, so a printed run is honoured verbatim and
+     * only a lone number is derived via `calculateScoreRun`.
+     *
+     * @param {string|number} text
+     * @returns {{ ordinary: number, good: number, amazing: number, isValid: boolean, wasDerived: boolean }}
+     */
+    parseScoreRun(text) {
+        const raw = String(text ?? '').trim();
+        if (!raw) return { ordinary: 0, good: 0, amazing: 0, isValid: false, wasDerived: false };
+
+        const parts = raw.split(/[/\\|,\s]+/).filter(Boolean).map((p) => parseInt(p, 10));
+        if (!parts.length || !isFinite(parts[0])) {
+            return { ordinary: 0, good: 0, amazing: 0, isValid: false, wasDerived: false };
+        }
+
+        const derived = this.calculateScoreRun(parts[0]);
+
+        if (parts.length === 1 || !isFinite(parts[1])) {
+            return {
+                ordinary: derived.ordinary,
+                good:     derived.good,
+                amazing:  derived.amazing,
+                isValid: true,
+                wasDerived: true,
+            };
+        }
+
+        return {
+            ordinary: derived.ordinary,
+            good:     Math.max(0, parts[1]),
+            // A two-part run ("16/8") leaves Amazing to the standard quartering.
+            amazing:  isFinite(parts[2]) ? Math.max(0, parts[2]) : derived.amazing,
+            isValid: true,
+            wasDerived: false,
+        };
+    },
+
+    // -----------------------------------------------------------------------
+    // selectDamageGrade
+    // -----------------------------------------------------------------------
+
+    /**
+     * Pick which of a weapon's three damage codes fires, given the degree the
+     * attack check achieved (PHB Ch.11: "Damage: given in Ordinary/Good/Amazing
+     * order, applied depending on the wielder's skill check result").
+     *
+     * A missed attack selects nothing rather than falling back to the Ordinary
+     * column, so a caller cannot accidentally roll damage for a failed attack.
+     *
+     * @param {string} degree - A SUCCESS_DEGREES value.
+     * @param {{ordinary?: string, good?: string, amazing?: string}} damageRun
+     * @returns {{ grade: string|null, code: string, usedFallback: boolean }}
+     *          `grade` is 'ordinary' | 'good' | 'amazing', or null on a miss.
+     *          `usedFallback` is true when the achieved column was left blank on
+     *          the sheet and a lower one had to stand in.
+     */
+    selectDamageGrade(degree, damageRun = {}) {
+        const ladder = ['ordinary', 'good', 'amazing'];
+        const achieved = degree === SUCCESS_DEGREES.AMAZING ? 2
+            : degree === SUCCESS_DEGREES.GOOD ? 1
+            : degree === SUCCESS_DEGREES.ORDINARY ? 0
+            : -1;
+
+        if (achieved < 0) return { grade: null, code: '', usedFallback: false };
+
+        // Walk down from the achieved column to the first one that has a code in
+        // it. Statblocks routinely print a single damage figure for all three.
+        for (let i = achieved; i >= 0; i -= 1) {
+            const code = String(damageRun[ladder[i]] ?? '').trim();
+            if (code) return { grade: ladder[i], code, usedFallback: i !== achieved };
+        }
+
+        return { grade: ladder[achieved], code: '', usedFallback: false };
+    },
+
+    // -----------------------------------------------------------------------
+    // calculateDodgeAdjustment
+    // -----------------------------------------------------------------------
+
+    /**
+     * Convert an Acrobatics-dodge check result into the step penalty the
+     * defender's next attacker suffers (see alternity-core-mechanics.md,
+     * "Dodge Defense").
+     *
+     * The value is expressed from the *attacker's* point of view — positive is a
+     * penalty on their check — because that is the direction every other
+     * modifier in this codebase runs, and because the dodge is ultimately handed
+     * to the attacker's roll as an ordinary modifier.
+     *
+     * @param {string} degree - A SUCCESS_DEGREES value.
+     * @returns {{ steps: number, degree: string, modifierTrace: object[] }}
+     */
+    calculateDodgeAdjustment(degree) {
+        const steps = DODGE_STEP_ADJUSTMENTS[degree] ?? 0;
+        return {
+            steps,
+            degree,
+            modifierTrace: steps === 0 ? [] : [this.buildModifier(
+                'Dodge', steps, `${degree} Acrobatics-dodge adjusts the defender's resistance modifier`
+            )],
+        };
+    },
 
     // -----------------------------------------------------------------------
     // calculateMitigatedDamage
@@ -2748,6 +3096,15 @@ export {
     DIFFICULTY_DCS,
     SUCCESS_DEGREES,
     SITUATION_DIE_SCALE,
+    MIN_STEP,
+    MAX_STEP,
+    PERSONAL_DAMAGE_GRADES,
+    CONDITION_STEP_MODIFIERS,
+    RANGE_CLASSES,
+    RANGE_BANDS,
+    RANGE_STEP_MODIFIERS,
+    DODGE_STEP_ADJUSTMENTS,
+    COMPLEX_CHECK_SUCCESS_VALUES,
     SHIP_TOUGHNESS_CLASSES,
     SHIP_DAMAGE_GRADES,
     FIREPOWER_CLASSES,

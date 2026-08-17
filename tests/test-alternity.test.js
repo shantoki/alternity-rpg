@@ -8,9 +8,12 @@ import {
     AI_PROCESSORS,
     AI_QUALITIES,
     AI_MAX_SKILL_RANK,
+    RANGE_STEP_MODIFIERS,
+    CONDITION_STEP_MODIFIERS,
 } from '../src/services/alternity-math.js';
 import { AlternityCharacterState } from '../src/data/alternity-actor-data.js';
 import { NpcData } from '../src/data/NpcData.js';
+import { WeaponData } from '../src/data/WeaponData.js';
 
 describe('Alternity System Unit Tests', () => {
 
@@ -1585,6 +1588,257 @@ describe('Alternity System Unit Tests', () => {
             expect(AI_PROCESSORS['PL7-Amazing']).toMatchObject({ activeSlots: 13, actionCheckModifier: '-d8' });
             expect(AI_PROCESSORS['PL8-Ordinary']).toMatchObject({ activeSlots: 10, actionCheckModifier: '-d6' });
             expect(AI_PROCESSORS['PL8-Good']).toMatchObject({ activeSlots: 15, maxSkillRank: 12 });
+        });
+    });
+
+    // -----------------------------------------------------------------------
+    // The roll pipeline
+    // -----------------------------------------------------------------------
+
+    describe('resolveAbilityCheck result shape', () => {
+        // Every consumer — the hook layer, the roll component, the chat card —
+        // reads `finalValue` and `margin`. They were never returned, so the card's
+        // breakdown footer rendered blank on every roll ever made.
+        const scores = { ordinary: 12, good: 6, amazing: 3 };
+
+        it('should report the combined result as finalValue', () => {
+            const result = AlternityMathService.resolveAbilityCheck(
+                scores, 0, [], 'Test', { control: 8, situation: 0 }
+            );
+            expect(result.finalValue).toBe(8);
+            expect(result.result).toBe(8);
+        });
+
+        it('should subtract a bonus situation die from the control roll', () => {
+            // -2 steps is -1d6, so a situation roll of 3 pulls the result down.
+            const result = AlternityMathService.resolveAbilityCheck(
+                scores, 0, [AlternityMathService.buildModifier('Test', -2, '')], 'Test',
+                { control: 8, situation: 3 }
+            );
+            expect(result.stepDie.formula).toBe('-1d6');
+            expect(result.finalValue).toBe(5);
+            expect(result.degree).toBe(SUCCESS_DEGREES.GOOD);
+        });
+
+        it('should report margin against the Ordinary score, negative on a miss', () => {
+            expect(AlternityMathService.resolveAbilityCheck(
+                scores, 0, [], 'Test', { control: 10, situation: 0 }
+            ).margin).toBe(2);
+            expect(AlternityMathService.resolveAbilityCheck(
+                scores, 0, [], 'Test', { control: 15, situation: 0 }
+            ).margin).toBe(-3);
+        });
+
+        it('should leave finalValue and margin null when no dice were supplied', () => {
+            const result = AlternityMathService.resolveAbilityCheck(scores, 1, [], 'Test');
+            expect(result.finalValue).toBeNull();
+            expect(result.margin).toBeNull();
+        });
+
+        it('should flag a step total that ran off the end of the scale', () => {
+            const result = AlternityMathService.resolveAbilityCheck(
+                scores, 1, [AlternityMathService.buildModifier('Test', 9, '')], 'Test'
+            );
+            expect(result.totalStep).toBe(10);
+            expect(result.stepDie.step).toBe(7);
+            expect(result.stepDie.isClamped).toBe(true);
+        });
+    });
+
+    describe('buildSituationFormula', () => {
+        it('should roll the control die alone at step 0', () => {
+            const built = AlternityMathService.buildSituationFormula(0);
+            expect(built.formula).toBe('1d20');
+            expect(built.hasSituation).toBe(false);
+            expect(built.situationIndex).toBeNull();
+        });
+
+        it('should place the situation die where the caller reads it back', () => {
+            // 1d20 + 1d4 parses to [Die, Operator, Die]; term 2 is the situation die.
+            const built = AlternityMathService.buildSituationFormula(1);
+            expect(built.formula).toBe('1d20+1d4');
+            expect(built.controlIndex).toBe(0);
+            expect(built.situationIndex).toBe(2);
+        });
+
+        it('should subtract for a bonus step', () => {
+            expect(AlternityMathService.buildSituationFormula(-5).formula).toBe('1d20-1d20');
+        });
+
+        it('should clamp rather than produce an undefined die', () => {
+            expect(AlternityMathService.buildSituationFormula(99).formula).toBe('1d20+3d20');
+            expect(AlternityMathService.buildSituationFormula(-99).formula).toBe('1d20-1d20');
+        });
+    });
+
+    describe('parseDamageCode', () => {
+        it('should split the track letter off a damage code', () => {
+            expect(AlternityMathService.parseDamageCode('d4+2w')).toMatchObject({
+                formula: '1d4+2', category: 'wound', isValid: true, hadSuffix: true,
+            });
+            expect(AlternityMathService.parseDamageCode('d6+1s').category).toBe('stun');
+            expect(AlternityMathService.parseDamageCode('2d6m').category).toBe('mortal');
+        });
+
+        it('should spell out the implied single die so Foundry can roll it', () => {
+            // The books write "d4+2"; Roll needs a dice count.
+            expect(AlternityMathService.parseDamageCode('d4').formula).toBe('1d4');
+            expect(AlternityMathService.parseDamageCode('d20+3w').formula).toBe('1d20+3');
+            // An explicit count is left alone.
+            expect(AlternityMathService.parseDamageCode('3d6w').formula).toBe('3d6');
+        });
+
+        it('should fall back to a caller-chosen track for a suffixless code', () => {
+            expect(AlternityMathService.parseDamageCode('2d6')).toMatchObject({
+                category: 'wound', hadSuffix: false,
+            });
+            expect(AlternityMathService.parseDamageCode('2d6', { fallbackCategory: 'stun' }).category)
+                .toBe('stun');
+            // A nonsense fallback does not become the category.
+            expect(AlternityMathService.parseDamageCode('2d6', { fallbackCategory: 'gravy' }).category)
+                .toBe('wound');
+        });
+
+        it('should refuse an empty or dice-free code rather than rolling nothing', () => {
+            expect(AlternityMathService.parseDamageCode('').isValid).toBe(false);
+            expect(AlternityMathService.parseDamageCode(null).isValid).toBe(false);
+            expect(AlternityMathService.parseDamageCode('w').isValid).toBe(false);
+        });
+    });
+
+    describe('parseScoreRun', () => {
+        it('should honour a printed run verbatim', () => {
+            // The compendia occasionally print a run that does not obey the
+            // halve-and-quarter rule; a printed run has to win over the derivation.
+            expect(AlternityMathService.parseScoreRun('13/5/2')).toMatchObject({
+                ordinary: 13, good: 5, amazing: 2, wasDerived: false,
+            });
+        });
+
+        it('should derive the run from a lone Ordinary score', () => {
+            expect(AlternityMathService.parseScoreRun('16')).toMatchObject({
+                ordinary: 16, good: 8, amazing: 4, wasDerived: true,
+            });
+            expect(AlternityMathService.parseScoreRun(16).ordinary).toBe(16);
+        });
+
+        it('should quarter the Amazing column when only two values are printed', () => {
+            expect(AlternityMathService.parseScoreRun('16/9')).toMatchObject({
+                ordinary: 16, good: 9, amazing: 4,
+            });
+        });
+
+        it('should mark an unreadable run invalid rather than rolling against zero', () => {
+            expect(AlternityMathService.parseScoreRun('').isValid).toBe(false);
+            expect(AlternityMathService.parseScoreRun('n/a').isValid).toBe(false);
+            expect(AlternityMathService.parseScoreRun(undefined).isValid).toBe(false);
+        });
+    });
+
+    describe('selectDamageGrade', () => {
+        const run = { ordinary: 'd4+1s', good: 'd4w', amazing: 'd6+2w' };
+
+        it('should pick the column the achieved degree unlocks', () => {
+            expect(AlternityMathService.selectDamageGrade(SUCCESS_DEGREES.ORDINARY, run))
+                .toMatchObject({ grade: 'ordinary', code: 'd4+1s' });
+            expect(AlternityMathService.selectDamageGrade(SUCCESS_DEGREES.GOOD, run))
+                .toMatchObject({ grade: 'good', code: 'd4w' });
+            expect(AlternityMathService.selectDamageGrade(SUCCESS_DEGREES.AMAZING, run))
+                .toMatchObject({ grade: 'amazing', code: 'd6+2w' });
+        });
+
+        it('should select nothing on a miss, so a failed attack cannot roll damage', () => {
+            expect(AlternityMathService.selectDamageGrade(SUCCESS_DEGREES.FAILURE, run).grade).toBeNull();
+            expect(AlternityMathService.selectDamageGrade(SUCCESS_DEGREES.CRITICAL_FAILURE, run).grade)
+                .toBeNull();
+            // A Marginal success on an Action Check is not an attack degree either.
+            expect(AlternityMathService.selectDamageGrade('Marginal', run).grade).toBeNull();
+        });
+
+        it('should walk down to a filled column when the achieved one is blank', () => {
+            // Statblocks frequently print one damage figure for all three grades.
+            const sparse = { ordinary: 'd4+1w', good: '', amazing: '' };
+            expect(AlternityMathService.selectDamageGrade(SUCCESS_DEGREES.AMAZING, sparse))
+                .toMatchObject({ grade: 'ordinary', code: 'd4+1w', usedFallback: true });
+        });
+    });
+
+    describe('calculateDodgeAdjustment', () => {
+        it('should hand the attacker a penalty scaled to the dodge degree', () => {
+            expect(AlternityMathService.calculateDodgeAdjustment(SUCCESS_DEGREES.ORDINARY).steps).toBe(1);
+            expect(AlternityMathService.calculateDodgeAdjustment(SUCCESS_DEGREES.GOOD).steps).toBe(2);
+            expect(AlternityMathService.calculateDodgeAdjustment(SUCCESS_DEGREES.AMAZING).steps).toBe(3);
+        });
+
+        it('should make a fumbled dodge help the attacker', () => {
+            expect(AlternityMathService.calculateDodgeAdjustment(SUCCESS_DEGREES.CRITICAL_FAILURE).steps)
+                .toBe(-2);
+        });
+
+        it('should do nothing on a plain failure', () => {
+            const result = AlternityMathService.calculateDodgeAdjustment(SUCCESS_DEGREES.FAILURE);
+            expect(result.steps).toBe(0);
+            expect(result.modifierTrace).toHaveLength(0);
+        });
+    });
+
+    describe('Range and condition step modifiers', () => {
+        it('should reproduce every row of Table P22', () => {
+            expect(RANGE_STEP_MODIFIERS.Pistol).toEqual({ short: -1, medium: 1, long: 3 });
+            expect(RANGE_STEP_MODIFIERS.Rifle).toEqual({ short: -1, medium: 0, long: 1 });
+            expect(RANGE_STEP_MODIFIERS.SMG).toEqual({ short: -1, medium: 1, long: 3 });
+            expect(RANGE_STEP_MODIFIERS.Primitive).toEqual({ short: -1, medium: 1, long: 2 });
+        });
+
+        it('should report that a melee weapon has no bands, rather than a zero modifier', () => {
+            const melee = AlternityMathService.getRangeStepModifier('Melee', 'long');
+            expect(melee.applies).toBe(false);
+            expect(melee.modifierTrace).toHaveLength(0);
+        });
+
+        it('should trace a band that actually shifts the step', () => {
+            const long = AlternityMathService.getRangeStepModifier('Pistol', 'long');
+            expect(long.steps).toBe(3);
+            expect(long.modifierTrace[0]).toMatchObject({ source: 'Range', value: 3 });
+            // A rifle at medium range is rated, but at zero — nothing to trace.
+            expect(AlternityMathService.getRangeStepModifier('Rifle', 'medium'))
+                .toMatchObject({ steps: 0, applies: true, modifierTrace: [] });
+        });
+
+        it('should place Marginal at the zero point of the condition ladder', () => {
+            expect(CONDITION_STEP_MODIFIERS.Marginal).toBe(0);
+            expect(AlternityMathService.getConditionStepModifier('Extreme')).toBe(3);
+            expect(AlternityMathService.getConditionStepModifier('Amazing')).toBe(-3);
+            // An unrated circumstance is no modifier, not a crash.
+            expect(AlternityMathService.getConditionStepModifier('Whatever')).toBe(0);
+        });
+    });
+
+    describe('WeaponData migration to a three-grade damage run', () => {
+        it('should move the old single formula into the Ordinary column with its track letter', () => {
+            const source = { damageFormula: 'd6+2', damageCategory: 'wound' };
+            const migrated = WeaponData.migrateData({ ...source });
+            expect(migrated.damageOrdinary).toBe('d6+2w');
+            expect(migrated.damageFormula).toBeUndefined();
+        });
+
+        it('should not overwrite a run that has already been entered', () => {
+            const migrated = WeaponData.migrateData({
+                damageFormula: 'd6+2', damageCategory: 'wound', damageOrdinary: 'd4+1s',
+            });
+            expect(migrated.damageOrdinary).toBe('d4+1s');
+        });
+
+        it('should class a weapon with a range as a gun and everything else as melee', () => {
+            expect(WeaponData.migrateData({ range: { short: 10, medium: 40, long: 100 } }).rangeClass)
+                .toBe('Rifle');
+            expect(WeaponData.migrateData({ range: { short: 0, medium: 0, long: 0 } }).rangeClass)
+                .toBe('Melee');
+        });
+
+        it('should leave an explicitly set range class alone', () => {
+            expect(WeaponData.migrateData({ rangeClass: 'Pistol', range: { long: 50 } }).rangeClass)
+                .toBe('Pistol');
         });
     });
 });

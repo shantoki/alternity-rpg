@@ -9,12 +9,17 @@ import {
     ABILITY_TYPES,
     ABILITIES,
     WOUND_LEVELS,
-    WOUND_PENALTIES,
     SKILL_DEFINITIONS,
     AlternityAbilitySet,
     AlternityCharacterState,
 } from '../data/alternity-actor-data.js';
-import { AlternityMathService, SUCCESS_DEGREES, DIFFICULTY_DCS, SITUATION_DIE_SCALE } from '../services/alternity-math.js';
+import {
+    AlternityMathService,
+    SUCCESS_DEGREES,
+    CONDITION_STEP_MODIFIERS,
+    RANGE_BANDS,
+} from '../services/alternity-math.js';
+import { AlternityRollService } from '../services/alternity-roll-service.js';
 import { SHIP_TOUGHNESS_CLASSES, SHIP_HULL_TYPES, SHIP_STATUS_EFFECTS } from '../data/WarshipData.js';
 import {
     SPACESHIP_HULL_TYPES,
@@ -76,11 +81,20 @@ const WOUND_SEVERITY = Object.freeze({
     Out:      'out',
 });
 
+/**
+ * Outcome → CSS class. 'Marginal' is spelled out rather than read off
+ * SUCCESS_DEGREES, which has no MARGINAL member: a Marginal result is only
+ * reachable on an Action Check, where a would-be failure is downgraded to one, so
+ * it is not one of the degrees `_calculateDegree` can return. Keying off the
+ * missing constant put the whole map under the key `undefined`.
+ */
 const DEGREE_CLASSES = Object.freeze({
-    [SUCCESS_DEGREES.MARGINAL]:  'degree--marginal',
-    [SUCCESS_DEGREES.ORDINARY]:  'degree--ordinary',
-    [SUCCESS_DEGREES.GOOD]:      'degree--good',
-    [SUCCESS_DEGREES.AMAZING]:   'degree--amazing',
+    'Marginal':                          'degree--marginal',
+    [SUCCESS_DEGREES.ORDINARY]:          'degree--ordinary',
+    [SUCCESS_DEGREES.GOOD]:              'degree--good',
+    [SUCCESS_DEGREES.AMAZING]:           'degree--amazing',
+    [SUCCESS_DEGREES.FAILURE]:           'degree--failure',
+    [SUCCESS_DEGREES.CRITICAL_FAILURE]:  'degree--critical-failure',
 });
 
 const ABILITY_TYPE_ICONS = Object.freeze({
@@ -160,133 +174,418 @@ function applySheetFieldChange(document, input, arrayFields = {}) {
 }
 
 // ---------------------------------------------------------------------------
+// Shared roll plumbing for the statblock sheets
+// ---------------------------------------------------------------------------
+//
+// Supporting cast, creatures, robots, AIs and spaceships all print scores and all
+// need the same four things rollable: an ability, a skill, an attack, and the
+// round's Action Check. None of them keep an AlternityCharacterState, so none of
+// them can use the hero sheet's state-backed paths — but the *shape* of the work
+// is identical, so it lives here once rather than five times over.
+//
+// Each sheet's static action handler is a two-liner that reads its own row shape
+// and calls in here.
+
+/**
+ * Mount the roll panel into a sheet's `.alt-roll-mount`.
+ *
+ * @param {ApplicationV2} sheet - Must be rendered, and its template must contain
+ *        a `.alt-roll-mount` element.
+ * @param {object} check   - { name, scores, baseStep, modifiers?, rangeClass? }.
+ * @param {string} context
+ * @param {object} [options] - Forwarded to AlternityRollComponent.
+ * @returns {AlternityRollComponent|null}
+ */
+function mountRoller(sheet, check, context, options = {}) {
+    const mount = sheet.element?.querySelector(`.${NS}-roll-mount`);
+    if (!mount) {
+        console.warn(`[Alternity] ${sheet.constructor.name} has no .${NS}-roll-mount element.`);
+        return null;
+    }
+    mount.hidden = false;
+    mount.innerHTML = '';
+    const roller = new AlternityRollComponent(mount, sheet.document, check, context, options);
+    roller.render();
+    mount.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    return roller;
+}
+
+/**
+ * Wire the roll panel's close event on a statblock sheet.
+ *
+ * Called from each sheet's `_onRender`. The hero sheet does this inside its own
+ * `_activateListeners`; the statblock sheets have no such method, so this is the
+ * whole of what they need.
+ *
+ * @param {ApplicationV2} sheet
+ */
+function bindRollMount(sheet) {
+    const mount = sheet.element?.querySelector(`.${NS}-roll-mount`);
+    if (!mount) return;
+    mount.addEventListener('alternity:rollClosed', () => { mount.hidden = true; });
+}
+
+/**
+ * Feat check on a bare ability score.
+ *
+ * Base step +1, because a check made against an ability rather than a trained
+ * specialty is a feat check (core mechanics, "Base Situation Die").
+ *
+ * @param {ApplicationV2} sheet
+ * @param {string} abilityKey - Key into `system.abilities`, any case.
+ */
+function rollStatblockAbility(sheet, abilityKey) {
+    const raw = sheet.document.system?.abilities?.[abilityKey]
+        ?? sheet.document.system?.abilities?.[abilityKey?.toLowerCase()]
+        ?? sheet.document.system?.abilities?.[abilityKey?.toUpperCase()];
+
+    if (typeof raw !== 'number' || raw <= 0) {
+        ui.notifications?.warn(game.i18n.format('ALTERNITY.Roll.NoAbilityScore', {
+            ability: abilityKey,
+        }));
+        return null;
+    }
+
+    return mountRoller(
+        sheet,
+        {
+            name: game.i18n.format('ALTERNITY.Roll.AbilityFeatCheck', {
+                ability: String(abilityKey).toUpperCase(),
+            }),
+            scores: AlternityMathService.calculateScoreRun(raw),
+            baseStep: 1,
+        },
+        game.i18n.localize('ALTERNITY.Roll.FeatCheck'),
+    );
+}
+
+/**
+ * Roll this round's Action Check.
+ *
+ * Every statblock type derives an `actionCheck` triple in its own
+ * `prepareDerivedData`, so the score is read from there rather than recomputed.
+ * Marked `isActionCheck` so the roll service applies the rule that an Action
+ * Check cannot fail.
+ *
+ * @param {ApplicationV2} sheet
+ */
+function rollStatblockActionCheck(sheet) {
+    const sys = sheet.document.system ?? {};
+    // Creatures store a flat `actionCheckScore` because the compendium prints one
+    // that does not obey the derivation; everything else exposes the triple.
+    const ac = sys.actionCheck
+        ?? (sys.actionCheckScore ? AlternityMathService.calculateScoreRun(sys.actionCheckScore) : null);
+
+    if (!ac || !ac.ordinary) {
+        ui.notifications?.warn(game.i18n.localize('ALTERNITY.Roll.NoActionCheck'));
+        return null;
+    }
+
+    return mountRoller(
+        sheet,
+        {
+            name: game.i18n.localize('ALTERNITY.Roll.ActionCheck'),
+            scores: { ordinary: ac.ordinary, good: ac.good, amazing: ac.amazing },
+            baseStep: 0,
+        },
+        game.i18n.localize('ALTERNITY.Roll.ActionCheck'),
+        { isActionCheck: true },
+    );
+}
+
+/**
+ * Roll a statblock attack row.
+ *
+ * A printed attack score already has the creature's or NPC's training folded into
+ * it, so it is rolled at base step 0 like a trained specialty rather than at the
+ * feat-check step. The row's three damage codes ride along as the check's damage
+ * payload, so the resulting card offers whichever grade the roll earns.
+ *
+ * @param {ApplicationV2} sheet
+ * @param {object} row - { name, score, scoreRun?, damageOrdinary, damageGood,
+ *                         damageAmazing, damageType?, mode? }.
+ * @param {object} [options]
+ * @param {string} [options.attackKind='melee'] - Which resistance the target uses.
+ */
+async function rollStatblockAttack(sheet, row, options = {}) {
+    if (!row) return null;
+
+    // A printed run wins over the single score, because the books occasionally
+    // print a run that does not obey the halve-and-quarter rule.
+    const scores = AlternityMathService.parseScoreRun(row.scoreRun || row.score);
+    if (!scores.isValid || scores.ordinary <= 0) {
+        ui.notifications?.warn(game.i18n.format('ALTERNITY.Roll.NoAttackScore', {
+            attack: row.name || game.i18n.localize('ALTERNITY.Roll.Attack'),
+        }));
+        return null;
+    }
+
+    const { modifiers } = await AlternityRollService.collectTargetModifiers({
+        attackKind: options.attackKind ?? 'melee',
+    });
+
+    return mountRoller(
+        sheet,
+        {
+            name: row.name || game.i18n.localize('ALTERNITY.Roll.Attack'),
+            scores: { ordinary: scores.ordinary, good: scores.good, amazing: scores.amazing },
+            baseStep: 0,
+            modifiers,
+        },
+        game.i18n.localize('ALTERNITY.Roll.Attack'),
+        {
+            damage: {
+                name: row.name || game.i18n.localize('ALTERNITY.Roll.Attack'),
+                codes: {
+                    ordinary: row.damageOrdinary ?? '',
+                    good:     row.damageGood ?? '',
+                    amazing:  row.damageAmazing ?? '',
+                },
+                damageType: row.damageType ?? '',
+                firepower: row.firepower ?? null,
+                actorUuid: sheet.document.uuid,
+            },
+        },
+    );
+}
+
+/**
+ * Roll a statblock skill row.
+ *
+ * Two row shapes are in play and both are handled: creatures and ship stations
+ * store a finished score (or a printed run), while robots and AIs store an
+ * ability plus a rank and expect the score to be derived from them.
+ *
+ * @param {ApplicationV2} sheet
+ * @param {object} row - { name, score?|scoreRun?, ability?, rank?, isBroad?, isSpecialty? }.
+ * @param {object} [options]
+ * @param {object[]} [options.modifiers=[]] - e.g. an AI's per-skill penalty.
+ */
+function rollStatblockSkill(sheet, row, options = {}) {
+    if (!row) return null;
+
+    const isBroad = row.isBroad ?? (row.isSpecialty === false);
+    let scores;
+
+    if (row.score !== undefined || row.scoreRun !== undefined) {
+        const parsed = AlternityMathService.parseScoreRun(row.scoreRun || row.score);
+        scores = { ordinary: parsed.ordinary, good: parsed.good, amazing: parsed.amazing };
+    } else {
+        const abilityKey = row.ability;
+        const abilities = sheet.document.system?.abilities ?? {};
+        const abilityScore = abilities[abilityKey]
+            ?? abilities[String(abilityKey).toLowerCase()]
+            ?? abilities[String(abilityKey).toUpperCase()]
+            ?? 0;
+        scores = AlternityMathService.calculateSkillScores(abilityScore, row.rank ?? 0);
+    }
+
+    if (!scores.ordinary) {
+        ui.notifications?.warn(game.i18n.format('ALTERNITY.Roll.NoSkillScore', {
+            skill: row.name || game.i18n.localize('ALTERNITY.Skill'),
+        }));
+        return null;
+    }
+
+    return mountRoller(
+        sheet,
+        {
+            name: row.name || game.i18n.localize('ALTERNITY.Skill'),
+            scores,
+            // Broad skills roll at +1 step, trained specialties at 0.
+            baseStep: isBroad ? 1 : 0,
+            modifiers: options.modifiers ?? [],
+        },
+        row.name || game.i18n.localize('ALTERNITY.Skill'),
+    );
+}
+
+/**
+ * Roll a dodge defence for a statblock actor.
+ *
+ * There is no skill list to look an Acrobatics-dodge rank up in, so this is the
+ * untrained fallback the core rules give: half the Dexterity score at feat-check
+ * step. A supporting-cast member who genuinely has the specialty should have it
+ * as a skill row and be rolled from there.
+ *
+ * @param {ApplicationV2} sheet
+ */
+async function rollStatblockDefence(sheet) {
+    const abilities = sheet.document.system?.abilities ?? {};
+    const dex = abilities.dex ?? abilities.DEX ?? 0;
+    if (!dex) {
+        ui.notifications?.warn(game.i18n.format('ALTERNITY.Roll.NoAbilityScore', { ability: 'DEX' }));
+        return null;
+    }
+
+    return AlternityRollService.rollDodge({
+        actor: sheet.document,
+        name: game.i18n.localize('ALTERNITY.Roll.Dodge'),
+        scores: AlternityMathService.calculateSkillScores(dex, 0, { untrained: true }),
+        baseStep: 1,
+    });
+}
+
+// ---------------------------------------------------------------------------
 // AlternityRollComponent
 // ---------------------------------------------------------------------------
 
+/**
+ * The inline roll widget every sheet mounts into its `.alt-roll-mount` element.
+ *
+ * It is a *pre-roll* panel: its job is to show what is about to be rolled and
+ * collect the two things only the player at the table can supply — the
+ * Gamemaster's circumstance call, and (for a shot) which range band the target is
+ * in — before handing the whole thing to AlternityRollService.
+ *
+ * The dice, the resolution and the chat card all belong to the service now. This
+ * class used to own copies of all three, which is why the situation die was being
+ * assembled in two places at once and only the copy inside the character sheet
+ * ever worked.
+ */
 class AlternityRollComponent {
-    constructor(container, actor, checks, context) {
+    /**
+     * @param {HTMLElement} container - Mount point, cleared on render.
+     * @param {Actor}  actor
+     * @param {object} check   - { name, scores, baseStep, modifiers? }.
+     * @param {string} context - Category label; filters which stances apply.
+     * @param {object} [options]
+     * @param {object}   [options.damage]     - Damage payload for the resulting card.
+     * @param {object[]} [options.rangeBands] - [{ band, steps, distance }] from the weapon.
+     * @param {boolean}  [options.isActionCheck]
+     */
+    constructor(container, actor, check, context, options = {}) {
         if (!container || !(container instanceof HTMLElement)) {
             throw new Error('[AlternityRollComponent] container must be an HTMLElement.');
         }
-        if (!Array.isArray(checks) || checks.length === 0) {
-            throw new Error('[AlternityRollComponent] checks must be a non-empty array.');
+        if (!check?.scores || typeof check.scores.ordinary !== 'number') {
+            throw new Error('[AlternityRollComponent] check.scores.ordinary must be a number.');
         }
         if (!context) throw new Error('[AlternityRollComponent] context is required.');
 
         this.container = container;
         this.actor     = actor;
-        this.checks    = checks;
+        this.check     = check;
         this.context   = context;
+        this.options   = options;
         this._result   = null;
     }
 
     async render() {
+        // Live modifiers are shown before the roll so a player can see *why* their
+        // step is what it is, rather than discovering it in the card afterwards.
+        const standing = await AlternityRollService.collectActorModifiers(this.actor, {
+            context: this.context,
+        });
+
         const html = await renderTemplate("systems/alternity-v2/templates/roll/roll-panel.hbs", {
             alt: NS,
             context: this.context,
-            checks: this.checks
+            check: {
+                ...this.check,
+                baseStep: this.check.baseStep ?? 0,
+            },
+            standing,
+            hasStanding: standing.length > 0,
+            conditions: Object.entries(CONDITION_STEP_MODIFIERS).map(([key, steps]) => ({
+                key, steps,
+                label: game.i18n.localize(`ALTERNITY.Condition.${key}`),
+                // 'Marginal' is the zero point of the ladder, so it is the default.
+                isDefault: steps === 0,
+            })),
+            rangeBands: (this.options.rangeBands ?? []).map((b) => ({
+                ...b,
+                label: game.i18n.localize(`ALTERNITY.Range.${b.band}`),
+            })),
+            hasRangeBands: (this.options.rangeBands ?? []).length > 0,
+            hasDamage: !!this.options.damage,
         });
         this.container.innerHTML = html;
         this._bindEvents();
         return this;
     }
 
-    async execute(forcedRoll) {
-        let control = forcedRoll;
-        if (control === undefined) {
-            const r = new Roll("1d20");
-            await r.evaluate();
-            control = r.total;
-        }
-        return this._resolve(control);
-    }
+    /**
+     * Collect the picks made in the panel and roll.
+     * @returns {Promise<object|null>}
+     */
+    async execute() {
+        const modifiers = [...(this.check.modifiers ?? [])];
 
-    _bindEvents() {
-        const btn = (sel) => this.container.querySelector(sel);
-        btn(`[data-action="roll"]`)?.addEventListener('click', async () => {
-            await this.execute();
-        });
-        btn(`.${NS}-roll-close`)?.addEventListener('click', () => {
-            this.container.innerHTML = '';
-            this.container.dispatchEvent(new CustomEvent('alternity:rollClosed', { bubbles: true }));
-        });
-    }
-
-    async _resolve(controlRoll) {
-        const altState = this.actor ? await getAlternityState(this.actor) : null;
-        const modifiers = [];
-
-        if (altState) {
-            const damagePenalty = altState.getDamageStepPenalty();
-            if (damagePenalty > 0) {
-                modifiers.push(AlternityMathService.buildModifier(
-                    'Wound/Dazed Penalty', damagePenalty, 'Current durability penalty'
-                ));
-            }
-            const activeAbilities = altState.getActiveAbilities();
-            for (const ability of activeAbilities) {
-                const trigger = ability.triggerCondition;
-                if (trigger.context && trigger.context !== this.context && trigger.context !== 'Any') continue;
-                if (typeof ability.effectPayload.step === 'number') {
-                    modifiers.push(AlternityMathService.buildModifier(
-                        ability.name, ability.effectPayload.step, `Ability: ${ability.name}`
-                    ));
-                }
-            }
-        }
-
-        const primaryCheck = this.checks[0];
-        const stepModifier = safeInt(this.container.querySelector(`.${NS}-roll-step-select`)?.value, 0);
-        if (stepModifier !== 0) {
+        const conditionKey = this.container.querySelector(`.${NS}-roll-condition-select`)?.value;
+        const conditionSteps = AlternityMathService.getConditionStepModifier(conditionKey);
+        if (conditionSteps !== 0) {
             modifiers.push(AlternityMathService.buildModifier(
-                'Situational Modifier', stepModifier, 'Manually selected situation step'
+                game.i18n.localize('ALTERNITY.Roll.Circumstance'),
+                conditionSteps,
+                game.i18n.format('ALTERNITY.Roll.CircumstanceNamed', {
+                    condition: game.i18n.localize(`ALTERNITY.Condition.${conditionKey}`),
+                }),
             ));
         }
 
-        const totalModifier = modifiers.reduce((sum, m) => sum + m.value, 0);
-        const totalStep = primaryCheck.baseStep + totalModifier;
-        const totalStepClamped = Math.min(7, Math.max(-5, totalStep));
-        
-        const formula = totalStepClamped === 0 ? '1d20' : `1d20${SITUATION_DIE_SCALE[String(totalStepClamped)][2]}`;
-        const roll = new Roll(formula);
-        await roll.evaluate();
-
-        const evaluatedControl = roll.terms[0].total;
-        let evaluatedSituation = 0;
-        if (roll.terms.length > 2) {
-            evaluatedSituation = roll.terms[2].total;
+        // Free-numeric step field, kept alongside the condition ladder because
+        // some modifiers in the book are quoted directly in steps (a weapon's
+        // accuracy, a cover penalty) rather than as a named condition.
+        const extraSteps = safeInt(this.container.querySelector(`.${NS}-roll-step-input`)?.value, 0);
+        if (extraSteps !== 0) {
+            modifiers.push(AlternityMathService.buildModifier(
+                game.i18n.localize('ALTERNITY.Roll.ExtraSteps'),
+                extraSteps,
+                game.i18n.localize('ALTERNITY.Roll.ExtraStepsReason'),
+            ));
         }
 
-        const resolveResult = AlternityMathService.resolveAbilityCheck(
-            primaryCheck.scores,
-            primaryCheck.baseStep,
+        const bandSelect = this.container.querySelector(`.${NS}-roll-range-select`);
+        if (bandSelect?.value && RANGE_BANDS.includes(bandSelect.value)) {
+            modifiers.push(...AlternityMathService.getRangeStepModifier(
+                bandSelect.dataset.rangeClass, bandSelect.value,
+            ).modifierTrace);
+        }
+
+        const result = await AlternityRollService.rollCheck({
+            actor:    this.actor,
+            name:     this.check.name,
+            context:  this.context,
+            scores:   this.check.scores,
+            baseStep: this.check.baseStep ?? 0,
             modifiers,
-            this.context,
-            { control: evaluatedControl, situation: evaluatedSituation }
-        );
+            whisper:  !!this.container.querySelector(`.${NS}-roll-whisper`)?.checked,
+            isActionCheck: !!this.options.isActionCheck,
+            damage:   this.options.damage ?? null,
+        });
 
-        this._result = { ...resolveResult, checkName: primaryCheck.name };
-        
-        const rollOptions = {
-            context:       this.context,
-            scores:        primaryCheck.scores,
-            baseValue:     primaryCheck.scores.ordinary,
-            adjustedValue: resolveResult.finalValue,
-            succeeded:     resolveResult.succeeded,
-            degree:        resolveResult.degree,
-            margin:        resolveResult.margin,
-            modifierTrace: resolveResult.modifierTrace,
-            whisper:       false
-        };
+        this._result = result;
+        if (result) {
+            this._showOutcome(result);
+            this.container.dispatchEvent(new CustomEvent('alternity:rollResult', {
+                bubbles: true,
+                detail: result,
+            }));
+        }
+        return result;
+    }
 
-        await this.actor._createRollChatMessage(roll, rollOptions);
+    /**
+     * Echo the outcome in the panel itself. The chat card is the record; this is
+     * so the roller does not have to look away from the sheet to see what happened.
+     * @private
+     */
+    _showOutcome(result) {
+        const slot = this.container.querySelector(`.${NS}-roll-outcome-slot`);
+        if (!slot) return;
+        slot.hidden = false;
+        slot.className = `${NS}-roll-outcome-slot ${DEGREE_CLASSES[result.degree] ?? ''}`;
+        slot.textContent = `${result.degree} — ${result.finalValue} `
+            + `${game.i18n.localize('ALTERNITY.Roll.VersusOrdinary')} ${result.scores.ordinary}`;
+    }
 
-        this.container.dispatchEvent(new CustomEvent('alternity:rollResult', {
-            bubbles: true,
-            detail: this._result,
-        }));
-
-        return this._result;
+    _bindEvents() {
+        this.container.querySelector(`[data-action="roll"]`)?.addEventListener('click', () => this.execute());
+        this.container.querySelector(`.${NS}-roll-close`)?.addEventListener('click', () => {
+            this.container.innerHTML = '';
+            this.container.dispatchEvent(new CustomEvent('alternity:rollClosed', { bubbles: true }));
+        });
     }
 }
 
@@ -313,8 +612,10 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
                 addAbility:     this._onAddAbilityAction,
                 setWound:       this._onSetWoundAction,
                 quickRoll:      this._onQuickRollAction,
+                rollActionCheck: this._onRollActionCheckAction,
+                rollDefence:    this._onRollDefenceAction,
+                rollWeaponDamage: this._onRollWeaponDamageAction,
                 toggleRule:     this._onToggleRuleAction,
-                editSkill:      this._onEditSkillAction,
                 rollSkill:      this._onRollSkillAction,
                 addSkill:       this._onAddSkillAction,
                 deleteSkill:    this._onDeleteSkillAction,
@@ -333,7 +634,11 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
                 refundBenefit:   this._onRefundBenefitAction,
                 setPsionicEnergy: this._onPsionicPipAction,
                 setLastResort:   this._onLastResortPipAction,
-                editState:      this._onEditStateAction
+                // `editSkill` and `editState` are deliberately absent. They mark
+                // *inputs*, and are handled by the `change` listener in
+                // _onSheetChange. Registering them here bound them to undefined,
+                // which ApplicationV2 would have thrown on had anyone clicked the
+                // field rather than typed in it.
             }
         });
     }
@@ -662,7 +967,19 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
     static async _onUseAbilityAction(event, target) {
         const ability = this._altState.abilitySets.find(a => a.id === target.dataset.abilityId);
         if (!ability || !ability.isActive) return;
-        this._openRoller([{ name: ability.name, baseValue: ability.effectPayload?.baseValue || 25 }], ability.triggerCondition?.context || 'General', this.element);
+
+        // The ability's payload carries a single Ordinary score, which the math
+        // service expands into the triple the check needs. This used to hand the
+        // panel a `baseValue` key it never read, so every ability roll opened a
+        // panel with no score and threw when the Roll button was pressed.
+        const scores = AlternityMathService.calculateScoreRun(
+            ability.effectPayload?.baseValue ?? this._altState.abilityScores.WIL ?? 10
+        );
+
+        this._openRoller(
+            { name: ability.name, scores, baseStep: ability.effectPayload?.baseStep ?? 0 },
+            ability.triggerCondition?.context || game.i18n.localize('ALTERNITY.Roll.General'),
+        );
     }
 
     static async _onAddAbilityAction(event, target) {
@@ -677,10 +994,64 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
         this.render();
     }
 
+    /**
+     * Feat check on a bare ability score (base step +1, per the core mechanic).
+     *
+     * The triple now comes from the math service instead of being derived inline —
+     * the halve-and-quarter rule lives in exactly one place.
+     */
     static _onQuickRollAction(event, target) {
-        const score = this._altState.abilityScores[target.dataset.ability] ?? 10;
-        const scores = { ordinary: score, good: Math.floor(score/2), amazing: Math.floor(score/4) };
-        this._openRoller([{ name: `${target.dataset.context} Check`, scores, baseStep: 1 }], target.dataset.context, this.element);
+        const ability = target.dataset.ability;
+        const scores = AlternityMathService.calculateScoreRun(
+            this._altState.abilityScores[ability] ?? 10
+        );
+        const context = target.dataset.context || game.i18n.localize('ALTERNITY.Roll.FeatCheck');
+        this._openRoller(
+            {
+                name: game.i18n.format('ALTERNITY.Roll.AbilityFeatCheck', { ability }),
+                scores,
+                baseStep: 1,
+            },
+            context,
+        );
+    }
+
+    /**
+     * Roll this round's Action Check (core mechanics, "Action Economy").
+     *
+     * Base step 0, and it cannot fail: a result that would have failed becomes a
+     * Marginal success, which the roll service applies. Kept separate from the
+     * combat tracker's initiative roll so a hero can check their phase without
+     * being in a combat encounter.
+     */
+    static _onRollActionCheckAction() {
+        const ac = this._altState.getActionCheckData();
+        this._openRoller(
+            {
+                name: game.i18n.localize('ALTERNITY.Roll.ActionCheck'),
+                scores: { ordinary: ac.ordinary, good: ac.good, amazing: ac.amazing },
+                baseStep: 0,
+            },
+            game.i18n.localize('ALTERNITY.Roll.ActionCheck'),
+            { isActionCheck: true },
+        );
+    }
+
+    /**
+     * Roll a dodge defence (core mechanics, "Dodge Defense").
+     *
+     * Rolls Acrobatics-dodge and stores the resulting step adjustment on the hero,
+     * where the next attack against them picks it up. Rolled directly rather than
+     * through the panel: it is a reaction, and stopping to pick a circumstance
+     * modifier for a reaction is not how it plays at the table.
+     */
+    static async _onRollDefenceAction() {
+        await AlternityRollService.rollDodge({
+            actor: this.actor,
+            name: game.i18n.localize('ALTERNITY.Roll.Dodge'),
+            scores: this._altState.getSkillScores('dex-dodge'),
+            baseStep: this._altState.getSkillBaseStep('dex-dodge'),
+        });
     }
 
     static async _onToggleRuleAction(event, target) {
@@ -732,9 +1103,29 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
 
     static async _onRollSkillAction(event, target) {
         const skillId = target.dataset.skillId;
-        const skillDef = SKILL_DEFINITIONS.find(d => d.id === skillId) || this._altState.customSkills.find(s => s.id === skillId);
+        const skillDef = SKILL_DEFINITIONS.find(d => d.id === skillId)
+            || this._altState.customSkills.find(s => s.id === skillId);
         if (!skillDef) return;
-        this._openRoller([{ name: skillDef.name, scores: this._altState.getSkillScores(skillId), baseStep: this._altState.getSkillBaseStep(skillId) }], skillDef.name, this.element);
+
+        const scores = this._altState.getSkillScores(skillId);
+
+        // A score of zero means the skill is one that cannot be attempted
+        // untrained at all, so there is nothing to roll under.
+        if (scores.ordinary <= 0) {
+            ui.notifications?.warn(game.i18n.format('ALTERNITY.Roll.CannotUseUntrainedNamed', {
+                skill: skillDef.name,
+            }));
+            return;
+        }
+
+        this._openRoller(
+            {
+                name: skillDef.name,
+                scores,
+                baseStep: this._altState.getSkillBaseStep(skillId),
+            },
+            skillDef.name,
+        );
     }
 
     static _onFilterSkillsAction(event, target) {
@@ -759,12 +1150,23 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
         });
     }
 
-    _openRoller(checks, context, html) {
-        const mount = html.querySelector(`.${NS}-roll-mount`);
-        if (!mount) return;
+    /**
+     * Mount the roll panel for one check.
+     *
+     * @param {object} check   - { name, scores, baseStep, modifiers?, rangeClass? }.
+     * @param {string} context - Category label, e.g. 'Melee Attack'.
+     * @param {object} [options] - Passed through to AlternityRollComponent
+     *        (`damage`, `rangeBands`, `isActionCheck`).
+     */
+    _openRoller(check, context, options = {}) {
+        const mount = this.element?.querySelector(`.${NS}-roll-mount`);
+        if (!mount) {
+            console.warn('[Alternity] Sheet has no .alt-roll-mount element to open the roll panel in.');
+            return;
+        }
         mount.hidden = false;
         mount.innerHTML = '';
-        this._activeRoller = new AlternityRollComponent(mount, this.actor, checks, context);
+        this._activeRoller = new AlternityRollComponent(mount, this.actor, check, context, options);
         this._activeRoller.render();
         mount.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
@@ -782,12 +1184,82 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
         this.actor.items.get(target.closest('[data-item-id]')?.dataset.itemId)?.sheet.render(true);
     }
 
+    /**
+     * Open the roll panel for a weapon attack.
+     *
+     * An Alternity attack is a roll-under check on the weapon's *governing
+     * specialty* — Melee Weapons-blade, Modern Ranged Weapons-pistol and so on —
+     * so the score and the base step both come from that skill. This used to roll
+     * against the raw attack ability score at a base step chosen from the weapon
+     * type, which ignored the hero's training entirely: a rank-6 blade specialist
+     * and someone who had never held a sword rolled identically.
+     *
+     * The weapon's accuracy and the defender's resistance and dodge go in as step
+     * modifiers, the range bands are offered in the panel, and the three damage
+     * codes ride along so the resulting card can offer whichever grade is earned.
+     */
     static async _onRollWeaponAction(event, target) {
-        const item = this.actor.items.get(target.dataset.itemId);
+        const item = this.actor.items.get(target.dataset.itemId
+            ?? target.closest('[data-item-id]')?.dataset.itemId);
         if (!item || item.type !== 'weapon') return;
-        const context = item.system.weaponType === 'Melee' ? 'Melee Attack' : 'Ranged Attack';
-        const score = this._altState.abilityScores[item.system.attackAbility.toUpperCase()] ?? 10;
-        this._openRoller([{ name: item.name, scores: { ordinary: score, good: Math.floor(score/2), amazing: Math.floor(score/4) }, baseStep: item.system.weaponType === 'Melee' ? 0 : 1 }], context, this.element);
+
+        const sys = item.system;
+        const isMelee = ['Melee', 'Thrown'].includes(sys.weaponType);
+        const skillId = sys.requiredSkill || (isMelee ? 'str-melee' : 'dex-ranged-mod');
+
+        const scores = this._altState.getSkillScores(skillId);
+        if (scores.ordinary <= 0) {
+            ui.notifications?.warn(game.i18n.format('ALTERNITY.Roll.CannotUseUntrainedNamed', {
+                skill: item.name,
+            }));
+            return;
+        }
+
+        const modifiers = [];
+        if (sys.attackBonus) {
+            modifiers.push(AlternityMathService.buildModifier(
+                game.i18n.localize('ALTERNITY.Weapon.Accuracy'),
+                sys.attackBonus,
+                game.i18n.format('ALTERNITY.Weapon.AccuracyReason', { weapon: item.name }),
+            ));
+        }
+
+        // Alternity's stand-in for an armour class: whoever is targeted hands the
+        // attacker a step penalty from their resistance modifier, plus any dodge
+        // they rolled this round.
+        const { modifiers: targetModifiers } = await AlternityRollService.collectTargetModifiers({
+            attackKind: isMelee ? 'melee' : 'ranged',
+        });
+        modifiers.push(...targetModifiers);
+
+        this._openRoller(
+            {
+                name: item.name,
+                scores,
+                baseStep: this._altState.getSkillBaseStep(skillId),
+                modifiers,
+                rangeClass: sys.rangeClass,
+            },
+            isMelee
+                ? game.i18n.localize('ALTERNITY.Roll.MeleeAttack')
+                : game.i18n.localize('ALTERNITY.Roll.RangedAttack'),
+            {
+                damage: item.getDamagePayload(),
+                rangeBands: sys.rangeBands ?? [],
+            },
+        );
+    }
+
+    /**
+     * Roll one damage grade straight off the inventory row, bypassing the attack
+     * check. For the cases the attack card cannot cover: damage from an attack
+     * rolled physically at the table, or a re-roll for a second target.
+     */
+    static async _onRollWeaponDamageAction(event, target) {
+        const item = this.actor.items.get(target.dataset.itemId
+            ?? target.closest('[data-item-id]')?.dataset.itemId);
+        if (!item || item.type !== 'weapon') return;
+        await item.rollDamage({ grade: target.dataset.grade ?? 'ordinary' });
     }
 
     static async _onRollPerkCheckAction(event, target) {
@@ -798,8 +1270,13 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
             ui.notifications?.warn(`${item.name} has no ability score to check against.`);
             return;
         }
-        const score = this._altState.abilityScores[abilityKey] ?? 10;
-        this._openRoller([{ name: item.name, scores: { ordinary: score, good: Math.floor(score/2), amazing: Math.floor(score/4) }, baseStep: 1 }], `${item.name} Perk Check`, this.element);
+        const scores = AlternityMathService.calculateScoreRun(
+            this._altState.abilityScores[abilityKey] ?? 10
+        );
+        this._openRoller(
+            { name: item.name, scores, baseStep: 1 },
+            game.i18n.format('ALTERNITY.Roll.PerkCheck', { perk: item.name }),
+        );
     }
 
     /**
@@ -852,15 +1329,10 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
         const item   = this.actor.items.get(itemId);
         if (!item || item.type !== 'cybertech') return;
 
-        const score = this._altState.abilityScores.CON ?? 10;
+        const scores = AlternityMathService.calculateScoreRun(this._altState.abilityScores.CON ?? 10);
         this._openRoller(
-            [{
-                name: item.name,
-                scores: { ordinary: score, good: Math.floor(score / 2), amazing: Math.floor(score / 4) },
-                baseStep: 1,
-            }],
-            'Cyber Tolerance (CON Feat Check)',
-            this.element
+            { name: item.name, scores, baseStep: 1 },
+            game.i18n.localize('ALTERNITY.Cybertech.ToleranceCheck'),
         );
     }
 
@@ -935,13 +1407,11 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
             return;
         }
 
-        const scores = item.system.scores
-            ?? { ordinary: 0, good: 0, amazing: 0 };
+        const scores = item.system.scores ?? { ordinary: 0, good: 0, amazing: 0 };
 
         this._openRoller(
-            [{ name: item.name, scores, baseStep: item.system.baseStep ?? 0 }],
+            { name: item.name, scores, baseStep: item.system.baseStep ?? 0 },
             `${item.name} (${item.system.broadSkill})`,
-            this.element
         );
     }
 
@@ -970,9 +1440,8 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
         const scores = item.system.untrainedScores ?? { ordinary: 0, good: 0, amazing: 0 };
 
         this._openRoller(
-            [{ name: item.name, scores, baseStep: item.system.untrainedBaseStep ?? 4 }],
-            `${item.name} (untrained)`,
-            this.element
+            { name: item.name, scores, baseStep: item.system.untrainedBaseStep ?? 4 },
+            game.i18n.format('ALTERNITY.Roll.MutationCheck', { mutation: item.name }),
         );
     }
 
@@ -1038,6 +1507,10 @@ class AlternityNpcSheet extends foundry.applications.api.HandlebarsApplicationMi
             setNpcDamage:  this._onSetNpcDamageAction,
             addNpcRow:     this._onAddNpcRowAction,
             deleteNpcRow:  this._onDeleteNpcRowAction,
+            rollAbility:     this._onRollAbilityAction,
+            rollActionCheck: this._onRollActionCheckAction,
+            rollAttack:      this._onRollAttackAction,
+            rollDefence:     this._onRollDefenceAction,
         }
     });
     static PARTS = {
@@ -1117,11 +1590,39 @@ class AlternityNpcSheet extends foundry.applications.api.HandlebarsApplicationMi
         this.element.addEventListener('change', (e) => {
             applySheetFieldChange(this.document, e.target, NPC_ARRAY_FIELDS);
         });
+        bindRollMount(this);
     }
 
     static async _onSetWoundAction(event, target) {
         const woundLevel = target.dataset.wound;
         await this.document.update({ "system.woundLevel": woundLevel });
+    }
+
+    // -----------------------------------------------------------------------
+    // Rolling
+    // -----------------------------------------------------------------------
+
+    static _onRollAbilityAction(event, target) {
+        return rollStatblockAbility(this, target.dataset.ability);
+    }
+
+    static _onRollActionCheckAction() {
+        return rollStatblockActionCheck(this);
+    }
+
+    /**
+     * Roll an attack row. A supporting-cast attack with a range is a shot and is
+     * resisted by the target's ranged resistance; one without is a melee attack.
+     */
+    static async _onRollAttackAction(event, target) {
+        const row = this.document.system.attackRows?.[safeInt(target.dataset.index, -1)];
+        return rollStatblockAttack(this, row, {
+            attackKind: row?.range ? 'ranged' : 'melee',
+        });
+    }
+
+    static async _onRollDefenceAction() {
+        return rollStatblockDefence(this);
     }
 
     static async _onSetNpcDamageAction(event, target) {
@@ -1239,6 +1740,7 @@ class AlternityWarshipSheet extends foundry.applications.api.HandlebarsApplicati
         this.element.addEventListener('change', (e) => {
             applySheetFieldChange(this.document, e.target, WARSHIP_ARRAY_FIELDS);
         });
+        bindRollMount(this);
     }
 
     static async _onAddArrayRowAction(event, target) {
@@ -1257,14 +1759,35 @@ class AlternityWarshipSheet extends foundry.applications.api.HandlebarsApplicati
         await this.document.update({ [`system.${arrayKey}`]: current.filter((_, i) => i !== idx) });
     }
 
+    /**
+     * Roll a warship weapon's damage.
+     *
+     * Warships run their own firepower ladder (SmallCraft..SuperHeavy) rather than
+     * the core rules' Marginal..Amazing one, and the grade shift is applied when the
+     * damage is *received* by `AlternityActor.applyWarshipDamage` — which needs the
+     * defending ship's toughness — so no degrade is reported here.
+     *
+     * A warship weapon's grade can also be `critical`, which is a track the personal
+     * and spaceship scales do not have. The damage card only understands the three
+     * personal tracks, so the grade is carried in the card's label rather than being
+     * squeezed into `fallbackCategory` and silently coming out as "wound".
+     */
     static async _onRollShipWeaponAction(event, target) {
         const idx = safeInt(target.dataset.index, -1);
         const weapon = this.document.system.weapons?.[idx];
         if (!weapon) return;
-        const roll = await new Roll(weapon.damageFormula || '1d6').evaluate();
-        await roll.toMessage({
-            speaker: ChatMessage.getSpeaker({ actor: this.document }),
-            flavor: `${weapon.name || 'Weapon'} — ${weapon.damageType} (${weapon.firepowerClass})`,
+
+        const isPersonalGrade = ['stun', 'wound', 'mortal'].includes(weapon.damageGrade);
+
+        await AlternityRollService.rollDamage({
+            actor: this.document,
+            name: isPersonalGrade
+                ? (weapon.name || game.i18n.localize('ALTERNITY.Spaceship.Weapon'))
+                : `${weapon.name || game.i18n.localize('ALTERNITY.Spaceship.Weapon')} (${weapon.damageGrade})`,
+            code: weapon.damageFormula || '1d6',
+            damageType: weapon.damageType,
+            firepower: weapon.firepowerClass,
+            fallbackCategory: isPersonalGrade ? weapon.damageGrade : 'wound',
         });
     }
 
@@ -1329,6 +1852,9 @@ class AlternitySpaceshipSheet extends foundry.applications.api.HandlebarsApplica
             rollHitLocation:       this._onRollHitLocationAction,
             fillHitTable:          this._onFillHitTableAction,
             rollShipWeapon:        this._onRollShipWeaponAction,
+            rollShipAttack:        this._onRollShipAttackAction,
+            rollStation:           this._onRollStationAction,
+            rollDurabilityCheck:   this._onRollDurabilityCheckAction,
         }
     });
 
@@ -1407,6 +1933,119 @@ class AlternitySpaceshipSheet extends foundry.applications.api.HandlebarsApplica
         this.element.addEventListener('change', (e) => {
             applySheetFieldChange(this.document, e.target, SPACESHIP_ARRAY_FIELDS);
         });
+        bindRollMount(this);
+    }
+
+    // -----------------------------------------------------------------------
+    // Crew checks
+    // -----------------------------------------------------------------------
+
+    /**
+     * Roll the crew check for a station.
+     *
+     * The station's skill score is stored as printed text ("9/4/2") because a
+     * published ship quotes its crew's scores rather than deriving them from
+     * character sheets, so it is parsed rather than computed. Base step 0: a
+     * station is manned by someone with the specialty, or it is not manned.
+     */
+    static _onRollStationAction(event, target) {
+        const row = this.document.system.stations?.[safeInt(target.dataset.index, -1)];
+        if (!row) return null;
+
+        const parsed = AlternityMathService.parseScoreRun(row.skillScore);
+        if (!parsed.isValid) {
+            ui.notifications?.warn(game.i18n.format('ALTERNITY.Spaceship.NoStationScore', {
+                station: row.role ?? '',
+            }));
+            return null;
+        }
+
+        return mountRoller(
+            this,
+            {
+                name: row.skillName || row.role,
+                scores: { ordinary: parsed.ordinary, good: parsed.good, amazing: parsed.amazing },
+                baseStep: 0,
+            },
+            game.i18n.format('ALTERNITY.Spaceship.StationCheck', {
+                station: row.role ?? '', crew: row.crewName || '—',
+            }),
+        );
+    }
+
+    /**
+     * Roll a compartment's durability check — the check its damage-control party
+     * makes to keep it working (GM Guide Ch.11). The score is already derived on
+     * the compartment, so this only has to roll it.
+     */
+    static _onRollDurabilityCheckAction(event, target) {
+        const compartment = this.document.system.compartmentDetails?.[safeInt(target.dataset.index, -1)];
+        if (!compartment) return null;
+
+        const score = compartment.durabilityCheckScore ?? 0;
+        if (score <= 0) {
+            ui.notifications?.warn(game.i18n.localize('ALTERNITY.Spaceship.NoDurabilityCheck'));
+            return null;
+        }
+
+        return mountRoller(
+            this,
+            {
+                name: game.i18n.localize('ALTERNITY.Spaceship.DurabilityCheck'),
+                scores: AlternityMathService.calculateScoreRun(score),
+                baseStep: 0,
+            },
+            `C${compartment.number} — ${compartment.label || compartment.kind}`,
+        );
+    }
+
+    /**
+     * Roll the gunner's attack check for a ship weapon, with the achieved degree
+     * selecting which of the weapon's three damage columns fires.
+     *
+     * Distinct from `rollShipWeapon` below, which rolls a *named* grade's damage
+     * directly — that one is for when the gunner's check was made on their own
+     * character sheet, which is the usual case for a crewed ship. This one is for
+     * a ship whose weapon score is recorded on the ship itself.
+     */
+    static async _onRollShipAttackAction(event, target) {
+        const idx = safeInt(target.dataset.index, -1);
+        const weapon = this.document.system.weapons?.[idx];
+        if (!weapon) return null;
+
+        // A ship weapon's own row carries no attack score — the gunner supplies it —
+        // so the score comes from whichever station is crewing the weapons post.
+        const station = (this.document.system.stations ?? [])
+            .find((s) => s.role === 'Weapons' && AlternityMathService.parseScoreRun(s.skillScore).isValid);
+
+        const parsed = AlternityMathService.parseScoreRun(station?.skillScore);
+        if (!parsed.isValid) {
+            ui.notifications?.warn(game.i18n.localize('ALTERNITY.Spaceship.NoGunner'));
+            return null;
+        }
+
+        return mountRoller(
+            this,
+            {
+                name: weapon.name || game.i18n.localize('ALTERNITY.Spaceship.Weapon'),
+                scores: { ordinary: parsed.ordinary, good: parsed.good, amazing: parsed.amazing },
+                baseStep: 0,
+            },
+            game.i18n.localize('ALTERNITY.Roll.Attack'),
+            {
+                damage: {
+                    name: weapon.name || game.i18n.localize('ALTERNITY.Spaceship.Weapon'),
+                    codes: {
+                        ordinary: weapon.damageOrdinary ?? '',
+                        good:     weapon.damageGood ?? '',
+                        amazing:  weapon.damageAmazing ?? '',
+                    },
+                    damageType: weapon.damageType ?? '',
+                    firepower: weapon.firepower ?? null,
+                    actorUuid: this.document.uuid,
+                },
+            },
+        );
     }
 
     // -----------------------------------------------------------------------
@@ -1567,27 +2206,22 @@ class AlternitySpaceshipSheet extends foundry.applications.api.HandlebarsApplica
             return;
         }
 
-        // Alternity damage codes carry a trailing grade letter ("d6+2s"), which is
-        // notation, not dice — strip it before handing the string to Roll.
-        const roll = await new Roll(String(formula).replace(/[swm]\s*$/i, '')).evaluate();
-
-        // Against a spaceship's Amazing toughness the weapon's firepower decides
-        // whether this damage lands at all, so show the result of that comparison.
-        const degrade = AlternityMathService.calculateFirepowerDegrade(
-            grade === 'amazing' ? 'mortal' : grade === 'good' ? 'wound' : 'stun',
-            weapon.firepower
-        );
-
-        await roll.toMessage({
-            speaker: ChatMessage.getSpeaker({ actor: this.document }),
-            flavor: game.i18n.format('ALTERNITY.Spaceship.WeaponRoll', {
-                weapon: weapon.name || game.i18n.localize('ALTERNITY.Spaceship.Weapon'),
-                grade,
-                firepower: weapon.firepower,
-                versusShip: degrade.isNegated
-                    ? game.i18n.localize('ALTERNITY.Spaceship.DegradedToNothing')
-                    : game.i18n.format('ALTERNITY.Spaceship.DegradedTo', { grade: degrade.finalGrade }),
-            }),
+        // Routed through the roll service rather than rolling here: it strips the
+        // damage code's grade letter, reads the track off it, and posts a card that
+        // can actually be applied to a target. This used to strip the letter with a
+        // local regex and post a bare Roll, so a ship's damage had to be typed into
+        // the target's sheet by hand.
+        //
+        // Every spaceship has Amazing toughness (GM Guide Ch.11), which is what the
+        // weapon's firepower is compared against.
+        await AlternityRollService.rollDamage({
+            actor: this.document,
+            name: weapon.name || game.i18n.localize('ALTERNITY.Spaceship.Weapon'),
+            code: formula,
+            grade,
+            damageType: weapon.damageType,
+            firepower: weapon.firepower,
+            targetToughness: 'Amazing',
         });
     }
 }
@@ -1622,6 +2256,10 @@ class AlternityRobotSheet extends foundry.applications.api.HandlebarsApplication
             setRobotDamage:   this._onSetRobotDamageAction,
             clearRobotDamage: this._onClearRobotDamageAction,
             loadAllRanks:     this._onLoadAllRanksAction,
+            rollAbility:      this._onRollAbilityAction,
+            rollActionCheck:  this._onRollActionCheckAction,
+            rollSkill:        this._onRollSkillAction,
+            rollDefence:      this._onRollDefenceAction,
         }
     });
 
@@ -1745,6 +2383,46 @@ class AlternityRobotSheet extends foundry.applications.api.HandlebarsApplication
         this.element.addEventListener('change', (e) => {
             applySheetFieldChange(this.document, e.target, ROBOT_ARRAY_FIELDS);
         });
+        bindRollMount(this);
+    }
+
+    // -----------------------------------------------------------------------
+    // Rolling
+    // -----------------------------------------------------------------------
+
+    static _onRollAbilityAction(event, target) {
+        return rollStatblockAbility(this, target.dataset.ability);
+    }
+
+    static _onRollActionCheckAction() {
+        return rollStatblockActionCheck(this);
+    }
+
+    /**
+     * Roll a skill row.
+     *
+     * Refused when the skill is not in active memory: a robot that has swapped a
+     * skill out cannot use it, which is the entire point of the memory budget.
+     * Partially-loaded skills roll at the ranks that are actually resident, not at
+     * the ranks the robot owns.
+     */
+    static _onRollSkillAction(event, target) {
+        const row = this.document.system.skills?.[safeInt(target.dataset.index, -1)];
+        if (!row) return null;
+
+        if (row.isLoaded === false) {
+            ui.notifications?.warn(game.i18n.format('ALTERNITY.Robot.SkillNotLoaded', {
+                skill: row.name,
+            }));
+            return null;
+        }
+
+        const effectiveRank = row.isBroad ? (row.rank ?? 0) : (row.ranksLoaded ?? 0);
+        return rollStatblockSkill(this, { ...row, rank: effectiveRank });
+    }
+
+    static async _onRollDefenceAction() {
+        return rollStatblockDefence(this);
     }
 
     // -----------------------------------------------------------------------
@@ -1845,6 +2523,10 @@ class AlternityAISheet extends foundry.applications.api.HandlebarsApplicationMix
             setAIDamage:    this._onSetAIDamageAction,
             clearAIDamage:  this._onClearAIDamageAction,
             loadAllAIRanks: this._onLoadAllAIRanksAction,
+            rollAbility:      this._onRollAbilityAction,
+            rollActionCheck:  this._onRollActionCheckAction,
+            rollSkill:        this._onRollSkillAction,
+            rollGridSkill:    this._onRollGridSkillAction,
         }
     });
 
@@ -1961,6 +2643,78 @@ class AlternityAISheet extends foundry.applications.api.HandlebarsApplicationMix
         this.element.addEventListener('change', (e) => {
             applySheetFieldChange(this.document, e.target, AI_ARRAY_FIELDS);
         });
+        bindRollMount(this);
+    }
+
+    // -----------------------------------------------------------------------
+    // Rolling
+    // -----------------------------------------------------------------------
+
+    /**
+     * An AI has no Strength, Dexterity or Constitution of its own, so those three
+     * are not offered here. Its avatar's physical scores are rolled through the
+     * Grid skill instead.
+     */
+    static _onRollAbilityAction(event, target) {
+        return rollStatblockAbility(this, target.dataset.ability);
+    }
+
+    static _onRollActionCheckAction() {
+        return rollStatblockActionCheck(this);
+    }
+
+    /**
+     * Roll a skill row, honouring the two restrictions an AI is under: some skills
+     * it simply cannot attempt, and others carry a standing step penalty. Both come
+     * from the math service, which is also what the sheet's warning banner reads.
+     */
+    static _onRollSkillAction(event, target) {
+        const row = this.document.system.skills?.[safeInt(target.dataset.index, -1)];
+        if (!row) return null;
+
+        const restriction = AlternityMathService.getAISkillRestriction(row.name, row.ability);
+        if (restriction.isBarred) {
+            ui.notifications?.warn(restriction.reason
+                ?? game.i18n.format('ALTERNITY.AI.SkillBarred', { skill: row.name }));
+            return null;
+        }
+
+        if (row.isLoaded === false) {
+            ui.notifications?.warn(game.i18n.format('ALTERNITY.AI.SkillNotLoaded', { skill: row.name }));
+            return null;
+        }
+
+        const modifiers = restriction.penalty
+            ? [AlternityMathService.buildModifier(
+                game.i18n.localize('ALTERNITY.AI.SkillPenalty'),
+                restriction.penalty,
+                restriction.reason ?? '',
+            )]
+            : [];
+
+        const effectiveRank = row.isBroad ? (row.rank ?? 0) : (row.ranksLoaded ?? 0);
+        return rollStatblockSkill(this, { ...row, rank: effectiveRank }, { modifiers });
+    }
+
+    /**
+     * Roll the AI's Grid skill — the derived score its Computer Science-hacking
+     * rank and Intelligence produce, which is what it acts with inside the Grid.
+     */
+    static _onRollGridSkillAction() {
+        const scores = this.document.system.gridSkillScore;
+        if (!scores?.ordinary) {
+            ui.notifications?.warn(game.i18n.localize('ALTERNITY.AI.NoGridSkill'));
+            return null;
+        }
+        return mountRoller(
+            this,
+            {
+                name: game.i18n.localize('ALTERNITY.AI.GridSkillScore'),
+                scores,
+                baseStep: 0,
+            },
+            game.i18n.localize('ALTERNITY.AI.Grid'),
+        );
     }
 
     // -----------------------------------------------------------------------
@@ -2057,6 +2811,11 @@ class AlternityCreatureSheet extends foundry.applications.api.HandlebarsApplicat
             deleteCreatureRow:   this._onDeleteCreatureRowAction,
             setCreatureDamage:   this._onSetCreatureDamageAction,
             clearCreatureDamage: this._onClearCreatureDamageAction,
+            rollAbility:         this._onRollAbilityAction,
+            rollActionCheck:     this._onRollActionCheckAction,
+            rollAttack:          this._onRollAttackAction,
+            rollSkill:           this._onRollSkillAction,
+            rollDefence:         this._onRollDefenceAction,
         }
     });
 
@@ -2142,6 +2901,39 @@ class AlternityCreatureSheet extends foundry.applications.api.HandlebarsApplicat
         this.element.addEventListener('change', (e) => {
             applySheetFieldChange(this.document, e.target, CREATURE_ARRAY_FIELDS);
         });
+        bindRollMount(this);
+    }
+
+    // -----------------------------------------------------------------------
+    // Rolling
+    // -----------------------------------------------------------------------
+
+    static _onRollAbilityAction(event, target) {
+        return rollStatblockAbility(this, target.dataset.ability);
+    }
+
+    static _onRollActionCheckAction() {
+        return rollStatblockActionCheck(this);
+    }
+
+    /**
+     * Roll an attack row. The mode column ('O' for an ordinary attack, 'F' for a
+     * ranged/breath one in the compendium's shorthand) decides which of the
+     * target's two resistance modifiers applies.
+     */
+    static async _onRollAttackAction(event, target) {
+        const row = this.document.system.attackRows?.[safeInt(target.dataset.index, -1)];
+        const isRanged = /f|r/i.test(String(row?.mode ?? ''));
+        return rollStatblockAttack(this, row, { attackKind: isRanged ? 'ranged' : 'melee' });
+    }
+
+    static _onRollSkillAction(event, target) {
+        const row = this.document.system.skillRows?.[safeInt(target.dataset.index, -1)];
+        return rollStatblockSkill(this, row);
+    }
+
+    static async _onRollDefenceAction() {
+        return rollStatblockDefence(this);
     }
 
     // -----------------------------------------------------------------------
@@ -2216,9 +3008,16 @@ async function registerAlternitySheet() {
      * label. The trailing options object Handlebars appends is dropped.
      */
     Handlebars.registerHelper('concat', (...args) => args.slice(0, -1).join(''));
-    
+    /** Lower-cased, for building CSS class names from a degree label. */
+    Handlebars.registerHelper('lower', (str) => String(str ?? '').toLowerCase().replace(/\s+/g, '-'));
+
     await foundry.applications.handlebars.loadTemplates([
-        "systems/alternity-v2/templates/actor/ability-card.hbs"
+        "systems/alternity-v2/templates/actor/ability-card.hbs",
+        // Preloaded so a roll never waits on a template fetch mid-click.
+        "systems/alternity-v2/templates/roll/roll-panel.hbs",
+        "systems/alternity-v2/templates/roll/roll-card.hbs",
+        "systems/alternity-v2/templates/roll/damage-card.hbs",
+        "systems/alternity-v2/templates/roll/action-check-card.hbs",
     ]);
 
     const ItemsCollection = foundry.documents.collections.Items ?? Items;

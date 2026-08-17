@@ -2,7 +2,7 @@
   "id": "alternity-v2",
   "title": "Alternity Fastplay Core",
   "description": "Alternity Fastplay Core RPG System for Foundry VTT.",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "compatibility": {
     "minimum": "12",
     "verified": "14"

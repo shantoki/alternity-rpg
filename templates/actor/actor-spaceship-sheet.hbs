@@ -294,6 +294,8 @@
                         </span>
                         <span class="{{alt}}-compartment-check" title="{{localize 'ALTERNITY.Spaceship.DurabilityCheckHint'}}">
                             {{localize 'ALTERNITY.Spaceship.DurabilityCheck'}}: <strong>{{c.durabilityCheckScore}}</strong>
+                            <button type="button" class="{{alt}}-roll-btn" data-action="rollDurabilityCheck"
+                                    data-index="{{c.index}}" title="{{localize 'ALTERNITY.Spaceship.DurabilityCheckHint'}}">⬡</button>
                         </span>
                         <input type="text" name="system.compartments.{{c.index}}.systemsText" value="{{c.systemsText}}"
                                class="{{alt}}-compartment-systems" placeholder="{{localize 'ALTERNITY.Spaceship.SystemsHousedHint'}}" />
@@ -341,7 +343,13 @@
                         {{/each}}
                     </select>
                     <input type="number" name="system.weapons.{{idx}}.powerReq" value="{{row.powerReq}}" min="0" title="{{localize 'ALTERNITY.Spaceship.PowerReq'}}" />
+                    {{!-- The ⚔ button rolls the gunner's attack check off the Weapons
+                          station and lets the degree pick the grade; the O/G/A buttons
+                          roll a named grade's damage on its own, for when the check was
+                          made on the gunner's own character sheet. --}}
                     <span class="{{../alt}}-ship-roll-group">
+                        <button type="button" data-action="rollShipAttack" data-index="{{idx}}"
+                                title="{{localize 'ALTERNITY.Roll.AttackHint'}}">⚔</button>
                         <button type="button" data-action="rollShipWeapon" data-index="{{idx}}" data-grade="ordinary" title="{{localize 'ALTERNITY.Spaceship.DamageOrdinary'}}">O</button>
                         <button type="button" data-action="rollShipWeapon" data-index="{{idx}}" data-grade="good" title="{{localize 'ALTERNITY.Spaceship.DamageGood'}}">G</button>
                         <button type="button" data-action="rollShipWeapon" data-index="{{idx}}" data-grade="amazing" title="{{localize 'ALTERNITY.Spaceship.DamageAmazing'}}">A</button>
@@ -443,6 +451,8 @@
                     <input type="text" name="system.stations.{{idx}}.crewName" value="{{row.crewName}}" placeholder="{{localize 'ALTERNITY.Spaceship.CrewName'}}" />
                     <input type="text" name="system.stations.{{idx}}.skillName" value="{{row.skillName}}" placeholder="{{localize 'ALTERNITY.Spaceship.SkillName'}}" />
                     <input type="text" name="system.stations.{{idx}}.skillScore" value="{{row.skillScore}}" placeholder="9/4/2" title="{{localize 'ALTERNITY.Spaceship.SkillScoreHint'}}" />
+                    <button type="button" class="{{../alt}}-roll-btn" data-action="rollStation" data-index="{{idx}}"
+                            title="{{localize 'ALTERNITY.Spaceship.StationCheckHint'}}">⬡</button>
                     <button type="button" data-action="deleteShipRow" data-array="stations" data-index="{{idx}}">✕</button>
                 </div>
                 {{else}}
@@ -460,4 +470,11 @@
         </section>
 
     </main>
+
+    {{!-- Mount point for the inline roll panel used by the station, durability and
+          weapon-attack checks above. A ship has no Action Check of its own — its crew
+          act on theirs — so the tray carries no quick-roll bar. --}}
+    <footer class="{{alt}}-roll-tray">
+        <div class="{{alt}}-roll-mount" hidden></div>
+    </footer>
 </form>

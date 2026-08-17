@@ -7,7 +7,8 @@
  *
  * Responsibilities:
  *   - prepareData() pipeline for each item type
- *   - rollAttack() for weapon items — fires through AlternityActor.rollSkill()
+ *   - rollAttack() / rollDamage() for weapon items — routed through
+ *     AlternityRollService, which owns the dice and the chat cards
  *   - rollSkill() for skill items — delegates to the owning actor
  *   - use() for effect items — validates prerequisites via SystemEffectItem,
  *     deducts resource costs, then fires the alternity:effectUsed hook
@@ -21,6 +22,7 @@
 import { getEffectTemplate, saveEffectTemplate } from '../data/alternity-item-template.js';
 import { getAlternityState, saveAlternityState }  from '../data/alternity-actor-data.js';
 import { AlternityMathService }                   from '../services/alternity-math.js';
+import { AlternityRollService }                   from '../services/alternity-roll-service.js';
 
 // ---------------------------------------------------------------------------
 // AlternityItem
@@ -87,18 +89,37 @@ export class AlternityItem extends Item {
             ? AlternityMathService.calculateStrengthDamageAdjustment(actor.system?.abilities?.str ?? 0)
             : 0;
 
+        // The flat term added to whichever damage code the attack's degree
+        // selects. Kept as a formula fragment rather than folded into the codes:
+        // there are three of them, and each carries its own grade letter that
+        // would have to be stripped and reattached to splice a number in.
         const damageMod = (sys.damageBonus ?? 0) + sys.strengthDamageAdjustment;
-        sys.fullDamageFormula = damageMod === 0
-            ? sys.damageFormula
-            : damageMod > 0
-                ? `${sys.damageFormula}+${damageMod}`
-                : `${sys.damageFormula}${damageMod}`;
+        sys.damageBonusFormula = damageMod === 0 ? ''
+            : damageMod > 0 ? `+${damageMod}`
+            : String(damageMod);
+        sys.damageBonusLabel = sys.damageBonusFormula || '—';
 
-        // Range display (ranged/thrown only)
+        // A negative Strength damage adjustment never takes a hit below one point
+        // (Table P9's "* To a minimum of 1" footnote).
+        sys.damageMinimumOne = sys.strengthDamageAdjustment < 0;
+
+        // Range display (ranged/thrown only). Metres, not feet: the weapon tables
+        // print "short/medium/long in meters" (PHB Ch.11).
         const r = sys.range;
         sys.rangeDisplay = (r?.long ?? 0) > 0
-            ? `${r.short}/${r.medium}/${r.long} ft`
+            ? `${r.short}/${r.medium}/${r.long} m`
             : '—';
+
+        // The band choices the roll panel offers, each already carrying its Table
+        // P22 step modifier and the distance it covers, so the wielder picks
+        // "medium (21-80 m)" rather than remembering a number.
+        sys.rangeBands = sys.usesRangeBands
+            ? ['short', 'medium', 'long'].map((band) => ({
+                band,
+                steps: AlternityMathService.getRangeStepModifier(sys.rangeClass, band).steps,
+                distance: r?.[band] ?? 0,
+            })).filter((b) => b.distance > 0)
+            : [];
 
         // Status labels
         sys.equippedLabel   = sys.isEquipped ? game.i18n.localize('ALTERNITY.Equipped') : game.i18n.localize('ALTERNITY.Stowed');
@@ -345,11 +366,43 @@ export class AlternityItem extends Item {
     // -----------------------------------------------------------------------
 
     /**
-     * Roll an attack with this weapon. Delegates to the owning actor's rollSkill()
-     * using the weapon's requiredSkill id and applies the weapon's attack bonus.
+     * The damage payload this weapon hands to a check, so the resulting chat card
+     * can offer the right grade's damage once the degree is known.
      *
-     * @param {object} [options]
-     * @param {boolean} [options.whisper] - Whisper to GM.
+     * Shaped for AlternityRollService.rollCheck's `damage` option. Built here
+     * rather than in the sheet because everything in it belongs to the weapon.
+     *
+     * @returns {object|null} Null for non-weapons.
+     */
+    getDamagePayload() {
+        if (this.type !== 'weapon') return null;
+        const sys = this.system;
+        return {
+            name: this.name,
+            codes: sys.damageRun ?? {},
+            damageType: sys.damageType,
+            firepower: sys.firepower,
+            bonus: sys.damageBonusFormula || '',
+            fallbackCategory: sys.damageCategory,
+            minimumOne: !!sys.damageMinimumOne,
+            actorUuid: this.actor?.uuid ?? null,
+            itemId: this.id,
+        };
+    }
+
+    /**
+     * Roll an attack with this weapon.
+     *
+     * The check is a roll-under on the weapon's governing specialty — not a d20
+     * plus bonuses — and the weapon's accuracy, the chosen range band, and the
+     * target's resistance and dodge all enter it as situation-die steps. The
+     * damage is not rolled here: the degree this check achieves decides which of
+     * the three damage codes fires, so the resulting card offers that button.
+     *
+     * @param {object}  [options]
+     * @param {string}  [options.rangeBand]  - 'short' | 'medium' | 'long' (Table P22).
+     * @param {number}  [options.situationStep=0] - The Gamemaster's circumstance modifier.
+     * @param {boolean} [options.whisper]
      * @returns {Promise<object|null>}
      */
     async rollAttack(options = {}) {
@@ -359,57 +412,104 @@ export class AlternityItem extends Item {
         }
         const actor = this.actor;
         if (!actor) {
-            ui.notifications?.warn('[Alternity] Weapon must be owned by an actor to roll.');
+            ui.notifications?.warn(game.i18n.localize('ALTERNITY.Errors.WeaponUnowned'));
             return null;
         }
 
-        const skillId   = this.system.requiredSkill ?? 'str-melee';
-        const extraBonus = this.system.attackBonus ?? 0;
+        const sys = this.system;
+        const skillId = sys.requiredSkill
+            || (sys.weaponType === 'Melee' ? 'str-melee' : 'dex-ranged-mod');
+        const isMelee = ['Melee', 'Thrown'].includes(sys.weaponType);
 
-        return actor.rollSkill(skillId, {
-            context:     `${this.name} Attack`,
-            extraBonus,  // picked up by the hook layer
-            itemId:      this.id,
-            ...options,
+        const modifiers = [];
+
+        // The weapon's own accuracy (the table's "Acc" column).
+        if (sys.attackBonus) {
+            modifiers.push(AlternityMathService.buildModifier(
+                game.i18n.localize('ALTERNITY.Weapon.Accuracy'),
+                sys.attackBonus,
+                `${this.name} accuracy`,
+            ));
+        }
+
+        // Range band, when one was picked and the weapon's class is rated for bands.
+        if (options.rangeBand) {
+            modifiers.push(...AlternityMathService
+                .getRangeStepModifier(sys.rangeClass, options.rangeBand).modifierTrace);
+        }
+
+        if (options.situationStep) {
+            modifiers.push(AlternityMathService.buildModifier(
+                game.i18n.localize('ALTERNITY.Roll.Circumstance'),
+                options.situationStep,
+                game.i18n.localize('ALTERNITY.Roll.CircumstanceReason'),
+            ));
+        }
+
+        // Whoever is targeted contributes their resistance modifier and any dodge
+        // they rolled — Alternity's substitute for an armour class.
+        const { modifiers: targetModifiers } = await AlternityRollService.collectTargetModifiers({
+            attackKind: isMelee ? 'melee' : 'ranged',
+        });
+        modifiers.push(...targetModifiers);
+
+        const state = await actor.getAltState?.();
+        const scores = state?.getSkillScores(skillId)
+            ?? AlternityMathService.calculateSkillScores(actor.system?.abilities?.[sys.attackAbility] ?? 0);
+        const baseStep = state?.getSkillBaseStep(skillId) ?? 1;
+
+        return AlternityRollService.rollCheck({
+            actor,
+            name: this.name,
+            context: isMelee
+                ? game.i18n.localize('ALTERNITY.Roll.MeleeAttack')
+                : game.i18n.localize('ALTERNITY.Roll.RangedAttack'),
+            scores,
+            baseStep,
+            modifiers,
+            whisper: options.whisper ?? false,
+            damage: this.getDamagePayload(),
         });
     }
 
     /**
-     * Roll damage for this weapon.
-     * Returns a Roll object and creates a chat message.
+     * Roll one damage grade for this weapon and post it with an apply button.
+     *
+     * Normally reached from the attack card, which knows which grade the check
+     * earned. Called directly it needs to be told, because rolling the Amazing
+     * column off an Ordinary hit is exactly the mistake this signature prevents.
      *
      * @param {object} [options]
-     * @returns {Promise<Roll>}
+     * @param {string} [options.grade='ordinary'] - 'ordinary' | 'good' | 'amazing'.
+     * @param {boolean} [options.whisper]
+     * @returns {Promise<object|null>}
      */
     async rollDamage(options = {}) {
         if (this.type !== 'weapon') return null;
 
-        const formula = this.system.fullDamageFormula ?? this.system.damageFormula ?? '1d6';
-        const roll    = await new Roll(formula).evaluate();
+        const grade = options.grade ?? 'ordinary';
+        const payload = this.getDamagePayload();
+        const code = payload.codes[grade];
 
-        await roll.toMessage({
-            speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-            flavor:  `${this.name} — ${this.system.damageType} Damage`,
-            rollMode: options.whisper ? 'gmroll' : 'roll',
-        });
-
-        // A negative Strength damage adjustment never takes a hit below 1 point
-        // (Table P9's "* To a minimum of 1" footnote).
-        const damageTotal = (this.system.strengthDamageAdjustment ?? 0) < 0
-            ? Math.max(1, roll.total)
-            : roll.total;
-
-        // Optionally apply the damage to a target (if one is selected)
-        if (options.applyToTarget && game.user.targets.size > 0) {
-            for (const token of game.user.targets) {
-                await token.actor?.applyAlternityDamage?.(damageTotal, this.system.damageType, {
-                    category: this.system.damageCategory,
-                    context:  `${this.name} Damage`,
-                });
-            }
+        if (!code) {
+            ui.notifications?.warn(game.i18n.format('ALTERNITY.Roll.NoDamageCode', {
+                name: this.name, grade,
+            }));
+            return null;
         }
 
-        return roll;
+        return AlternityRollService.rollDamage({
+            actor: this.actor,
+            name: this.name,
+            code,
+            grade,
+            damageType: payload.damageType,
+            firepower: payload.firepower,
+            bonus: payload.bonus,
+            fallbackCategory: payload.fallbackCategory,
+            minimumOne: payload.minimumOne,
+            whisper: options.whisper ?? false,
+        });
     }
 
     // -----------------------------------------------------------------------

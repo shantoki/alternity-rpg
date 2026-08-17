@@ -33,6 +33,7 @@ import {
     ABILITY_TYPES,
 } from '../data/alternity-actor-data.js';
 import { AlternityMathService } from '../services/alternity-math.js';
+import { AlternityRollService } from '../services/alternity-roll-service.js';
 import { Actor, Roll, ChatMessage, Hooks, game, renderTemplate } from '../module-info.js';
 
 // ---------------------------------------------------------------------------
@@ -282,15 +283,24 @@ export class AlternityActor extends Actor {
     // -----------------------------------------------------------------------
 
     /**
-     * Roll a skill check for this actor. Assembles the roll options object and
-     * fires the 'alternity:abilityCheck' custom hook, which alt-mechanics.js
-     * intercepts to apply stances, wound penalties, and momentum.
+     * Roll a skill check for this actor.
+     *
+     * This is the *programmatic* entry point — macros, modules, and anything that
+     * wants the custom hooks to fire. The sheets go through AlternityRollService
+     * instead, which is what gives the player a panel to pick a circumstance
+     * modifier in; this path takes its modifiers from the caller and the hooks.
+     *
+     * The full control-plus-situation formula is rolled here, and both dice are
+     * handed to the hook layer. It used to roll a bare `1d20` and pass
+     * `situation: 0`, so the situation die was assembled by the hooks and then
+     * never rolled — meaning modifiers had no effect whatsoever on any check made
+     * through this method.
      *
      * @param {string}  skillId    - Skill id from SKILL_DEFINITIONS.
      * @param {object}  [options]  - Optional overrides.
-     * @param {number}  [options.baseValue]  - Override the derived target number.
-     * @param {string}  [options.context]    - Override the roll context label.
-     * @param {boolean} [options.whisper]    - If true, roll is whispered to GM.
+     * @param {string}  [options.context]      - Override the roll context label.
+     * @param {object[]}[options.modifiers]    - Step modifiers to apply.
+     * @param {boolean} [options.whisper]      - If true, roll is whispered to GM.
      * @returns {Promise<object|null>} Roll result or null if incapacitated.
      */
     async rollSkill(skillId, options = {}) {
@@ -302,39 +312,61 @@ export class AlternityActor extends Actor {
             return null;
         }
 
-        const baseValue = options.baseValue ?? altState.getSkillDC(skillId);
         const skillDef  = (await import('../data/alternity-actor-data.js'))
             .SKILL_DEFINITIONS.find(d => d.id === skillId);
         const context   = options.context ?? skillDef?.name ?? 'Skill Check';
 
+        const scores   = altState.getSkillScores(skillId);
+        const baseStep = altState.getSkillBaseStep(skillId);
+
         const rollOptions = {
-            baseValue,
             context,
             actor:   this,
             skillId,
+            scores,
+            baseStep,
+            baseValue: scores.ordinary,
+            // The actor's standing modifiers — wound level, the Dazed fatigue
+            // penalty, active stances, worn armour — are collected *before* the
+            // dice are rolled, because they decide which situation die is rolled.
+            //
+            // They used to be assembled by the `alternity:resolveAbilityCheck`
+            // listener, which fires after the roll: the modifiers were computed,
+            // printed in the trace, and then had no effect on the outcome, because
+            // the die they should have selected had already been rolled as a bare
+            // d20. That listener no longer adds them, so this is not a double count.
+            modifiers: [
+                ...(options.modifiers ?? []),
+                ...await AlternityRollService.collectActorModifiers(this, { context }),
+            ],
             whisper: options.whisper ?? false,
         };
 
-        // Fire the custom hook — intercepted by onCreateAbilityCheck in alt-mechanics.js
+        // Fire the custom hook — intercepted by onCreateAbilityCheck in
+        // alt-mechanics.js. Listeners may push further modifiers, so this has to run
+        // before the formula is built.
         Hooks.call('alternity:abilityCheck', this, rollOptions);
 
-        // Execute the roll using Foundry's Roll API
-        const roll = await new Roll('1d20').evaluate();
+        const totalStep = baseStep + rollOptions.modifiers.reduce((sum, m) => sum + m.value, 0);
+        const situation = AlternityMathService.buildSituationFormula(totalStep);
 
-        rollOptions.roll   = roll.total;
+        const roll = await new Roll(situation.formula).evaluate();
+
+        rollOptions.roll    = roll.terms[situation.controlIndex]?.total ?? roll.total;
+        rollOptions.situationRoll = situation.hasSituation
+            ? (roll.terms[situation.situationIndex]?.total ?? 0)
+            : 0;
         rollOptions.rollObj = roll;
 
-        // Let the hook layer calculate the adjusted value + modifier trace
+        // Let the hook layer calculate the result + modifier trace.
         await Hooks.callAll('alternity:resolveAbilityCheck', this, rollOptions);
 
-        // If the hook didn't set adjustedValue (e.g. no hook fired), do it directly
+        // If the hook didn't resolve it (e.g. no listener), do it directly.
         if (rollOptions.adjustedValue === undefined) {
-            const scores = altState.getSkillScores(skillId);
-            const baseStep = altState.getSkillBaseStep(skillId);
             const result = AlternityMathService.resolveAbilityCheck(
-                scores, baseStep, [], context, { control: roll.total, situation: 0 }
+                scores, baseStep, rollOptions.modifiers, context,
+                { control: rollOptions.roll, situation: rollOptions.situationRoll }
             );
-            rollOptions.scores        = scores;
             rollOptions.adjustedValue = result.finalValue;
             rollOptions.modifierTrace = result.modifierTrace;
             rollOptions.succeeded     = result.succeeded;
@@ -349,13 +381,17 @@ export class AlternityActor extends Actor {
     }
 
     /**
-     * Quick combat attack roll. Used by the sheet's quick-roll bar.
+     * Attack roll for a skill id, without a weapon item.
      *
-     * @param {string}  [skillId='str-melee'] - Attack skill id.
+     * For an unarmed or improvised attack, or a macro that only knows the skill.
+     * A weapon's attack goes through `AlternityItem.rollAttack`, which also brings
+     * the accuracy, the range band and the three damage grades with it.
+     *
+     * @param {string}  [skillId='str-unarmed'] - Attack skill id.
      * @param {object}  [options]
      * @returns {Promise<object|null>}
      */
-    async rollAttack(skillId = 'str-melee', options = {}) {
+    async rollAttack(skillId = 'str-unarmed', options = {}) {
         return this.rollSkill(skillId, { context: 'Combat', ...options });
     }
 

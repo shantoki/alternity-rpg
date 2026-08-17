@@ -298,4 +298,11 @@
             {{editor system.description target="system.description" button=true owner=owner editable=editable}}
         </section>
     </main>
+
+    {{!-- Mount point for the inline roll panel. A warship has no checks of its own
+          yet — its crew roll on their own sheets — but the mount is present so the
+          weapon damage rolls above have somewhere to put a panel if they grow one. --}}
+    <footer class="{{alt}}-roll-tray">
+        <div class="{{alt}}-roll-mount" hidden></div>
+    </footer>
 </form>
