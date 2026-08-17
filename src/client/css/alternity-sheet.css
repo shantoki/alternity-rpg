@@ -374,38 +374,56 @@
     padding: 12px;
 }
 
-.alt-npc-combat-summary {
-    display: flex;
-    flex-direction: row;
-    gap: 12px;
-    margin-top: 4px;
-}
+/*
+ * The supporting-cast sheet was rebuilt around the statblock the Gamemaster Guide
+ * actually prints, which retired four rules that styled the old two-column layout
+ * and its Challenge Rating badge — `.alt-npc-combat-summary`, `.alt-npc-cr-badge`,
+ * `.alt-npc-main-content` and `.alt-npc-stats-extras`. Challenge Rating was never
+ * an Alternity mechanic in the first place.
+ */
 
-.alt-npc-cr-badge {
-    background: #444;
-    color: #eee;
-    padding: 1px 6px;
-    border-radius: 4px;
+/* The quality tier's own description, shown under the header. */
+.alt-npc-tier-hint {
+    margin: 0 0 10px;
+    padding: 4px 8px;
     font-size: 10px;
-    font-weight: bold;
+    font-style: italic;
+    color: var(--alt-color-text-muted);
+    background: var(--alt-color-surface);
+    border-left: 2px solid var(--alt-color-primary);
+    border-radius: var(--alt-radius);
 }
 
-.alt-npc-main-content {
-    display: flex;
-    flex-direction: row;
-    gap: 15px;
-    margin-bottom: 15px;
+/* A value/max pair sharing one box, as last resort points are printed. */
+.alt-npc-inline-pair {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--alt-color-text-muted);
 }
+.alt-npc-inline-pair input { width: 44px; text-align: center; }
 
-.alt-npc-stats-extras {
-    flex: 0 0 150px;
+/* The wound ladder, worst to best, with the current step called out. */
+.alt-npc-wound-track {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
-    background: rgba(0, 0, 0, 0.2);
-    padding: 8px;
-    border-radius: 4px;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+.alt-npc-wound-step {
+    flex: 1 1 auto;
+    padding: 3px 6px;
+    font-size: 10px;
+    white-space: nowrap;
+    color: var(--alt-color-text-muted);
+    background: var(--alt-color-surface);
     border: 1px solid var(--alt-color-border);
+    border-radius: var(--alt-radius);
+}
+.alt-npc-wound-step.is-current {
+    color: var(--alt-color-text);
+    border-color: var(--alt-color-primary);
+    background: rgba(74, 144, 217, 0.18);
 }
 
 .alt-stat-row {

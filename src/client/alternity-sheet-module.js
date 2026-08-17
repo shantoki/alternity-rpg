@@ -39,6 +39,13 @@ import {
     CHASSIS_COST_MODES,
 } from '../data/RobotData.js';
 import {
+    PROFESSIONS,
+    NPC_QUALITY_TIERS,
+    SUPPORTING_CAST_ROLES,
+    REACTION_DEGREES,
+    NPC_DAMAGE_TYPES,
+} from '../data/NpcData.js';
+import {
     AI_QUALITIES,
     AI_PROCESSORS,
     AI_AVATAR_PROGRAMS,
@@ -1005,69 +1012,140 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
 }
 
 // ---------------------------------------------------------------------------
-// AlternityNpcSheet
+// AlternityNpcSheet — the supporting cast
 // ---------------------------------------------------------------------------
+
+const NPC_ARRAY_FIELDS = Object.freeze({
+    attacks: {
+        name: '', score: 0, damageOrdinary: '', damageGood: '', damageAmazing: '',
+        damageType: 'LI', range: '', notes: '',
+    },
+});
 
 class AlternityNpcSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
     static DEFAULT_OPTIONS = foundry.utils.mergeObject(super.DEFAULT_OPTIONS, {
         classes: [NS, `${NS}-sheet-app`, `${NS}-npc-sheet`],
         tag: "form",
-        window: { resizable: true, width: 560, height: 750 },
+        window: { resizable: true, width: 620, height: 800 },
         actions: {
-            switchTab: this._onTabAction,
-            setWound:  this._onSetWoundAction
+            setWound:      this._onSetWoundAction,
+            setNpcDamage:  this._onSetNpcDamageAction,
+            addNpcRow:     this._onAddNpcRowAction,
+            deleteNpcRow:  this._onDeleteNpcRowAction,
         }
     });
     static PARTS = {
         sheet: { template: "systems/alternity-v2/templates/actor/actor-npc-sheet.hbs" }
     };
 
-    constructor(options = {}) {
-        super(options);
-        this._activeTab = 'tactics';
-    }
-
     async _prepareContext(options) {
         const context = await super._prepareContext(options);
+        const system = this.document.system;
+
         context.actor = this.document;
-        context.system = this.document.system;
+        context.system = system;
         context.alt = NS;
-        context.woundSeverity = WOUND_SEVERITY[this.document.system.woundLevel] || 'healthy';
-        context.activeTab = this._activeTab;
+        context.woundSeverity = WOUND_SEVERITY[system.woundLevel] || 'healthy';
         context.WOUND_LEVELS = WOUND_LEVELS;
         context.WOUND_SEVERITY = WOUND_SEVERITY;
-        context.crChoices = ['Easy', 'Average', 'Tough', 'Overwhelming'];
+
+        // ── Choice lists ────────────────────────────────────────────────────
+        context.qualityChoices = Object.entries(NPC_QUALITY_TIERS).map(([key, cfg]) => ({
+            key,
+            ...cfg,
+            // The tier's own summary, so the Gamemaster can see what they are
+            // picking: "as capable as a level 6 hero, average ability 11".
+            hint: cfg.heroLevel === null
+                ? game.i18n.format('ALTERNITY.Npc.TierMarginalHint', { average: cfg.averageAbility })
+                : game.i18n.format('ALTERNITY.Npc.TierHint', {
+                    level: cfg.heroLevel, average: cfg.averageAbility,
+                }),
+        }));
+        context.professionChoices = PROFESSIONS;
+        context.roleChoices = SUPPORTING_CAST_ROLES;
+        context.reactionDegreeChoices = REACTION_DEGREES;
+        context.damageTypeChoices = NPC_DAMAGE_TYPES;
+
+        // ── Abilities ───────────────────────────────────────────────────────
+        context.abilities = ['str', 'dex', 'con', 'int', 'wil', 'per'].map((key) => ({
+            key,
+            label: game.i18n.localize(`ALTERNITY.Ability.${key.toUpperCase()}`),
+            value: system.abilities?.[key] ?? 0,
+        }));
+
+        // ── Damage tracks ───────────────────────────────────────────────────
+        context.tracks = ['stun', 'wound', 'mortal', 'fatigue'].map((key) => {
+            const track = system.durability?.[key] ?? { value: 0, max: 0 };
+            return {
+                key,
+                label: game.i18n.localize(`ALTERNITY.${key.charAt(0).toUpperCase()}${key.slice(1)}`),
+                value: track.value, max: track.max,
+                pct: pct(track.value, track.max),
+            };
+        });
+
+        // ── Movement ────────────────────────────────────────────────────────
+        // Every rate is editable, but the statblock summary only names the ones
+        // that are actually set — a walking NPC should not advertise a fly speed.
+        context.movementKeys = ['sprint', 'run', 'walk', 'easySwim', 'swim', 'glide', 'fly']
+            .map((key) => ({
+                key,
+                label: game.i18n.localize(`ALTERNITY.Movement.${key}`),
+                value: system.movement?.[key] ?? 0,
+            }));
+        context.movementSummary = (system.movementRates ?? [])
+            .map((r) => `${game.i18n.localize(`ALTERNITY.Movement.${r.key}`)} ${r.value}`)
+            .join(', ');
+
+        context.attackRows = system.attackRows ?? [];
+
+        // The tier decides this on its own, so say so rather than letting the
+        // profession select look as though it is being ignored.
+        context.professionBonusSuppressed = system.qualityInfo?.isNonprofessional
+            && system.profession !== 'Nonprofessional';
+
         return context;
     }
 
     _onRender(context, options) {
-        const html = this.element;
-        html.addEventListener('change', (e) => {
-            const input = e.target;
-            if (input.name) {
-                const val = input.type === 'checkbox' ? input.checked : input.value;
-                this.document.update({ [input.name]: val });
-            }
+        this.element.addEventListener('change', (e) => {
+            applySheetFieldChange(this.document, e.target, NPC_ARRAY_FIELDS);
         });
-
-        // Tab visibility
-        html.querySelectorAll('.tab').forEach(t => {
-            t.classList.toggle('active', t.dataset.tab === this._activeTab);
-            t.style.display = t.dataset.tab === this._activeTab ? 'block' : 'none';
-        });
-        html.querySelectorAll('.item[data-tab]').forEach(i => {
-            i.classList.toggle('active', i.dataset.tab === this._activeTab);
-        });
-    }
-
-    static _onTabAction(event, target) {
-        this._activeTab = target.dataset.tab;
-        this.render();
     }
 
     static async _onSetWoundAction(event, target) {
         const woundLevel = target.dataset.wound;
         await this.document.update({ "system.woundLevel": woundLevel });
+    }
+
+    static async _onSetNpcDamageAction(event, target) {
+        const track = target.dataset.track;
+        const delta = safeInt(target.dataset.delta, 0);
+        if (!['stun', 'wound', 'mortal', 'fatigue'].includes(track)) return;
+
+        const max = this.document.system.durability?.[track]?.max ?? 0;
+        const current = this.document.system.durability?.[track]?.value ?? 0;
+        await this.document.update({
+            [`system.durability.${track}.value`]: Math.min(max, Math.max(0, current + delta)),
+        });
+    }
+
+    static async _onAddNpcRowAction(event, target) {
+        const arrayKey = target.dataset.array;
+        const defaults = NPC_ARRAY_FIELDS[arrayKey];
+        if (!defaults) return;
+        const current = foundry.utils.getProperty(this.document.system, arrayKey) ?? [];
+        await this.document.update({
+            [`system.${arrayKey}`]: [...current, foundry.utils.deepClone(defaults)],
+        });
+    }
+
+    static async _onDeleteNpcRowAction(event, target) {
+        const arrayKey = target.dataset.array;
+        const idx = safeInt(target.dataset.index, -1);
+        if (idx < 0 || !NPC_ARRAY_FIELDS[arrayKey]) return;
+        const current = foundry.utils.getProperty(this.document.system, arrayKey) ?? [];
+        await this.document.update({ [`system.${arrayKey}`]: current.filter((_, i) => i !== idx) });
     }
 }
 

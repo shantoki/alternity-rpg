@@ -731,26 +731,34 @@ class AlternityCharacterState {
 
     /**
      * Calculate Action Check scores.
-     * Marginal = Ordinary + 1.
-     * Ordinary = floor((DEX + INT) / 2) + ProfessionBonus.
+     *
+     * Delegates to `AlternityMathService.calculateActionCheckScore`, which is the
+     * single implementation of this formula — the supporting-cast sheet needs the
+     * same one, and the Gamemaster Guide is explicit that supporting cast
+     * "determine their action check score and actions per round normally".
+     *
+     * The profession is matched loosely here rather than against a fixed list,
+     * because `state.profession` is free text on a hero and has always been able
+     * to hold values like "Combat Spec (Tech Infantry)".
      */
     getActionCheckData() {
-        const base = Math.floor((this.abilityScores.DEX + this.abilityScores.INT) / 2);
-        
-        let bonus = 0;
-        const prof = this.profession.toLowerCase();
-        if (prof.includes('combat')) bonus = 3;
-        else if (prof.includes('free') || prof.includes('agent')) bonus = 2;
-        else if (prof.includes('diplomat') || prof.includes('tech')) bonus = 1;
+        const prof = String(this.profession ?? '').toLowerCase();
+        let profession = 'Nonprofessional';
+        if (prof.includes('combat')) profession = 'Combat Spec';
+        else if (prof.includes('free') || prof.includes('agent')) profession = 'Free Agent';
+        else if (prof.includes('diplomat')) profession = 'Diplomat';
+        else if (prof.includes('tech')) profession = 'Tech Op';
+        else if (prof.includes('mindwalker')) profession = 'Mindwalker';
 
-        const ordinary = base + bonus;
-        const marginal = ordinary + 1;
+        const result = AlternityMathService.calculateActionCheckScore(
+            this.abilityScores.DEX, this.abilityScores.INT, { profession }
+        );
 
         return {
-            marginal,
-            ordinary,
-            good:    Math.floor(ordinary / 2),
-            amazing: Math.floor(ordinary / 4)
+            marginal: result.marginal,
+            ordinary: result.ordinary,
+            good:     result.good,
+            amazing:  result.amazing,
         };
     }
 

@@ -1,5 +1,17 @@
-<form class="{{cssClass}} {{alt}}-sheet {{alt}}-npc-sheet" autocomplete="off">
-    {{!-- NPC Sheet Header --}}
+{{!--
+    Supporting cast record sheet.
+
+    Laid out in the order the Gamemaster Guide prints a supporting-character
+    statblock: identity and quality tier, abilities, the derived statblock run
+    (durability / action check / move / actions / reaction score), then attacks and
+    Gamemaster notes. Skills are deliberately absent — supporting cast use the hero
+    skill tree in AlternityCharacterState, not a second list.
+
+    Root is a plain <div>: the ApplicationV2 root is already a <form>.
+--}}
+<div class="{{cssClass}} {{alt}}-sheet {{alt}}-npc-sheet">
+
+    {{!-- ═══ Header ════════════════════════════════════════════════════════ --}}
     <header class="{{alt}}-sheet-header">
         <div class="{{alt}}-sheet-portrait">
             <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
@@ -9,157 +21,214 @@
                 <input name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'Name'}}" spellcheck="false" />
             </h1>
             <div class="{{alt}}-sheet-meta">
-                <span class="{{alt}}-wound-badge {{alt}}-wound-badge--{{woundSeverity}}">
-                    {{localize (concat 'ALTERNITY.' system.woundLevel)}}
-                </span>
-                {{#if system.isIncapacitated}}<span class="{{alt}}-incap-warning">⚠ {{localize 'ALTERNITY.Incapacitated'}}</span>{{/if}}
-                
                 <div class="{{alt}}-meta-field">
-                    <label>CR</label>
-                    <select name="system.cr">
-                        {{#each crChoices as |choice|}}
-                        <option value="{{choice}}" {{#if (eq ../system.cr choice)}}selected{{/if}}>{{choice}}</option>
+                    <label title="{{localize 'ALTERNITY.Npc.QualityHint'}}">{{localize 'ALTERNITY.Npc.Quality'}}</label>
+                    <select name="system.quality">
+                        {{#each qualityChoices as |choice|}}
+                        <option value="{{choice.key}}" {{#if (eq ../system.quality choice.key)}}selected{{/if}}>{{choice.label}}</option>
                         {{/each}}
                     </select>
                 </div>
-            </div>
-            
-            <div class="{{alt}}-npc-combat-summary">
-                <div class="{{alt}}-stat-box">
-                    <label>{{localize 'ALTERNITY.ResistanceModifier'}}</label>
-                    <div class="{{alt}}-stat-combined">
-                        {{!-- A step penalty applied to attackers, not an armor class:
-                              DEX's resistance modifier plus this NPC's flat bonus. --}}
-                        <strong>{{fmtMod system.resistanceModifier}}</strong>
-                        <span class="{{alt}}-stat-sub">({{localize 'ALTERNITY.Bonus'}}: <input type="number" name="system.defenseBonus" value="{{system.defenseBonus}}" />)</span>
-                    </div>
+                <div class="{{alt}}-meta-field">
+                    <label title="{{localize 'ALTERNITY.Npc.RoleHint'}}">{{localize 'ALTERNITY.Npc.Role'}}</label>
+                    <select name="system.role">
+                        {{#each roleChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq ../system.role choice)}}selected{{/if}}>{{localize (concat 'ALTERNITY.Npc.RoleName.' choice)}}</option>
+                        {{/each}}
+                    </select>
                 </div>
-                <div class="{{alt}}-stat-box">
-                    <label>{{localize 'ALTERNITY.Attack'}}</label>
-                    <input type="number" name="system.attackBonus" value="{{system.attackBonus}}" />
+                <div class="{{alt}}-meta-field">
+                    <label title="{{localize 'ALTERNITY.Npc.ProfessionHint'}}">{{localize 'ALTERNITY.Npc.Profession'}}</label>
+                    <select name="system.profession">
+                        {{#each professionChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq ../system.profession choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
                 </div>
-                <div class="{{alt}}-stat-box">
-                    <label>{{localize 'ALTERNITY.Damage'}}</label>
-                    <input type="text" name="system.damageFormula" value="{{system.damageFormula}}" />
+                <div class="{{alt}}-meta-field">
+                    <label>{{localize 'ALTERNITY.Npc.Level'}}</label>
+                    <input type="number" name="system.level" value="{{system.level}}" min="0" />
                 </div>
-                <div class="{{alt}}-stat-box">
-                    <label>{{localize 'ALTERNITY.Actions'}}</label>
-                    <input type="number" name="system.actionsPerRound" value="{{system.actionsPerRound}}" min="1" />
-                </div>
+                <span class="{{alt}}-wound-badge {{alt}}-wound-badge--{{woundSeverity}}">
+                    {{localize (concat 'ALTERNITY.' system.woundLevel)}}
+                </span>
             </div>
         </div>
     </header>
 
-    {{!-- NPC Resources --}}
-    <section class="{{alt}}-resources">
-        {{!-- The four damage tracks a supporting-cast statblock prints as
-              `Durability: 9/9/5/5` (stun/wound/mortal/fatigue). These were
-              formerly two bars named stamina/vitality, which are not game terms —
-              they were stun and wound all along. --}}
-        <div class="{{alt}}-resource-bar bar--stun">
-            <div class="{{alt}}-bar-label">
-                <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.Durability.Stun'}}</span>
-                <span class="{{alt}}-bar-values">
-                    <input type="number" name="system.durability.stun.value" value="{{system.durability.stun.value}}" data-dtype="Number" min="0" />
-                    <span>/</span>
-                    <input type="number" name="system.durability.stun.max" value="{{system.durability.stun.max}}" data-dtype="Number" min="0" />
-                </span>
-            </div>
-            <div class="{{alt}}-bar-track">
-                <div class="{{alt}}-bar-fill" style="width: {{pct system.durability.stun.value system.durability.stun.max}}"></div>
-            </div>
-        </div>
-        <div class="{{alt}}-resource-bar bar--wound">
-            <div class="{{alt}}-bar-label">
-                <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.Durability.Wound'}}</span>
-                <span class="{{alt}}-bar-values">
-                    <input type="number" name="system.durability.wound.value" value="{{system.durability.wound.value}}" data-dtype="Number" min="0" />
-                    <span>/</span>
-                    <input type="number" name="system.durability.wound.max" value="{{system.durability.wound.max}}" data-dtype="Number" min="0" />
-                </span>
-            </div>
-            <div class="{{alt}}-bar-track">
-                <div class="{{alt}}-bar-fill" style="width: {{pct system.durability.wound.value system.durability.wound.max}}"></div>
-            </div>
-        </div>
-        <div class="{{alt}}-resource-bar bar--mortal">
-            <div class="{{alt}}-bar-label">
-                <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.Durability.Mortal'}}</span>
-                <span class="{{alt}}-bar-values">
-                    <input type="number" name="system.durability.mortal.value" value="{{system.durability.mortal.value}}" data-dtype="Number" min="0" />
-                    <span>/</span>
-                    <input type="number" name="system.durability.mortal.max" value="{{system.durability.mortal.max}}" data-dtype="Number" min="0" />
-                </span>
-            </div>
-            <div class="{{alt}}-bar-track">
-                <div class="{{alt}}-bar-fill" style="width: {{pct system.durability.mortal.value system.durability.mortal.max}}"></div>
-            </div>
-        </div>
-        <div class="{{alt}}-resource-bar bar--fatigue">
-            <div class="{{alt}}-bar-label">
-                <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.Durability.Fatigue'}}</span>
-                <span class="{{alt}}-bar-values">
-                    <input type="number" name="system.durability.fatigue.value" value="{{system.durability.fatigue.value}}" data-dtype="Number" min="0" />
-                    <span>/</span>
-                    <input type="number" name="system.durability.fatigue.max" value="{{system.durability.fatigue.max}}" data-dtype="Number" min="0" />
-                </span>
-            </div>
-            <div class="{{alt}}-bar-track">
-                <div class="{{alt}}-bar-fill" style="width: {{pct system.durability.fatigue.value system.durability.fatigue.max}}"></div>
-            </div>
-        </div>
-    </section>
+    <main class="{{alt}}-sheet-body">
 
-    {{!-- Wound Track --}}
-    <div class="{{alt}}-wound-track">
-        {{#each WOUND_LEVELS as |w|}}
-        <button type="button" class="{{../alt}}-wound-pip {{#if (eq w ../system.woundLevel)}}active{{/if}} {{../alt}}-wound-pip--{{lookup ../WOUND_SEVERITY w}}"
-                data-action="setWound" data-wound="{{w}}"
-                title="{{localize (concat 'ALTERNITY.' w)}}">{{firstChar w}}</button>
+        {{!-- ═══ Quality tier readout ══════════════════════════════════════ --}}
+        {{#each qualityChoices as |choice|}}
+        {{#if (eq ../system.quality choice.key)}}
+        <p class="{{../alt}}-npc-tier-hint">{{choice.hint}}</p>
+        {{/if}}
         {{/each}}
-    </div>
 
-    {{!-- NPC Content --}}
-    <section class="{{alt}}-sheet-body">
-        <div class="{{alt}}-npc-main-content">
-            <div class="{{alt}}-abilities-grid">
-                {{#each system.abilities as |val key|}}
-                <div class="{{../alt}}-ability-box">
-                    <span class="{{../alt}}-ability-label">{{key}}</span>
-                    <input type="number" name="system.abilities.{{key}}" value="{{val}}" min="-3" max="6" />
+        {{#if professionBonusSuppressed}}
+        <p class="{{alt}}-ship-warning is-soft">{{localize 'ALTERNITY.Npc.WarnMarginalNonprofessional'}}</p>
+        {{/if}}
+
+        {{!-- ═══ Abilities ═════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-robot-abilities">
+            {{#each abilities as |a|}}
+            <div class="{{../alt}}-robot-ability">
+                <label title="{{a.label}}">{{a.key}}</label>
+                <input type="number" name="system.abilities.{{a.key}}" value="{{a.value}}" min="0" max="30" />
+            </div>
+            {{/each}}
+        </section>
+
+        {{!-- ═══ The printed statblock run ═════════════════════════════════ --}}
+        <section class="{{alt}}-stats-grid">
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Npc.DurabilityHint'}}">{{localize 'ALTERNITY.Npc.Durability'}}</label>
+                <strong>{{system.durabilityRun}}</strong>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Npc.ActionCheckHint'}}">{{localize 'ALTERNITY.Npc.ActionCheck'}}</label>
+                <strong>{{system.actionCheck.marginal}}+ / {{system.actionCheck.ordinary}} / {{system.actionCheck.good}} / {{system.actionCheck.amazing}}</strong>
+                <span class="{{alt}}-ai-note">
+                    {{system.actionCheck.base}} {{localize 'ALTERNITY.Npc.FromAbilities'}}
+                    {{fmtMod system.actionCheck.professionBonus}} {{localize 'ALTERNITY.Npc.FromProfession'}}
+                </span>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Npc.ActionsPerRoundHint'}}">{{localize 'ALTERNITY.Npc.ActionsPerRound'}}</label>
+                <input type="number" name="system.actionsPerRound" value="{{system.actionsPerRound}}" min="1" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Npc.ReactionScoreHint'}}">{{localize 'ALTERNITY.Npc.ReactionScore'}}</label>
+                <select name="system.reactionDegree">
+                    {{#each reactionDegreeChoices as |choice|}}
+                    <option value="{{choice}}" {{#if (eq ../system.reactionDegree choice)}}selected{{/if}}>{{choice}}</option>
+                    {{/each}}
+                </select>
+                <span class="{{alt}}-ai-note">/ {{system.reactionScore.number}}</span>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Npc.ResistanceHint'}}">{{localize 'ALTERNITY.Npc.Resistance'}}</label>
+                <strong>{{fmtMod system.resistanceModifier}}</strong>
+                <span class="{{alt}}-ai-note">
+                    {{localize 'ALTERNITY.Npc.FlatBonus'}}
+                    <input type="number" name="system.resistanceBonus" value="{{system.resistanceBonus}}" />
+                </span>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Npc.ActionCheckOverrideHint'}}">{{localize 'ALTERNITY.Npc.ActionCheckOverride'}}</label>
+                <input type="number" name="system.actionCheckBonusOverride" value="{{system.actionCheckBonusOverride}}" placeholder="—" />
+            </div>
+            <div class="{{alt}}-stat-box {{alt}}-stat-box--wide">
+                <label title="{{localize 'ALTERNITY.Npc.LastResortHint'}}">{{localize 'ALTERNITY.LastResort.Label'}}</label>
+                <span class="{{alt}}-npc-inline-pair">
+                    <input type="number" name="system.lastResort.value" value="{{system.lastResort.value}}" min="0" max="5" />
+                    /
+                    <input type="number" name="system.lastResort.max" value="{{system.lastResort.max}}" min="0" max="5" />
+                </span>
+            </div>
+            <div class="{{alt}}-stat-box {{alt}}-stat-box--wide">
+                <label title="{{localize 'ALTERNITY.Npc.SuperiorDurabilityHint'}}">{{localize 'ALTERNITY.Npc.SuperiorDurability'}}</label>
+                <label class="{{alt}}-ship-inline-toggle">
+                    <input type="checkbox" name="system.isSuperiorDurability" data-dtype="Boolean" {{#if system.isSuperiorDurability}}checked{{/if}} />
+                    <span>{{localize 'ALTERNITY.Npc.SuperiorDurabilityLabel'}}</span>
+                </label>
+            </div>
+        </section>
+
+        {{!-- ═══ Damage tracks ═════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>{{localize 'ALTERNITY.Npc.DamageTracks'}}</h3>
+            <div class="{{alt}}-resources">
+                {{#each tracks as |t|}}
+                <div class="{{../alt}}-resource-bar bar--{{t.key}}">
+                    <div class="{{../alt}}-bar-label">
+                        <span class="{{../alt}}-compartment-track-name">{{t.label}}</span>
+                        <span class="{{../alt}}-bar-values">{{t.value}} / {{t.max}}</span>
+                        <span class="{{../alt}}-damage-quick">
+                            <button type="button" data-action="setNpcDamage" data-track="{{t.key}}" data-delta="-1">−</button>
+                            <button type="button" data-action="setNpcDamage" data-track="{{t.key}}" data-delta="1">+</button>
+                        </span>
+                    </div>
+                    <div class="{{../alt}}-bar-track"><div class="{{../alt}}-bar-fill" style="width: {{t.pct}}%"></div></div>
                 </div>
                 {{/each}}
             </div>
+            <p class="{{alt}}-ai-note">{{localize 'ALTERNITY.Npc.DurabilityNote'}}</p>
+        </section>
 
-            <div class="{{alt}}-npc-stats-extras">
-                <div class="{{alt}}-stat-row">
-                    <label>{{localize 'ALTERNITY.Morale'}}</label>
-                    <input type="number" name="system.morale" value="{{system.morale}}" min="0" max="100" />
-                </div>
-                <div class="{{alt}}-stat-row">
-                    <label>{{localize 'ALTERNITY.XP'}}</label>
-                    <input type="number" name="system.rewardXP" value="{{system.rewardXP}}" min="0" />
-                </div>
-                <div class="{{alt}}-stat-row">
-                    <label>{{localize 'ALTERNITY.Elite'}}</label>
-                    <input type="checkbox" name="system.isElite" {{checked system.isElite}} />
-                </div>
+        {{!-- ═══ Wound level ═══════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>{{localize 'ALTERNITY.Npc.WoundLevel'}}</h3>
+            <div class="{{alt}}-npc-wound-track">
+                {{#each WOUND_LEVELS as |level|}}
+                <button type="button" class="{{../alt}}-npc-wound-step {{#if (eq ../system.woundLevel level)}}is-current{{/if}}"
+                        data-action="setWound" data-wound="{{level}}">
+                    {{localize (concat 'ALTERNITY.' level)}}
+                </button>
+                {{/each}}
             </div>
-        </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Npc.BleedRateHint'}}">{{localize 'ALTERNITY.Npc.BleedRate'}}</label>
+                <input type="number" name="system.bleedRate" value="{{system.bleedRate}}" min="0" />
+            </div>
+        </section>
 
-        <div class="{{alt}}-npc-tabs">
-            <nav class="{{alt}}-sheet-nav" data-group="primary">
-                <a class="item {{#if (eq activeTab 'tactics')}}active{{/if}}" data-tab="tactics" data-action="switchTab">{{localize 'ALTERNITY.Tactics'}}</a>
-                <a class="item {{#if (eq activeTab 'biography')}}active{{/if}}" data-tab="biography" data-action="switchTab">{{localize 'ALTERNITY.Biography'}}</a>
-            </nav>
-            <section class="tab-content">
-                <div class="tab" data-tab="tactics">
-                    {{editor system.tactics target="system.tactics" button=true owner=owner editable=editable}}
+        {{!-- ═══ Movement ══════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.Npc.Movement'}}
+                {{#if movementSummary}}
+                <span class="{{alt}}-robot-hardware-note">{{movementSummary}}</span>
+                {{/if}}
+            </h3>
+            <div class="{{alt}}-stats-grid">
+                {{#each movementKeys as |m|}}
+                <div class="{{../alt}}-stat-box">
+                    <label>{{m.label}}</label>
+                    <input type="number" name="system.movement.{{m.key}}" value="{{m.value}}" min="0" />
                 </div>
-                <div class="tab" data-tab="biography">
-                    {{editor system.biography target="system.biography" button=true owner=owner editable=editable}}
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Attacks ═══════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.Npc.Attacks'}}
+                <button type="button" data-action="addNpcRow" data-array="attacks">+</button>
+            </h3>
+            <div class="{{alt}}-ship-table">
+                {{#each attackRows as |row|}}
+                <div class="{{../alt}}-ship-table-row">
+                    <input type="text" name="system.attacks.{{row.index}}.name" value="{{row.name}}" placeholder="{{localize 'ALTERNITY.Name'}}" />
+                    <input type="number" name="system.attacks.{{row.index}}.score" value="{{row.score}}" min="0" title="{{localize 'ALTERNITY.Npc.AttackScoreHint'}}" />
+                    <span class="{{../alt}}-robot-resolved" title="{{localize 'ALTERNITY.Npc.AttackScoreRunHint'}}">{{row.scoreRun}}</span>
+                    <input type="text" name="system.attacks.{{row.index}}.damageOrdinary" value="{{row.damageOrdinary}}" placeholder="d4+1s" title="{{localize 'ALTERNITY.DegreeOrdinary'}}" />
+                    <input type="text" name="system.attacks.{{row.index}}.damageGood" value="{{row.damageGood}}" placeholder="d4w" title="{{localize 'ALTERNITY.DegreeGood'}}" />
+                    <input type="text" name="system.attacks.{{row.index}}.damageAmazing" value="{{row.damageAmazing}}" placeholder="d6+2w" title="{{localize 'ALTERNITY.DegreeAmazing'}}" />
+                    <select name="system.attacks.{{row.index}}.damageType">
+                        {{#each ../damageTypeChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.damageType choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                    <input type="text" name="system.attacks.{{row.index}}.range" value="{{row.range}}" placeholder="{{localize 'ALTERNITY.Npc.Range'}}" />
+                    <button type="button" data-action="deleteNpcRow" data-array="attacks" data-index="{{row.index}}">✕</button>
                 </div>
-            </section>
-        </div>
-    </section>
-</form>
+                {{else}}
+                <p class="{{alt}}-empty-state">{{localize 'ALTERNITY.Npc.NoAttacks'}}</p>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Gamemaster notes ══════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>{{localize 'ALTERNITY.Npc.Motivation'}}</h3>
+            <input type="text" class="{{alt}}-robot-concept" name="system.motivation" value="{{system.motivation}}" placeholder="{{localize 'ALTERNITY.Npc.MotivationHint'}}" />
+            <h3>{{localize 'ALTERNITY.Npc.Tactics'}}</h3>
+            <textarea name="system.tactics" rows="3">{{system.tactics}}</textarea>
+            <h3>{{localize 'ALTERNITY.Npc.Biography'}}</h3>
+            <textarea name="system.biography" rows="3">{{system.biography}}</textarea>
+        </section>
+
+    </main>
+</div>

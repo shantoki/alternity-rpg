@@ -435,6 +435,76 @@ const AI_FUNCTION_SPECIALTIES = Object.freeze(['multitask', 'prediction', 'remot
 /** "as many as 10 duplicate shadows", each at a penalty of one less than the count. */
 const AI_MAX_MIRROR_SHADOWS = 10;
 
+// ---------------------------------------------------------------------------
+// Supporting cast (Gamemaster Guide Ch.7)
+// ---------------------------------------------------------------------------
+//
+// "Supporting cast" is the book's umbrella term for every Gamemaster-run
+// character, and the decisive point is that they are **not** a simplified chassis:
+// "These supporting cast members receive the same number of stun, wound, fatigue,
+// and mortal points as a hero with the same Constitution score, and they determine
+// their action check score and actions per round normally."
+//
+// So they use the hero stat model outright. The only genuinely different chassis in
+// the book is the animal/alien creature block, which is a separate actor type.
+
+/** The four heroic professions, plus the nonprofessional default. */
+const PROFESSIONS = Object.freeze([
+    'Nonprofessional', 'Combat Spec', 'Free Agent', 'Diplomat', 'Tech Op', 'Mindwalker',
+]);
+
+/**
+ * Action check score increase granted by profession.
+ *
+ * Every value here is printed verbatim in a profession's benefits list:
+ *   Combat Spec +3, Free Agent +2, Diplomat +1, Tech Op +1 (Player's Handbook
+ *   Ch.2), and Mindwalker +1 (Mindwalking Ch.1, "A Mindwalker's action check score
+ *   is increased by 1 point").
+ *
+ * A nonprofessional gets nothing: "A nonprofessional's base situation die for
+ * action checks is +d0. He receives no action check bonus because he doesn't
+ * belong to one of the heroic professions."
+ *
+ * Note that Mindwalker is a genuine fifth profession, not a variant — "Mindwalker
+ * is a profession, just as Combat Spec, Diplomat, Free Agent, and Tech Op are."
+ * The hero sheet's own copy of this formula omitted it, so every Mindwalker hero
+ * was silently scoring one point low until this table replaced it.
+ */
+const PROFESSION_ACTION_CHECK_BONUS = Object.freeze({
+    Nonprofessional: 0,
+    'Combat Spec':   3,
+    'Free Agent':    2,
+    Diplomat:        1,
+    'Tech Op':       1,
+    Mindwalker:      1,
+});
+
+/**
+ * The four supporting-cast quality tiers (Gamemaster Guide, "Supporting Character
+ * Templates"). Each template in the book prints one column per tier.
+ *
+ *   heroLevel      the achievement level this tier is "equivalent in power" to
+ *   averageAbility the tier's stated average Ability Score
+ *
+ * Marginal is the odd one out and it matters mechanically: "Marginal characters —
+ * average members of society — are nonprofessionals", so a Marginal supporting cast
+ * member takes no profession action check bonus however they are labelled.
+ */
+const NPC_QUALITY_TIERS = Object.freeze({
+    Marginal: { label: 'Marginal', heroLevel: null, averageAbility: 9,  isNonprofessional: true },
+    Ordinary: { label: 'Ordinary', heroLevel: 1,    averageAbility: 10, isNonprofessional: false },
+    Good:     { label: 'Good',     heroLevel: 6,    averageAbility: 11, isNonprofessional: false },
+    Amazing:  { label: 'Amazing',  heroLevel: 12,   averageAbility: 12, isNonprofessional: false },
+});
+
+/** The five categories the book sorts supporting characters into. */
+const SUPPORTING_CAST_ROLES = Object.freeze([
+    'Villain', 'Ally', 'Sidekick', 'Employee', 'Follower', 'Expert', 'Extra',
+]);
+
+/** Degrees a reaction score can be pitched at, worst to best. */
+const REACTION_DEGREES = Object.freeze(['Marginal', 'Ordinary', 'Good', 'Amazing']);
+
 /**
  * Situation Die Steps Scale (Fastplay Accurate).
  * Index maps total step to [sign, dieLabel, formula]
@@ -2159,6 +2229,115 @@ const AlternityMathService = {
     },
 
     // -----------------------------------------------------------------------
+    // calculateActionCheckScore
+    // -----------------------------------------------------------------------
+
+    /**
+     * Resolve an action check score and its Marginal/Ordinary/Good/Amazing run.
+     *
+     *   Ordinary = floor((DEX + INT) / 2) + profession bonus
+     *   Good     = half of that, Amazing = a quarter, both rounded down
+     *   Marginal = one above Ordinary
+     *
+     * This is the hero formula, and the Gamemaster Guide is explicit that supporting
+     * cast "determine their action check score and actions per round normally" — so
+     * one function serves both. Verified against all sixteen columns of the four
+     * legible supporting-character templates in the Gamemaster Guide (Administrator,
+     * Bartender, Brawler and Corporate Executive, each printed at four qualities):
+     * every one reproduces exactly, including the Brawler's Combat Spec +3.
+     *
+     * Statblocks print supporting cast as a three-value run (`12/6/3`, omitting the
+     * Marginal threshold) and creatures as a four-value one (`14+/13/6/3`). Both are
+     * the same numbers.
+     *
+     * @param {number} dexterity
+     * @param {number} intelligence
+     * @param {object}  [options]
+     * @param {string}  [options.profession='Nonprofessional'] - Key of PROFESSION_ACTION_CHECK_BONUS.
+     * @param {boolean} [options.isNonprofessional=false] - Force the bonus to zero,
+     *        which is what the Marginal quality tier does regardless of label.
+     * @param {number|null} [options.bonus=null] - Explicit override for the bonus.
+     * @returns {{
+     *   marginal: number, ordinary: number, good: number, amazing: number,
+     *   base: number, professionBonus: number, modifierTrace: object[],
+     * }}
+     */
+    calculateActionCheckScore(dexterity, intelligence, options = {}) {
+        const { profession = 'Nonprofessional', isNonprofessional = false, bonus = null } = options;
+
+        const dex = Math.max(0, Math.floor(Number(dexterity) || 0));
+        const int = Math.max(0, Math.floor(Number(intelligence) || 0));
+        const base = Math.floor((dex + int) / 2);
+
+        let professionBonus;
+        let reason;
+        if (bonus !== null) {
+            professionBonus = Math.round(Number(bonus) || 0);
+            reason = 'Set directly';
+        } else if (isNonprofessional) {
+            professionBonus = 0;
+            reason = 'Nonprofessionals receive no action check bonus';
+        } else {
+            professionBonus = PROFESSION_ACTION_CHECK_BONUS[profession] ?? 0;
+            reason = `${profession} profession`;
+        }
+
+        const ordinary = base + professionBonus;
+
+        return {
+            marginal: ordinary + 1,
+            ordinary,
+            good:    Math.floor(ordinary / 2),
+            amazing: Math.floor(ordinary / 4),
+            base,
+            professionBonus,
+            modifierTrace: [
+                this.buildModifier('Abilities', base, `Half of DEX ${dex} + INT ${int}, rounded down`),
+                this.buildModifier('Profession', professionBonus, reason),
+            ],
+        };
+    },
+
+    // -----------------------------------------------------------------------
+    // calculateReactionScore
+    // -----------------------------------------------------------------------
+
+    /**
+     * Resolve the reaction score printed on Gamemaster-side statblocks (`Ordinary/2`).
+     *
+     * This stat appears only in the Gamemaster Guide — there is not one occurrence
+     * in the Player's Handbook — and **the rule that defines it did not survive the
+     * scan**: the "Reaction Scores" sidebar is a floating heading whose body text
+     * belongs to a different section.
+     *
+     * What is recoverable is the number. Across all seven fully printed creature
+     * statblocks it is exactly one less than the actions per round, without
+     * exception, so it is derived here. The degree is *not* derived: it broadly
+     * tracks the action check score (Marginal at 8-9, Ordinary at 11-13, Good at 13)
+     * but the dog and the great cat both print 13 and disagree, so it stays entered.
+     *
+     * @param {number} actionsPerRound
+     * @param {object} [options]
+     * @param {string} [options.degree='Ordinary'] - One of REACTION_DEGREES.
+     * @returns {{ degree: string, number: number, label: string, modifierTrace: object[] }}
+     */
+    calculateReactionScore(actionsPerRound, options = {}) {
+        const { degree = 'Ordinary' } = options;
+        const actions = Math.max(1, Math.floor(Number(actionsPerRound) || 1));
+        const number = Math.max(0, actions - 1);
+        const resolved = REACTION_DEGREES.includes(degree) ? degree : 'Ordinary';
+
+        return {
+            degree: resolved,
+            number,
+            label: `${resolved}/${number}`,
+            modifierTrace: [
+                this.buildModifier('Actions', number, `One less than ${actions} action${actions === 1 ? '' : 's'} per round`),
+            ],
+        };
+    },
+
+    // -----------------------------------------------------------------------
     // calculateAIGridAvatar
     // -----------------------------------------------------------------------
 
@@ -2485,4 +2664,9 @@ export {
     AI_FUNCTION_SPECIALTIES,
     AI_MAX_MIRROR_SHADOWS,
     AI_MAX_SKILL_RANK,
+    PROFESSIONS,
+    PROFESSION_ACTION_CHECK_BONUS,
+    NPC_QUALITY_TIERS,
+    SUPPORTING_CAST_ROLES,
+    REACTION_DEGREES,
 };

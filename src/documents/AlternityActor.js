@@ -144,9 +144,16 @@ export class AlternityActor extends Actor {
     _prepareNpcData() {
         const sys = this.system;
         // See _prepareCharacterData: a resistance modifier, not an armor class.
+        // Supporting cast wear armour like anyone else, so equipped armour counts
+        // here on top of the flat adjustment NpcData already applied. This used to
+        // read `defenseBonus`, a d20 armor-class field that no longer exists.
+        const equippedArmor = this.items.filter(
+            i => i.type === 'armor' && i.system.isEquipped
+        );
+        sys.totalArmorBonus = equippedArmor.reduce((t, a) => t + (a.system.armorBonus ?? 0), 0);
         sys.resistanceModifier = AlternityMathService.calculateResistanceModifier(
             sys.abilities?.dex ?? 0, 'DEX'
-        ) + (sys.defenseBonus ?? 0);
+        ) + (sys.resistanceBonus ?? 0) + sys.totalArmorBonus;
         sys.stunPct    = this._resourcePct(sys.durability?.stun);
         sys.woundPct   = this._resourcePct(sys.durability?.wound);
         sys.mortalPct  = this._resourcePct(sys.durability?.mortal);

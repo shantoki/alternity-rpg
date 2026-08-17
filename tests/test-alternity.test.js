@@ -10,6 +10,7 @@ import {
     AI_MAX_SKILL_RANK,
 } from '../src/services/alternity-math.js';
 import { AlternityCharacterState } from '../src/data/alternity-actor-data.js';
+import { NpcData } from '../src/data/NpcData.js';
 
 describe('Alternity System Unit Tests', () => {
 
@@ -1301,6 +1302,161 @@ describe('Alternity System Unit Tests', () => {
             expect(AlternityMathService.getAISkillRestriction('Knowledge-mathematics', 'INT'))
                 .toMatchObject({ isBarred: false, penalty: 0, reason: null });
             expect(AlternityMathService.getAISkillRestriction('Computer Science-hacking', 'INT').penalty).toBe(0);
+        });
+    });
+
+    // -----------------------------------------------------------------------
+    // Supporting cast
+    //
+    // The Gamemaster Guide prints four legible supporting-character templates,
+    // each at four qualities. Those sixteen columns are the regression suite:
+    // every one of them must fall out of the hero action check formula, because
+    // the book's whole claim about supporting cast is that they use it.
+    // -----------------------------------------------------------------------
+
+    describe('AlternityMathService — Supporting Cast Action Check', () => {
+
+        // [name, profession, [DEX, INT, expected ordinary] per quality M/O/G/A]
+        const TEMPLATES = [
+            ['Administrator', 'Diplomat', [
+                [9, 9, 9], [10, 10, 11], [11, 11, 12], [11, 12, 12],
+            ]],
+            ['Bartender', 'Diplomat', [
+                [8, 8, 8], [9, 9, 10], [10, 10, 11], [11, 11, 12],
+            ]],
+            ['Brawler', 'Combat Spec', [
+                [9, 8, 8], [10, 9, 12], [11, 10, 13], [12, 11, 14],
+            ]],
+            ['Corporate Executive', 'Diplomat', [
+                [9, 10, 9], [10, 11, 11], [11, 12, 12], [12, 13, 13],
+            ]],
+        ];
+        const QUALITIES = ['Marginal', 'Ordinary', 'Good', 'Amazing'];
+
+        it.each(TEMPLATES)('should reproduce every printed column of the %s template', (name, profession, columns) => {
+            columns.forEach(([dex, int, expected], i) => {
+                const quality = QUALITIES[i];
+                const r = AlternityMathService.calculateActionCheckScore(dex, int, {
+                    profession,
+                    // "Marginal characters — average members of society — are
+                    // nonprofessionals", so the tier suppresses the bonus.
+                    isNonprofessional: quality === 'Marginal',
+                });
+                expect(r.ordinary).toBe(expected);
+                expect(r.marginal).toBe(expected + 1);
+                expect(r.good).toBe(Math.floor(expected / 2));
+                expect(r.amazing).toBe(Math.floor(expected / 4));
+            });
+        });
+
+        it('should give a nonprofessional no bonus at all', () => {
+            const r = AlternityMathService.calculateActionCheckScore(10, 10, { profession: 'Nonprofessional' });
+            expect(r).toMatchObject({ base: 10, professionBonus: 0, ordinary: 10 });
+        });
+
+        it('should apply each profession bonus as its benefits list prints it', () => {
+            const at = (profession) => AlternityMathService
+                .calculateActionCheckScore(10, 10, { profession }).professionBonus;
+            expect(at('Combat Spec')).toBe(3);   // PHB Ch.2
+            expect(at('Free Agent')).toBe(2);    // PHB Ch.2
+            expect(at('Diplomat')).toBe(1);      // PHB Ch.2
+            expect(at('Tech Op')).toBe(1);       // PHB Ch.2
+            expect(at('Mindwalker')).toBe(1);    // Mindwalking Ch.1
+        });
+
+        it('should give a hero the Mindwalker bonus the sheet used to miss', () => {
+            // The hand-rolled copy of this formula on AlternityCharacterState matched
+            // only "combat" / "free"|"agent" / "diplomat"|"tech", so a Mindwalker
+            // silently scored a point low.
+            const state = new AlternityCharacterState({
+                actorId: 'test-mindwalker',
+                abilityScores: { STR: 10, DEX: 11, CON: 10, INT: 13, WIL: 10, PER: 10 },
+                profession: 'Mindwalker',
+            });
+            expect(state.getActionCheckData().ordinary).toBe(13);
+        });
+
+        it('should let an explicit bonus override the profession', () => {
+            const r = AlternityMathService.calculateActionCheckScore(10, 10, {
+                profession: 'Combat Spec', bonus: 0,
+            });
+            expect(r.ordinary).toBe(10);
+        });
+
+        it('should round the ability half down', () => {
+            // DEX 11 + INT 12 = 23, halved to 11, not 12.
+            expect(AlternityMathService.calculateActionCheckScore(11, 12).base).toBe(11);
+        });
+    });
+
+    describe('AlternityMathService — Reaction Score', () => {
+
+        it('should put the number one below the actions per round', () => {
+            // Holds across all seven fully printed creature statblocks: the bear
+            // and the dog at 3 actions print /2, the buffalo and horse at 2 print /1.
+            expect(AlternityMathService.calculateReactionScore(3).number).toBe(2);
+            expect(AlternityMathService.calculateReactionScore(2).number).toBe(1);
+            expect(AlternityMathService.calculateReactionScore(1).number).toBe(0);
+        });
+
+        it('should format the label as the book prints it', () => {
+            expect(AlternityMathService.calculateReactionScore(3, { degree: 'Ordinary' }).label)
+                .toBe('Ordinary/2');
+            expect(AlternityMathService.calculateReactionScore(2, { degree: 'Marginal' }).label)
+                .toBe('Marginal/1');
+        });
+
+        it('should fall back to Ordinary for an unknown degree', () => {
+            expect(AlternityMathService.calculateReactionScore(2, { degree: 'Legendary' }).degree)
+                .toBe('Ordinary');
+        });
+    });
+
+    describe('NpcData migration — retiring the non-canonical fields', () => {
+
+        const migrate = (source) => NpcData.migrateData({ ...source });
+
+        it('should map Challenge Rating onto the book’s quality tiers', () => {
+            expect(migrate({ cr: 'Easy' }).quality).toBe('Marginal');
+            expect(migrate({ cr: 'Average' }).quality).toBe('Ordinary');
+            expect(migrate({ cr: 'Tough' }).quality).toBe('Good');
+            expect(migrate({ cr: 'Overwhelming' }).quality).toBe('Amazing');
+            expect(migrate({ cr: 'Easy' }).cr).toBeUndefined();
+        });
+
+        it('should carry an armor-class bonus over as a resistance step', () => {
+            const out = migrate({ defenseBonus: 3 });
+            expect(out.resistanceBonus).toBe(3);
+            expect(out.defenseBonus).toBeUndefined();
+        });
+
+        it('should turn the elite flag into the extra action it granted', () => {
+            expect(migrate({ isElite: true, actionsPerRound: 2 }).actionsPerRound).toBe(3);
+            expect(migrate({ isElite: false, actionsPerRound: 2 }).actionsPerRound).toBe(2);
+        });
+
+        it('should fold a flat attack bonus and damage formula into one attack row', () => {
+            const out = migrate({ attackBonus: 12, damageFormula: '2d6+3' });
+            expect(out.attacks).toHaveLength(1);
+            expect(out.attacks[0]).toMatchObject({ score: 12, damageOrdinary: '2d6+3' });
+            expect(out.attackBonus).toBeUndefined();
+            expect(out.damageFormula).toBeUndefined();
+        });
+
+        it('should not invent an attack row from untouched defaults', () => {
+            expect(migrate({ attackBonus: 0, damageFormula: '1d6' }).attacks).toBeUndefined();
+        });
+
+        it('should preserve morale and reward XP as prose rather than dropping them', () => {
+            const out = migrate({ morale: 75, rewardXP: 250 });
+            expect(out.tactics).toContain('Morale 75');
+            expect(out.tactics).toContain('Reward XP 250');
+            expect(out.morale).toBeUndefined();
+            expect(out.rewardXP).toBeUndefined();
+        });
+
+        it('should stay quiet when morale and XP were never changed', () => {
+            expect(migrate({ morale: 50, rewardXP: 100 }).tactics).toBeUndefined();
         });
     });
 
