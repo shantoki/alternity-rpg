@@ -237,10 +237,11 @@
                 <div class="form-group">
                     <label>{{localize 'ALTERNITY.Armor.ResistedTypes'}}</label>
                     <div class="alt-checkbox-row">
+                        {{!-- `key` is the stored form (LI/HI/En); `label` spells it out. --}}
                         {{#each config.damageTypes as |label key|}}
                         <label class="alt-checkbox-inline">
                             <input type="checkbox" name="system.resistedTypes" value="{{key}}" {{#if (includes ../system.resistedTypes key)}}checked{{/if}}/>
-                            {{key}}
+                            {{label}}
                         </label>
                         {{/each}}
                     </div>

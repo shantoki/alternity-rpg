@@ -24,6 +24,8 @@
  *   - psiPointCost   : PP cost to activate
  */
 
+import { DAMAGE_TYPES, LEGACY_DAMAGE_TYPE_MAP } from '../services/alternity-math.js';
+
 const { fields } = foundry.data;
 
 // ---------------------------------------------------------------------------
@@ -48,14 +50,14 @@ class EffectEntryModel extends foundry.abstract.DataModel {
                 nullable: false,
                 initial:  0,
             }),
+            // The three damage forms the rules use, or null for an effect that deals
+            // no damage. Was a d20-flavoured list; see LEGACY_DAMAGE_TYPE_MAP for why
+            // that could not work.
             damageType: new fields.StringField({
                 required: false,
                 nullable: true,
                 initial:  null,
-                choices:  [
-                    null, 'Ballistic', 'Energy', 'Laser', 'Piercing', 'Slashing',
-                    'Impact', 'Incendiary', 'Toxic', 'Radiation', 'Psionic',
-                ],
+                choices:  [null, ...DAMAGE_TYPES],
             }),
             stat: new fields.StringField({
                 required: false,
@@ -217,6 +219,20 @@ export class EffectData extends foundry.abstract.TypeDataModel {
             delete source.damageType;
             delete source.duration;
         }
+
+        // v0.3: the d20-flavoured damage list became the three forms the rules use.
+        // Runs after the block above so a top-level damageType that has just been
+        // folded into effects[0] is converted too.
+        for (const entry of source.effects ?? []) {
+            if (!entry?.damageType || DAMAGE_TYPES.includes(entry.damageType)) continue;
+            const mapped = LEGACY_DAMAGE_TYPE_MAP[entry.damageType] ?? null;
+            console.warn(
+                `[Alternity] Effect damage type "${entry.damageType}" is not an Alternity `
+                + `damage form; migrated to ${mapped ? `"${mapped}"` : 'none'}.`
+            );
+            entry.damageType = mapped;
+        }
+
         return super.migrateData(source);
     }
 }

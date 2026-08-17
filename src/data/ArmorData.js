@@ -18,12 +18,9 @@
  *   - techPointCost  : TP to activate powered armor per scene
  */
 
-const { fields } = foundry.data;
+import { DAMAGE_TYPES, LEGACY_DAMAGE_TYPE_MAP } from '../services/alternity-math.js';
 
-const DAMAGE_TYPES = [
-    'Ballistic', 'Energy', 'Laser', 'Piercing', 'Slashing',
-    'Impact', 'Incendiary', 'Toxic', 'Radiation', 'Psionic',
-];
+const { fields } = foundry.data;
 
 export class ArmorData extends foundry.abstract.TypeDataModel {
 
@@ -136,6 +133,30 @@ export class ArmorData extends foundry.abstract.TypeDataModel {
             source.resistedTypes = source.resistedType ? [source.resistedType] : [];
             delete source.resistedType;
         }
+
+        // v0.3: the d20-flavoured damage list became the three forms the rules use.
+        // This side of the comparison has to move with WeaponData's: applyAlternityDamage
+        // tests a weapon's damage type against this array, so a mismatch between the two
+        // lists means armour never resists anything.
+        //
+        // Mapping several old names onto one form can produce duplicates
+        // ('Ballistic' and 'Slashing' both become 'LI'), so the result is deduped.
+        if (Array.isArray(source.resistedTypes)) {
+            const converted = source.resistedTypes.map((type) => (
+                DAMAGE_TYPES.includes(type) ? type : (LEGACY_DAMAGE_TYPE_MAP[type] ?? null)
+            ));
+            const mapped = [...new Set(converted.filter(Boolean))];
+            if (mapped.length !== source.resistedTypes.length
+                || mapped.some((t, i) => t !== source.resistedTypes[i])) {
+                console.warn(
+                    `[Alternity] Armour resisted types [${source.resistedTypes.join(', ')}] `
+                    + `migrated to [${mapped.join(', ')}]. Add HI if this armour is rated `
+                    + `against high-impact damage — the migration cannot tell.`
+                );
+            }
+            source.resistedTypes = mapped;
+        }
+
         return super.migrateData(source);
     }
 }

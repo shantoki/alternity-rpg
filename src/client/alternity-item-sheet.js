@@ -3,6 +3,8 @@
  * @description Shared item sheet for every Alternity Fastplay item type.
  */
 
+import { DAMAGE_TYPE_LABELS } from '../services/alternity-math.js';
+
 const NS = 'alt';
 
 // Default row shapes for every item type's array fields, keyed by field name
@@ -114,10 +116,12 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
             },
             armorTypes: ['Light', 'Medium', 'Heavy', 'Powered']
                 .reduce((obj, val) => { obj[val] = val; return obj; }, {}),
-            damageTypes: [
-                'Ballistic', 'Energy', 'Laser', 'Piercing', 'Slashing',
-                'Impact', 'Incendiary', 'Toxic', 'Radiation', 'Psionic',
-            ].reduce((obj, val) => { obj[val] = val; return obj; }, {}),
+            // The three damage forms Alternity has, long-labelled. This used to offer
+            // a d20 list (Ballistic, Slashing, Laser…) that matched no rule and no
+            // armour rating anywhere in the system: armour is rated against LI, HI and
+            // En, so a weapon marked "Slashing" could never be armoured against, and
+            // applyAlternityDamage's armour check silently did nothing.
+            damageTypes: DAMAGE_TYPE_LABELS,
             // NOTE: damageCategory and attackAbility deliberately have no entry here —
             // the template renders those two selects with inline <option> markup so it
             // does not depend on config keys introduced in the same change as the markup.

@@ -526,8 +526,54 @@ const REACTION_DEGREES = Object.freeze(['Marginal', 'Ordinary', 'Good', 'Amazing
 /** What kind of thing this is. The chapter covers animals and nonhumanoid aliens. */
 const CREATURE_CATEGORIES = Object.freeze(['Animal', 'Alien', 'Construct', 'Other']);
 
-/** Natural armour and attack damage are quoted per damage type. */
+/**
+ * The three damage forms Alternity actually has: Low Impact, High Impact, Energy
+ * (PHB Ch.11, the weapon table's "Type" column — see alternity-core-mechanics.md).
+ *
+ * This is the *only* damage-type axis in the game. Armour is rated separately
+ * against each of the three, which is why a hero's armour block is `{li, hi, en}`,
+ * why creature natural armour is, and why every attack has to name one of these to
+ * be armourable at all.
+ */
 const DAMAGE_TYPES = Object.freeze(['LI', 'HI', 'En']);
+
+/** Long labels, for a select that has room for them. */
+const DAMAGE_TYPE_LABELS = Object.freeze({
+    LI: 'LI — Low Impact',
+    HI: 'HI — High Impact',
+    En: 'En — Energy',
+});
+
+/**
+ * Maps the d20-flavoured damage list that `WeaponData`, `ArmorData` and
+ * `EffectData` used to carry — Ballistic, Slashing, Piercing, Laser and so on —
+ * onto the three forms the rules recognise.
+ *
+ * That list was a leftover, and an actively harmful one: `applyAlternityDamage`
+ * compares a weapon's damage type against an armour's resisted types, so those two
+ * agreed with each other while neither could ever match the LI/HI/En ratings the
+ * sheets display and the rules use. Armour mitigation was quietly inert.
+ *
+ * Nothing in the old list corresponds to High Impact — HI is what armour-piercing
+ * and heavy weapons do, and the d20 names carry no such distinction — so no value
+ * maps to it. Anything not clearly an energy weapon becomes Low Impact, which is
+ * both the commonest form in the weapon tables and the *weakest*: guessing LI can
+ * never leave a migrated weapon hitting harder than it did, whereas guessing HI or
+ * En would. A Gamemaster who has an armour-piercing weapon has to say so, and the
+ * migration logs each conversion so they know where to look.
+ */
+const LEGACY_DAMAGE_TYPE_MAP = Object.freeze({
+    Ballistic:  'LI',
+    Piercing:   'LI',
+    Slashing:   'LI',
+    Impact:     'LI',
+    Toxic:      'LI',
+    Psionic:    'LI',
+    Energy:     'En',
+    Laser:      'En',
+    Incendiary: 'En',
+    Radiation:  'En',
+});
 
 /**
  * Situation Die Steps Scale (Fastplay Accurate).
@@ -3140,4 +3186,6 @@ export {
     REACTION_DEGREES,
     CREATURE_CATEGORIES,
     DAMAGE_TYPES,
+    DAMAGE_TYPE_LABELS,
+    LEGACY_DAMAGE_TYPE_MAP,
 };

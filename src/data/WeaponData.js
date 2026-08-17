@@ -25,12 +25,9 @@
  * written without a letter.
  */
 
-const { fields } = foundry.data;
+import { DAMAGE_TYPES, LEGACY_DAMAGE_TYPE_MAP } from '../services/alternity-math.js';
 
-const DAMAGE_TYPES = [
-    'Ballistic', 'Energy', 'Laser', 'Piercing', 'Slashing',
-    'Impact', 'Incendiary', 'Toxic', 'Radiation', 'Psionic',
-];
+const { fields } = foundry.data;
 
 /**
  * Firepower tier from the weapon table's Type column. A weapon whose firepower is
@@ -61,10 +58,15 @@ export class WeaponData extends foundry.abstract.TypeDataModel {
                 choices:  ['Melee', 'Ranged', 'Thrown', 'Heavy'],
             }),
 
+            // The damage *form*: Low Impact, High Impact or Energy. This is the axis
+            // armour is rated against, so it has to be one of these three or armour
+            // mitigation cannot apply. It previously held a d20-flavoured list
+            // (Ballistic, Slashing, Laser…) that no rule and no armour rating in the
+            // system could match — see LEGACY_DAMAGE_TYPE_MAP.
             damageType: new fields.StringField({
                 required: true,
                 nullable: false,
-                initial:  'Ballistic',
+                initial:  'LI',
                 choices:  DAMAGE_TYPES,
             }),
 
@@ -239,6 +241,20 @@ export class WeaponData extends foundry.abstract.TypeDataModel {
                 source.damageOrdinary = `${source.damageFormula}${letter}`;
             }
             delete source.damageFormula;
+        }
+
+        // v0.3: damageType moved from a d20-flavoured list onto the three forms the
+        // rules actually use. Logged per weapon rather than converted silently: the
+        // mapping is a best guess (nothing in the old list means High Impact), and a
+        // Gamemaster needs to know which weapons to look at.
+        if (source.damageType && !DAMAGE_TYPES.includes(source.damageType)) {
+            const mapped = LEGACY_DAMAGE_TYPE_MAP[source.damageType] ?? 'LI';
+            console.warn(
+                `[Alternity] Weapon damage type "${source.damageType}" is not an Alternity `
+                + `damage form; migrated to "${mapped}". Set it to HI if this weapon is `
+                + `armour-piercing — the migration cannot tell.`
+            );
+            source.damageType = mapped;
         }
 
         // v0.3: `rangeClass` split off from `weaponType`. Existing weapons are

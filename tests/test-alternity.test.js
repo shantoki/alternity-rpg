@@ -10,10 +10,14 @@ import {
     AI_MAX_SKILL_RANK,
     RANGE_STEP_MODIFIERS,
     CONDITION_STEP_MODIFIERS,
+    DAMAGE_TYPES,
+    LEGACY_DAMAGE_TYPE_MAP,
 } from '../src/services/alternity-math.js';
 import { AlternityCharacterState } from '../src/data/alternity-actor-data.js';
 import { NpcData } from '../src/data/NpcData.js';
 import { WeaponData } from '../src/data/WeaponData.js';
+import { ArmorData } from '../src/data/ArmorData.js';
+import { EffectData } from '../src/data/EffectData.js';
 import { readFileSync } from 'node:fs';
 
 /** Read as text as well as parsed, so duplicate keys can be caught — JSON.parse hides them. */
@@ -1844,6 +1848,138 @@ describe('Alternity System Unit Tests', () => {
         it('should leave an explicitly set range class alone', () => {
             expect(WeaponData.migrateData({ rangeClass: 'Pistol', range: { long: 50 } }).rangeClass)
                 .toBe('Pistol');
+        });
+    });
+
+    // -----------------------------------------------------------------------
+    // Damage forms
+    // -----------------------------------------------------------------------
+
+    describe('Damage forms are LI / HI / En', () => {
+        // Alternity has exactly three damage forms, and armour is rated against each
+        // separately — a hero's armour block is {li, hi, en}. WeaponData, ArmorData,
+        // EffectData and the effect-template class all used to carry a d20-flavoured
+        // list instead (Ballistic, Slashing, Piercing, Laser…). applyAlternityDamage
+        // compares a weapon's damage type against an armour's resisted types, so those
+        // two agreed with each other while neither could ever match the ratings the
+        // rules use: armour mitigation was inert for every weapon in the system.
+        // console.warn is captured by hand rather than with jest.spyOn: under ESM the
+        // `jest` object is not a global, and importing @jest/globals just for this
+        // would be the only such import in the suite.
+        let warnings = [];
+        const realWarn = console.warn;
+        beforeEach(() => {
+            warnings = [];
+            console.warn = (...args) => warnings.push(args.join(' '));
+        });
+        afterEach(() => { console.warn = realWarn; });
+
+        it('should offer only the three real forms', () => {
+            expect(DAMAGE_TYPES).toEqual(['LI', 'HI', 'En']);
+        });
+
+        it('should map every retired d20 name onto a real form', () => {
+            // No old name maps to HI: armour-piercing is what HI means, and the d20
+            // list drew no such distinction. A Gamemaster has to say so by hand.
+            const mapped = Object.values(LEGACY_DAMAGE_TYPE_MAP);
+            expect(new Set(mapped)).toEqual(new Set(['LI', 'En']));
+            expect(mapped).not.toContain('HI');
+
+            expect(LEGACY_DAMAGE_TYPE_MAP.Laser).toBe('En');
+            expect(LEGACY_DAMAGE_TYPE_MAP.Energy).toBe('En');
+            expect(LEGACY_DAMAGE_TYPE_MAP.Slashing).toBe('LI');
+            expect(LEGACY_DAMAGE_TYPE_MAP.Ballistic).toBe('LI');
+        });
+
+        it('should never migrate a weapon to a harder-hitting form than it had', () => {
+            // The conservative direction matters: LI is the weakest form, so a wrong
+            // guess cannot make an existing weapon better than it was. HI and En both
+            // get through armour that LI does not.
+            for (const form of Object.values(LEGACY_DAMAGE_TYPE_MAP)) {
+                expect(['LI', 'En']).toContain(form);
+            }
+        });
+
+        describe('WeaponData', () => {
+            it('should convert a retired damage type', () => {
+                expect(WeaponData.migrateData({ damageType: 'Slashing' }).damageType).toBe('LI');
+                expect(WeaponData.migrateData({ damageType: 'Laser' }).damageType).toBe('En');
+            });
+
+            it('should say so rather than converting silently', () => {
+                WeaponData.migrateData({ damageType: 'Ballistic' });
+                const all = warnings.join(' | ');
+                expect(all).toContain('Ballistic');
+                // The warning has to name HI, because that is the one form the
+                // migration can never infer and a GM may need to set by hand.
+                expect(all).toContain('HI');
+            });
+
+            it('should leave a form that is already valid alone and quiet', () => {
+                for (const form of DAMAGE_TYPES) {
+                    expect(WeaponData.migrateData({ damageType: form }).damageType).toBe(form);
+                }
+                expect(warnings).toEqual([]);
+            });
+
+            it('should fall back to the weakest form for an unrecognised name', () => {
+                expect(WeaponData.migrateData({ damageType: 'Sonic' }).damageType).toBe('LI');
+            });
+        });
+
+        describe('ArmorData', () => {
+            it('should convert resisted types so they can match a weapon again', () => {
+                expect(ArmorData.migrateData({ resistedTypes: ['Laser', 'Energy'] }).resistedTypes)
+                    .toEqual(['En']);
+            });
+
+            it('should dedupe forms that several old names collapse onto', () => {
+                // Ballistic, Slashing and Piercing are all Low Impact.
+                expect(ArmorData.migrateData({
+                    resistedTypes: ['Ballistic', 'Slashing', 'Piercing'],
+                }).resistedTypes).toEqual(['LI']);
+            });
+
+            it('should leave an already-valid list untouched and quiet', () => {
+                expect(ArmorData.migrateData({ resistedTypes: ['LI', 'HI'] }).resistedTypes)
+                    .toEqual(['LI', 'HI']);
+                expect(warnings).toEqual([]);
+            });
+
+            it('should keep resisting nothing when it resisted nothing', () => {
+                // An empty list means "resists all types", not "resists none" — so it
+                // must survive the migration unchanged.
+                expect(ArmorData.migrateData({ resistedTypes: [] }).resistedTypes).toEqual([]);
+            });
+
+            it('should still handle the older single-string field', () => {
+                expect(ArmorData.migrateData({ resistedType: 'Laser' }).resistedTypes).toEqual(['En']);
+            });
+        });
+
+        describe('EffectData', () => {
+            it('should convert a retired type inside the effects array', () => {
+                const migrated = EffectData.migrateData({
+                    effects: [{ effectType: 'Damage', damageType: 'Incendiary' }],
+                });
+                expect(migrated.effects[0].damageType).toBe('En');
+            });
+
+            it('should convert a top-level type that was just folded into effects[0]', () => {
+                // Both migrations run in one pass, oldest first, so a v0.1 document
+                // does not need two loads to come out right.
+                const migrated = EffectData.migrateData({
+                    effectType: 'Damage', value: 3, damageType: 'Slashing',
+                });
+                expect(migrated.effects[0].damageType).toBe('LI');
+            });
+
+            it('should leave a damage-free effect null', () => {
+                const migrated = EffectData.migrateData({
+                    effects: [{ effectType: 'Buff', damageType: null }],
+                });
+                expect(migrated.effects[0].damageType).toBeNull();
+            });
         });
     });
 

@@ -18,6 +18,8 @@
 // Constants
 // ---------------------------------------------------------------------------
 
+import { DAMAGE_TYPES as CANONICAL_DAMAGE_TYPES } from '../services/alternity-math.js';
+
 /** Valid effect types. */
 const EFFECT_TYPES = Object.freeze({
     DAMAGE:   'Damage',
@@ -34,11 +36,16 @@ const TARGET_SCOPES = Object.freeze({
     ALL_ENEMIES: 'AllEnemies',
 });
 
-/** Valid damage types from the Alternity ruleset. */
-const DAMAGE_TYPES = Object.freeze([
-    'Ballistic', 'Energy', 'Laser', 'Piercing', 'Slashing',
-    'Impact', 'Incendiary', 'Toxic', 'Radiation', 'Psionic',
-]);
+/**
+ * Valid damage forms from the Alternity ruleset: Low Impact, High Impact, Energy.
+ *
+ * Re-exported from the math service rather than redeclared, because this list is
+ * *enforced* a few lines down — `AlternityEffect` throws on anything outside it. A
+ * second copy meant EffectData and this class could disagree about what a legal
+ * damage type is, and after the d20-flavoured list was retired everywhere else this
+ * copy would have rejected every valid value.
+ */
+const DAMAGE_TYPES = CANONICAL_DAMAGE_TYPES;
 
 // ---------------------------------------------------------------------------
 // RequiredCheck

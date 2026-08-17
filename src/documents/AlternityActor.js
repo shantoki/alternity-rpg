@@ -507,25 +507,31 @@ export class AlternityActor extends Actor {
      *   4. Persist state back to flags AND sync actor.system.
      *
      * @param {number} rawDamage   - Unmitigated damage amount.
-     * @param {string} damageType  - The weapon's damage type (e.g. 'Ballistic', 'HI').
+     * @param {string} damageType  - The damage *form*: 'LI', 'HI' or 'En'. This is the
+     *        axis armour is rated against, and it is orthogonal to the category below.
      * @param {object} [options]
      * @param {string} [options.context='Combat'] - Log context.
-     * @param {string} [options.category='wound'] - Damage category ('stun', 'wound', 'mortal').
+     * @param {string} [options.category='wound'] - Which track the damage lands on:
+     *        'stun', 'wound' or 'mortal'. Comes from the damage code's trailing letter,
+     *        which AlternityMathService.parseDamageCode extracts.
      * @returns {Promise<{ finalDamage: number, woundLevelChanged: boolean, newWoundLevel: string }|null>}
      */
-    async applyAlternityDamage(rawDamage, damageType = 'Ballistic', options = {}) {
+    async applyAlternityDamage(rawDamage, damageType = 'LI', options = {}) {
         const context  = options.context ?? 'Combat';
         const altState = await this.getAltState();
         if (!altState) return null;
 
-        // Determine damage category from options or damageType string (fallback)
-        let category = options.category;
-        if (!category) {
-            const lowerType = damageType.toLowerCase();
-            if (lowerType.includes('stun') || lowerType.includes('s')) category = 'stun';
-            else if (lowerType.includes('mortal') || lowerType.includes('m')) category = 'mortal';
-            else category = 'wound'; // Default to wound
-        }
+        // Form and category are independent axes — a Low Impact weapon can do stun,
+        // wound or mortal damage — so the category is never guessed from the form.
+        //
+        // It used to be, by substring: `lowerType.includes('s')` classified anything
+        // with an 's' in its name as stun damage, which caught 'Ballistic' and
+        // 'Slashing' among others. Callers supply the category (parseDamageCode reads
+        // it off the damage code's own s/w/m letter); wound is the fallback because it
+        // is what an unsuffixed damage code means in the books.
+        const category = ['stun', 'wound', 'mortal'].includes(options.category)
+            ? options.category
+            : 'wound';
 
         // Collect mitigation modifiers from active passive traits and stances
         const modifiers = [];

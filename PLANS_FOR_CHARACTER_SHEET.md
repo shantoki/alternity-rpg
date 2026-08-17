@@ -40,6 +40,11 @@ Improve the layout and interactivity of the sheet.
 - [ ] **Armor Mitigation in Rolls**: Integrate armor die rolls into the damage application flow.
       Armour values can be die ranges (`d6-1`), and `applyAlternityDamage` currently
       mitigates with a flat `damageResistance` number rather than rolling the die.
+- [ ] **Reconcile the two armour models**: `AlternityCharacterState.armor` is the canonical
+      `{li, hi, en}` triple of die ranges, while `ArmorData` items carry a single flat
+      `damageResistance` plus a `resistedTypes` list. Both now speak LI/HI/En (see below),
+      so they can finally be compared — but an armour item still cannot express "d6-1 LI /
+      d4 HI / d4+1 En", which is how the book prints every suit.
 - [ ] **Skill specialty highlighting**: Ensure specialty skills are visually distinct (italics as per PDF).
 - [ ] **Quick Action Buttons**: Add buttons for common actions (Recovery, First Aid check).
 - [ ] **Personal-scale firepower degrade**: `calculateFirepowerDegrade` exists and the
@@ -71,6 +76,18 @@ all arithmetic owned by the math service.
 - [x] **The situation die is actually rolled.** It previously was not: modifiers were
       assembled after the dice were cast, so a wound penalty appeared in the trace and
       changed nothing. See the notes in `alt-mechanics.js` and `AlternityActor.rollSkill`.
+- [x] **Damage forms are LI / HI / En.** `WeaponData`, `ArmorData`, `EffectData` and the
+      effect-template class all carried a d20 list (Ballistic, Slashing, Piercing, Laser…).
+      `applyAlternityDamage` compares a weapon's damage type against an armour's resisted
+      types, so those two agreed with each other while neither could ever match the LI/HI/En
+      ratings the sheets show and the rules use — armour mitigation was inert for every
+      weapon in the system. Migrated via `LEGACY_DAMAGE_TYPE_MAP`, which logs each
+      conversion: nothing in the old list means High Impact, so an armour-piercing weapon
+      has to be re-marked by hand.
+- [x] **Damage form and damage grade are separate axes.** `applyAlternityDamage` used to
+      guess the track from the type by substring — `includes('s')` classified 'Ballistic'
+      and 'Slashing' as *stun* damage. The grade now comes only from the damage code's own
+      trailing s/w/m letter.
 
 Not done, deliberately: the **vehicle** sheet has no roll buttons, because `VehicleData`
 holds no skill, attack or action-check scores to roll — a vehicle is driven by a

@@ -486,7 +486,12 @@ export const AlternityRollService = {
 
             if (typeof target.applyAlternityDamage === 'function'
                 && STATEFUL_TYPES.includes(target.type)) {
-                await target.applyAlternityDamage(total, damageType || category, {
+                // The form ('LI'/'HI'/'En') and the track are separate arguments and
+                // must not stand in for each other. This used to pass
+                // `damageType || category`, which handed a track name ('wound') in as
+                // a damage form whenever the form was blank — and armour then tried to
+                // resist "wound".
+                await target.applyAlternityDamage(total, damageType || 'LI', {
                     category,
                     context: name ? `${name} damage` : 'Damage',
                 });
