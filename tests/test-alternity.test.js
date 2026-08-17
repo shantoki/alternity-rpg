@@ -2,7 +2,13 @@
  * @fileoverview Test suite for core Alternity system mechanics, ensuring data integrity and hook reliability.
  */
 
-import { AlternityMathService, SUCCESS_DEGREES } from '../src/services/alternity-math.js';
+import {
+    AlternityMathService,
+    SUCCESS_DEGREES,
+    AI_PROCESSORS,
+    AI_QUALITIES,
+    AI_MAX_SKILL_RANK,
+} from '../src/services/alternity-math.js';
 import { AlternityCharacterState } from '../src/data/alternity-actor-data.js';
 
 describe('Alternity System Unit Tests', () => {
@@ -1077,6 +1083,256 @@ describe('Alternity System Unit Tests', () => {
 
         it('should reject a non-array skill list', () => {
             expect(() => AlternityMathService.calculateRobotMemoryLoad(5, 'nope')).toThrow();
+        });
+    });
+
+    // -----------------------------------------------------------------------
+    // Artificial intelligences
+    //
+    // Dataware Ch.5 prints six complete AIs. Its own hardware table is destroyed
+    // in the scan, so those six statblocks are the regression suite: everything
+    // below is asserted against numbers that appear verbatim in the book.
+    // -----------------------------------------------------------------------
+
+    describe('AlternityMathService — AI Grid Avatar', () => {
+
+        it('should build the Watchman’s avatar from a Marginal OS with no hacking', () => {
+            // "Marginal Quality AI Operating System Program" — STR 6, DEX 6, CON 6,
+            // Durability 6/6/3, Grid Movement Rate 12.
+            const a = AlternityMathService.calculateAIGridAvatar('Marginal', 0);
+            expect(a).toMatchObject({ STR: 6, DEX: 6, CON: 6, gridMovementRate: 12 });
+            expect(a.durability).toEqual({ stun: 6, wound: 6, mortal: 3 });
+        });
+
+        it('should add half the hacking rank to every physical score', () => {
+            // Government Data Warden: Good OS (9/9/10) with hacking 4 prints
+            // STR 11, DEX 11, CON 12, Durability 12/12/6, movement 22.
+            const a = AlternityMathService.calculateAIGridAvatar('Good', 4);
+            expect(a).toMatchObject({ STR: 11, DEX: 11, CON: 12, hackingBonus: 2, gridMovementRate: 22 });
+            expect(a.durability).toEqual({ stun: 12, wound: 12, mortal: 6 });
+        });
+
+        it('should round the hacking bonus down', () => {
+            // Ship's AI: Ordinary OS (8/8/8) with hacking 2 prints 9/9/9, 9/9/5.
+            const a = AlternityMathService.calculateAIGridAvatar('Ordinary', 2);
+            expect(a).toMatchObject({ STR: 9, DEX: 9, CON: 9, hackingBonus: 1 });
+            expect(a.durability).toEqual({ stun: 9, wound: 9, mortal: 5 });
+
+            // 3 ranks still only buys +1.
+            expect(AlternityMathService.calculateAIGridAvatar('Ordinary', 3).hackingBonus).toBe(1);
+        });
+
+        it('should reach the Grid Lord’s scores at hacking 8', () => {
+            // Good OS, hacking 8 (+4): STR 13, DEX 13, CON 14, movement 26.
+            const a = AlternityMathService.calculateAIGridAvatar('Good', 8);
+            expect(a).toMatchObject({ STR: 13, DEX: 13, CON: 14, gridMovementRate: 26 });
+            expect(a.durability.mortal).toBe(7);
+        });
+
+        it('should use the shadow form 2 table when asked', () => {
+            const a = AlternityMathService.calculateAIGridAvatar('Amazing', 0, { program: 'shadowForm2' });
+            expect(a).toMatchObject({ STR: 12, DEX: 12, CON: 14 });
+        });
+
+        it('should reject an unknown quality or generator program', () => {
+            expect(() => AlternityMathService.calculateAIGridAvatar('Legendary', 0)).toThrow();
+            expect(() => AlternityMathService.calculateAIGridAvatar('Good', 0, { program: 'nope' })).toThrow();
+        });
+    });
+
+    describe('AlternityMathService — AI Action Check', () => {
+
+        it('should reproduce the Watchman’s action check', () => {
+            // Marginal program on an Ordinary processor: 13+/12/6/3, 1 action.
+            const r = AlternityMathService.calculateAIActionCheck('Marginal', 'Ordinary');
+            expect(r).toMatchObject({ marginal: 13, ordinary: 12, good: 6, amazing: 3, actionsPerRound: 1 });
+        });
+
+        it('should reproduce the Ship’s AI action check', () => {
+            // Ordinary program on a Good processor: 16+/15/7/3, 2 actions.
+            const r = AlternityMathService.calculateAIActionCheck('Ordinary', 'Good');
+            expect(r).toMatchObject({ marginal: 16, ordinary: 15, good: 7, amazing: 3, actionsPerRound: 2 });
+        });
+
+        it('should reproduce the Grid Lord’s action check', () => {
+            // Good program on an Amazing processor: 19+/18/9/4, 4 actions.
+            const r = AlternityMathService.calculateAIActionCheck('Good', 'Amazing');
+            expect(r).toMatchObject({ marginal: 19, ordinary: 18, good: 9, amazing: 4, actionsPerRound: 4 });
+        });
+
+        it('should add the achievement level bonus on top of the grid base', () => {
+            // Government Data Warden, Level 16: Good on Good gives a base of 16,
+            // and the statblock prints 21+/20/10/5 with 3 actions.
+            const r = AlternityMathService.calculateAIActionCheck('Good', 'Good', { bonus: 4 });
+            expect(r).toMatchObject({ baseScore: 16, marginal: 21, ordinary: 20, good: 10, amazing: 5, actionsPerRound: 3 });
+
+            // Freeborn Grid Sentient: Good on Ordinary, base 14, prints 18+/17/8/4.
+            const f = AlternityMathService.calculateAIActionCheck('Good', 'Ordinary', { bonus: 3 });
+            expect(f).toMatchObject({ marginal: 18, ordinary: 17, good: 8, amazing: 4, actionsPerRound: 3 });
+        });
+
+        it('should not clamp a score at 20', () => {
+            // "Values of 20 or greater still fail on a result of 20 on the control
+            //  die, but may succeed on higher totals of the control die plus
+            //  situation die." An AI with an action check of 24 is legal.
+            const r = AlternityMathService.calculateAIActionCheck('Amazing', 'Amazing', { bonus: 5 });
+            expect(r.ordinary).toBe(24);
+            expect(r.amazing).toBe(6);
+        });
+
+        it('should reject an unknown quality on either axis', () => {
+            expect(() => AlternityMathService.calculateAIActionCheck('Good', 'Legendary')).toThrow();
+            expect(() => AlternityMathService.calculateAIActionCheck('Legendary', 'Good')).toThrow();
+        });
+    });
+
+    describe('AlternityMathService — AI Grid Skill Score', () => {
+
+        it('should be Intelligence plus the hacking rank, halved and quartered', () => {
+            // Grid Lord: INT 18, hacking 8 — printed 26/13/6.
+            expect(AlternityMathService.calculateGridSkillScore(18, 8))
+                .toMatchObject({ ordinary: 26, good: 13, amazing: 6 });
+            // Watchman: INT 14, no hacking — printed 14/7/3.
+            expect(AlternityMathService.calculateGridSkillScore(14, 0))
+                .toMatchObject({ ordinary: 14, good: 7, amazing: 3 });
+            // Government Data Warden: INT 18, hacking 4 — printed 22/11/5.
+            expect(AlternityMathService.calculateGridSkillScore(18, 4))
+                .toMatchObject({ ordinary: 22, good: 11, amazing: 5 });
+        });
+    });
+
+    describe('AlternityMathService — AI Active Memory', () => {
+
+        it('should charge nothing for the operating system', () => {
+            // The decisive difference from a robot, whose OS permanently holds a slot:
+            // "The operating system does not take up any of the available slots of
+            //  active memory allowed to the AI."
+            const r = AlternityMathService.calculateAIMemoryLoad(7, []);
+            expect(r.used).toBe(0);
+            expect(r.remaining).toBe(7);
+        });
+
+        it('should charge one slot per broad skill and one per loaded rank', () => {
+            const r = AlternityMathService.calculateAIMemoryLoad(7, [
+                { name: 'Computer Science', isBroad: true },
+                { name: 'hacking', ranksLoaded: 6 },
+            ]);
+            expect(r.used).toBe(7);
+            expect(r.isFull).toBe(true);
+            expect(r.isOverloaded).toBe(false);
+        });
+
+        it('should reserve slots for loaded Grid programs', () => {
+            const r = AlternityMathService.calculateAIMemoryLoad(10, [
+                { name: 'AI Functions', isBroad: true },
+            ], { reservedSlots: 4 });
+            expect(r.reservedSlots).toBe(4);
+            expect(r.used).toBe(5);
+        });
+
+        it('should ignore skills that are not loaded', () => {
+            const r = AlternityMathService.calculateAIMemoryLoad(4, [
+                { name: 'Stowed', ranksLoaded: 6, isLoaded: false },
+            ]);
+            expect(r.used).toBe(0);
+            expect(r.isOverloaded).toBe(false);
+        });
+
+        it('should report an overloaded mainframe', () => {
+            const r = AlternityMathService.calculateAIMemoryLoad(4, [
+                { name: 'Broad', isBroad: true },
+                { name: 'Spec', ranksLoaded: 6 },
+            ]);
+            expect(r.isOverloaded).toBe(true);
+            expect(r.remaining).toBeLessThan(0);
+        });
+
+        it('should never overload a supercomputer with a neural matrix', () => {
+            // "The number of active slots these computers have is effectively
+            //  unlimited."
+            const r = AlternityMathService.calculateAIMemoryLoad(10, [
+                { name: 'Spec', ranksLoaded: 40 },
+            ], { isUnlimited: true });
+            expect(r.isUnlimited).toBe(true);
+            expect(r.isOverloaded).toBe(false);
+            expect(r.remaining).toBe(Infinity);
+        });
+
+        it('should reject a non-array skill list', () => {
+            expect(() => AlternityMathService.calculateAIMemoryLoad(7, 'nope')).toThrow();
+        });
+    });
+
+    describe('AlternityMathService — AI Skill Restrictions', () => {
+
+        it('should bar every physical skill outright', () => {
+            // "all Strength, Dexterity, and Constitution skills are unavailable to AIs."
+            for (const ability of ['STR', 'DEX', 'CON']) {
+                const r = AlternityMathService.getAISkillRestriction('Athletics', ability);
+                expect(r.isBarred).toBe(true);
+            }
+        });
+
+        it('should bar the three named specialties', () => {
+            // "The following Will skills can't be loaded into a program:
+            //  Awareness-intuition, Resolve-mental or physical."
+            expect(AlternityMathService.getAISkillRestriction('Awareness-intuition').isBarred).toBe(true);
+            expect(AlternityMathService.getAISkillRestriction('Resolve-mental').isBarred).toBe(true);
+            expect(AlternityMathService.getAISkillRestriction('Resolve-physical').isBarred).toBe(true);
+            // Awareness-perception is fine — every printed AI has it.
+            expect(AlternityMathService.getAISkillRestriction('Awareness-perception').isBarred).toBe(false);
+        });
+
+        it('should penalise the social broad skills', () => {
+            // "Deception, +1; Interaction, +2; Leadership, +3" and Creativity +3.
+            expect(AlternityMathService.getAISkillRestriction('Deception').penalty).toBe(1);
+            expect(AlternityMathService.getAISkillRestriction('Interaction').penalty).toBe(2);
+            expect(AlternityMathService.getAISkillRestriction('Leadership').penalty).toBe(3);
+            expect(AlternityMathService.getAISkillRestriction('Creativity').penalty).toBe(3);
+        });
+
+        it('should apply a broad skill’s penalty to its specialties', () => {
+            // The Freeborn Grid Sentient carries Interaction-bargain 3.
+            const r = AlternityMathService.getAISkillRestriction('Interaction-bargain');
+            expect(r).toMatchObject({ isBarred: false, penalty: 2 });
+        });
+
+        it('should leave an AI’s own ground clear', () => {
+            expect(AlternityMathService.getAISkillRestriction('Knowledge-mathematics', 'INT'))
+                .toMatchObject({ isBarred: false, penalty: 0, reason: null });
+            expect(AlternityMathService.getAISkillRestriction('Computer Science-hacking', 'INT').penalty).toBe(0);
+        });
+    });
+
+    describe('AI hardware table', () => {
+
+        it('should cap skill rank one below the slot count, and never above 12', () => {
+            // "an AI may not have a skill rank higher than one less than its number
+            //  of active memory slots." Every printed row obeys it except PL 6,
+            //  whose single row prints a hard 4.
+            for (const [key, row] of Object.entries(AI_PROCESSORS)) {
+                if (key === 'PL6-Amazing') continue;
+                expect(row.maxSkillRank).toBe(Math.min(AI_MAX_SKILL_RANK, row.activeSlots - 1));
+            }
+            expect(AI_PROCESSORS['PL6-Amazing'].maxSkillRank).toBe(4);
+        });
+
+        it('should follow one modifier law across every printed cell', () => {
+            // step = 7 - progressLevel - qualityIndex, which reproduces the Player's
+            // Handbook's own +d4/+d0/-d4/-d6 ladder as the PL 6 row.
+            for (const row of Object.values(AI_PROCESSORS)) {
+                const qualityIndex = AI_QUALITIES.indexOf(row.quality);
+                expect(row.step).toBe(7 - row.progressLevel - qualityIndex);
+            }
+        });
+
+        it('should match the values printed in the statblocks', () => {
+            expect(AI_PROCESSORS['PL6-Amazing']).toMatchObject({ activeSlots: 9,  actionCheckModifier: '-d6' });
+            expect(AI_PROCESSORS['PL7-Ordinary']).toMatchObject({ activeSlots: 7,  actionCheckModifier: '-d4' });
+            expect(AI_PROCESSORS['PL7-Good']).toMatchObject({ activeSlots: 10, maxSkillRank: 9 });
+            expect(AI_PROCESSORS['PL7-Amazing']).toMatchObject({ activeSlots: 13, actionCheckModifier: '-d8' });
+            expect(AI_PROCESSORS['PL8-Ordinary']).toMatchObject({ activeSlots: 10, actionCheckModifier: '-d6' });
+            expect(AI_PROCESSORS['PL8-Good']).toMatchObject({ activeSlots: 15, maxSkillRank: 12 });
         });
     });
 });

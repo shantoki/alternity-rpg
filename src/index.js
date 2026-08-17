@@ -18,6 +18,7 @@ import {
     WarshipData,
     SpaceshipData,
     RobotData,
+    AIData,
     WeaponData,
     ArmorData,
     SkillData,
@@ -60,6 +61,7 @@ Hooks.once('init', async () => {
     CONFIG.Actor.dataModels.warship   = WarshipData;
     CONFIG.Actor.dataModels.spaceship = SpaceshipData;
     CONFIG.Actor.dataModels.robot     = RobotData;
+    CONFIG.Actor.dataModels.ai        = AIData;
 
     CONFIG.Item.dataModels = CONFIG.Item.dataModels ?? {};
     CONFIG.Item.dataModels.weapon = WeaponData;
@@ -116,6 +118,14 @@ Hooks.once('init', async () => {
         robot: {
             bar: ['durability.stun', 'durability.wound', 'durability.mortal', 'durability.fatigue'],
             value: ['status', 'actionsPerRound', 'chassisFree', 'powerSurplus'],
+        },
+        // An AI's damage tracks belong to its Grid avatar and derive from that
+        // shadow's Constitution, so `durability.*` is rebuilt in prepareDerivedData
+        // purely so the token bars have something to point at. There is no fatigue
+        // track — software does not tire.
+        ai: {
+            bar: ['durability.stun', 'durability.wound', 'durability.mortal'],
+            value: ['status', 'actionsPerRound', 'gridMovementRate', 'gridSkillScore.ordinary'],
         },
     };
 

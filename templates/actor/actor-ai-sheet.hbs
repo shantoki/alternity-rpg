@@ -1,0 +1,390 @@
+{{!--
+    Artificial intelligence record sheet.
+
+    Laid out in the order Dataware Ch.5 prints its AIs: identity, abilities and
+    derived scores, physical form, Grid avatar, then systems. The root element is a
+    plain <div>, not a <form> — the ApplicationV2 root already is one.
+--}}
+<div class="{{cssClass}} {{alt}}-sheet {{alt}}-ai-sheet">
+
+    {{!-- ═══ Header ════════════════════════════════════════════════════════ --}}
+    <header class="{{alt}}-sheet-header">
+        <div class="{{alt}}-sheet-portrait">
+            <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
+        </div>
+        <div class="{{alt}}-sheet-identity">
+            <h1 class="{{alt}}-sheet-name">
+                <input name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'Name'}}" spellcheck="false" />
+            </h1>
+            <div class="{{alt}}-sheet-meta">
+                <div class="{{alt}}-meta-field">
+                    <label title="{{localize 'ALTERNITY.AI.OSQualityHint'}}">{{localize 'ALTERNITY.AI.OSQuality'}}</label>
+                    <select name="system.osQuality">
+                        {{#each qualityChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq ../system.osQuality choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="{{alt}}-meta-field">
+                    <label>{{localize 'ALTERNITY.ProgressLevel'}}</label>
+                    <input type="number" name="system.progressLevel" value="{{system.progressLevel}}" min="6" max="9" />
+                </div>
+                <div class="{{alt}}-meta-field">
+                    <label title="{{localize 'ALTERNITY.AI.LevelHint'}}">{{localize 'ALTERNITY.AI.Level'}}</label>
+                    <input type="number" name="system.level" value="{{system.level}}" min="1" />
+                    <span class="{{alt}}-ai-note">≈ {{system.approximateAge}} {{localize 'ALTERNITY.AI.Years'}}</span>
+                </div>
+                <span class="{{alt}}-ship-status-badge {{alt}}-ai-status--{{system.status}}"
+                      title="{{localize (concat 'ALTERNITY.AI.Status.' system.status 'Hint')}}">
+                    {{localize (concat 'ALTERNITY.AI.Status.' system.status)}}
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <main class="{{alt}}-sheet-body">
+
+        {{!-- ═══ Warnings ══════════════════════════════════════════════════ --}}
+        {{#if system.memory.isOverloaded}}
+        <p class="{{alt}}-ship-warning">{{localize 'ALTERNITY.AI.WarnMemoryOverloaded'}}</p>
+        {{/if}}
+        {{#if system.overRankedSkills.length}}
+        <p class="{{alt}}-ship-warning">
+            {{localize 'ALTERNITY.AI.WarnOverRanked'}}
+            {{#each system.overRankedSkills}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}.
+        </p>
+        {{/if}}
+        {{#if system.disabledPrograms.length}}
+        <p class="{{alt}}-ship-warning">
+            {{localize 'ALTERNITY.AI.WarnAIDisabled'}}
+            {{#each system.disabledPrograms}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}.
+        </p>
+        {{/if}}
+        {{#if system.hasUnusedSupercomputer}}
+        <p class="{{alt}}-ship-warning">{{localize 'ALTERNITY.AI.WarnNoNeuralMatrix'}}</p>
+        {{/if}}
+        {{#if system.needsMultitaskForRemotes}}
+        <p class="{{alt}}-ship-warning">{{localize 'ALTERNITY.AI.WarnNoMultitask'}}</p>
+        {{/if}}
+        {{#each skillIssues}}
+        <p class="{{../alt}}-ship-warning {{#unless this.isBarred}}is-soft{{/unless}}">{{this.name}} — {{this.reason}}.</p>
+        {{/each}}
+
+        {{!-- ═══ Abilities ═════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ai-abilities">
+            <div class="{{alt}}-ai-ability-group">
+                <h4 title="{{localize 'ALTERNITY.AI.OwnAbilitiesHint'}}">{{localize 'ALTERNITY.AI.OwnAbilities'}}</h4>
+                <div class="{{alt}}-ai-ability-row">
+                    {{#each abilities as |a|}}
+                    <div class="{{../alt}}-robot-ability">
+                        <label title="{{a.label}}">{{a.key}}</label>
+                        <input type="number" name="system.abilities.{{a.key}}" value="{{a.value}}" min="1" />
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+            <div class="{{alt}}-ai-ability-group">
+                <h4 title="{{localize 'ALTERNITY.AI.AvatarAbilitiesHint'}}">{{localize 'ALTERNITY.AI.AvatarAbilities'}}</h4>
+                <div class="{{alt}}-ai-ability-row">
+                    {{#each avatarAbilities as |a|}}
+                    <div class="{{../alt}}-robot-ability is-derived">
+                        <label title="{{a.label}}">{{a.key}}</label>
+                        <strong>{{a.value}}</strong>
+                    </div>
+                    {{/each}}
+                </div>
+                <span class="{{alt}}-ai-note">
+                    {{localize 'ALTERNITY.AI.AvatarFrom'}} {{avatarProgramLabel}} ({{system.osQuality}})
+                    {{#if system.hackingBonus}} {{fmtMod system.hackingBonus}} {{localize 'ALTERNITY.AI.FromHacking'}}{{/if}}
+                </span>
+            </div>
+        </section>
+
+        {{!-- ═══ Derived stats ═════════════════════════════════════════════ --}}
+        <section class="{{alt}}-stats-grid">
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.AI.ActionCheckHint'}}">{{localize 'ALTERNITY.AI.ActionCheck'}}</label>
+                <strong>{{system.actionCheck.marginal}}+ / {{system.actionCheck.ordinary}} / {{system.actionCheck.good}} / {{system.actionCheck.amazing}}</strong>
+                <span class="{{alt}}-ai-note">{{localize 'ALTERNITY.AI.Base'}} {{system.actionCheck.baseScore}}</span>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.AI.ActionCheckBonusHint'}}">{{localize 'ALTERNITY.AI.ActionCheckBonus'}}</label>
+                <input type="number" name="system.actionCheckBonus" value="{{system.actionCheckBonus}}" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.AI.ActionCheckModifierHint'}}">{{localize 'ALTERNITY.AI.ActionCheckModifier'}}</label>
+                <strong>{{system.actionCheckModifier}}</strong>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.AI.ActionsPerRoundHint'}}">{{localize 'ALTERNITY.AI.ActionsPerRound'}}</label>
+                <strong>{{system.actionsPerRound}}</strong>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.AI.GridSkillScoreHint'}}">{{localize 'ALTERNITY.AI.GridSkillScore'}}</label>
+                <strong>{{system.gridSkillScore.ordinary}} / {{system.gridSkillScore.good}} / {{system.gridSkillScore.amazing}}</strong>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.AI.GridMovementHint'}}">{{localize 'ALTERNITY.AI.GridMovement'}}</label>
+                <strong>{{system.gridMovementRate}}</strong>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.AI.HackingRankHint'}}">{{localize 'ALTERNITY.AI.HackingRank'}}</label>
+                <input type="number" name="system.hackingRank" value="{{system.hackingRank}}" min="0" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.AI.ResistanceHint'}}">{{localize 'ALTERNITY.AI.Resistance'}}</label>
+                <strong>
+                    {{localize 'ALTERNITY.AI.VsGrid'}} {{fmtMod system.resistance.grid}} ·
+                    INT {{fmtMod system.resistance.int}} / WIL {{fmtMod system.resistance.wil}}
+                </strong>
+            </div>
+        </section>
+
+        {{!-- ═══ Hardware ══════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-stats-grid">
+            <div class="{{alt}}-stat-box {{alt}}-stat-box--wide">
+                <label title="{{localize 'ALTERNITY.AI.ProcessorHint'}}">{{localize 'ALTERNITY.AI.Processor'}}</label>
+                <select name="system.processor">
+                    {{#each processorChoices as |choice|}}
+                    <option value="{{choice.key}}" {{#if (eq ../system.processor choice.key)}}selected{{/if}}>{{choice.label}}</option>
+                    {{/each}}
+                </select>
+                {{#if system.processorInfo}}
+                <span class="{{alt}}-robot-hardware-note">
+                    {{localize 'ALTERNITY.AI.Slots'}} {{system.processorInfo.activeSlots}} ·
+                    {{localize 'ALTERNITY.AI.MaxRank'}} {{system.processorInfo.maxSkillRank}} ·
+                    {{system.processorInfo.actionCheckModifier}}
+                    {{#unless system.processorInfo.isPrinted}}
+                    <em title="{{localize 'ALTERNITY.AI.DerivedRowHint'}}">({{localize 'ALTERNITY.AI.DerivedRow'}})</em>
+                    {{/unless}}
+                </span>
+                {{/if}}
+            </div>
+            <div class="{{alt}}-stat-box {{alt}}-stat-box--wide">
+                <label title="{{localize 'ALTERNITY.AI.CoreTypeHint'}}">{{localize 'ALTERNITY.AI.CoreType'}}</label>
+                <select name="system.coreType">
+                    {{#each coreTypeChoices as |choice|}}
+                    <option value="{{choice}}" {{#if (eq ../system.coreType choice)}}selected{{/if}}>{{choice}}</option>
+                    {{/each}}
+                </select>
+                <label class="{{alt}}-ship-inline-toggle" title="{{localize 'ALTERNITY.AI.NeuralMatrixHint'}}">
+                    <input type="checkbox" name="system.hasNeuralMatrix" data-dtype="Boolean" {{#if system.hasNeuralMatrix}}checked{{/if}} />
+                    <span>{{localize 'ALTERNITY.AI.NeuralMatrix'}}</span>
+                </label>
+            </div>
+            <div class="{{alt}}-stat-box {{alt}}-stat-box--wide">
+                <label title="{{localize 'ALTERNITY.AI.AvatarProgramHint'}}">{{localize 'ALTERNITY.AI.AvatarProgram'}}</label>
+                <select name="system.avatarProgram">
+                    {{#each avatarProgramChoices as |choice|}}
+                    <option value="{{choice.key}}" {{#if (eq ../system.avatarProgram choice.key)}}selected{{/if}}>{{choice.label}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="{{alt}}-stat-box {{alt}}-stat-box--wide">
+                <label>{{localize 'ALTERNITY.AI.Interface'}}</label>
+                <input type="text" name="system.interface" value="{{system.interface}}" placeholder="{{localize 'ALTERNITY.AI.InterfaceHint'}}" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.AI.MirrorShadowsHint'}}">{{localize 'ALTERNITY.AI.MirrorShadows'}}</label>
+                <input type="number" name="system.mirrorShadows" value="{{system.mirrorShadows}}" min="1" max="10" />
+                {{#if system.mirrorPenalty}}
+                <span class="{{alt}}-ai-note">{{fmtMod system.mirrorPenalty}} {{localize 'ALTERNITY.AI.StepEach'}}</span>
+                {{/if}}
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.AI.Cost'}}</label>
+                <input type="text" name="system.cost" value="{{system.cost}}" placeholder="$" />
+            </div>
+        </section>
+
+        {{!-- ═══ AI Functions ══════════════════════════════════════════════ --}}
+        <section class="{{alt}}-stats-grid">
+            {{#each aiFunctionRows as |fn|}}
+            <div class="{{../alt}}-stat-box">
+                <label title="{{fn.hint}}">{{fn.label}}</label>
+                <input type="number" name="system.aiFunctions.{{fn.key}}" value="{{fn.value}}" min="0" />
+                {{#if fn.readout}}<span class="{{../alt}}-ai-note">{{fn.readout}}</span>{{/if}}
+            </div>
+            {{/each}}
+            <div class="{{alt}}-stat-box {{alt}}-stat-box--wide">
+                <label title="{{localize 'ALTERNITY.AI.PurposeSkillHint'}}">{{localize 'ALTERNITY.AI.PurposeSkill'}}</label>
+                <input type="text" name="system.purposeSkill" value="{{system.purposeSkill}}" placeholder="{{localize 'ALTERNITY.AI.PurposeSkillPlaceholder'}}" />
+                <span class="{{alt}}-ai-note">
+                    {{localize 'ALTERNITY.AI.FreeBroadSkills'}}
+                    {{#each system.freeBroadSkills}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+                </span>
+            </div>
+        </section>
+
+        {{!-- ═══ Damage ════════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.AI.Durability'}}
+                <span class="{{alt}}-section-tools">
+                    <label class="{{alt}}-ship-inline-toggle" title="{{localize 'ALTERNITY.AI.BackupsHint'}}">
+                        <input type="checkbox" name="system.hasBackups" data-dtype="Boolean" {{#if system.hasBackups}}checked{{/if}} />
+                        <span>{{localize 'ALTERNITY.AI.Backups'}}</span>
+                    </label>
+                    <input type="text" name="system.lastBackup" value="{{system.lastBackup}}" placeholder="{{localize 'ALTERNITY.AI.LastBackup'}}" />
+                    <button type="button" data-action="clearAIDamage" title="{{localize 'ALTERNITY.AI.ClearDamage'}}">⟲</button>
+                </span>
+            </h3>
+            <div class="{{alt}}-resources">
+                {{#each tracks as |t|}}
+                <div class="{{../alt}}-resource-bar bar--{{t.key}}">
+                    <div class="{{../alt}}-bar-label">
+                        <span class="{{../alt}}-compartment-track-name">{{t.label}}</span>
+                        <span class="{{../alt}}-bar-values">{{t.value}} / {{t.max}}</span>
+                        <span class="{{../alt}}-damage-quick">
+                            <button type="button" data-action="setAIDamage" data-track="{{t.key}}" data-delta="-1">−</button>
+                            <button type="button" data-action="setAIDamage" data-track="{{t.key}}" data-delta="1">+</button>
+                        </span>
+                    </div>
+                    <div class="{{../alt}}-bar-track"><div class="{{../alt}}-bar-fill" style="width: {{t.pct}}%"></div></div>
+                </div>
+                {{/each}}
+            </div>
+            <p class="{{alt}}-ai-note">{{localize 'ALTERNITY.AI.DurabilityNote'}}</p>
+        </section>
+
+        {{!-- ═══ Physical form ═════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.AI.PhysicalForm'}}
+                <button type="button" data-action="addAIRow" data-array="physicalForm">+</button>
+            </h3>
+            <div class="{{alt}}-ship-table">
+                {{#each physicalFormRows as |row|}}
+                <div class="{{../alt}}-ship-table-row">
+                    <select name="system.physicalForm.{{row.index}}.kind">
+                        {{#each ../physicalFormKindChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.kind choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                    <input type="text" name="system.physicalForm.{{row.index}}.name" value="{{row.name}}" placeholder="{{localize 'ALTERNITY.Name'}}" />
+                    <input type="text" name="system.physicalForm.{{row.index}}.skill" value="{{row.skill}}" placeholder="{{localize 'ALTERNITY.AI.Skill'}}" />
+                    <input type="text" name="system.physicalForm.{{row.index}}.value" value="{{row.value}}" placeholder="{{localize 'ALTERNITY.AI.ArmorOrDamage'}}" />
+                    <button type="button" data-action="deleteAIRow" data-array="physicalForm" data-index="{{row.index}}">✕</button>
+                </div>
+                {{else}}
+                <p class="{{alt}}-empty-state">{{localize 'ALTERNITY.AI.NoPhysicalForm'}}</p>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Grid avatar programs ══════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.AI.GridPrograms'}}
+                <span class="{{alt}}-section-tools">
+                    <span class="{{alt}}-robot-hardware-note">{{localize 'ALTERNITY.AI.ProgramSlots'}} {{system.gridProgramSlots}}</span>
+                    <button type="button" data-action="addAIRow" data-array="gridPrograms">+</button>
+                </span>
+            </h3>
+            <div class="{{alt}}-ship-table">
+                {{#each gridProgramRows as |row|}}
+                <div class="{{../alt}}-ship-table-row {{#if row.isAIDisabled}}is-offline{{/if}}">
+                    <input type="text" name="system.gridPrograms.{{row.index}}.name" value="{{row.name}}" placeholder="{{localize 'ALTERNITY.Name'}}" />
+                    <select name="system.gridPrograms.{{row.index}}.quality">
+                        {{#each ../qualityChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.quality choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                    <input type="number" name="system.gridPrograms.{{row.index}}.slots" value="{{row.slots}}" min="0" title="{{localize 'ALTERNITY.AI.SlotsHint'}}" />
+                    <input type="text" name="system.gridPrograms.{{row.index}}.effect" value="{{row.effect}}" placeholder="{{localize 'ALTERNITY.AI.ArmorOrDamage'}}" />
+                    <label class="{{../alt}}-ship-inline-toggle" title="{{localize 'ALTERNITY.AI.LoadedHint'}}">
+                        <input type="checkbox" name="system.gridPrograms.{{row.index}}.isLoaded" data-dtype="Boolean" {{#if row.isLoaded}}checked{{/if}} />
+                        <span>{{localize 'ALTERNITY.AI.Loaded'}}</span>
+                    </label>
+                    <label class="{{../alt}}-ship-inline-toggle" title="{{localize 'ALTERNITY.AI.AIDisabledHint'}}">
+                        <input type="checkbox" name="system.gridPrograms.{{row.index}}.isAIDisabled" data-dtype="Boolean" {{#if row.isAIDisabled}}checked{{/if}} />
+                        <span>{{localize 'ALTERNITY.AI.AIDisabled'}}</span>
+                    </label>
+                    <button type="button" data-action="deleteAIRow" data-array="gridPrograms" data-index="{{row.index}}">✕</button>
+                </div>
+                {{else}}
+                <p class="{{alt}}-empty-state">{{localize 'ALTERNITY.AI.NoGridPrograms'}}</p>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Skills ════════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.AI.Skills'}}
+                <span class="{{alt}}-section-tools">
+                    <span class="{{alt}}-robot-hardware-note" title="{{localize 'ALTERNITY.AI.MemoryHint'}}">
+                        {{localize 'ALTERNITY.AI.Memory'}}
+                        {{system.memory.used}} / {{#if system.memory.isUnlimited}}∞{{else}}{{system.memory.max}}{{/if}}
+                    </span>
+                    <button type="button" data-action="addAIRow" data-array="skills">+</button>
+                </span>
+            </h3>
+            <div class="{{alt}}-ship-table">
+                {{#each skillRows as |row|}}
+                <div class="{{../alt}}-ship-table-row {{#if row.isOverRanked}}is-over-ranked{{/if}} {{#if row.isBarred}}is-offline{{/if}}">
+                    <input type="text" name="system.skills.{{row.index}}.name" value="{{row.name}}" placeholder="{{localize 'ALTERNITY.Name'}}" />
+                    <select name="system.skills.{{row.index}}.ability" title="{{localize 'ALTERNITY.AI.AbilityHint'}}">
+                        <option value="" {{#if (eq row.ability '')}}selected{{/if}}>—</option>
+                        {{#each ../allAbilityChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.ability choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                    <label class="{{../alt}}-ship-inline-toggle" title="{{localize 'ALTERNITY.AI.BroadHint'}}">
+                        <input type="checkbox" name="system.skills.{{row.index}}.isBroad" data-dtype="Boolean" {{#if row.isBroad}}checked{{/if}} />
+                        <span>{{localize 'ALTERNITY.AI.Broad'}}</span>
+                    </label>
+                    <input type="number" name="system.skills.{{row.index}}.rank" value="{{row.rank}}" min="0" title="{{localize 'ALTERNITY.AI.RankHint'}}" />
+                    <input type="number" name="system.skills.{{row.index}}.ranksLoaded" value="{{row.ranksLoaded}}" min="0" title="{{localize 'ALTERNITY.AI.RanksLoadedHint'}}" />
+                    <span class="{{../alt}}-robot-resolved" title="{{localize 'ALTERNITY.AI.SlotsHint'}}">{{row.slots}} {{localize 'ALTERNITY.AI.Slots'}}</span>
+                    <button type="button" data-action="loadAllAIRanks" data-index="{{row.index}}" title="{{localize 'ALTERNITY.AI.LoadAllHint'}}">
+                        {{#if row.isLoaded}}⏏{{else}}⭳{{/if}}
+                    </button>
+                    <button type="button" data-action="deleteAIRow" data-array="skills" data-index="{{row.index}}">✕</button>
+                </div>
+                {{else}}
+                <p class="{{alt}}-empty-state">{{localize 'ALTERNITY.AI.NoSkills'}}</p>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Remotes ═══════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.AI.Remotes'}}
+                <span class="{{alt}}-section-tools">
+                    <span class="{{alt}}-robot-hardware-note" title="{{localize 'ALTERNITY.AI.RemotesControlledHint'}}">
+                        {{system.remotesOwned}} {{localize 'ALTERNITY.AI.Owned'}} ·
+                        {{system.remotesControlled}} {{localize 'ALTERNITY.AI.Simultaneous'}}
+                    </span>
+                    <button type="button" data-action="addAIRow" data-array="remotes">+</button>
+                </span>
+            </h3>
+            <div class="{{alt}}-ship-table">
+                {{#each remoteRows as |row|}}
+                <div class="{{../alt}}-ship-table-row">
+                    <input type="text" name="system.remotes.{{row.index}}.name" value="{{row.name}}" placeholder="{{localize 'ALTERNITY.Name'}}" />
+                    <input type="number" name="system.remotes.{{row.index}}.quantity" value="{{row.quantity}}" min="0" />
+                    <input type="number" name="system.remotes.{{row.index}}.progressLevel" value="{{row.progressLevel}}" min="5" max="9" title="{{localize 'ALTERNITY.ProgressLevel'}}" />
+                    <input type="text" name="system.remotes.{{row.index}}.statblock" value="{{row.statblock}}" placeholder="{{localize 'ALTERNITY.AI.StatblockHint'}}" />
+                    <input type="text" name="system.remotes.{{row.index}}.notes" value="{{row.notes}}" placeholder="{{localize 'ALTERNITY.Details'}}" />
+                    <button type="button" data-action="deleteAIRow" data-array="remotes" data-index="{{row.index}}">✕</button>
+                </div>
+                {{else}}
+                <p class="{{alt}}-empty-state">{{localize 'ALTERNITY.AI.NoRemotes'}}</p>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Notes ═════════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>{{localize 'ALTERNITY.AI.Concept'}}</h3>
+            <input type="text" class="{{alt}}-robot-concept" name="system.concept" value="{{system.concept}}" placeholder="{{localize 'ALTERNITY.AI.ConceptHint'}}" />
+            <h3>{{localize 'ALTERNITY.Description'}}</h3>
+            <textarea name="system.description" rows="3">{{system.description}}</textarea>
+            <h3>{{localize 'ALTERNITY.Notes'}}</h3>
+            <textarea name="system.notes" rows="3">{{system.notes}}</textarea>
+        </section>
+
+    </main>
+</div>

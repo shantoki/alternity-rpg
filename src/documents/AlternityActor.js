@@ -225,8 +225,12 @@ export class AlternityActor extends Actor {
      * @private
      */
     async _syncSystemFromState(state) {
-        // vehicles and warships don't use AlternityCharacterState
-        if (this.type === 'vehicle' || this.type === 'warship') return;
+        // Only heroes and supporting cast keep an AlternityCharacterState; every
+        // other actor type owns its numbers entirely in its own TypeDataModel.
+        // This used to deny-list vehicle and warship, which meant each new actor
+        // type added since (spaceship, robot, ai) would have fallen through and
+        // tried to write durability and psionics fields it does not have.
+        if (!['character', 'npc'].includes(this.type)) return;
 
         // All four damage tracks now mirror across, not just the two that used to
         // hide behind the `stamina`/`vitality` names. Mortal previously had no

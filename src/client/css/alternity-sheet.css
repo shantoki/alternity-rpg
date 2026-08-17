@@ -1894,3 +1894,69 @@
 .alt-robot-status--Shutdown,
 .alt-robot-status--Disabled    { background: rgba(217, 74, 74, 0.15); color: var(--alt-color-danger); }
 .alt-robot-status--Destroyed   { background: rgba(0, 0, 0, 0.4); color: var(--alt-color-text-muted); }
+
+/* ═══ AI sheet ═══════════════════════════════════════════════════════════════ */
+
+/*
+ * Abilities are shown in two labelled groups rather than one row of six, because
+ * the split is the whole point: the left three belong to the AI, the right three
+ * belong to the Grid avatar it wears and are derived, not entered.
+ */
+.alt-ai-abilities {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+@media (max-width: 620px) {
+    .alt-ai-abilities { grid-template-columns: 1fr; }
+}
+
+.alt-ai-ability-group {
+    padding: 6px 8px 8px;
+    background: var(--alt-color-surface);
+    border: 1px solid var(--alt-color-border);
+    border-radius: var(--alt-radius);
+}
+.alt-ai-ability-group h4 {
+    margin: 0 0 6px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--alt-color-primary);
+}
+.alt-ai-ability-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+
+/* A derived score is shown, not edited — same box, no input. */
+.alt-robot-ability.is-derived {
+    border-style: dashed;
+}
+.alt-robot-ability.is-derived strong {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--alt-color-text-muted);
+}
+
+.alt-ai-note {
+    display: block;
+    font-size: 9px;
+    line-height: 1.4;
+    color: var(--alt-color-text-muted);
+}
+
+/* A penalised skill is worth naming, but it is not an error the way a barred one is. */
+.alt-ship-warning.is-soft {
+    border-color: var(--alt-color-warning);
+    color: var(--alt-color-warning);
+}
+
+.alt-ai-status--Operational { background: rgba(74, 217, 122, 0.15); color: var(--alt-color-success); }
+.alt-ai-status--Strained    { background: rgba(217, 164, 74, 0.15); color: var(--alt-color-warning); }
+.alt-ai-status--Crashed,
+.alt-ai-status--Disabled    { background: rgba(217, 74, 74, 0.15); color: var(--alt-color-danger); }
+.alt-ai-status--Restorable  { background: rgba(217, 164, 74, 0.2); color: var(--alt-color-warning); }
+.alt-ai-status--Destroyed   { background: rgba(0, 0, 0, 0.4); color: var(--alt-color-text-muted); }

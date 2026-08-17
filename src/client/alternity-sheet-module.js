@@ -38,6 +38,14 @@ import {
     ROBOT_SYSTEM_CATEGORIES,
     CHASSIS_COST_MODES,
 } from '../data/RobotData.js';
+import {
+    AI_QUALITIES,
+    AI_PROCESSORS,
+    AI_AVATAR_PROGRAMS,
+    AI_ABILITIES,
+    AI_CORE_TYPES,
+    AI_PHYSICAL_FORM_KINDS,
+} from '../data/AIData.js';
 import { renderTemplate, Roll, ChatMessage } from '../module-info.js';
 
 // ---------------------------------------------------------------------------
@@ -1726,6 +1734,222 @@ class AlternityRobotSheet extends foundry.applications.api.HandlebarsApplication
 }
 
 // ---------------------------------------------------------------------------
+// AlternityAISheet
+// ---------------------------------------------------------------------------
+
+const AI_ARRAY_FIELDS = Object.freeze({
+    physicalForm: { name: '', kind: 'CPU Armor', skill: '', value: '' },
+    gridPrograms: { name: '', quality: 'Ordinary', slots: 0, effect: '', isLoaded: true, isAIDisabled: false },
+    skills:       { name: '', isBroad: false, rank: 0, ranksLoaded: 0, isLoaded: true, ability: '' },
+    remotes:      { name: '', quantity: 1, progressLevel: 6, statblock: '', notes: '' },
+});
+
+/** An AI has no fatigue track — its avatar is software and does not get tired. */
+const AI_TRACKS = Object.freeze(['stun', 'wound', 'mortal']);
+
+/** Every ability a skill row can hang off, including the three an AI is barred from. */
+const AI_ALL_ABILITIES = Object.freeze(['STR', 'DEX', 'CON', 'INT', 'WIL', 'PER']);
+
+class AlternityAISheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
+    static DEFAULT_OPTIONS = foundry.utils.mergeObject(super.DEFAULT_OPTIONS, {
+        classes: [NS, `${NS}-sheet-app`, `${NS}-ai-sheet`],
+        tag: "form",
+        window: { resizable: true, width: 780, height: 860 },
+        actions: {
+            addAIRow:       this._onAddAIRowAction,
+            deleteAIRow:    this._onDeleteAIRowAction,
+            setAIDamage:    this._onSetAIDamageAction,
+            clearAIDamage:  this._onClearAIDamageAction,
+            loadAllAIRanks: this._onLoadAllAIRanksAction,
+        }
+    });
+
+    static PARTS = {
+        sheet: { template: "systems/alternity-v2/templates/actor/actor-ai-sheet.hbs" }
+    };
+
+    async _prepareContext(options) {
+        const context = await super._prepareContext(options);
+        const system = this.document.system;
+
+        context.actor = this.document;
+        context.system = system;
+        context.alt = NS;
+
+        // ── Choice lists ────────────────────────────────────────────────────
+        context.qualityChoices = AI_QUALITIES;
+        context.coreTypeChoices = AI_CORE_TYPES;
+        context.physicalFormKindChoices = AI_PHYSICAL_FORM_KINDS;
+        context.allAbilityChoices = AI_ALL_ABILITIES;
+        context.processorChoices = Object.entries(AI_PROCESSORS).map(([key, cfg]) => ({
+            key,
+            label: `PL${cfg.progressLevel} ${cfg.quality}`,
+            ...cfg,
+        }));
+        context.avatarProgramChoices = Object.entries(AI_AVATAR_PROGRAMS)
+            .map(([key, cfg]) => ({ key, label: cfg.label }));
+        context.avatarProgramLabel = AI_AVATAR_PROGRAMS[system.avatarProgram]?.label ?? '';
+
+        // ── Abilities, split by what actually owns them ─────────────────────
+        // The left group is the AI; the right group is the shadow it wears in the
+        // Grid, and is read-only because it is a pure function of the OS quality
+        // and the AI's hacking rank.
+        context.abilities = AI_ABILITIES.map((key) => ({
+            key,
+            label: game.i18n.localize(`ALTERNITY.Ability.${key}`),
+            value: system.abilities?.[key] ?? 0,
+        }));
+        context.avatarAbilities = ['STR', 'DEX', 'CON'].map((key) => ({
+            key,
+            label: game.i18n.localize(`ALTERNITY.Ability.${key}`),
+            value: system.avatar?.[key] ?? 0,
+        }));
+
+        // ── AI Functions, each with the limit its rank governs ──────────────
+        context.aiFunctionRows = [
+            {
+                key: 'multitask',
+                label: game.i18n.localize('ALTERNITY.AI.Multitask'),
+                hint: game.i18n.localize('ALTERNITY.AI.MultitaskHint'),
+                value: system.aiFunctions?.multitask ?? 0,
+                readout: game.i18n.format('ALTERNITY.AI.SubsystemsReadout', {
+                    count: system.subsystemsControlled ?? 1,
+                }),
+            },
+            {
+                key: 'prediction',
+                label: game.i18n.localize('ALTERNITY.AI.Prediction'),
+                hint: game.i18n.localize('ALTERNITY.AI.PredictionHint'),
+                value: system.aiFunctions?.prediction ?? 0,
+                readout: null,
+            },
+            {
+                key: 'remote',
+                label: game.i18n.localize('ALTERNITY.AI.Remote'),
+                hint: game.i18n.localize('ALTERNITY.AI.RemoteHint'),
+                value: system.aiFunctions?.remote ?? 0,
+                readout: game.i18n.format('ALTERNITY.AI.RemotesReadout', {
+                    count: system.remotesControlled ?? 0,
+                }),
+            },
+        ];
+
+        // ── Damage tracks ───────────────────────────────────────────────────
+        context.tracks = AI_TRACKS.map((key) => {
+            const track = system.durability?.[key] ?? { value: 0, max: 0 };
+            return {
+                key,
+                label: game.i18n.localize(`ALTERNITY.${key.charAt(0).toUpperCase()}${key.slice(1)}`),
+                value: track.value, max: track.max,
+                pct: pct(track.value, track.max),
+            };
+        });
+
+        // ── Rows ────────────────────────────────────────────────────────────
+        context.physicalFormRows = (system.physicalForm ?? []).map((row, index) => ({ ...row, index }));
+        context.gridProgramRows   = (system.gridPrograms ?? []).map((row, index) => ({ ...row, index }));
+        context.remoteRows        = (system.remotes ?? []).map((row, index) => ({ ...row, index }));
+
+        context.skillRows = (system.skills ?? []).map((skill, index) => {
+            const restriction = AlternityMathService.getAISkillRestriction(skill.name, skill.ability);
+            return {
+                ...skill,
+                index,
+                isBarred: restriction.isBarred,
+                penalty: restriction.penalty,
+                isOverRanked: system.maxSkillRank !== null && !skill.isBroad
+                    && (skill.rank ?? 0) > system.maxSkillRank,
+                // Slots this skill is holding right now. An AI's OS is free, so
+                // unlike a robot this is the whole of the memory bill bar programs.
+                slots: skill.isLoaded === false ? 0
+                    : skill.isBroad ? 1 : (skill.ranksLoaded ?? 0),
+            };
+        });
+
+        // Surfaced separately from the rows so the banner can name every problem
+        // at once rather than relying on the reader spotting a highlighted row.
+        context.skillIssues = system.skillIssues ?? [];
+
+        return context;
+    }
+
+    _onRender(context, options) {
+        this.element.addEventListener('change', (e) => {
+            applySheetFieldChange(this.document, e.target, AI_ARRAY_FIELDS);
+        });
+    }
+
+    // -----------------------------------------------------------------------
+    // Row management
+    // -----------------------------------------------------------------------
+
+    static async _onAddAIRowAction(event, target) {
+        const arrayKey = target.dataset.array;
+        const defaults = AI_ARRAY_FIELDS[arrayKey];
+        if (!defaults) return;
+        const current = foundry.utils.getProperty(this.document.system, arrayKey) ?? [];
+        await this.document.update({
+            [`system.${arrayKey}`]: [...current, foundry.utils.deepClone(defaults)],
+        });
+    }
+
+    static async _onDeleteAIRowAction(event, target) {
+        const arrayKey = target.dataset.array;
+        const idx = safeInt(target.dataset.index, -1);
+        if (idx < 0 || !AI_ARRAY_FIELDS[arrayKey]) return;
+        const current = foundry.utils.getProperty(this.document.system, arrayKey) ?? [];
+        await this.document.update({ [`system.${arrayKey}`]: current.filter((_, i) => i !== idx) });
+    }
+
+    // -----------------------------------------------------------------------
+    // Damage
+    // -----------------------------------------------------------------------
+
+    static async _onSetAIDamageAction(event, target) {
+        const track = target.dataset.track;
+        const delta = safeInt(target.dataset.delta, 0);
+        if (!AI_TRACKS.includes(track)) return;
+
+        const max = this.document.system.durability?.[track]?.max ?? 0;
+        const current = this.document.system.damage?.[track] ?? 0;
+        await this.document.update({
+            [`system.damage.${track}`]: Math.min(max, Math.max(0, current + delta)),
+        });
+    }
+
+    static async _onClearAIDamageAction() {
+        await this.document.update({
+            'system.damage': { stun: 0, wound: 0, mortal: 0 },
+        });
+    }
+
+    // -----------------------------------------------------------------------
+    // Memory
+    // -----------------------------------------------------------------------
+
+    /**
+     * Load a skill fully into active memory, or unload it entirely.
+     *
+     * Part-loading is the normal state of affairs for a mainframe AI — it pulls
+     * the rest out of storage memory when it needs it — so the ranks field stays
+     * editable and this is only the common case as one click.
+     */
+    static async _onLoadAllAIRanksAction(event, target) {
+        const idx = safeInt(target.dataset.index, -1);
+        if (idx < 0) return;
+        const skills = foundry.utils.deepClone(this.document.system.skills ?? []);
+        const skill = skills[idx];
+        if (!skill) return;
+
+        const isFullyLoaded = skill.isLoaded && (skill.isBroad || skill.ranksLoaded >= skill.rank);
+        skill.isLoaded = !isFullyLoaded;
+        skill.ranksLoaded = isFullyLoaded ? 0 : (skill.rank ?? 0);
+
+        await this.document.update({ 'system.skills': skills });
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Registration
 // ---------------------------------------------------------------------------
 
@@ -1769,6 +1993,7 @@ async function registerAlternitySheet() {
     ActorsCollection.registerSheet('alternity-v2', AlternityWarshipSheet, { types: ['warship'], makeDefault: true, label: 'Alternity Warship Sheet' });
     ActorsCollection.registerSheet('alternity-v2', AlternitySpaceshipSheet, { types: ['spaceship'], makeDefault: true, label: 'Alternity Spaceship Sheet' });
     ActorsCollection.registerSheet('alternity-v2', AlternityRobotSheet, { types: ['robot'], makeDefault: true, label: 'Alternity Robot Sheet' });
+    ActorsCollection.registerSheet('alternity-v2', AlternityAISheet, { types: ['ai'], makeDefault: true, label: 'Alternity AI Sheet' });
 }
 
 export {
@@ -1780,6 +2005,7 @@ export {
     AlternityWarshipSheet,
     AlternitySpaceshipSheet,
     AlternityRobotSheet,
+    AlternityAISheet,
     registerAlternitySheet,
     pct,
     fmtMod,
