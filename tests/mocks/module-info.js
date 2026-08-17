@@ -66,6 +66,7 @@ export class Roll {
 
 export const ChatMessage = lateBound('ChatMessage');
 export const game = lateBound('game');
+export const ui = lateBound('ui');
 
 export const renderTemplate = (...args) => {
     const fn = globalThis.foundry?.applications?.handlebars?.renderTemplate
@@ -75,6 +76,12 @@ export const renderTemplate = (...args) => {
 
 export const fromUuid = (...args) => {
     const fn = globalThis.foundry?.utils?.fromUuid || globalThis.fromUuid;
+    return fn(...args);
+};
+
+export const performIntegerSort = (...args) => {
+    const fn = globalThis.foundry?.utils?.performIntegerSort
+        || globalThis.SortingHelpers?.performIntegerSort;
     return fn(...args);
 };
 

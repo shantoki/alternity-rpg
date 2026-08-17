@@ -844,6 +844,25 @@
 .alt-item-name { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .alt-item-stats { font-size: 10px; color: var(--alt-color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+/* ── Drag & Drop ────────────────────────────────────────────────────────── */
+/* The whole sheet is the drop target, so the cue has to read at sheet scale.
+   `outline` rather than `border`: a border would resize the root and shift every
+   row down by a pixel the moment a drag entered. */
+.alt-drop-hover {
+    outline: 2px dashed var(--alt-color-primary);
+    outline-offset: -3px;
+}
+/* Only the rows the drag handler actually picks up advertise themselves as
+   grabbable — `draggable` is set from JS on each render, so this stays in step
+   with what is really draggable. */
+.alt-item-card[draggable="true"],
+.alt-computer-card[draggable="true"] {
+    cursor: grab;
+}
+.alt-drag-source {
+    opacity: 0.45;
+}
+
 /* ── Roll Tray (Fixed at bottom) ────────────────────────────────────────── */
 /* Every sheet root carries `.alt-sheet` (a full-height flex column) with the body
    as the only growing child, so the tray pins itself to the bottom on all of them. */

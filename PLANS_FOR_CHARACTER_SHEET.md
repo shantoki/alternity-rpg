@@ -94,6 +94,48 @@ holds no skill, attack or action-check scores to roll — a vehicle is driven by
 character's own Vehicle Operation check. The **warship** sheet rolls weapon damage but
 has no crew checks, for the same reason.
 
+## Phase 5: Drag and drop — done
+
+- [x] **Items drop onto the hero sheet.** Anywhere on the sheet accepts an Item dragged
+      from a compendium, the Items sidebar or another actor's sheet; the copy is appended
+      to the bottom of the list for its type and the sheet switches to the tab that shows
+      it. Dropping a **Folder** of Items copies the whole folder, subfolders included, so
+      a kit built in a compendium moves across in one drag.
+- [x] **Items drag out of the hero sheet**, onto another sheet or back to the sidebar.
+- [x] **Rows re-order by dragging** within their own list. Each list is one item type, so
+      a drop onto a row of a different type is treated as no instruction rather than as a
+      cross-list move. The lists are now ordered by the `sort` field for this to stick.
+
+- [x] **Statblock sheets translate a drop into a schema row.** They hold their attacks
+      and gear as `ArrayField`s rather than as embedded items, so an Item dropped on one
+      is *mapped* rather than copied (`alternity-statblock-drops.js`):
+
+      | sheet | item type | lands in |
+      | --- | --- | --- |
+      | npc | weapon | `attacks` |
+      | creature | weapon, skill | `attacks`, `skills` |
+      | robot | weapon, perkFlaw, skill | `systems` (as Weapon Support), `perksFlaws`, `skills` |
+      | ai | weapon, armor, program, skill | `physicalForm` (Weapon / CPU Armor), `gridPrograms`, `skills` |
+      | spaceship | weapon | `weapons` |
+      | warship | weapon | `weapons` |
+
+      Nothing is guessed at. A field with no honest source on the item keeps the same
+      default the sheet's own "+ Add row" button gives it — most importantly the attack
+      **score**, which is the NPC's skill score and not a property of the gun; the
+      governing skill and the Acc modifier go into the row's notes so the Gamemaster
+      knows what to score it from. Damage forms are translated across scales
+      (`LI`/`HI`/`En` → `lowImpact`/`highImpact`/`energy`), and the warship's
+      single-formula row is split out of the Ordinary code through
+      `parseDamageCode` so the trailing s/w/m never reaches a formula field.
+      An item type with no home on a sheet is **refused out loud** rather than silently
+      swallowed. Rows are grouped and written one array at a time, because an
+      `ArrayField` update replaces the array rather than merging into it.
+
+Not done, deliberately: the **vehicle** sheet accepts nothing, because `VehicleData` has
+no attack or gear arrays at all — a vehicle is driven by a character's own Vehicle
+Operation check. It is still wired up, so a drop there says so rather than looking as
+though it worked.
+
 ## Current Status
 - [x] Basic Ability/Skill management.
 - [x] Action Check & Durability tracking.
@@ -101,3 +143,4 @@ has no crew checks, for the same reason.
 - [x] Wound penalties (Dazed effect) logic.
 - [x] Serialization/Deserialization.
 - [x] Rolling from every sheet that has something to roll (see Phase 4).
+- [x] Drag and drop of items on every sheet that has somewhere to put one (see Phase 5).

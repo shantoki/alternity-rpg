@@ -139,3 +139,14 @@ export const fromUuid = (...args) => {
     const fn = globalThis.foundry?.utils?.fromUuid || globalThis.fromUuid;
     return fn(...args);
 };
+
+/**
+ * Relative sort-value solver, used when an item is dragged to a new position in a
+ * list. The v12 global alias is kept as a fallback for the same reason the two
+ * above have one.
+ */
+export const performIntegerSort = (...args) => {
+    const fn = globalThis.foundry?.utils?.performIntegerSort
+        || globalThis.SortingHelpers?.performIntegerSort;
+    return fn(...args);
+};

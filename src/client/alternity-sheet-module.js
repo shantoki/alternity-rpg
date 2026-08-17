@@ -20,6 +20,8 @@ import {
     RANGE_BANDS,
 } from '../services/alternity-math.js';
 import { AlternityRollService } from '../services/alternity-roll-service.js';
+import { bindActorSheetDragDrop, claimDropHandling, tabForItemType } from './alternity-drag-drop.js';
+import { bindStatblockDragDrop } from './alternity-statblock-drops.js';
 import { SHIP_TOUGHNESS_CLASSES, SHIP_HULL_TYPES, SHIP_STATUS_EFFECTS } from '../data/WarshipData.js';
 import {
     SPACESHIP_HULL_TYPES,
@@ -753,17 +755,24 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
             pips: [...Array(Math.min(5, Math.max(0, lr.max))).keys()].map(i => i < lr.value),
         };
 
+        // Ordered by the `sort` field rather than by the collection's own order, so
+        // that dragging a row to a new position in a list actually sticks. Items
+        // created before drag-ordering existed all carry sort 0, where a stable
+        // sort leaves them in the creation order they have always displayed in.
+        const ownedItems = (type) => this.document.items
+            .filter(i => i.type === type)
+            .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
         context.inventory = {
-            weapons: this.document.items.filter(i => i.type === 'weapon'),
-            armor:   this.document.items.filter(i => i.type === 'armor'),
-            computers: this.document.items.filter(i => i.type === 'computer'),
-            perksFlaws: this.document.items.filter(i => i.type === 'perkFlaw'),
-            personalEquipment: this.document.items.filter(i => i.type === 'personalEquipment'),
-            cybertech: this.document.items.filter(i => i.type === 'cybertech'),
-            programs: this.document.items.filter(i => i.type === 'program'),
-            fxPowers: this.document.items.filter(i => i.type === 'fx'),
-            mutations: this.document.items.filter(i => i.type === 'mutation'),
-            achievementBenefits: this.document.items.filter(i => i.type === 'achievementBenefit')
+            weapons: ownedItems('weapon'),
+            armor:   ownedItems('armor'),
+            computers: ownedItems('computer'),
+            perksFlaws: ownedItems('perkFlaw'),
+            personalEquipment: ownedItems('personalEquipment'),
+            cybertech: ownedItems('cybertech'),
+            programs: ownedItems('program'),
+            fxPowers: ownedItems('fx'),
+            mutations: ownedItems('mutation'),
+            achievementBenefits: ownedItems('achievementBenefit')
         };
 
         // Active memory is derived from the owned computers' capacity and the
@@ -851,6 +860,19 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
     /** @override */
     _onRender(context, options) {
         this._activateListeners(this.element);
+        // Items dropped from a compendium, the sidebar or another sheet are copied
+        // onto this actor; items dragged within a list are re-ordered.
+        bindActorSheetDragDrop(this, this.element, {
+            onDropped: (created) => {
+                // Reveal the list the item landed in — otherwise a weapon dropped
+                // while the Skills tab is open appears to have gone nowhere.
+                const tab = tabForItemType(created[0]?.type);
+                if (tab && tab !== this._activeTab) {
+                    this._activeTab = tab;
+                    this.render();
+                }
+            },
+        });
     }
 
     _activateListeners(html) {
@@ -1591,6 +1613,7 @@ class AlternityNpcSheet extends foundry.applications.api.HandlebarsApplicationMi
             applySheetFieldChange(this.document, e.target, NPC_ARRAY_FIELDS);
         });
         bindRollMount(this);
+        bindStatblockDragDrop(this, this.element, NPC_ARRAY_FIELDS);
     }
 
     static async _onSetWoundAction(event, target) {
@@ -1686,6 +1709,10 @@ class AlternityVehicleSheet extends foundry.applications.api.HandlebarsApplicati
                 this.document.update({ [input.name]: val });
             }
         });
+        // A vehicle has no attack or gear arrays to drop into — it is driven by a
+        // character's own Vehicle Operation check. Bound anyway so a drop is
+        // refused out loud instead of appearing to have worked.
+        bindStatblockDragDrop(this, this.element, {});
     }
 }
 
@@ -1741,6 +1768,7 @@ class AlternityWarshipSheet extends foundry.applications.api.HandlebarsApplicati
             applySheetFieldChange(this.document, e.target, WARSHIP_ARRAY_FIELDS);
         });
         bindRollMount(this);
+        bindStatblockDragDrop(this, this.element, WARSHIP_ARRAY_FIELDS);
     }
 
     static async _onAddArrayRowAction(event, target) {
@@ -1934,6 +1962,7 @@ class AlternitySpaceshipSheet extends foundry.applications.api.HandlebarsApplica
             applySheetFieldChange(this.document, e.target, SPACESHIP_ARRAY_FIELDS);
         });
         bindRollMount(this);
+        bindStatblockDragDrop(this, this.element, SPACESHIP_ARRAY_FIELDS);
     }
 
     // -----------------------------------------------------------------------
@@ -2384,6 +2413,7 @@ class AlternityRobotSheet extends foundry.applications.api.HandlebarsApplication
             applySheetFieldChange(this.document, e.target, ROBOT_ARRAY_FIELDS);
         });
         bindRollMount(this);
+        bindStatblockDragDrop(this, this.element, ROBOT_ARRAY_FIELDS);
     }
 
     // -----------------------------------------------------------------------
@@ -2644,6 +2674,7 @@ class AlternityAISheet extends foundry.applications.api.HandlebarsApplicationMix
             applySheetFieldChange(this.document, e.target, AI_ARRAY_FIELDS);
         });
         bindRollMount(this);
+        bindStatblockDragDrop(this, this.element, AI_ARRAY_FIELDS);
     }
 
     // -----------------------------------------------------------------------
@@ -2902,6 +2933,7 @@ class AlternityCreatureSheet extends foundry.applications.api.HandlebarsApplicat
             applySheetFieldChange(this.document, e.target, CREATURE_ARRAY_FIELDS);
         });
         bindRollMount(this);
+        bindStatblockDragDrop(this, this.element, CREATURE_ARRAY_FIELDS);
     }
 
     // -----------------------------------------------------------------------
@@ -3028,6 +3060,15 @@ async function registerAlternitySheet() {
 
     const ActorsCollection = foundry.documents.collections.Actors ?? Actors;
     if (typeof ActorsCollection === 'undefined') return;
+
+    // Drops are handled by alternity-drag-drop.js, so core ActorSheetV2's own drop
+    // path is shut off on every one of these classes. Without this, a later change
+    // that adds `super._onRender(...)` to any sheet — which is what binds core's
+    // DragDrop — would make each drop create the item twice.
+    for (const SheetClass of [
+        AlternityCharacterSheet, AlternityNpcSheet, AlternityVehicleSheet, AlternityWarshipSheet,
+        AlternitySpaceshipSheet, AlternityRobotSheet, AlternityAISheet, AlternityCreatureSheet,
+    ]) claimDropHandling(SheetClass);
 
     ActorsCollection.registerSheet('alternity-v2', AlternityCharacterSheet, { types: ['character'], makeDefault: true, label: 'Alternity Character Sheet' });
     ActorsCollection.registerSheet('alternity-v2', AlternityNpcSheet, { types: ['npc'], makeDefault: true, label: 'Alternity NPC Sheet' });
