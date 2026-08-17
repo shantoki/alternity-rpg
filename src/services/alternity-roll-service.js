@@ -22,6 +22,8 @@ import {
     AlternityMathService,
     SUCCESS_DEGREES,
     PERSONAL_DAMAGE_GRADES,
+    DAMAGE_TYPES,
+    DEFAULT_PERSONAL_TOUGHNESS,
 } from './alternity-math.js';
 import {
     getAlternityState,
@@ -33,9 +35,13 @@ const NAMESPACE = 'alternity-v2';
 
 const CHECK_CARD  = `systems/${NAMESPACE}/templates/roll/roll-card.hbs`;
 const DAMAGE_CARD = `systems/${NAMESPACE}/templates/roll/damage-card.hbs`;
+const ARMOR_CARD  = `systems/${NAMESPACE}/templates/roll/armor-card.hbs`;
 
 /** Actor types that keep an AlternityCharacterState alongside their schema. */
 const STATEFUL_TYPES = Object.freeze(['character', 'npc']);
+
+/** Damage form -> the sub-field armour is rated in, on every armour-bearing shape. */
+const FORM_KEYS = Object.freeze({ LI: 'li', HI: 'hi', En: 'en' });
 
 // ---------------------------------------------------------------------------
 // Internal helpers
@@ -450,6 +456,177 @@ export const AlternityRollService = {
     },
 
     // -----------------------------------------------------------------------
+    // Armour
+    // -----------------------------------------------------------------------
+
+    /**
+     * Every source of protection this actor is carrying, in one shape.
+     *
+     * Four kinds of protection exist in the system and they are stored four
+     * different ways, which is exactly why they are collected here rather than at
+     * each call site: worn armour Items keep a `protection` triple, installed
+     * cybertech keeps an `armorProtection` triple, heroes and supporting cast keep a
+     * hand-entered triple on their AlternityCharacterState, and creatures keep
+     * `naturalArmor`. They all hold the same thing — a die range per damage form —
+     * and under the layering rule they compete rather than stack, so they have to
+     * end up in one list to be compared.
+     *
+     * @param {Actor} actor
+     * @returns {Promise<Array<{source: string, li: string, hi: string, en: string, toughness: string|null}>>}
+     */
+    async collectArmorRatings(actor) {
+        if (!actor) return [];
+        const ratings = [];
+
+        // ── Worn armour, and installed cybertech ────────────────────────────
+        for (const item of actor.items ?? []) {
+            if (item.type === 'armor' && item.system?.isEquipped) {
+                const p = item.system.protection ?? {};
+                ratings.push({
+                    source: item.name,
+                    li: p.li ?? '', hi: p.hi ?? '', en: p.en ?? '',
+                    toughness: item.system.toughness ?? null,
+                });
+            } else if (item.type === 'cybertech' && item.system?.isInstalled) {
+                const p = item.system.armorProtection ?? {};
+                // Damaged implants still read as installed; the plating is what is
+                // rated, so a damaged one is left to the Gamemaster to un-install.
+                if (!p.li && !p.hi && !p.en) continue;
+                ratings.push({
+                    source: item.name,
+                    li: p.li ?? '', hi: p.hi ?? '', en: p.en ?? '',
+                    toughness: null,
+                });
+            }
+        }
+
+        // ── The hand-entered triple on the hero / supporting-cast sheet ──────
+        if (STATEFUL_TYPES.includes(actor.type)) {
+            const state = await getAlternityState(actor);
+            const worn = state?.armor ?? {};
+            if (worn.li || worn.hi || worn.en) {
+                ratings.push({
+                    source: game.i18n.localize('ALTERNITY.Armor.Ratings'),
+                    li: String(worn.li ?? ''), hi: String(worn.hi ?? ''), en: String(worn.en ?? ''),
+                    toughness: null,
+                });
+            }
+        }
+
+        // ── Natural armour ──────────────────────────────────────────────────
+        const natural = actor.system?.naturalArmor;
+        if (natural && (natural.li || natural.hi || natural.en)) {
+            ratings.push({
+                source: game.i18n.localize('ALTERNITY.Armor.Natural'),
+                li: natural.li ?? '', hi: natural.hi ?? '', en: natural.en ?? '',
+                toughness: null,
+            });
+        }
+
+        // ── An AI's CPU armour, which lives in its physical-form table ───────
+        for (const row of actor.system?.physicalForm ?? []) {
+            if (row?.kind !== 'CPU Armor' || !row.value) continue;
+            // One printed value covering every form: the box is armoured, not
+            // rated per damage type the way a suit is.
+            ratings.push({
+                source: row.name || game.i18n.localize('ALTERNITY.Armor.Label'),
+                li: row.value, hi: row.value, en: row.value,
+                toughness: null,
+            });
+        }
+
+        return ratings;
+    },
+
+    /**
+     * The toughness a target actually presents: its own grade, raised by anything
+     * it is wearing that provides a better one.
+     *
+     * @param {Actor} actor
+     * @param {Array<{toughness: string|null}>} [ratings] - Reuses an already-collected list.
+     * @returns {Promise<string>}
+     */
+    async collectTargetToughness(actor, ratings = null) {
+        const list = ratings ?? await this.collectArmorRatings(actor);
+        return AlternityMathService.selectHighestToughness(
+            [actor?.system?.toughness, ...list.map((r) => r.toughness)],
+            DEFAULT_PERSONAL_TOUGHNESS,
+        );
+    },
+
+    /**
+     * Roll every protection the actor has against one damage form and return the
+     * result the layering rule keeps.
+     *
+     * The dice are here rather than in `applyAlternityDamage` for the same reason
+     * every other roll in the system is: the document classes stay free of dice, and
+     * a roll the players are entitled to see becomes a real Foundry `Roll` that Dice
+     * So Nice can animate and the chat card can show. A rating printed as a flat
+     * number is not rolled at all.
+     *
+     * @param {object} config
+     * @param {Actor}  config.actor
+     * @param {string} config.damageForm - 'LI' | 'HI' | 'En'.
+     * @returns {Promise<{
+     *   value: number, source: string, rolls: Roll[], toughness: string,
+     *   considered: object[], modifierTrace: object[],
+     * }>}
+     */
+    async rollArmorProtection(config) {
+        const { actor, damageForm } = config;
+        const empty = {
+            value: 0, source: '', rolls: [], considered: [], modifierTrace: [],
+            toughness: DEFAULT_PERSONAL_TOUGHNESS,
+        };
+        if (!actor) return empty;
+
+        const ratings = await this.collectArmorRatings(actor);
+        const toughness = await this.collectTargetToughness(actor, ratings);
+
+        // An unknown form cannot be matched to a rating. Armour is rated per form and
+        // nothing else, so guessing one would apply the wrong die.
+        const key = FORM_KEYS[damageForm];
+        if (!key) {
+            if (ratings.length) {
+                console.warn(
+                    `[Alternity] ${actor.name} has armour but the damage form "${damageForm}" is not one of `
+                    + `${DAMAGE_TYPES.join(' / ')}, so no rating could be rolled.`
+                );
+            }
+            return { ...empty, toughness };
+        }
+
+        const candidates = [];
+        const rolls = [];
+
+        for (const rating of ratings) {
+            const parsed = AlternityMathService.parseArmorValue(rating[key]);
+            if (!parsed.isValid) {
+                if (String(rating[key] ?? '').trim()) {
+                    console.warn(
+                        `[Alternity] ${actor.name}: could not read the ${damageForm} armour rating `
+                        + `"${rating[key]}" on ${rating.source}. Expected a die range such as "d6-1".`
+                    );
+                }
+                continue;
+            }
+
+            if (!parsed.isDie) {
+                candidates.push({ source: rating.source, value: parsed.flat });
+                continue;
+            }
+
+            const roll = new Roll(parsed.formula);
+            await roll.evaluate();
+            rolls.push(roll);
+            candidates.push({ source: rating.source, value: roll.total });
+        }
+
+        const best = AlternityMathService.selectBestArmorRoll(candidates);
+        return { ...best, rolls, toughness };
+    },
+
+    // -----------------------------------------------------------------------
     // Applying damage
     // -----------------------------------------------------------------------
 
@@ -466,7 +643,7 @@ export const AlternityRollService = {
      * @returns {Promise<number>} How many actors were damaged.
      */
     async applyDamageToTargets(damageData) {
-        const { total, category, damageType, name } = damageData ?? {};
+        const { total, category, damageType, firepower, name } = damageData ?? {};
         if (!PERSONAL_DAMAGE_GRADES.includes(category)) {
             ui.notifications?.warn(game.i18n.localize('ALTERNITY.Roll.UnknownDamageCategory'));
             return 0;
@@ -479,24 +656,42 @@ export const AlternityRollService = {
             return 0;
         }
 
+        // The form ('LI'/'HI'/'En') and the track are separate arguments and must not
+        // stand in for each other. This used to pass `damageType || category`, which
+        // handed a track name ('wound') in as a damage form whenever the form was
+        // blank — and armour then tried to resist "wound".
+        const damageForm = DAMAGE_TYPES.includes(damageType) ? damageType : 'LI';
+        const context = name ? `${name} damage` : 'Damage';
+
         let applied = 0;
         for (const token of tokens) {
             const target = token.actor;
             if (!target) continue;
 
-            if (typeof target.applyAlternityDamage === 'function'
-                && STATEFUL_TYPES.includes(target.type)) {
-                // The form ('LI'/'HI'/'En') and the track are separate arguments and
-                // must not stand in for each other. This used to pass
-                // `damageType || category`, which handed a track name ('wound') in as
-                // a damage form whenever the form was blank — and armour then tried to
-                // resist "wound".
-                await target.applyAlternityDamage(total, damageType || 'LI', {
-                    category,
-                    context: name ? `${name} damage` : 'Damage',
+            // Armour is rolled per target, before the damage is handed over: each
+            // defender rolls their own protection, and the roll has to exist before
+            // anything can be subtracted with it.
+            const armor = await this.rollArmorProtection({ actor: target, damageForm });
+
+            const options = {
+                category,
+                context,
+                firepower: firepower ?? null,
+                toughness: armor.toughness,
+                armorRoll: armor.value,
+                armorSource: armor.source,
+                armorTrace: armor.modifierTrace,
+            };
+
+            const outcome = (typeof target.applyAlternityDamage === 'function'
+                && STATEFUL_TYPES.includes(target.type))
+                ? await target.applyAlternityDamage(total, damageForm, options)
+                : await this._applyTrackDamage(target, total, damageForm, options);
+
+            if (outcome) {
+                await this._postMitigationCard(target, {
+                    rawDamage: total, damageForm, armor, outcome, name,
                 });
-            } else {
-                await this._applyTrackDamage(target, category, total, name);
             }
             applied += 1;
         }
@@ -510,33 +705,114 @@ export const AlternityRollService = {
     },
 
     /**
+     * Show what happened between the damage roll and the target's tracks — but only
+     * when something did. A hit that lands in full is already fully described by the
+     * damage card, and a card per unmitigated hit would be noise.
+     *
+     * This exists because the armour roll would otherwise be invisible: it happens
+     * inside the Apply handler, long after the attacker's card was posted, and "why
+     * did 6 wounds become 4" is not something a player should have to take on trust.
+     *
+     * @private
+     */
+    async _postMitigationCard(target, { rawDamage, damageForm, armor, outcome, name }) {
+        const hasMitigation = outcome.isNegated
+            || (outcome.armorAbsorbed ?? 0) > 0
+            || (outcome.degradeSteps ?? 0) > 0
+            || (outcome.mitigated ?? 0) > 0;
+        if (!hasMitigation) return null;
+
+        const grade = outcome.grade ?? outcome.category ?? 'wound';
+        const secondary = outcome.secondary ?? { stun: 0, wound: 0 };
+        const secondaryParts = [];
+        if (secondary.wound) secondaryParts.push(`${secondary.wound} ${game.i18n.localize('ALTERNITY.Wound')}`);
+        if (secondary.stun) secondaryParts.push(`${secondary.stun} ${game.i18n.localize('ALTERNITY.Stun')}`);
+
+        const content = await renderTemplate(ARMOR_CARD, {
+            targetName:  target.name,
+            damageForm,
+            rawDamage,
+            grade,
+            // 'none' is a degrade outcome, not a track, so it has no track label —
+            // localizing it would render the raw key on the card.
+            gradeLabel:  grade === 'none'
+                ? game.i18n.localize('ALTERNITY.Armor.Negated')
+                : game.i18n.localize(`ALTERNITY.${grade.charAt(0).toUpperCase()}${grade.slice(1)}`),
+            isNegated:   outcome.isNegated ?? false,
+            primary:     outcome.finalDamage ?? outcome.primary ?? 0,
+            degradeSteps: outcome.degradeSteps ?? 0,
+            armorAbsorbed: outcome.armorAbsorbed ?? 0,
+            armorSource: armor.source,
+            secondaryLabel: secondaryParts.join(' + '),
+            // Rendered here rather than in the template: `Roll#render` is async and
+            // Handlebars helpers are not.
+            rollHtml:    await Promise.all(armor.rolls.map((r) => r.render())),
+            trace:       outcome.modifierTrace ?? [],
+            name,
+        });
+
+        return ChatMessage.create({
+            speaker: ChatMessage.getSpeaker({ actor: target }),
+            content,
+            style: _rollStyle(),
+            rolls: armor.rolls,
+            flags: { [NAMESPACE]: { mitigation: { targetUuid: target.uuid, rawDamage, damageForm } } },
+        });
+    },
+
+    /**
      * Apply damage to an actor type that stores its own damage tracks rather than
      * keeping an AlternityCharacterState.
      *
      * The three shapes in play are all handled: creatures nest a `{value, max}`
      * pair per track, robots and AIs store a bare number per track, and warships
      * have their own graded pipeline in `applyWarshipDamage` which this defers to.
-     * Secondary damage comes from the math service, and is applied on top of the
-     * primary hit because armour never reduces it.
      *
+     * The whole degrade → secondary → armour sequence is the math service's
+     * `resolvePersonalDamage`, the same one the hero path uses — a creature's natural
+     * armour and printed toughness were previously collected by nobody and applied by
+     * nothing, so a bear's `d6 (LI)` hide stopped exactly zero damage.
+     *
+     * @param {Actor}  actor
+     * @param {number} total       - Raw damage rolled.
+     * @param {string} damageForm  - 'LI' | 'HI' | 'En'.
+     * @param {object} options     - See `applyDamageToTargets`.
+     * @returns {Promise<object|null>} The resolution, or null when nothing was applied.
      * @private
      */
-    async _applyTrackDamage(actor, category, total, name) {
+    async _applyTrackDamage(actor, total, damageForm, options = {}) {
+        const { category, context, name } = options;
+
         if (actor.type === 'warship') {
             ui.notifications?.info(game.i18n.localize('ALTERNITY.Roll.UseShipDamage'));
-            return;
+            return null;
         }
         if (actor.type === 'spaceship') {
             // Every hit on a core-rules spaceship lands on a named compartment,
             // chosen by a hit-location roll on the ship's own sheet — there is no
             // ship-wide track to add to.
             ui.notifications?.info(game.i18n.localize('ALTERNITY.Roll.UseCompartmentDamage'));
-            return;
+            return null;
         }
 
-        const secondary = AlternityMathService.calculateSecondaryDamage(category, total);
-        const perTrack = { stun: secondary.stun, wound: secondary.wound };
-        perTrack[category] = (perTrack[category] ?? 0) + total;
+        const resolved = AlternityMathService.resolvePersonalDamage({
+            rawDamage:   total,
+            damageGrade: category,
+            damageForm,
+            firepower:   options.firepower ?? null,
+            toughness:   options.toughness ?? null,
+            armorRoll:   options.armorRoll ?? 0,
+            armorSource: options.armorSource || game.i18n.localize('ALTERNITY.Armor.Label'),
+            context:     context ?? 'Damage',
+        });
+
+        // Secondary damage is added on top of whatever armour let through, because
+        // armour never touches it — but it is figured from the post-degrade primary,
+        // which is why it comes back from the resolution rather than being recomputed.
+        const perTrack = { stun: resolved.secondary.stun, wound: resolved.secondary.wound };
+        if (!resolved.isNegated) {
+            perTrack[resolved.grade] = (perTrack[resolved.grade] ?? 0) + resolved.primary;
+        }
 
         // Creatures nest each track as {value, max}; robots and AIs store a plain
         // number. Which one this actor uses is read off the data rather than the
@@ -554,17 +830,21 @@ export const AlternityRollService = {
             updates[isNested ? `system.damage.${track}.value` : `system.damage.${track}`] = next;
         }
 
-        if (!Object.keys(updates).length) return;
-        await actor.update(updates);
+        if (Object.keys(updates).length) await actor.update(updates);
 
         Hooks.callAll('alternity:damageApplied', actor, {
-            rawDamage: total, finalDamage: total, mitigated: 0,
-            damageType: category, category,
-            modifierTrace: secondary.modifierTrace,
+            rawDamage: total,
+            finalDamage: resolved.primary,
+            mitigated: resolved.mitigated,
+            damageType: damageForm,
+            category: resolved.grade,
+            modifierTrace: resolved.modifierTrace,
             woundLevelChanged: false,
             newWoundLevel: actor.system?.woundLevel ?? actor.system?.status ?? null,
             source: name ?? null,
         });
+
+        return resolved;
     },
 
     // -----------------------------------------------------------------------
@@ -699,7 +979,14 @@ export const AlternityRollService = {
 
         modifiers.push(...await this.readPendingDodge(target));
 
-        return { modifiers, target };
+        // The target's toughness travels with the modifiers so the attack card can
+        // report a firepower shortfall on the spot, rather than the player discovering
+        // at apply time that their pistol was never going to hurt a body tank. It is
+        // read here because it is the target's property and this is the one place the
+        // attack path already looks at the target.
+        const toughness = await this.collectTargetToughness(target);
+
+        return { modifiers, target, toughness };
     },
 };
 

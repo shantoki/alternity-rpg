@@ -703,6 +703,17 @@
     color: var(--alt-color-primary);
 }
 
+/* Derived toughness, shown under the armour ratings only when worn armour has
+   raised it above Ordinary. Read-only by design — it is not a stored field. */
+.alt-armor-toughness {
+    display: block;
+    margin-top: 4px;
+    font-size: 9px;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--alt-color-primary);
+}
+
 .alt-armor-field input {
     width: 100%;
     text-align: center;
@@ -1686,6 +1697,41 @@
     font-weight: normal;
     color: var(--alt-color-text);
     white-space: nowrap;
+}
+
+/* A labelled field sitting inside a grid cell — the armour rating's three die-range
+   boxes, where the LI/HI/En label has to hug its own input rather than head a row. */
+.alt-item-sheet .alt-item-inline-field {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    text-transform: none;
+    font-weight: normal;
+    color: var(--alt-color-text-muted);
+}
+.alt-item-sheet .alt-item-inline-field > span {
+    min-width: 18px;
+    text-align: right;
+}
+.alt-item-sheet .alt-item-inline-field > input {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Explains a field whose correct value is not obvious from its label — what shape a
+   die range takes, or that a resistance bonus is only for field gear. */
+.alt-item-sheet .alt-item-hint {
+    margin: 2px 0 0;
+    font-size: 9px;
+    font-style: italic;
+    color: var(--alt-color-text-muted);
+    line-height: 1.3;
+}
+
+/* A summary line reporting a problem with what was entered rather than a value. */
+.alt-item-sheet .alt-item-summary-warn {
+    color: var(--alt-color-danger);
 }
 
 /* Sub-heading inside a Details tab, grouping related fields (cybertech uses these

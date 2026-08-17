@@ -549,10 +549,12 @@ const DAMAGE_TYPE_LABELS = Object.freeze({
  * `EffectData` used to carry — Ballistic, Slashing, Piercing, Laser and so on —
  * onto the three forms the rules recognise.
  *
- * That list was a leftover, and an actively harmful one: `applyAlternityDamage`
- * compares a weapon's damage type against an armour's resisted types, so those two
- * agreed with each other while neither could ever match the LI/HI/En ratings the
- * sheets display and the rules use. Armour mitigation was quietly inert.
+ * That list was a leftover, and an actively harmful one: armour used to carry a
+ * matching list of "resisted types", so the two agreed with each other while neither
+ * could ever match the LI/HI/En ratings the sheets display and the rules use. Armour
+ * mitigation was quietly inert. Armour is now rated per form (`ArmorData.protection`)
+ * and the resisted-types list is gone, but the map stays: it is what migrates a
+ * Gamemaster's existing weapons and effects onto the real forms.
  *
  * Nothing in the old list corresponds to High Impact — HI is what armour-piercing
  * and heavy weapons do, and the d20 names carry no such distinction — so no value
@@ -606,6 +608,24 @@ const MAX_STEP = 7;
  */
 const PERSONAL_DAMAGE_GRADES = Object.freeze(['stun', 'wound', 'mortal']);
 const DAMAGE_CODE_SUFFIXES = Object.freeze({ s: 'stun', w: 'wound', m: 'mortal' });
+
+/**
+ * The toughness grades a personal-scale target can have (GM Guide Ch.11,
+ * "Firepower and Toughness"). A subset of FIREPOWER_CLASSES: weapons have a
+ * Marginal tier, targets do not.
+ *
+ * "Humanoid species, most personal armor, and portable objects have Ordinary
+ * toughness. Vehicles, buildings, and a few types of personal armor (such as
+ * powered attack armor and body tanks) have Good toughness. Tanks, fortified
+ * buildings, and spaceships have Amazing toughness." The Guide also extends this
+ * to creatures and machines — "an alien might have Good toughness, downgrading
+ * Ordinary firepower used against it" — which is why creature and supporting-cast
+ * statblocks carry the grade too.
+ */
+const PERSONAL_TOUGHNESS_CLASSES = Object.freeze(['Ordinary', 'Good', 'Amazing']);
+
+/** What an unarmoured person presents: "Humanoid species ... Ordinary toughness". */
+const DEFAULT_PERSONAL_TOUGHNESS = 'Ordinary';
 
 /**
  * Table P16 / Table P17 "Conditions" — the ladder a Gamemaster names a
@@ -987,6 +1007,70 @@ const AlternityMathService = {
             category,
             isValid: /\d/.test(formula),
             hadSuffix,
+            raw,
+        };
+    },
+
+    // -----------------------------------------------------------------------
+    // parseArmorValue
+    // -----------------------------------------------------------------------
+
+    /**
+     * Read an armour rating as the books print it — `d6-1`, `2d4+1`, a flat `4`,
+     * or a blank / `none` for a form the armour does not stop.
+     *
+     * Armour is quoted once per damage form (`Armor: d6-1 (LI), d4 (HI), d4+1
+     * (En)`), and the rating for the form that hit is rolled on every hit. The
+     * string is split here rather than handed straight to Foundry's `Roll` for the
+     * same reason damage codes are: two of the printed shapes are not roll-safe —
+     * `d6-1` needs its die count spelled out, and `none` is not a formula at all.
+     *
+     * PHB Ch.11 ("How to Read the Tables"): "For armor, the die ranges preceding
+     * LI, HI, and En indicate the amount of damage the armor stops when the wearer
+     * is hit by a weapon that does this type of damage. If a subtraction from a die
+     * roll produces a result less than 1, the armor failed to block any damage on
+     * that attack." So a rating genuinely can come up zero — `d6-3` does it half
+     * the time — and the roller floors it there rather than letting armour heal.
+     *
+     * @param {string|number} text
+     * @returns {{
+     *   formula: string,   // Roll-safe formula, '' when nothing needs rolling
+     *   flat:    number,   // A rating printed as a plain number
+     *   isDie:   boolean,  // true when `formula` has to be rolled
+     *   isValid: boolean,  // false for 'none', blank, and unreadable text
+     *   raw:     string,
+     * }}
+     */
+    parseArmorValue(text) {
+        const raw = String(text ?? '').trim();
+        // The scans print minus signs as en/em dashes and as U+2212, and hand entry
+        // copies whatever the reader saw.
+        const normalised = raw.replace(/[\u2010-\u2015\u2212]/g, '-');
+
+        if (!normalised || /^(none|no|n\/a|-)$/i.test(normalised)) {
+            return { formula: '', flat: 0, isDie: false, isValid: false, raw };
+        }
+
+        // A bare integer is a rating that needs no dice, and 0 is "stops nothing".
+        if (/^\d+$/.test(normalised)) {
+            const flat = parseInt(normalised, 10);
+            return { formula: '', flat, isDie: false, isValid: flat > 0, raw };
+        }
+
+        // Everything else has to look like dice. Interior spaces are dropped so
+        // "2d4 + 1" is as acceptable as "2d4+1"; anything that still does not match
+        // is reported invalid rather than guessed at, because a rating this code
+        // cannot read must not silently become 0 protection without saying so.
+        const compact = normalised.replace(/\s+/g, '');
+        if (!/^\d*d\d+([+-]\d+)?$/i.test(compact)) {
+            return { formula: '', flat: 0, isDie: false, isValid: false, raw };
+        }
+
+        return {
+            formula: compact.replace(/^d/i, '1d'),
+            flat:    0,
+            isDie:   true,
+            isValid: true,
             raw,
         };
     },
@@ -1994,6 +2078,221 @@ const AlternityMathService = {
         ];
 
         return { finalGrade, steps, isNegated: finalGrade === 'none', modifierTrace };
+    },
+
+    // -----------------------------------------------------------------------
+    // selectBestArmorRoll
+    // -----------------------------------------------------------------------
+
+    /**
+     * Apply the layering rule to a set of already-rolled protection values
+     * (PHB Ch.11, "Layering Armor").
+     *
+     * Protection does **not** add up. A character with natural armour, an implant
+     * and a worn suit "makes an armor roll for each type of protection and applies
+     * the more favorable result" — the phrasing the mutation and cybertech entries
+     * repeat verbatim four times, and the artifact armour entry states as "if
+     * combined with another form of armor, only the more effective armor is
+     * considered". So the best single roll wins and the rest are discarded.
+     *
+     * The losing rolls are still reported, because "your implant rolled higher than
+     * your armour" is exactly the sort of thing a player wants to see rather than
+     * infer.
+     *
+     * @param {Array<{source: string, value: number}>} candidates - Rolled results.
+     * @returns {{
+     *   value:         number,    // the winning roll, floored at 0
+     *   source:        string,    // which protection won ('' when there was none)
+     *   considered:    object[],  // every candidate, normalised
+     *   modifierTrace: object[],
+     * }}
+     */
+    selectBestArmorRoll(candidates = []) {
+        const considered = (Array.isArray(candidates) ? candidates : [])
+            .filter((c) => c && typeof c.value === 'number' && isFinite(c.value))
+            // A die range can roll below zero (`d6-3` on a 1); armour that fails to
+            // block anything blocks nothing, it does not add damage.
+            .map((c) => ({ source: String(c.source ?? 'Armor'), value: Math.max(0, Math.round(c.value)) }));
+
+        if (!considered.length) {
+            return { value: 0, source: '', considered, modifierTrace: [] };
+        }
+
+        const winner = considered.reduce((best, c) => (c.value > best.value ? c : best), considered[0]);
+
+        const modifierTrace = [this.buildModifier(
+            winner.source, -winner.value, `Armor absorbs ${winner.value} (${winner.source})`
+        )];
+        for (const loser of considered) {
+            if (loser === winner) continue;
+            modifierTrace.push(this.buildModifier(
+                loser.source, 0,
+                `${loser.source} rolled ${loser.value} — layered protection uses only the best result`
+            ));
+        }
+
+        return { value: winner.value, source: winner.source, considered, modifierTrace };
+    },
+
+    // -----------------------------------------------------------------------
+    // selectHighestToughness
+    // -----------------------------------------------------------------------
+
+    /**
+     * The toughness a target actually presents, given every source that could
+     * raise it (GM Guide Ch.11, "Firepower and Toughness").
+     *
+     * Toughness is a property of the target as armoured, not of the body alone:
+     * "Humanoid species, most personal armor, and portable objects have Ordinary
+     * toughness. Vehicles, buildings, and a few types of personal armor (such as
+     * powered attack armor and body tanks) have Good toughness." Worn armour
+     * therefore confers its own grade, and the artifact-armour entry says so
+     * outright — "provides Good toughness". The best source wins; nothing in the
+     * rules adds two toughness grades together.
+     *
+     * @param {Array<string|null|undefined>} values
+     * @param {string} [fallback='Ordinary'] - Used when nothing names a grade.
+     * @returns {string} A PERSONAL_TOUGHNESS_CLASSES value.
+     */
+    selectHighestToughness(values = [], fallback = DEFAULT_PERSONAL_TOUGHNESS) {
+        const ranked = (Array.isArray(values) ? values : [values])
+            .map((v) => FIREPOWER_CLASSES.indexOf(v))
+            .filter((i) => i >= 0);
+
+        const floor = Math.max(0, FIREPOWER_CLASSES.indexOf(fallback));
+        const best = ranked.length ? Math.max(floor, ...ranked) : floor;
+        return FIREPOWER_CLASSES[best];
+    },
+
+    // -----------------------------------------------------------------------
+    // resolvePersonalDamage
+    // -----------------------------------------------------------------------
+
+    /**
+     * Resolve one personal-scale hit end to end, in the order the Gamemaster Guide
+     * sets out (Ch.11, "Firepower and Toughness" / "Armor").
+     *
+     * The order is the whole point of this function, and it is not the order the
+     * steps are usually implemented in:
+     *
+     *   1. **Degrade first.** "This effect occurs before any armor rolls or
+     *      secondary damage take place." A grade shift changes the *track*, never
+     *      the number of points: 6 wounds become 6 stuns.
+     *   2. **Secondary damage next, off the degraded primary.** "Secondary damage
+     *      is based on the new primary damage" — and on the primary *before* armour,
+     *      because "armor has no effect on secondary damage". Both halves matter:
+     *      figuring it before the degrade overstates it, and figuring it after
+     *      armour understates it.
+     *   3. **Armour last, against the primary only.**
+     *
+     * Worked from the Guide's own examples, all three of which are asserted in the
+     * tests: a battle vest rolling 2 against 6 wounds leaves 4 wounds and 3 stuns;
+     * a body tank (Good toughness) turns 6 sword wounds into 6 stuns and then
+     * absorbs all 6; a Good-firepower plasma gun against the same tank keeps its 7
+     * wounds, loses 5 to armour, and still lands the 3 secondary stuns.
+     *
+     * @param {object}   config
+     * @param {number}   config.rawDamage           - Points rolled, before anything.
+     * @param {string}   [config.damageGrade='wound'] - Track the code named: stun/wound/mortal.
+     * @param {string}   [config.damageForm='LI']   - LI / HI / En. Reported, not applied:
+     *        the caller has already used it to pick which armour rating to roll.
+     * @param {string}   [config.firepower=null]    - Weapon firepower. Degrade needs both
+     *        halves, so a null on either side means no degrade rather than a guessed one.
+     * @param {string}   [config.toughness=null]    - The target's toughness.
+     * @param {number}   [config.armorRoll=0]       - Already-rolled protection (see
+     *        `selectBestArmorRoll`). Dice belong to the roll service, not here.
+     * @param {string}   [config.armorSource='Armor']
+     * @param {object[]} [config.modifiers=[]]      - Further mitigation; negative reduces.
+     * @param {string}   [config.context='Combat']
+     * @returns {{
+     *   grade:          string,   // track after degrading, or 'none' when ignored
+     *   isNegated:      boolean,  // the hit does nothing at all
+     *   degradeSteps:   number,
+     *   primary:        number,   // points reaching the track after armour
+     *   secondaryBasis: number,   // post-degrade, pre-armour primary
+     *   secondary:      {stun: number, wound: number},
+     *   armorAbsorbed:  number,
+     *   mitigated:      number,   // total reduction, armour plus other modifiers
+     *   modifierTrace:  object[],
+     * }}
+     */
+    resolvePersonalDamage(config = {}) {
+        const {
+            rawDamage,
+            damageGrade = 'wound',
+            damageForm = 'LI',
+            firepower = null,
+            toughness = null,
+            armorRoll = 0,
+            armorSource = 'Armor',
+            modifiers = [],
+            context = 'Combat',
+        } = config;
+
+        if (typeof rawDamage !== 'number' || !isFinite(rawDamage) || rawDamage < 0) {
+            throw new Error(
+                '[AlternityMathService.resolvePersonalDamage] rawDamage must be a non-negative finite number.'
+            );
+        }
+        if (!PERSONAL_DAMAGE_GRADES.includes(damageGrade)) {
+            throw new Error(
+                `[AlternityMathService.resolvePersonalDamage] damageGrade must be one of ` +
+                `${PERSONAL_DAMAGE_GRADES.join(', ')}. Received "${damageGrade}".`
+            );
+        }
+
+        const points = Math.max(0, Math.round(rawDamage));
+        const modifierTrace = [];
+
+        // ── 1. Degrade ──────────────────────────────────────────────────────
+        let grade = damageGrade;
+        let degradeSteps = 0;
+        if (firepower && toughness) {
+            const degrade = this.calculateFirepowerDegrade(damageGrade, firepower, toughness);
+            grade = degrade.finalGrade;
+            degradeSteps = degrade.steps;
+            modifierTrace.push(...degrade.modifierTrace);
+        }
+
+        if (grade === 'none') {
+            console.log(
+                `[Alternity|${context}] ${points} ${damageGrade} (${damageForm}) degraded away entirely ` +
+                `(${firepower} firepower vs ${toughness} toughness).`
+            );
+            return {
+                grade: 'none', isNegated: true, degradeSteps,
+                primary: 0, secondaryBasis: 0, secondary: { stun: 0, wound: 0 },
+                armorAbsorbed: 0, mitigated: points, modifierTrace,
+            };
+        }
+
+        // ── 2. Secondary damage, off the degraded primary, before armour ─────
+        const secondary = this.calculateSecondaryDamage(grade, points);
+        modifierTrace.push(...secondary.modifierTrace);
+
+        // ── 3. Armour, against the primary only ─────────────────────────────
+        const armorValue = Math.max(0, Math.round(Number(armorRoll) || 0));
+        const mitigationModifiers = [...modifiers.filter(Boolean)];
+        if (armorValue > 0) {
+            mitigationModifiers.unshift(this.buildModifier(
+                armorSource, -armorValue, `${armorSource} stops ${armorValue} ${damageForm} damage`
+            ));
+        }
+
+        const mitigation = this.calculateMitigatedDamage(points, mitigationModifiers, context);
+        modifierTrace.push(...mitigation.modifierTrace);
+
+        return {
+            grade,
+            isNegated: false,
+            degradeSteps,
+            primary: mitigation.finalDamage,
+            secondaryBasis: points,
+            secondary: { stun: secondary.stun, wound: secondary.wound },
+            armorAbsorbed: Math.min(points, armorValue),
+            mitigated: mitigation.mitigated,
+            modifierTrace,
+        };
     },
 
     // -----------------------------------------------------------------------
@@ -3145,6 +3444,8 @@ export {
     MIN_STEP,
     MAX_STEP,
     PERSONAL_DAMAGE_GRADES,
+    PERSONAL_TOUGHNESS_CLASSES,
+    DEFAULT_PERSONAL_TOUGHNESS,
     CONDITION_STEP_MODIFIERS,
     RANGE_CLASSES,
     RANGE_BANDS,

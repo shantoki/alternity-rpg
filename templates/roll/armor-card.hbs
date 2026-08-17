@@ -1,0 +1,61 @@
+{{!--
+    Mitigation card: what happened between a damage roll and the target's tracks.
+
+    Posted only when there is something to report — armour rolled, damage degraded,
+    or a stance absorbed some — because a hit that lands in full needs no explanation.
+    It has no buttons: by the time this renders the damage is already applied, and the
+    card exists so the roll behind the reduction is visible rather than hidden inside
+    the apply handler.
+--}}
+<div class="alt-roll-card alt-armor-card">
+    <header class="alt-roll-card-header">
+        <span class="alt-roll-card-context">{{localize "ALTERNITY.Armor.Mitigation"}}</span>
+        <span class="alt-roll-card-actor">{{targetName}}</span>
+    </header>
+
+    <div class="alt-roll-card-body">
+        <div class="alt-damage-total track--{{grade}}">
+            {{#if isNegated}}
+                <strong class="alt-damage-value">0</strong>
+                <span class="alt-damage-category">{{localize "ALTERNITY.Armor.Negated"}}</span>
+            {{else}}
+                <strong class="alt-damage-value">{{primary}}</strong>
+                <span class="alt-damage-category">{{gradeLabel}}</span>
+            {{/if}}
+            {{#if damageForm}}<span class="alt-damage-type">{{damageForm}}</span>{{/if}}
+        </div>
+
+        <p class="alt-roll-note">
+            {{localize "ALTERNITY.Armor.RawDamage"}}: {{rawDamage}}
+            {{#if degradeSteps}} — {{localize "ALTERNITY.Roll.DegradedTo"}} {{gradeLabel}}{{/if}}
+            {{#if armorAbsorbed}} — {{localize "ALTERNITY.Armor.Absorbed"}} {{armorAbsorbed}}{{#if armorSource}} ({{armorSource}}){{/if}}{{/if}}
+        </p>
+
+        {{#if secondaryLabel}}
+        <p class="alt-roll-note">{{localize "ALTERNITY.Armor.SecondaryNote"}}: {{secondaryLabel}}</p>
+        {{/if}}
+
+        {{#each rollHtml}}
+        <div class="alt-roll-rendered">{{{this}}}</div>
+        {{/each}}
+
+        {{#if trace.length}}
+        <details class="alt-roll-breakdown">
+            <summary>{{localize "ALTERNITY.Roll.Breakdown"}}</summary>
+            <table class="alt-trace-table">
+                <tbody>
+                    {{#each trace}}
+                    <tr>
+                        <td class="alt-trace-source">{{source}}</td>
+                        <td class="alt-trace-value {{#if (gt value 0)}}penalty{{else}}{{#if (lt value 0)}}bonus{{/if}}{{/if}}">
+                            {{#if (gt value 0)}}+{{/if}}{{value}}
+                        </td>
+                        <td class="alt-trace-reason">{{reason}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </details>
+        {{/if}}
+    </div>
+</div>

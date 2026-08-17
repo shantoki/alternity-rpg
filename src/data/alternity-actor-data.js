@@ -350,7 +350,11 @@ class AlternityCharacterState {
         career        = '',
         background    = '',
         actionsPerRound = 2,
-        armor         = { li: 0, hi: 0, en: 0 },
+        // Blank, not 0: these hold die ranges as printed ("d6-1"), and the damage
+        // pipeline reads them with AlternityMathService.parseArmorValue. A default of
+        // 0 put a readable "stops nothing" rating in every box, which is a different
+        // statement from "no armour entered".
+        armor         = { li: '', hi: '', en: '' },
         features      = null,
         psionics      = null,
         mutations     = null,

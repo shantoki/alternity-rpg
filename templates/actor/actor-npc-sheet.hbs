@@ -120,6 +120,17 @@
                 </span>
             </div>
             <div class="{{alt}}-stat-box">
+                {{!-- Humanoids are Ordinary; the Guide lets a resilient alien or a
+                      machine be entered as Good, which degrades an Ordinary-firepower
+                      weapon's damage a grade before armour is rolled. --}}
+                <label title="{{localize 'ALTERNITY.Armor.ToughnessHint'}}">{{localize 'ALTERNITY.Armor.Toughness'}}</label>
+                <select name="system.toughness">
+                    {{#each toughnessChoices as |choice|}}
+                    <option value="{{choice}}" {{#if (eq ../system.toughness choice)}}selected{{/if}}>{{choice}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="{{alt}}-stat-box">
                 <label title="{{localize 'ALTERNITY.Npc.ActionCheckOverrideHint'}}">{{localize 'ALTERNITY.Npc.ActionCheckOverride'}}</label>
                 <input type="number" name="system.actionCheckBonusOverride" value="{{system.actionCheckBonusOverride}}" placeholder="—" />
             </div>

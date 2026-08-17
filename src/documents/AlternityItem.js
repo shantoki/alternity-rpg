@@ -133,12 +133,9 @@ export class AlternityItem extends Item {
     _prepareArmorData() {
         const sys = this.system;
 
-        sys.defenseBonusLabel  = sys.armorBonus > 0 ? `+${sys.armorBonus}` : '0';
-        sys.speedPenaltyLabel  = sys.speedPenalty  > 0 ? `-${sys.speedPenalty} ft` : '—';
-        sys.skillPenaltyLabel  = sys.skillPenalty  > 0 ? `-${sys.skillPenalty}` : '—';
-        sys.resistanceLabel    = sys.damageResistance > 0
-            ? `${sys.damageResistance} DR${sys.resistedTypes.length ? ' (' + sys.resistedTypes.join(', ') + ')' : ''}`
-            : '—';
+        // The protection labels, the toughness flag and the two penalty labels are
+        // all derived by ArmorData.prepareDerivedData, which runs first and has the
+        // parsed die ranges to hand. Only the item-level ones are added here.
         sys.equippedLabel      = sys.isEquipped ? game.i18n.localize('ALTERNITY.Equipped') : game.i18n.localize('ALTERNITY.Stowed');
         sys.techCostDisplay    = sys.techPointCost > 0 ? `${sys.techPointCost} TP/scene` : '—';
     }
@@ -448,7 +445,7 @@ export class AlternityItem extends Item {
 
         // Whoever is targeted contributes their resistance modifier and any dodge
         // they rolled — Alternity's substitute for an armour class.
-        const { modifiers: targetModifiers } = await AlternityRollService.collectTargetModifiers({
+        const { modifiers: targetModifiers, toughness } = await AlternityRollService.collectTargetModifiers({
             attackKind: isMelee ? 'melee' : 'ranged',
         });
         modifiers.push(...targetModifiers);
@@ -468,7 +465,10 @@ export class AlternityItem extends Item {
             baseStep,
             modifiers,
             whisper: options.whisper ?? false,
-            damage: this.getDamagePayload(),
+            // The target's toughness travels with the damage payload so the card can
+            // report a firepower shortfall; null when nothing is targeted, because the
+            // degrade rule needs both halves and will not guess at one.
+            damage: { ...this.getDamagePayload(), targetToughness: toughness ?? null },
         });
     }
 

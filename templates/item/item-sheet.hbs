@@ -216,10 +216,38 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>{{localize 'ALTERNITY.Armor.DefenseBonus'}}</label>
-                        <input type="number" name="system.armorBonus" value="{{system.armorBonus}}" data-dtype="Number" min="0" max="15"/>
+                        <label>{{localize 'ALTERNITY.Armor.Toughness'}}</label>
+                        <select name="system.toughness">
+                            {{selectOptions config.toughnessClasses selected=system.toughness}}
+                        </select>
                     </div>
                 </div>
+
+                {{!-- The armour rating proper: one die range per damage form, entered
+                      exactly as the book prints it ("d6-1 (LI), d4 (HI), d4+1 (En)").
+                      Text inputs, not numbers, because a die range is not a number. --}}
+                <div class="form-group">
+                    <label>{{localize 'ALTERNITY.Armor.Protection'}}</label>
+                    <div class="grid grid-3col">
+                        {{!-- Plain LI/HI/En here, not the ALTERNITY.Armor.LI keys: those
+                              read "Armor LI", which is redundant under a Protection
+                              heading, and they belong to the warship sheet. --}}
+                        <label class="alt-item-inline-field">
+                            <span>LI</span>
+                            <input type="text" name="system.protection.li" value="{{system.protection.li}}" placeholder="d6-1"/>
+                        </label>
+                        <label class="alt-item-inline-field">
+                            <span>HI</span>
+                            <input type="text" name="system.protection.hi" value="{{system.protection.hi}}" placeholder="d4"/>
+                        </label>
+                        <label class="alt-item-inline-field">
+                            <span>En</span>
+                            <input type="text" name="system.protection.en" value="{{system.protection.en}}" placeholder="d4+1"/>
+                        </label>
+                    </div>
+                    <p class="alt-item-hint">{{localize 'ALTERNITY.Armor.ProtectionHint'}}</p>
+                </div>
+
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.SpeedPenalty'}}</label>
@@ -231,20 +259,9 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>{{localize 'ALTERNITY.Armor.DamageResistance'}}</label>
-                    <input type="number" name="system.damageResistance" value="{{system.damageResistance}}" data-dtype="Number" min="0"/>
-                </div>
-                <div class="form-group">
-                    <label>{{localize 'ALTERNITY.Armor.ResistedTypes'}}</label>
-                    <div class="alt-checkbox-row">
-                        {{!-- `key` is the stored form (LI/HI/En); `label` spells it out. --}}
-                        {{#each config.damageTypes as |label key|}}
-                        <label class="alt-checkbox-inline">
-                            <input type="checkbox" name="system.resistedTypes" value="{{key}}" {{#if (includes ../system.resistedTypes key)}}checked{{/if}}/>
-                            {{label}}
-                        </label>
-                        {{/each}}
-                    </div>
+                    <label>{{localize 'ALTERNITY.Armor.ResistanceBonus'}}</label>
+                    <input type="number" name="system.resistanceModifierBonus" value="{{system.resistanceModifierBonus}}" data-dtype="Number" min="0" max="5"/>
+                    <p class="alt-item-hint">{{localize 'ALTERNITY.Armor.ResistanceBonusHint'}}</p>
                 </div>
                 <div class="grid grid-2col">
                     <div class="form-group">
@@ -258,14 +275,20 @@
                 </div>
 
                 <div class="alt-item-summary">
-                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Armor.DefenseBonus'}}:</strong> {{system.defenseBonusLabel}}</span>
+                    <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Armor.Protection'}}:</strong> {{system.protectionLabel}}</span>
+                    {{#if system.raisesToughness}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Armor.Toughness'}}:</strong> {{system.toughness}}</span>
+                    {{/if}}
                     <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.SpeedPenalty'}}:</strong> {{system.speedPenaltyLabel}}</span>
                     <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Armor.SkillPenalty'}}:</strong> {{system.skillPenaltyLabel}}</span>
-                    {{#if system.hasResistance}}
-                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Armor.DamageResistance'}}:</strong> {{system.resistanceLabel}}</span>
+                    {{#if system.resistanceModifierBonus}}
+                        <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Armor.ResistanceBonus'}}:</strong> {{system.resistanceBonusLabel}}</span>
                     {{/if}}
                     {{#if system.usesTechPoints}}
                         <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.TechPointCost'}}:</strong> {{system.techCostDisplay}}</span>
+                    {{/if}}
+                    {{#if system.hasUnreadable}}
+                        <span class="alt-item-summary-entry alt-item-summary-warn">{{localize 'ALTERNITY.Armor.UnreadableRating'}}</span>
                     {{/if}}
                 </div>
             {{/if}}

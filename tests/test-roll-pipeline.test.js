@@ -531,6 +531,243 @@ describe('AlternityRollService.applyDamageToTargets', () => {
     });
 });
 
+describe('Armour mitigation', () => {
+    /** An armour item as the item sheet stores one. */
+    const armorItem = (name, protection, extra = {}) => ({
+        id: `armor-${name}`, name, type: 'armor',
+        system: { isEquipped: true, protection, toughness: 'Ordinary', ...extra },
+    });
+
+    describe('collectArmorRatings', () => {
+        it('should collect worn armour, implants and natural armour into one list', async () => {
+            const target = makeActor({
+                type: 'creature',
+                system: { naturalArmor: { li: 'd4', hi: '', en: 'd4-1' } },
+                items: [
+                    armorItem('Battle Vest', { li: 'd6-3', hi: 'd4', en: '' }),
+                    { id: 'cyb', name: 'Dermal Plating', type: 'cybertech',
+                        system: { isInstalled: true, armorProtection: { li: 'd6+2', hi: 'd6+1', en: 'd6+1' } } },
+                    // Not worn and not installed: neither should be collected.
+                    armorItem('Spare Suit', { li: 'd8', hi: 'd8', en: 'd8' }, { isEquipped: false }),
+                    { id: 'cyb2', name: 'Uninstalled Plating', type: 'cybertech',
+                        system: { isInstalled: false, armorProtection: { li: 'd8', hi: '', en: '' } } },
+                ],
+            });
+
+            const ratings = await AlternityRollService.collectArmorRatings(target);
+            expect(ratings.map((r) => r.source))
+                .toEqual(['Battle Vest', 'Dermal Plating', 'ALTERNITY.Armor.Natural']);
+        });
+
+        it('should read an AI\'s CPU armour out of its physical form table', async () => {
+            const target = makeActor({
+                type: 'ai',
+                system: { physicalForm: [
+                    { name: 'Shell', kind: 'CPU Armor', value: 'd6+1' },
+                    { name: 'Turret', kind: 'Weapon', value: 'd6w' },
+                ] },
+            });
+
+            const ratings = await AlternityRollService.collectArmorRatings(target);
+            // One printed value covers every form — the box is armoured, not rated
+            // per damage type the way a suit is.
+            expect(ratings).toEqual([
+                { source: 'Shell', li: 'd6+1', hi: 'd6+1', en: 'd6+1', toughness: null },
+            ]);
+        });
+    });
+
+    describe('rollArmorProtection', () => {
+        it('should roll the rating for the form that hit, and no other', async () => {
+            const target = makeActor({
+                type: 'creature',
+                items: [armorItem('Battle Vest', { li: 'd6-3', hi: '2d4+1', en: '' })],
+            });
+            // One value is consumed, so only one rating can have been rolled.
+            queueRolls([4]);
+
+            const result = await AlternityRollService.rollArmorProtection({ actor: target, damageForm: 'LI' });
+            expect(result.rolls).toHaveLength(1);
+            expect(result.rolls[0].formula).toBe('1d6-3');
+            expect(result.value).toBe(1);
+            expect(result.source).toBe('Battle Vest');
+        });
+
+        it('should stop nothing for a form the armour does not cover', async () => {
+            const target = makeActor({
+                type: 'creature',
+                items: [armorItem('Battle Vest', { li: 'd6-1', hi: '', en: '' })],
+            });
+
+            const result = await AlternityRollService.rollArmorProtection({ actor: target, damageForm: 'En' });
+            expect(result).toMatchObject({ value: 0, source: '' });
+            expect(result.rolls).toHaveLength(0);
+        });
+
+        it('should keep only the best roll when protection is layered', async () => {
+            const target = makeActor({
+                type: 'creature',
+                system: { naturalArmor: { li: 'd4', hi: '', en: '' } },
+                items: [armorItem('Battle Vest', { li: 'd6', hi: '', en: '' })],
+            });
+            // Vest rolls 2, hide rolls 4 — the hide wins, and 6 would be the sum.
+            queueRolls([2, 4]);
+
+            const result = await AlternityRollService.rollArmorProtection({ actor: target, damageForm: 'LI' });
+            expect(result.value).toBe(4);
+            expect(result.source).toBe('ALTERNITY.Armor.Natural');
+            expect(result.considered).toHaveLength(2);
+        });
+
+        it('should report the target\'s toughness, raised by what it wears', async () => {
+            const target = makeActor({
+                type: 'npc',
+                system: { toughness: 'Ordinary' },
+                items: [armorItem('Body Tank', { li: '2d4+1', hi: '2d4+1', en: '2d4+1' }, { toughness: 'Good' })],
+            });
+            queueRolls([6]);
+
+            const result = await AlternityRollService.rollArmorProtection({ actor: target, damageForm: 'LI' });
+            expect(result.toughness).toBe('Good');
+        });
+
+        it('should not roll a rating it cannot read, and should say so', async () => {
+            // console.warn is captured by hand rather than with jest.spyOn: under ESM
+            // the `jest` object is not a global, and the rest of the suite does it
+            // this way too.
+            const warnings = [];
+            const realWarn = console.warn;
+            console.warn = (...args) => warnings.push(args.join(' '));
+
+            try {
+                const target = makeActor({
+                    type: 'creature',
+                    items: [armorItem('Mystery Suit', { li: 'quite good', hi: '', en: '' })],
+                });
+
+                const result = await AlternityRollService.rollArmorProtection({ actor: target, damageForm: 'LI' });
+                expect(result.value).toBe(0);
+                expect(warnings.join(' | ')).toMatch(/could not read/);
+            } finally {
+                console.warn = realWarn;
+            }
+        });
+    });
+
+    describe('applied end to end', () => {
+        it('should subtract the armour roll from a creature\'s primary damage only', async () => {
+            const target = makeActor({
+                type: 'creature',
+                system: {
+                    naturalArmor: { li: 'd6-4', hi: '', en: '' },
+                    damage: { stun: { value: 0 }, wound: { value: 0 }, mortal: { value: 0 } },
+                    durability: { stun: { max: 20 }, wound: { max: 20 }, mortal: { max: 10 } },
+                },
+            });
+            targetActor(target);
+            queueRolls([6]); // d6-4 rolls 6 -> stops 2
+
+            await AlternityRollService.applyDamageToTargets({
+                total: 6, category: 'wound', damageType: 'LI', name: 'Sword',
+            });
+
+            // The Gamemaster Guide's battle-vest example, run through the real pipeline:
+            // 4 wounds get through, and all 3 secondary stuns do.
+            expect(target.updates[0]).toEqual({
+                'system.damage.stun.value': 3,
+                'system.damage.wound.value': 4,
+            });
+        });
+
+        it('should degrade before rolling armour when firepower falls short', async () => {
+            const target = makeActor({
+                type: 'creature',
+                system: {
+                    toughness: 'Good',
+                    naturalArmor: { li: '1', hi: '', en: '' },
+                    damage: { stun: { value: 0 }, wound: { value: 0 }, mortal: { value: 0 } },
+                    durability: { stun: { max: 20 }, wound: { max: 20 }, mortal: { max: 10 } },
+                },
+            });
+            targetActor(target);
+
+            await AlternityRollService.applyDamageToTargets({
+                total: 6, category: 'wound', damageType: 'LI', firepower: 'Ordinary', name: 'Sword',
+            });
+
+            // 6 wounds become 6 stuns, armour stops 1 -> 5 stun, and a stun hit has no
+            // secondary damage, so the wound track is untouched.
+            expect(target.updates[0]).toEqual({ 'system.damage.stun.value': 5 });
+        });
+
+        it('should hand the roll to a hero through applyAlternityDamage', async () => {
+            const target = makeActor({
+                type: 'npc',
+                system: { toughness: 'Ordinary' },
+                items: [armorItem('Battle Vest', { li: 'd6-3', hi: '', en: '' })],
+            });
+            const calls = [];
+            target.applyAlternityDamage = async (...args) => { calls.push(args); return { armorAbsorbed: 2 }; };
+            targetActor(target);
+            queueRolls([5]); // d6-3 -> 2
+
+            await AlternityRollService.applyDamageToTargets({
+                total: 6, category: 'wound', damageType: 'LI', firepower: 'Ordinary', name: 'Sword',
+            });
+
+            expect(calls[0][1]).toBe('LI');
+            expect(calls[0][2]).toMatchObject({
+                category: 'wound', armorRoll: 2, armorSource: 'Battle Vest',
+                firepower: 'Ordinary', toughness: 'Ordinary',
+            });
+        });
+
+        it('should post a mitigation card so the armour roll is not hidden', async () => {
+            const target = makeActor({
+                type: 'creature',
+                system: {
+                    naturalArmor: { li: 'd6-4', hi: '', en: '' },
+                    damage: { stun: { value: 0 }, wound: { value: 0 }, mortal: { value: 0 } },
+                    durability: { stun: { max: 20 }, wound: { max: 20 }, mortal: { max: 10 } },
+                },
+            });
+            targetActor(target);
+            queueRolls([6]);
+
+            await AlternityRollService.applyDamageToTargets({
+                total: 6, category: 'wound', damageType: 'LI', name: 'Sword',
+            });
+
+            const card = renderLog.find((r) => r.path.endsWith('armor-card.hbs'));
+            expect(card).toBeDefined();
+            expect(card.context).toMatchObject({
+                targetName: target.name, rawDamage: 6, primary: 4, armorAbsorbed: 2,
+                armorSource: 'ALTERNITY.Armor.Natural', damageForm: 'LI',
+            });
+            // The armour die itself is attached to the message, not just described.
+            expect(chatLog[chatLog.length - 1].rolls).toHaveLength(1);
+        });
+
+        it('should stay quiet when nothing reduced the damage', async () => {
+            const target = makeActor({
+                type: 'creature',
+                system: {
+                    damage: { stun: { value: 0 }, wound: { value: 0 }, mortal: { value: 0 } },
+                    durability: { stun: { max: 20 }, wound: { max: 20 }, mortal: { max: 10 } },
+                },
+            });
+            targetActor(target);
+
+            await AlternityRollService.applyDamageToTargets({
+                total: 6, category: 'wound', damageType: 'LI', name: 'Sword',
+            });
+
+            // An unmitigated hit is already fully described by the damage card.
+            expect(renderLog.some((r) => r.path.endsWith('armor-card.hbs'))).toBe(false);
+        });
+    });
+});
+
 describe('Dodge defence', () => {
     it('should store the step adjustment on the defender for the next attack', async () => {
         const actor = makeActor();

@@ -37,20 +37,31 @@ Improve the layout and interactivity of the sheet.
 - [x] **Profession & Career Selection**: Use a dropdown or similar for professions to automate bonuses.
 
 ## Phase 3: Advanced Automation & Integration
-- [ ] **Armor Mitigation in Rolls**: Integrate armor die rolls into the damage application flow.
-      Armour values can be die ranges (`d6-1`), and `applyAlternityDamage` currently
-      mitigates with a flat `damageResistance` number rather than rolling the die.
-- [ ] **Reconcile the two armour models**: `AlternityCharacterState.armor` is the canonical
-      `{li, hi, en}` triple of die ranges, while `ArmorData` items carry a single flat
-      `damageResistance` plus a `resistedTypes` list. Both now speak LI/HI/En (see below),
-      so they can finally be compared — but an armour item still cannot express "d6-1 LI /
-      d4 HI / d4+1 En", which is how the book prints every suit.
+- [x] **Armor Mitigation in Rolls**: armour dice are rolled and subtracted. The Apply button
+      on a damage card now rolls the target's protection for the form that hit
+      (`AlternityRollService.rollArmorProtection`), applies the layering rule, and posts a
+      mitigation card so the roll is visible rather than hidden inside the handler.
+- [x] **Reconcile the two armour models**: there is now one model. `ArmorData` carries a
+      `protection` `{li, hi, en}` triple of die ranges — the shape the book prints, and the
+      same shape `CybertechData.armorProtection`, `CreatureData.naturalArmor` and
+      `AlternityCharacterState.armor` already used. The flat `damageResistance` and its
+      `resistedTypes` list are gone, migrated into `protection` (world migration v2).
+      `armorBonus` — a d20 armour-class number that was being added to the wearer's
+      resistance modifier, so every suit bought its wearer a dodge bonus — became
+      `resistanceModifierBonus`, documented as being for the deflection harness and
+      displacer softsuit only.
+- [x] **Personal-scale firepower degrade**: armour, supporting cast and creatures carry a
+      `toughness` grade (Ordinary/Good/Amazing), worn armour raises its wearer's, and the
+      degrade runs *before* the armour roll and *before* secondary damage, as the Gamemaster
+      Guide specifies. The Guide's three worked examples are asserted in the test suite.
 - [ ] **Skill specialty highlighting**: Ensure specialty skills are visually distinct (italics as per PDF).
+      Note the conflict to resolve first: italic is currently the *locked* style
+      (`.alt-skill-item.is-locked`), and specialties are distinguished by indentation.
 - [ ] **Quick Action Buttons**: Add buttons for common actions (Recovery, First Aid check).
-- [ ] **Personal-scale firepower degrade**: `calculateFirepowerDegrade` exists and the
-      damage card reports it, but only when the caller knows the target's toughness.
-      Personal armour has no toughness field yet, so a weapon's firepower currently
-      has no effect against a person.
+- [ ] **Armor Operation stun absorption**: ranks in the Armor Operation specialty let a hero
+      absorb stun points *including secondary* — the one place anything reduces secondary
+      damage. It is a skill benefit rather than an armour property, so it was left out of the
+      armour work above.
 
 ## Phase 4: Rolling from the sheets — done
 Every sheet can now roll what it prints. The pipeline is:
@@ -144,3 +155,26 @@ though it worked.
 - [x] Serialization/Deserialization.
 - [x] Rolling from every sheet that has something to roll (see Phase 4).
 - [x] Drag and drop of items on every sheet that has somewhere to put one (see Phase 5).
+
+## Phase 6: Armour actually stops damage — done
+
+Armour was the last part of a combat round that was wired up in name only. `ArmorData`
+could not express a die range, so no suit could be entered as the book prints it; the
+one number it did have was subtracted flat; `AlternityCharacterState.armor` and
+`CreatureData.naturalArmor` were read by nobody at all; and `armorBonus` was quietly
+making heavy armour harder to hit. What exists now:
+
+- One armour model — a `{li, hi, en}` triple of die ranges — shared by worn armour,
+  cybertech plating, natural armour and the hero sheet's own ratings box.
+- `AlternityMathService.parseArmorValue`, `selectBestArmorRoll`, `selectHighestToughness`
+  and `resolvePersonalDamage` (pure); `AlternityRollService.collectArmorRatings` and
+  `rollArmorProtection` (the dice). The Gamemaster Guide's order of operations —
+  degrade, then secondary off the degraded primary, then armour — lives in exactly one
+  function, and its three worked examples are the tests.
+- The layering rule: protections compete, the best roll wins, and the discarded rolls
+  are reported on the mitigation card rather than vanishing.
+- A `toughness` grade on armour, supporting cast and creatures, so a pistol against a
+  body tank loses a grade before the armour is even rolled.
+
+See `alternity-core-mechanics.md` ("Armor" / "Firepower vs. Toughness") for the sourced
+rules, and Phase 3 for the two armour-adjacent items deliberately left open.

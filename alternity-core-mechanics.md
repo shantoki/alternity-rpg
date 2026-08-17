@@ -103,13 +103,73 @@ Damage comes in three forms: **Stun (s)**, **Wound (w)**, and **Mortal (m)**.
 - **Mortal Rating**: Equal to 1/2 CON (rounded up).
 
 #### Secondary Damage
-Serious injuries cause secondary damage based on the **raw damage** received:
+Serious injuries cause secondary damage based on the primary damage received — after any
+firepower-versus-toughness degrade, but before armour (see "Firepower vs. Toughness" below):
 - **Wound Damage**: For every 2 points of wound damage, receive 1 point of stun damage.
 - **Mortal Damage**: For every 2 points of mortal damage, receive 1 point of wound and 1 point of stun damage.
 
 #### Armor
-- Armor reduces **primary damage** (Stun, Wound, or Mortal).
-- Armor has **no effect on secondary damage**. Secondary damage is calculated from the raw damage *before* armor reduction.
+Transcribed from the Player's Handbook Ch.11 and Gamemaster Guide Ch.11 scans (verified 2026-08-17).
+
+- Armor is rated as a **die range per damage form**, and every printed suit gives all three:
+  `Armor: d6-1 (LI), d4 (HI), d4+1 (En)`. The rating for the form that hit is **rolled on
+  every hit** and subtracted from the primary damage. PHB Ch.11: "the die ranges preceding
+  LI, HI, and En indicate the amount of damage the armor stops when the wearer is hit by a
+  weapon that does this type of damage. **If a subtraction from a die roll produces a result
+  less than 1, the armor failed to block any damage on that attack**" — so a rating can
+  legitimately come up zero, and never goes negative.
+- Armor reduces **primary damage** (Stun, Wound, or Mortal) only. It has **no effect on
+  secondary damage**.
+- **Layering: roll each protection separately and apply the more favorable result.** Natural
+  armour, an implant and a worn suit do **not** add up. The mutation and cybertech entries
+  state it four times ("makes an armor roll for each type of protection and applies the more
+  favorable result"), and the artifact-armour entry as "if combined with another form of
+  armor, only the more effective armor is considered".
+- Armor is **not** a to-hit number. There is no armour class, and wearing armour does nothing
+  to an attacker's check. The only gear that adjusts a resistance modifier says so in its own
+  entry: the PL 7 **deflection harness** (+2 steps, and a +2 penalty attacking outside the
+  field) and the PL 8 **displacer softsuit** (+3 steps).
+
+#### Firepower vs. Toughness (personal scale)
+GM Guide Ch.11. A weapon has a firepower grade and a target has a toughness grade; a shortfall
+degrades the damage a grade **before anything else happens**.
+
+| Toughness | Who has it |
+| :--- | :--- |
+| Ordinary | Humanoid species, most personal armor, portable objects |
+| Good | Vehicles, buildings, a few types of personal armor (powered attack armor, body tanks), resilient aliens |
+| Amazing | Tanks, fortified buildings, spaceships; very rare creatures |
+
+Most personal weapons are Ordinary firepower, many heavy weapons Good, vehicular and
+spaceship weapons Amazing. "When a weapon's firepower equals or exceeds the toughness of its
+target, damage doesn't degrade." Each grade of shortfall degrades once: mortal → wound →
+stun → ignored.
+
+**The order of operations is explicit, and is not the obvious one:**
+
+1. **Degrade first.** "This effect occurs before any armor rolls or secondary damage take
+   place." The grade changes; the number of points does not — 6 wounds become 6 stuns.
+2. **Secondary damage next, from the *degraded* primary, before armour.** "Secondary damage
+   is based on the new primary damage", and armour never touches it.
+3. **Armour last, against the primary only.**
+
+Three worked examples from the Guide, all three asserted in the test suite:
+
+- **Battle vest.** A sword inflicts 6 wounds. Secondary damage is 3 stuns. The vest stops
+  `d6-3`, rolling 2. Result: **4 wounds and 3 stuns**.
+- **Body tank (Good toughness) vs. a sword (Ordinary firepower).** The 6 wounds degrade to
+  6 stuns *first*; the tank then rolls `2d4+1` for 6 and blocks all of it. Result: **nothing**.
+- **Body tank vs. a plasma gun (Good firepower).** No degrade. 7 wounds, armour rolls 5, so
+  2 wounds get through — "but the 3 stuns of secondary damage get through" as well.
+
+Implemented as `AlternityMathService.resolvePersonalDamage` (the sequence above),
+`parseArmorValue` (the die ranges), `selectBestArmorRoll` (layering) and
+`selectHighestToughness`; the dice are rolled by `AlternityRollService.rollArmorProtection`,
+which collects every protection the target has.
+
+Not implemented, and deliberately so: the **Armor Operation** specialty's ability to absorb
+stun points *including secondary* (a skill benefit, not an armour property), the PL 8
+**ablative harness**'s 50-point energy pool, and the deflection harness's attack penalty.
 
 #### Effects of Damage
 - **Knockout**: All stun or wound boxes marked results in being knocked out.
@@ -218,7 +278,7 @@ Column meanings for any weapon table transcribed from the book:
 - **Acc**: Accuracy — an optional bonus/penalty applied to the wielder's check (e.g. a precise laser rifle gives -1 step, a flintlock pistol gives +2 steps).
 - **Md**: Mode — Fire (single shot/phase), Burst, or Autofire. A burst uses one 3-shot burst of ammunition per use; autofire uses three bursts per use.
 - **Range**: "Personal" for melee weapons (an asterisk marks a melee weapon that can also be thrown, via Athletics-throw), otherwise short/medium/long in meters — these are the ranges Table P22's step modifiers apply to.
-- **Type**: Two parts — the damage form (Low Impact / High Impact / Energy) and the weapon's firepower (Ordinary/Good/Amazing). **If a weapon's firepower is inferior to the toughness of the armor it's used against, the damage it inflicts is degraded a grade** (e.g. mortal damage becomes wound damage) — this is a personal-combat counterpart to the firepower-vs-toughness grade shift already implemented for ships in `AlternityMathService.calculateFirepowerShift`, but it is **not yet implemented anywhere for personal-scale weapons/armor** in this codebase.
+- **Type**: Two parts — the damage form (Low Impact / High Impact / Energy) and the weapon's firepower (Ordinary/Good/Amazing). **If a weapon's firepower is inferior to the toughness of the armor it's used against, the damage it inflicts is degraded a grade** (e.g. mortal damage becomes wound damage). See "Firepower vs. Toughness (personal scale)" above for the table and the order of operations; it runs through `AlternityMathService.calculateFirepowerDegrade`, which is the core-rules degrade-only ladder and **not** interchangeable with the Warships supplement's `calculateFirepowerShift`.
 - **Damage**: Given in Ordinary/Good/Amazing order, applied depending on the wielder's skill check result.
 - **Clip Size / Clip Cost**: Shots per clip, and average clip replacement cost.
 - **Hide**: Penalty to an opponent's Awareness-perception check to spot the concealed weapon ("—" means it can't be concealed).

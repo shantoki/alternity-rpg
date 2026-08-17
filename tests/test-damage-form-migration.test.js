@@ -75,17 +75,45 @@ describe('planItemMigration', () => {
         expect(planItemMigration(makeItem('weapon', { damageType: 'HI' }))).toBeNull();
     });
 
-    it('should rewrite an armour resisted-types list, deduped', () => {
-        const armor = makeItem('armor', { resistedTypes: ['Ballistic', 'Slashing', 'Laser'] });
+    it('should convert a flat resistance into a per-form protection rating', () => {
+        // The legacy names are mapped on the way through, deduped, and only the forms
+        // the armour actually resisted get the value.
+        const armor = makeItem('armor', {
+            damageResistance: 4,
+            resistedTypes: ['Ballistic', 'Slashing', 'Laser'],
+        });
         expect(planItemMigration(armor).updates).toEqual({
-            'system.resistedTypes': ['LI', 'En'],
+            'system.protection': { li: '4', hi: '', en: '4' },
         });
     });
 
-    it('should leave an empty resisted-types list empty', () => {
-        // Empty means "resists every type", not "resists none", so inventing entries
-        // would silently change what the armour does.
-        expect(planItemMigration(makeItem('armor', { resistedTypes: [] }))).toBeNull();
+    it('should read an empty resisted-types list as "resists everything"', () => {
+        // Empty meant "resists every type", not "resists none" — the only reading
+        // under which the old field did anything for most armour.
+        const armor = makeItem('armor', { damageResistance: 3, resistedTypes: [] });
+        expect(planItemMigration(armor).updates['system.protection'])
+            .toEqual({ li: '3', hi: '3', en: '3' });
+    });
+
+    it('should not touch armour whose protection is already entered', () => {
+        // A hand-entered die range is the better data and must survive the migration.
+        const armor = makeItem('armor', {
+            damageResistance: 4,
+            protection: { li: 'd6-1', hi: '', en: '' },
+        });
+        expect(planItemMigration(armor)).toBeNull();
+    });
+
+    it('should carry an armour-class bonus across as a resistance-modifier bonus', () => {
+        // Capped at the range field gear actually uses; armour itself should be 0.
+        expect(planItemMigration(makeItem('armor', { armorBonus: 9 })).updates)
+            .toEqual({ 'system.resistanceModifierBonus': 5 });
+        expect(planItemMigration(makeItem('armor', { armorBonus: 2 })).updates)
+            .toEqual({ 'system.resistanceModifierBonus': 2 });
+    });
+
+    it('should return null for armour with nothing to convert', () => {
+        expect(planItemMigration(makeItem('armor', { damageResistance: 0 }))).toBeNull();
     });
 
     it('should rewrite a whole effects array to change one entry', () => {

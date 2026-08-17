@@ -182,6 +182,17 @@
                     <input type="text" name="system.naturalArmor.{{slot.key}}" value="{{slot.value}}" placeholder="{{localize 'ALTERNITY.Creature.None'}}" />
                 </div>
                 {{/each}}
+                {{!-- The statblock prints this on its own line above the resistance
+                      modifiers ("Good toughness"). It degrades an inferior weapon's
+                      damage a grade before natural armour is rolled. --}}
+                <div class="{{alt}}-stat-box">
+                    <label title="{{localize 'ALTERNITY.Armor.ToughnessHint'}}">{{localize 'ALTERNITY.Armor.Toughness'}}</label>
+                    <select name="system.toughness">
+                        {{#each toughnessChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq ../system.toughness choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                </div>
             </div>
         </section>
 

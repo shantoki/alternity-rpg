@@ -251,24 +251,25 @@ describe('ai', () => {
         const actor = makeActor('ai', { physicalForm: [] });
         const { update, added } = planStatblockDrop(actor, [
             makeWeapon(),
-            item('armor', 'CPU Shell', { armorBonus: 4, damageResistance: 7 }),
+            item('armor', 'CPU Shell', { protection: { li: 'd6-1', hi: 'd4', en: '' } }),
         ], AI_DEFAULTS);
 
         expect(Object.keys(update)).toEqual(['system.physicalForm']);
         expect(update['system.physicalForm']).toEqual([
             { name: 'Charge Rifle', kind: 'Weapon', skill: 'Melee Weapons', value: 'd6+1w / d6+3w / d8+2m' },
-            // Resistance is the more specific of the two numbers, so it wins.
-            { name: 'CPU Shell', kind: 'CPU Armor', skill: '', value: '7' },
+            // A CPU shell is printed as one value, not a per-form triple, so the first
+            // rating the item states is the one that carries across.
+            { name: 'CPU Shell', kind: 'CPU Armor', skill: '', value: 'd6-1' },
         ]);
         expect(added).toHaveLength(2);
     });
 
-    test('armour with no resistance falls back to its armour bonus', () => {
+    test('armour with no readable rating leaves the row blank rather than inventing one', () => {
         const actor = makeActor('ai', { physicalForm: [] });
         const { update } = planStatblockDrop(actor, [
-            item('armor', 'Plating', { armorBonus: 3, damageResistance: 0 }),
+            item('armor', 'Plating', { protection: { li: '', hi: '', en: '' } }),
         ], AI_DEFAULTS);
-        expect(update['system.physicalForm'][0].value).toBe('3');
+        expect(update['system.physicalForm'][0].value).toBe('');
     });
 
     test('a program becomes a grid program row', () => {

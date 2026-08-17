@@ -43,6 +43,8 @@ import {
     NPC_QUALITY_TIERS,
     SUPPORTING_CAST_ROLES,
     REACTION_DEGREES,
+    PERSONAL_TOUGHNESS_CLASSES,
+    DEFAULT_PERSONAL_TOUGHNESS,
 } from '../services/alternity-math.js';
 
 const { fields } = foundry.data;
@@ -224,6 +226,21 @@ export class NpcData extends foundry.abstract.TypeDataModel {
              */
             resistanceBonus: new fields.NumberField({
                 required: true, nullable: false, integer: true, initial: 0,
+            }),
+
+            /**
+             * Toughness (GM Guide Ch.11). Supporting cast are humanoid by default —
+             * "Humanoid species, most personal armor, and portable objects have
+             * Ordinary toughness" — but the Guide extends the rule to aliens and
+             * machines outright, so a resilient alien can be entered as Good and
+             * shrug off Ordinary-firepower weapons. Worn armour raises this too,
+             * which is resolved at damage time rather than stored here.
+             */
+            toughness: new fields.StringField({
+                required: true,
+                nullable: false,
+                initial:  DEFAULT_PERSONAL_TOUGHNESS,
+                choices:  PERSONAL_TOUGHNESS_CLASSES,
             }),
 
             // ── Attacks ──────────────────────────────────────────────────

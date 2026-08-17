@@ -34,8 +34,17 @@ import { game, Hooks } from '../module-info.js';
 
 const NAMESPACE = 'alternity-v2';
 
-/** Bumped only when this migration's behaviour changes. */
-export const DAMAGE_FORM_MIGRATION_VERSION = 1;
+/** Damage form -> the `protection` sub-field it is rated in. */
+const FORM_KEYS = Object.freeze({ LI: 'li', HI: 'hi', En: 'en' });
+
+/**
+ * Bumped only when this migration's behaviour changes.
+ *
+ * v2: armour's flat `damageResistance` + `resistedTypes` pair became a `protection`
+ * die range per damage form, and `armorBonus` became `resistanceModifierBonus`. A
+ * world that already ran v1 has to run again for the armour half.
+ */
+export const DAMAGE_FORM_MIGRATION_VERSION = 2;
 
 const SETTING_KEY = 'damageFormMigration';
 
@@ -84,17 +93,44 @@ export function planItemMigration(item) {
         }
     }
 
-    if (item.type === 'armor' && Array.isArray(source.resistedTypes)) {
-        const mapped = [...new Set(
-            source.resistedTypes
-                .map((type) => (DAMAGE_TYPES.includes(type) ? type : LEGACY_DAMAGE_TYPE_MAP[type] ?? null))
-                .filter(Boolean)
-        )];
-        const changed = mapped.length !== source.resistedTypes.length
-            || mapped.some((type, i) => type !== source.resistedTypes[i]);
-        if (changed) {
-            updates['system.resistedTypes'] = mapped;
-            notes.push(`resistedTypes [${source.resistedTypes.join(', ')}] -> [${mapped.join(', ')}]`);
+    if (item.type === 'armor') {
+        // Armour no longer has a `resistedTypes` list or a flat `damageResistance`.
+        // Both become a die range per damage form, which is how every printed suit is
+        // rated — see the header of ArmorData.js. Only ever written when `protection`
+        // is still blank, so a rating already entered by hand is never overwritten.
+        const protection = source.protection ?? {};
+        const hasProtection = ['li', 'hi', 'en'].some((k) => String(protection[k] ?? '').trim());
+        const resistance = Number(source.damageResistance) || 0;
+
+        if (!hasProtection && resistance > 0) {
+            // Legacy names have to be mapped first: the flat value applied to a list of
+            // forms, and that list could still hold 'Ballistic' in a world that never
+            // ran version 1 of this migration.
+            const listed = Array.isArray(source.resistedTypes)
+                ? [...new Set(source.resistedTypes
+                    .map((t) => (DAMAGE_TYPES.includes(t) ? t : LEGACY_DAMAGE_TYPE_MAP[t] ?? null))
+                    .filter(Boolean))]
+                : [];
+            // An empty list meant "resists everything", which is the only reading under
+            // which the old field did anything for most armour.
+            const forms = listed.length ? listed : [...DAMAGE_TYPES];
+            const next = { li: '', hi: '', en: '', ...protection };
+            for (const form of forms) next[FORM_KEYS[form]] = String(resistance);
+
+            updates['system.protection'] = next;
+            notes.push(
+                `damageResistance ${resistance} (${forms.join(', ')}) -> protection `
+                + `${forms.map((f) => `${resistance} (${f})`).join(', ')} — re-enter the printed die ranges`
+            );
+        }
+
+        // `armorBonus` was a d20 armour-class number being added to the wearer's
+        // resistance modifier. Carried across capped at the range field gear actually
+        // uses, and reported so a Gamemaster can zero it on ordinary armour.
+        if (source.armorBonus !== undefined && source.resistanceModifierBonus === undefined) {
+            const carried = Math.min(5, Math.max(0, Number(source.armorBonus) || 0));
+            updates['system.resistanceModifierBonus'] = carried;
+            notes.push(`armorBonus ${source.armorBonus} -> resistanceModifierBonus ${carried}`);
         }
     }
 

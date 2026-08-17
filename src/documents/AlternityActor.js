@@ -105,21 +105,37 @@ export class AlternityActor extends Actor {
     _prepareCharacterData() {
         const sys = this.system;
 
-        // Sum armor bonuses from equipped armor items
         const equippedArmor = this.items.filter(
             i => i.type === 'armor' && i.system.isEquipped
         );
-        sys.totalArmorBonus     = equippedArmor.reduce((t, a) => t + (a.system.armorBonus ?? 0), 0);
         sys.totalSpeedPenalty   = equippedArmor.reduce((t, a) => t + (a.system.speedPenalty ?? 0), 0);
         sys.totalSkillPenalty   = equippedArmor.reduce((t, a) => t + (a.system.skillPenalty ?? 0), 0);
 
+        // Steps worn gear adds to the resistance modifier. This is *not* "armour makes
+        // you harder to hit" — armour in Alternity absorbs damage and does nothing to
+        // an attacker's check. It exists for the gear whose own entry says otherwise:
+        // the PL 7 deflection harness's +2 steps and the PL 8 displacer softsuit's +3.
+        // The field it reads used to be `armorBonus`, a d20 armour-class number, so
+        // every suit in the system was quietly buying its wearer a dodge bonus.
+        sys.totalResistanceBonus = equippedArmor.reduce(
+            (t, a) => t + (a.system.resistanceModifierBonus ?? 0), 0
+        );
+
         // Derived defense. Alternity has no armor-class number: defending applies a
-        // step penalty to the attacker's check, so this is DEX's resistance modifier
-        // plus whatever the worn armor contributes. The old `10 + dex + armor` was a
+        // step penalty to the attacker's check. The old `10 + dex + armor` was a
         // d20-shaped formula that also read the DEX *score* as if it were a modifier.
         sys.resistanceModifier = AlternityMathService.calculateResistanceModifier(
             sys.abilities?.dex ?? 0, 'DEX'
-        ) + sys.totalArmorBonus;
+        ) + sys.totalResistanceBonus;
+
+        // Toughness, raised by anything worn that provides a better grade — a body
+        // tank makes its wearer a Good-toughness target (GM Guide Ch.11), which
+        // degrades an Ordinary-firepower weapon's damage a whole grade. A hero has no
+        // toughness of their own to store: "humanoid species ... have Ordinary
+        // toughness", so this is entirely derived from what they are wearing.
+        sys.effectiveToughness = AlternityMathService.selectHighestToughness(
+            equippedArmor.map((a) => a.system.toughness)
+        );
 
         // Derived speed: 30ft base − speed penalty
         sys.speed = Math.max(0, 30 - sys.totalSpeedPenalty);
@@ -151,10 +167,20 @@ export class AlternityActor extends Actor {
         const equippedArmor = this.items.filter(
             i => i.type === 'armor' && i.system.isEquipped
         );
-        sys.totalArmorBonus = equippedArmor.reduce((t, a) => t + (a.system.armorBonus ?? 0), 0);
+        sys.totalResistanceBonus = equippedArmor.reduce(
+            (t, a) => t + (a.system.resistanceModifierBonus ?? 0), 0
+        );
         sys.resistanceModifier = AlternityMathService.calculateResistanceModifier(
             sys.abilities?.dex ?? 0, 'DEX'
-        ) + (sys.resistanceBonus ?? 0) + sys.totalArmorBonus;
+        ) + (sys.resistanceBonus ?? 0) + sys.totalResistanceBonus;
+        // The schema's own grade is the floor; worn armour can only raise it. Written
+        // to a *separate* key, never back onto `system.toughness` — that one is bound
+        // to a select on the sheet, and a derived value landing in an input would be
+        // saved back as though the Gamemaster had typed it.
+        sys.effectiveToughness = AlternityMathService.selectHighestToughness(
+            equippedArmor.map((a) => a.system.toughness),
+            sys.toughness,
+        );
         sys.stunPct    = this._resourcePct(sys.durability?.stun);
         sys.woundPct   = this._resourcePct(sys.durability?.wound);
         sys.mortalPct  = this._resourcePct(sys.durability?.mortal);
@@ -500,11 +526,19 @@ export class AlternityActor extends Actor {
      *
      * Routing:
      *   1. Load AlternityCharacterState from flags.
-     *   2. Run damage through AlternityMathService.calculateMitigatedDamage()
-     *      using resistance modifiers from active passives / stances.
-     *   3. Apply final damage via AlternityCharacterState.applyDamage().
-     *      Fastplay Rule: Secondary damage is calculated from rawDamage BEFORE armor reduction.
+     *   2. Resolve the hit through AlternityMathService.resolvePersonalDamage(), which
+     *      owns the Gamemaster Guide's order of operations: firepower-versus-toughness
+     *      degrade first, then secondary damage off the degraded primary, then armour
+     *      against the primary only.
+     *   3. Apply the result via AlternityCharacterState.applyDamage().
      *   4. Persist state back to flags AND sync actor.system.
+     *
+     * The armour die is **not** rolled here. Dice belong to the roll pipeline, so
+     * `AlternityRollService.rollArmorProtection` rolls every protection the target
+     * has, applies the layering rule, and hands the winning value in as `armorRoll` —
+     * the same arrangement `applyWarshipDamage` already used. A caller that omits it
+     * (a macro, a GM applying damage by hand) simply gets no armour, which is the
+     * honest outcome: no roll was made.
      *
      * @param {number} rawDamage   - Unmitigated damage amount.
      * @param {string} damageType  - The damage *form*: 'LI', 'HI' or 'En'. This is the
@@ -514,6 +548,11 @@ export class AlternityActor extends Actor {
      * @param {string} [options.category='wound'] - Which track the damage lands on:
      *        'stun', 'wound' or 'mortal'. Comes from the damage code's trailing letter,
      *        which AlternityMathService.parseDamageCode extracts.
+     * @param {number} [options.armorRoll=0]   - Already-rolled protection.
+     * @param {string} [options.armorSource]   - Which protection won the layering roll.
+     * @param {string} [options.firepower]     - Attacking weapon's firepower grade.
+     * @param {string} [options.toughness]     - This actor's toughness, armour included.
+     * @param {object[]} [options.armorTrace]  - The armour roll's own trace lines.
      * @returns {Promise<{ finalDamage: number, woundLevelChanged: boolean, newWoundLevel: string }|null>}
      */
     async applyAlternityDamage(rawDamage, damageType = 'LI', options = {}) {
@@ -559,40 +598,64 @@ export class AlternityActor extends Actor {
             ));
         }
 
-        // Also factor in equipped armor's damage resistance
-        const armor = this.items.find(i => i.type === 'armor' && i.system.isEquipped);
-        if (armor && armor.system.damageResistance > 0) {
-            const resists = armor.system.resistedTypes;
-            const applies = !resists.length || resists.includes(damageType);
-            if (applies) {
-                modifiers.push(AlternityMathService.buildModifier(
-                    armor.name,
-                    -armor.system.damageResistance,
-                    `Armor: ${armor.name}`,
-                ));
-            }
-        }
+        // Worn armour, natural armour and implants are all collected and rolled by
+        // the roll service before we get here — see the note on this method. What
+        // arrives is one already-rolled value, because protection does not stack:
+        // "makes an armor roll for each type of protection and applies the more
+        // favorable result" (PHB Ch.11, "Layering Armor").
+        const resolved = AlternityMathService.resolvePersonalDamage({
+            rawDamage,
+            damageGrade: category,
+            damageForm:  damageType,
+            firepower:   options.firepower ?? null,
+            toughness:   options.toughness ?? null,
+            armorRoll:   options.armorRoll ?? 0,
+            armorSource: options.armorSource || game.i18n.localize('ALTERNITY.Armor.Label'),
+            modifiers,
+            context,
+        });
 
-        const { finalDamage, modifierTrace, mitigated } =
-            AlternityMathService.calculateMitigatedDamage(rawDamage, modifiers, context);
+        const modifierTrace = [...(options.armorTrace ?? []).filter(
+            // The winning armour line is already in the resolution's own trace; only
+            // the discarded layers are worth carrying across.
+            (line) => line.value === 0
+        ), ...resolved.modifierTrace];
 
-        // Apply damage. Pass rawDamage as the basis for secondary damage calculation.
-        const { woundLevelChanged, newWoundLevel } = altState.applyDamage(finalDamage, category, rawDamage);
+        // The secondary basis is the *post-degrade, pre-armour* primary. Passing the
+        // raw roll instead would overstate it on a degraded hit, and passing the
+        // post-armour figure would understate it — the Guide is explicit on both:
+        // "Secondary damage is based on the new primary damage", and "armor has no
+        // effect on secondary damage".
+        const { woundLevelChanged, newWoundLevel } = resolved.isNegated
+            ? { woundLevelChanged: false, newWoundLevel: altState.woundLevel }
+            : altState.applyDamage(resolved.primary, resolved.grade, resolved.secondaryBasis);
 
         await this.saveAltState(altState);
 
         console.log(
-            `[Alternity] ${this.name} took ${finalDamage} ${category} damage (${damageType}) ` +
-            `(${rawDamage} raw, ${mitigated} mitigated). Wound: ${newWoundLevel}.`
+            `[Alternity] ${this.name} took ${resolved.primary} ${resolved.grade} damage (${damageType}) ` +
+            `(${rawDamage} raw, ${resolved.mitigated} mitigated`
+            + `${resolved.degradeSteps ? `, degraded ${resolved.degradeSteps} grade(s)` : ''}). ` +
+            `Wound: ${newWoundLevel}.`
         );
 
         // Notify other modules
         Hooks.callAll('alternity:damageApplied', this, {
-            rawDamage, finalDamage, mitigated, damageType, category,
+            rawDamage,
+            finalDamage: resolved.primary,
+            mitigated: resolved.mitigated,
+            damageType,
+            category: resolved.grade,
             modifierTrace, woundLevelChanged, newWoundLevel,
         });
 
-        return { finalDamage, mitigated, modifierTrace, woundLevelChanged, newWoundLevel };
+        return {
+            ...resolved,
+            finalDamage: resolved.primary,
+            modifierTrace,
+            woundLevelChanged,
+            newWoundLevel,
+        };
     }
 
     /**

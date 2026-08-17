@@ -177,6 +177,14 @@
                                     <input type="text" value="{{armor.en}}" data-action="editArmor" data-type="en" />
                                 </div>
                             </div>
+                            {{!-- Derived from worn armour, so it is shown rather than
+                                  edited. Only worth the line when it is not Ordinary,
+                                  which is what an unarmoured human is. --}}
+                            {{#if raisesToughness}}
+                            <span class="{{@root.alt}}-armor-toughness" title="{{localize 'ALTERNITY.Armor.ToughnessHint'}}">
+                                {{toughness}} {{localize 'ALTERNITY.Armor.Toughness'}}
+                            </span>
+                            {{/if}}
                         </div>
 
                         <div class="{{@root.alt}}-armor-list {{@root.alt}}-achievement-track">
@@ -306,12 +314,16 @@
                         <img src="{{item.img}}" data-action="editItem" data-item-id="{{item.id}}" title="Edit Item" />
                         <div class="{{@root.alt}}-item-info">
                             <span class="{{@root.alt}}-item-name">{{item.name}}</span>
-                            {{!-- ArmorData has no li/hi/en fields — those were left over from an
-                                  older data shape and rendered blank for every armor item. --}}
+                            {{!-- `protectionLabel` is the armour rating as printed —
+                                  "d6-1 (LI), d4 (HI), d4+1 (En)" — which is the only
+                                  number on an armour item that does anything. There is
+                                  no defence bonus to show: armour absorbs damage, it
+                                  does not make its wearer harder to hit. --}}
                             <span class="{{@root.alt}}-item-stats">
-                                {{item.system.armorType}} | Defense {{item.system.defenseBonusLabel}}
-                                {{#if item.system.hasResistance}} | {{item.system.resistanceLabel}}{{/if}}
+                                {{item.system.armorType}} | {{item.system.protectionLabel}}
+                                {{#if item.system.raisesToughness}} | {{item.system.toughness}} toughness{{/if}}
                                 {{#if item.system.skillPenalty}} | Skill {{item.system.skillPenaltyLabel}}{{/if}}
+                                {{#if item.system.isEquipped}} | {{localize 'ALTERNITY.Equipped'}}{{/if}}
                             </span>
                         </div>
                         <div class="{{@root.alt}}-item-actions">

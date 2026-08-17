@@ -18,6 +18,8 @@ import {
     SUCCESS_DEGREES,
     CONDITION_STEP_MODIFIERS,
     RANGE_BANDS,
+    PERSONAL_TOUGHNESS_CLASSES,
+    DEFAULT_PERSONAL_TOUGHNESS,
 } from '../services/alternity-math.js';
 import { AlternityRollService } from '../services/alternity-roll-service.js';
 import { bindActorSheetDragDrop, claimDropHandling, tabForItemType } from './alternity-drag-drop.js';
@@ -323,7 +325,7 @@ async function rollStatblockAttack(sheet, row, options = {}) {
         return null;
     }
 
-    const { modifiers } = await AlternityRollService.collectTargetModifiers({
+    const { modifiers, toughness } = await AlternityRollService.collectTargetModifiers({
         attackKind: options.attackKind ?? 'melee',
     });
 
@@ -346,6 +348,9 @@ async function rollStatblockAttack(sheet, row, options = {}) {
                 },
                 damageType: row.damageType ?? '',
                 firepower: row.firepower ?? null,
+                // Only reported when a token is actually targeted; the degrade rule
+                // needs both halves and a guessed toughness would misstate the damage.
+                targetToughness: toughness ?? null,
                 actorUuid: sheet.document.uuid,
             },
         },
@@ -813,7 +818,12 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
         // AlternityCharacterState — only the hand-off was missing.
         context.actionCheck      = state.getActionCheckData();
         context.actionsPerRound  = state.getActionsPerRound();
-        context.armor            = state.armor || { li: 0, hi: 0, en: 0 };
+        context.armor            = state.armor || { li: '', hi: '', en: '' };
+        // Derived, and read-only on the sheet: a hero is an Ordinary-toughness target
+        // unless what they are wearing says otherwise (a body tank makes them Good).
+        context.toughness        = this.actor.system?.effectiveToughness
+            ?? DEFAULT_PERSONAL_TOUGHNESS;
+        context.raisesToughness  = context.toughness !== DEFAULT_PERSONAL_TOUGHNESS;
         context.career           = state.career || '';
         context.background       = state.background || '';
 
@@ -1266,7 +1276,7 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
         // Alternity's stand-in for an armour class: whoever is targeted hands the
         // attacker a step penalty from their resistance modifier, plus any dodge
         // they rolled this round.
-        const { modifiers: targetModifiers } = await AlternityRollService.collectTargetModifiers({
+        const { modifiers: targetModifiers, toughness } = await AlternityRollService.collectTargetModifiers({
             attackKind: isMelee ? 'melee' : 'ranged',
         });
         modifiers.push(...targetModifiers);
@@ -1283,7 +1293,10 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
                 ? game.i18n.localize('ALTERNITY.Roll.MeleeAttack')
                 : game.i18n.localize('ALTERNITY.Roll.RangedAttack'),
             {
-                damage: item.getDamagePayload(),
+                // The target's toughness rides along so the damage card can report a
+                // firepower shortfall — a pistol against a body tank loses a grade
+                // before armour is even rolled (GM Guide Ch.11).
+                damage: { ...item.getDamagePayload(), targetToughness: toughness ?? null },
                 rangeBands: sys.rangeBands ?? [],
             },
         );
@@ -1583,6 +1596,7 @@ class AlternityNpcSheet extends foundry.applications.api.HandlebarsApplicationMi
         context.roleChoices = SUPPORTING_CAST_ROLES;
         context.reactionDegreeChoices = REACTION_DEGREES;
         context.damageTypeChoices = NPC_DAMAGE_TYPES;
+        context.toughnessChoices = PERSONAL_TOUGHNESS_CLASSES;
 
         // ── Abilities ───────────────────────────────────────────────────────
         context.abilities = ['str', 'dex', 'con', 'int', 'wil', 'per'].map((key) => ({
@@ -2898,6 +2912,7 @@ class AlternityCreatureSheet extends foundry.applications.api.HandlebarsApplicat
         context.categoryChoices = CREATURE_CATEGORIES;
         context.reactionDegreeChoices = REACTION_DEGREES;
         context.damageTypeChoices = DAMAGE_TYPES;
+        context.toughnessChoices = PERSONAL_TOUGHNESS_CLASSES;
 
         // ── Abilities, with their printed range and the animal scale ────────
         context.abilities = CREATURE_ABILITIES.map((key) => ({
@@ -3083,6 +3098,7 @@ async function registerAlternitySheet() {
         "systems/alternity-v2/templates/roll/roll-panel.hbs",
         "systems/alternity-v2/templates/roll/roll-card.hbs",
         "systems/alternity-v2/templates/roll/damage-card.hbs",
+        "systems/alternity-v2/templates/roll/armor-card.hbs",
         "systems/alternity-v2/templates/roll/action-check-card.hbs",
     ]);
 

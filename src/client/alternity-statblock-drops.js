@@ -203,11 +203,15 @@ function buildAiWeaponRow(item) {
 }
 
 function buildAiArmorRow(item) {
-    const system = item.system ?? {};
-    // Both are flat numbers and the row's `value` is free text; resistance is the
-    // more specific of the two, so it wins when it is set.
-    const value = Number(system.damageResistance) || Number(system.armorBonus) || 0;
-    return { name: item.name, kind: 'CPU Armor', skill: '', value: `${value}` };
+    const protection = item.system?.protection ?? {};
+    // A CPU shell is printed as one value covering every form — the box is armoured,
+    // not rated per damage type the way a suit is — so the three ratings collapse to
+    // the first one the item actually states. Nothing is invented: an armour with no
+    // readable rating gives an empty row, which reads as "fill this in".
+    const value = [protection.li, protection.hi, protection.en]
+        .map((v) => String(v ?? '').trim())
+        .find(Boolean) ?? '';
+    return { name: item.name, kind: 'CPU Armor', skill: '', value };
 }
 
 function buildGridProgramRow(item) {

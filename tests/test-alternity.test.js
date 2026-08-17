@@ -1715,6 +1715,218 @@ describe('Alternity System Unit Tests', () => {
         });
     });
 
+    describe('parseArmorValue', () => {
+        it('should read the die ranges the books print', () => {
+            // "Armor: d6-1 (LI), d4 (HI), d4+1 (En)" — the shape every printed suit uses.
+            expect(AlternityMathService.parseArmorValue('d6-1')).toMatchObject({
+                formula: '1d6-1', isDie: true, isValid: true, flat: 0,
+            });
+            expect(AlternityMathService.parseArmorValue('2d4+1').formula).toBe('2d4+1');
+            expect(AlternityMathService.parseArmorValue('d4').formula).toBe('1d4');
+        });
+
+        it('should treat a plain number as needing no dice', () => {
+            expect(AlternityMathService.parseArmorValue('4')).toMatchObject({
+                formula: '', flat: 4, isDie: false, isValid: true,
+            });
+            // Zero protection is readable but stops nothing, so it is not "valid" armour.
+            expect(AlternityMathService.parseArmorValue('0')).toMatchObject({ flat: 0, isValid: false });
+        });
+
+        it('should read the scans’ unicode dashes as minus signs', () => {
+            // The OCR renders "d4-1" with an em dash, and hand entry copies it.
+            expect(AlternityMathService.parseArmorValue('d4—1').formula).toBe('1d4-1');
+            expect(AlternityMathService.parseArmorValue('d6−3').formula).toBe('1d6-3');
+        });
+
+        it('should report a rating it cannot read rather than silently zeroing it', () => {
+            expect(AlternityMathService.parseArmorValue('').isValid).toBe(false);
+            expect(AlternityMathService.parseArmorValue('none').isValid).toBe(false);
+            expect(AlternityMathService.parseArmorValue('—').isValid).toBe(false);
+            expect(AlternityMathService.parseArmorValue(null).isValid).toBe(false);
+            // OCR junk: "d6+!" is not a rating, and must not become 1d6.
+            expect(AlternityMathService.parseArmorValue('d6+!').isValid).toBe(false);
+            expect(AlternityMathService.parseArmorValue('good').isValid).toBe(false);
+        });
+
+        it('should tolerate spacing inside a term', () => {
+            expect(AlternityMathService.parseArmorValue(' 2d4 + 1 ').formula).toBe('2d4+1');
+        });
+    });
+
+    describe('selectBestArmorRoll — the layering rule', () => {
+        it('should use only the most favourable roll, never the sum', () => {
+            // PHB Ch.11 "Layering Armor", as the mutation entries quote it: "makes an
+            // armor roll for each type of protection and applies the more favorable
+            // result". Summing 3 + 5 to 8 would be the obvious wrong answer.
+            const result = AlternityMathService.selectBestArmorRoll([
+                { source: 'Dermal Plating', value: 3 },
+                { source: 'Battle Vest', value: 5 },
+            ]);
+            expect(result.value).toBe(5);
+            expect(result.source).toBe('Battle Vest');
+        });
+
+        it('should still report the rolls it discarded', () => {
+            const result = AlternityMathService.selectBestArmorRoll([
+                { source: 'Dermal Plating', value: 3 },
+                { source: 'Battle Vest', value: 5 },
+            ]);
+            // The winner reduces damage; the loser is traced at 0 so the card can
+            // explain why a roll the player watched happen did nothing.
+            expect(result.modifierTrace).toHaveLength(2);
+            expect(result.modifierTrace[0]).toMatchObject({ source: 'Battle Vest', value: -5 });
+            expect(result.modifierTrace[1]).toMatchObject({ source: 'Dermal Plating', value: 0 });
+        });
+
+        it('should floor a failed die range at zero', () => {
+            // "If a subtraction from a die roll produces a result less than 1, the
+            // armor failed to block any damage" — d6-3 rolling a 1 gives -2.
+            expect(AlternityMathService.selectBestArmorRoll([{ source: 'Vest', value: -2 }]).value).toBe(0);
+        });
+
+        it('should return nothing for an unprotected target', () => {
+            expect(AlternityMathService.selectBestArmorRoll([])).toMatchObject({ value: 0, source: '' });
+            expect(AlternityMathService.selectBestArmorRoll().modifierTrace).toEqual([]);
+        });
+    });
+
+    describe('selectHighestToughness', () => {
+        it('should default an unarmoured target to Ordinary', () => {
+            // "Humanoid species, most personal armor, and portable objects have
+            // Ordinary toughness."
+            expect(AlternityMathService.selectHighestToughness([])).toBe('Ordinary');
+            expect(AlternityMathService.selectHighestToughness([null, undefined, ''])).toBe('Ordinary');
+        });
+
+        it('should let worn armour raise it', () => {
+            // A body tank "provides Good toughness" to whoever is inside it.
+            expect(AlternityMathService.selectHighestToughness(['Good'])).toBe('Good');
+            expect(AlternityMathService.selectHighestToughness(['Ordinary', 'Good'])).toBe('Good');
+            expect(AlternityMathService.selectHighestToughness(['Good', 'Amazing'])).toBe('Amazing');
+        });
+
+        it('should never drop below the fallback', () => {
+            // A grade lower than the body's own does not make the body flimsier.
+            expect(AlternityMathService.selectHighestToughness(['Ordinary'], 'Good')).toBe('Good');
+        });
+    });
+
+    describe('resolvePersonalDamage — the Gamemaster Guide’s worked examples', () => {
+        it('should reproduce the battle vest example', () => {
+            // GM Guide Ch.11: "Everstar's sword inflicted 6 wounds and 3 stuns to the
+            // guard... This stops d6-3 hits... the vest absorbs 2 of the 6 wounds. The
+            // secondary stun damage is not affected. In total, the guard takes 4 wounds
+            // and 3 stuns."
+            const result = AlternityMathService.resolvePersonalDamage({
+                rawDamage: 6, damageGrade: 'wound', damageForm: 'LI',
+                armorRoll: 2, armorSource: 'Battle Vest', context: 'Test',
+            });
+            expect(result.grade).toBe('wound');
+            expect(result.primary).toBe(4);
+            expect(result.secondary).toEqual({ stun: 3, wound: 0 });
+            expect(result.armorAbsorbed).toBe(2);
+        });
+
+        it('should reproduce the body tank example — degrade before armour', () => {
+            // "Since this armor has Good toughness, the 6 wounds Everstar inflicts
+            // degrade to 6 stuns. Now the guard makes an armor roll... the body tank
+            // stops 2d4+1 hits — in this case, a total of 6 hits. So, the armor blocks
+            // the 6 stuns."
+            const result = AlternityMathService.resolvePersonalDamage({
+                rawDamage: 6, damageGrade: 'wound', damageForm: 'LI',
+                firepower: 'Ordinary', toughness: 'Good',
+                armorRoll: 6, armorSource: 'Body Tank', context: 'Test',
+            });
+            // The grade shifted but the point count did not: 6 wounds became 6 stuns.
+            expect(result.grade).toBe('stun');
+            expect(result.secondaryBasis).toBe(6);
+            expect(result.primary).toBe(0);
+            // Degraded to stun, so there is no secondary damage left to leak through.
+            expect(result.secondary).toEqual({ stun: 0, wound: 0 });
+        });
+
+        it('should reproduce the plasma gun example — secondary survives armour', () => {
+            // "Since the plasma gun is considered to be a weapon of Good firepower,
+            // these 7 wounds don't degrade. The guard's armor stops 2d4+1 hits (this
+            // time the result is 5) and thus negates most of the primary damage — but
+            // the 3 stuns of secondary damage get through."
+            const result = AlternityMathService.resolvePersonalDamage({
+                rawDamage: 7, damageGrade: 'wound', damageForm: 'En',
+                firepower: 'Good', toughness: 'Good',
+                armorRoll: 5, armorSource: 'Body Tank', context: 'Test',
+            });
+            expect(result.degradeSteps).toBe(0);
+            expect(result.primary).toBe(2);
+            expect(result.secondary).toEqual({ stun: 3, wound: 0 });
+        });
+
+        it('should ignore a hit degraded off the bottom of the ladder', () => {
+            // "When an object of Amazing toughness is struck by a weapon of Ordinary
+            // firepower, the damage degrades twice. Mortal damage becomes stun damage,
+            // and wound and stun damage is ignored."
+            const ignored = AlternityMathService.resolvePersonalDamage({
+                rawDamage: 9, damageGrade: 'wound',
+                firepower: 'Ordinary', toughness: 'Amazing', context: 'Test',
+            });
+            expect(ignored).toMatchObject({ grade: 'none', isNegated: true, primary: 0 });
+            expect(ignored.secondary).toEqual({ stun: 0, wound: 0 });
+
+            const mortal = AlternityMathService.resolvePersonalDamage({
+                rawDamage: 9, damageGrade: 'mortal',
+                firepower: 'Ordinary', toughness: 'Amazing', context: 'Test',
+            });
+            expect(mortal.grade).toBe('stun');
+        });
+
+        it('should not degrade when firepower matches the target’s toughness', () => {
+            // "When a weapon's firepower equals or exceeds the toughness of its
+            // target, damage doesn't degrade."
+            expect(AlternityMathService.resolvePersonalDamage({
+                rawDamage: 5, damageGrade: 'mortal',
+                firepower: 'Ordinary', toughness: 'Ordinary', context: 'Test',
+            })).toMatchObject({ grade: 'mortal', degradeSteps: 0 });
+        });
+
+        it('should not degrade when only one half of the comparison is known', () => {
+            // Guessing the missing half would silently misstate the damage, so an
+            // unknown toughness means the rule sits out.
+            expect(AlternityMathService.resolvePersonalDamage({
+                rawDamage: 5, damageGrade: 'mortal', firepower: 'Ordinary', context: 'Test',
+            }).grade).toBe('mortal');
+            expect(AlternityMathService.resolvePersonalDamage({
+                rawDamage: 5, damageGrade: 'mortal', toughness: 'Amazing', context: 'Test',
+            }).grade).toBe('mortal');
+        });
+
+        it('should figure secondary damage off the degraded primary, not the raw roll', () => {
+            // The order in the Guide is explicit: "Secondary damage is based on the new
+            // primary damage." A mortal hit degraded to wound yields 1 secondary stun
+            // per 2 points — not the stun *and* wound a mortal hit would have caused.
+            const result = AlternityMathService.resolvePersonalDamage({
+                rawDamage: 8, damageGrade: 'mortal',
+                firepower: 'Ordinary', toughness: 'Good', context: 'Test',
+            });
+            expect(result.grade).toBe('wound');
+            expect(result.secondary).toEqual({ stun: 4, wound: 0 });
+        });
+
+        it('should never let armour heal the target', () => {
+            expect(AlternityMathService.resolvePersonalDamage({
+                rawDamage: 2, damageGrade: 'wound', armorRoll: 9, context: 'Test',
+            }).primary).toBe(0);
+        });
+
+        it('should reject a damage grade that is not a track', () => {
+            expect(() => AlternityMathService.resolvePersonalDamage({
+                rawDamage: 4, damageGrade: 'LI', context: 'Test',
+            })).toThrow(/damageGrade must be one of/);
+            expect(() => AlternityMathService.resolvePersonalDamage({
+                rawDamage: -1, context: 'Test',
+            })).toThrow(/non-negative/);
+        });
+    });
+
     describe('parseScoreRun', () => {
         it('should honour a printed run verbatim', () => {
             // The compendia occasionally print a run that does not obey the
@@ -1928,32 +2140,59 @@ describe('Alternity System Unit Tests', () => {
         });
 
         describe('ArmorData', () => {
-            it('should convert resisted types so they can match a weapon again', () => {
-                expect(ArmorData.migrateData({ resistedTypes: ['Laser', 'Energy'] }).resistedTypes)
-                    .toEqual(['En']);
-            });
-
-            it('should dedupe forms that several old names collapse onto', () => {
-                // Ballistic, Slashing and Piercing are all Low Impact.
+            it('should turn a flat resistance into a rating on each form it resisted', () => {
+                // The legacy names are mapped on the way through, so 'Laser' and
+                // 'Energy' both land on the energy rating and nowhere else.
                 expect(ArmorData.migrateData({
-                    resistedTypes: ['Ballistic', 'Slashing', 'Piercing'],
-                }).resistedTypes).toEqual(['LI']);
+                    damageResistance: 4, resistedTypes: ['Laser', 'Energy'],
+                }).protection).toEqual({ li: '', hi: '', en: '4' });
             });
 
-            it('should leave an already-valid list untouched and quiet', () => {
-                expect(ArmorData.migrateData({ resistedTypes: ['LI', 'HI'] }).resistedTypes)
-                    .toEqual(['LI', 'HI']);
-                expect(warnings).toEqual([]);
-            });
-
-            it('should keep resisting nothing when it resisted nothing', () => {
-                // An empty list means "resists all types", not "resists none" — so it
-                // must survive the migration unchanged.
-                expect(ArmorData.migrateData({ resistedTypes: [] }).resistedTypes).toEqual([]);
+            it('should read an empty resisted list as "resists everything"', () => {
+                // Empty meant "resists all types", not "resists none".
+                expect(ArmorData.migrateData({ damageResistance: 3, resistedTypes: [] }).protection)
+                    .toEqual({ li: '3', hi: '3', en: '3' });
             });
 
             it('should still handle the older single-string field', () => {
-                expect(ArmorData.migrateData({ resistedType: 'Laser' }).resistedTypes).toEqual(['En']);
+                expect(ArmorData.migrateData({ damageResistance: 2, resistedType: 'Laser' }).protection)
+                    .toEqual({ li: '', hi: '', en: '2' });
+            });
+
+            it('should say so rather than converting silently', () => {
+                ArmorData.migrateData({ damageResistance: 4, resistedTypes: [] });
+                // A flat number is not what the book prints, so the warning has to
+                // point the Gamemaster at re-entering the die ranges.
+                expect(warnings.join(' | ')).toMatch(/die ranges/);
+            });
+
+            it('should never overwrite a protection rating already entered', () => {
+                const migrated = ArmorData.migrateData({
+                    damageResistance: 9,
+                    protection: { li: 'd6-1', hi: '', en: '' },
+                });
+                expect(migrated.protection).toEqual({ li: 'd6-1', hi: '', en: '' });
+            });
+
+            it('should leave armour with no legacy resistance alone and quiet', () => {
+                const migrated = ArmorData.migrateData({ protection: { li: 'd4', hi: 'd4', en: '' } });
+                expect(migrated.protection).toEqual({ li: 'd4', hi: 'd4', en: '' });
+                expect(warnings).toEqual([]);
+            });
+
+            it('should carry an armour-class bonus across, capped, and complain', () => {
+                // Alternity has no armour class. The value survives only because field
+                // gear (deflection harness +2, displacer softsuit +3) does adjust a
+                // resistance modifier — everything else should be zeroed by hand.
+                const migrated = ArmorData.migrateData({ armorBonus: 9 });
+                expect(migrated.resistanceModifierBonus).toBe(5);
+                expect(migrated.armorBonus).toBeUndefined();
+                expect(warnings.join(' | ')).toMatch(/harder to hit/);
+            });
+
+            it('should not complain about an armour bonus that was already zero', () => {
+                expect(ArmorData.migrateData({ armorBonus: 0 }).resistanceModifierBonus).toBe(0);
+                expect(warnings).toEqual([]);
             });
         });
 

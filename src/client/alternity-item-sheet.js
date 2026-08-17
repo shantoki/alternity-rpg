@@ -3,7 +3,7 @@
  * @description Shared item sheet for every Alternity Fastplay item type.
  */
 
-import { DAMAGE_TYPE_LABELS } from '../services/alternity-math.js';
+import { DAMAGE_TYPE_LABELS, PERSONAL_TOUGHNESS_CLASSES } from '../services/alternity-math.js';
 
 const NS = 'alt';
 
@@ -115,6 +115,11 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
                 'Heavy': 'Heavy'
             },
             armorTypes: ['Light', 'Medium', 'Heavy', 'Powered']
+                .reduce((obj, val) => { obj[val] = val; return obj; }, {}),
+            // Ordinary / Good / Amazing. A weapon whose firepower falls short of the
+            // target's toughness has its damage degraded a grade before armour is
+            // even rolled, so this is a real mechanical setting and not a label.
+            toughnessClasses: PERSONAL_TOUGHNESS_CLASSES
                 .reduce((obj, val) => { obj[val] = val; return obj; }, {}),
             // The three damage forms Alternity has, long-labelled. This used to offer
             // a d20 list (Ballistic, Slashing, Laser…) that matched no rule and no

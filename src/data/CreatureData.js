@@ -46,6 +46,8 @@ import {
     CREATURE_CATEGORIES,
     DAMAGE_TYPES,
     REACTION_DEGREES,
+    PERSONAL_TOUGHNESS_CLASSES,
+    DEFAULT_PERSONAL_TOUGHNESS,
 } from '../services/alternity-math.js';
 
 const { fields } = foundry.data;
@@ -187,6 +189,21 @@ export class CreatureData extends foundry.abstract.TypeDataModel {
             resistance: new fields.SchemaField({
                 melee:  new fields.NumberField({ required: false, nullable: true, integer: true, initial: null }),
                 ranged: new fields.NumberField({ required: false, nullable: true, integer: true, initial: null }),
+            }),
+
+            /**
+             * The toughness the statblock prints — "Good toughness" appears on its
+             * own line above the resistance modifiers on the larger creatures. A
+             * weapon whose firepower falls short of it has its damage degraded a
+             * grade before natural armour is even rolled (GM Guide Ch.11, which
+             * extends the rule to creatures explicitly: "an alien might have Good
+             * toughness, downgrading Ordinary firepower used against it").
+             */
+            toughness: new fields.StringField({
+                required: true,
+                nullable: false,
+                initial:  DEFAULT_PERSONAL_TOUGHNESS,
+                choices:  PERSONAL_TOUGHNESS_CLASSES,
             }),
 
             /**
