@@ -14,6 +14,11 @@ import {
 import { AlternityCharacterState } from '../src/data/alternity-actor-data.js';
 import { NpcData } from '../src/data/NpcData.js';
 import { WeaponData } from '../src/data/WeaponData.js';
+import { readFileSync } from 'node:fs';
+
+/** Read as text as well as parsed, so duplicate keys can be caught — JSON.parse hides them. */
+const langSource = readFileSync(new URL('../lang/en.json', import.meta.url), 'utf8');
+const lang = JSON.parse(langSource);
 
 describe('Alternity System Unit Tests', () => {
 
@@ -1839,6 +1844,46 @@ describe('Alternity System Unit Tests', () => {
         it('should leave an explicitly set range class alone', () => {
             expect(WeaponData.migrateData({ rangeClass: 'Pistol', range: { long: 50 } }).rangeClass)
                 .toBe('Pistol');
+        });
+    });
+
+    // -----------------------------------------------------------------------
+    // Localization file integrity
+    // -----------------------------------------------------------------------
+
+    describe('lang/en.json', () => {
+        // Foundry runs the file through `expandObject`, turning every dotted key into
+        // a nested tree. A key that is BOTH a leaf and a branch — "ALTERNITY.Skill"
+        // alongside "ALTERNITY.Skill.Rank" — makes that expansion throw
+        // ("Cannot create property 'Rank' on string 'Skill'"), and Foundry aborts
+        // localization for the whole system: every label on every sheet renders as a
+        // raw key. It is a one-word mistake that breaks everything, and nothing else
+        // catches it before a world is loaded, so it is checked here.
+        const keys = Object.keys(lang);
+
+        it('should not use any key as both a value and a namespace', () => {
+            const conflicts = keys
+                .map((key) => ({ key, children: keys.filter((o) => o !== key && o.startsWith(`${key}.`)) }))
+                .filter(({ children }) => children.length > 0)
+                .map(({ key, children }) => `"${key}" is also a namespace for ${children.join(', ')}`);
+
+            expect(conflicts).toEqual([]);
+        });
+
+        it('should map every key to a string', () => {
+            // A nested object here would survive expandObject but defeat the point of
+            // the flat-key convention the rest of the file follows.
+            const nonStrings = keys.filter((k) => typeof lang[k] !== 'string');
+            expect(nonStrings).toEqual([]);
+        });
+
+        it('should not declare the same key twice', () => {
+            // JSON.parse silently keeps the last of a duplicated key, so the raw text
+            // is counted rather than the parsed object.
+            const declared = [...langSource.matchAll(/^\s*"([^"]+)"\s*:/gm)].map((m) => m[1]);
+            const seen = new Set();
+            const duplicates = declared.filter((k) => (seen.has(k) ? true : (seen.add(k), false)));
+            expect([...new Set(duplicates)]).toEqual([]);
         });
     });
 });

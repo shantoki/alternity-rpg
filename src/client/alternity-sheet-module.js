@@ -382,7 +382,7 @@ function rollStatblockSkill(sheet, row, options = {}) {
 
     if (!scores.ordinary) {
         ui.notifications?.warn(game.i18n.format('ALTERNITY.Roll.NoSkillScore', {
-            skill: row.name || game.i18n.localize('ALTERNITY.Skill'),
+            skill: row.name || game.i18n.localize('ALTERNITY.Roll.UnnamedSkill'),
         }));
         return null;
     }
@@ -390,13 +390,13 @@ function rollStatblockSkill(sheet, row, options = {}) {
     return mountRoller(
         sheet,
         {
-            name: row.name || game.i18n.localize('ALTERNITY.Skill'),
+            name: row.name || game.i18n.localize('ALTERNITY.Roll.UnnamedSkill'),
             scores,
             // Broad skills roll at +1 step, trained specialties at 0.
             baseStep: isBroad ? 1 : 0,
             modifiers: options.modifiers ?? [],
         },
-        row.name || game.i18n.localize('ALTERNITY.Skill'),
+        row.name || game.i18n.localize('ALTERNITY.Roll.UnnamedSkill'),
     );
 }
 
@@ -495,7 +495,7 @@ class AlternityRollComponent {
             })),
             rangeBands: (this.options.rangeBands ?? []).map((b) => ({
                 ...b,
-                label: game.i18n.localize(`ALTERNITY.Range.${b.band}`),
+                label: game.i18n.localize(`ALTERNITY.RangeBand.${b.band}`),
             })),
             hasRangeBands: (this.options.rangeBands ?? []).length > 0,
             hasDamage: !!this.options.damage,
