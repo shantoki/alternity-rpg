@@ -5,7 +5,7 @@
  * imports it from here and tests substitute `tests/mocks/module-info.js` via the
  * `moduleNameMapper` in jest.config.js.
  *
- * ## Why most of this is late-bound
+ * ## Why `game` is late-bound and almost nothing else is
  *
  * Foundry loads a system's `esmodules` while it is still booting. At that moment
  * `globalThis.game` exists but is a bare shell — `game.i18n` in particular is not
@@ -14,34 +14,58 @@
  * So `export const game = globalThis.game` captures the shell **permanently**.
  * Every later read of `game.i18n` then returns undefined, and the first call
  * through it dies with "Cannot read properties of undefined (reading 'localize')".
- * That is exactly what happened to the damage button on the attack chat card: the
- * sheets had always worked because they happen to use the bare `game` global
- * rather than importing it, so the bug stayed hidden until a service imported
- * `game` from here and tried to localize something.
  *
- * Everything that is only ever used as a namespace (`game.i18n`,
- * `ChatMessage.create`, `Hooks.on`) is therefore resolved at *use* time.
+ * `game` is the only global with that problem. Every other one this file exports is
+ * fully defined before esmodules load — which is why `src/index.js` can call
+ * `Hooks.once('init', ...)` at module scope, and why chat messages have always
+ * posted. They stay eager, deliberately; see the warning below.
  *
- * ## Why a few things cannot be
+ * ## Why a Proxy is the wrong tool for most of them
  *
- * `Actor`, `Item` and `Combatant` appear in class heritage
- * (`class AlternityActor extends Actor`), which JavaScript evaluates when the
- * module is imported. A Proxy cannot stand in for a base class, so these stay
- * eager — which is safe, because Foundry defines its document classes before it
- * loads a system's esmodules. If one of them ever comes back undefined, the fix is
- * load order, not this file.
+ * A Proxy makes `this` inside a method the *Proxy*, not the real object. Foundry's
+ * classes use private fields, and a private-field lookup throws outright when the
+ * receiver is not the declaring class:
+ *
+ *   Hooks.on(...)  ->  TypeError: Cannot read private member #id from an object
+ *                      whose class did not declare it
+ *
+ * The `get` trap below therefore binds methods to the real object. Binding is not
+ * free either — a bound function loses the original's own static properties — so
+ * the trap leaves class constructors alone, and the Proxy is reserved for globals
+ * that are read as property bags rather than called as objects.
+ *
+ * **Only add a symbol to `lateBound` if it genuinely is not ready at import time,
+ * and only if it is read rather than called.** `Actor`, `Item` and `Combatant`
+ * additionally *cannot* be proxied at all: they appear in class heritage
+ * (`class AlternityActor extends Actor`), which JavaScript evaluates when the module
+ * is imported, and a Proxy cannot serve as a base class.
  */
 
+/** True for `class X {}`, false for `function f() {}` or a method. */
+function isClass(value) {
+    return typeof value === 'function'
+        && /^class[\s{]/.test(Function.prototype.toString.call(value));
+}
+
 /**
- * Forward every property read to the named global, at read time rather than at
- * import time.
+ * Forward property reads to the named global at read time rather than at import
+ * time, binding any method to the real object so private-field access works.
  *
  * @param {string} name - Key on globalThis to read through to.
  * @returns {Proxy}
  */
 function lateBound(name) {
     return new Proxy({}, {
-        get: (_target, prop) => globalThis[name]?.[prop],
+        get: (_target, prop) => {
+            const source = globalThis[name];
+            if (source === undefined || source === null) return undefined;
+            const value = source[prop];
+            // Methods are bound so `this` is the real object; classes are handed
+            // back untouched, because binding one would strip its statics.
+            return (typeof value === 'function' && !isClass(value))
+                ? value.bind(source)
+                : value;
+        },
         set: (_target, prop, value) => {
             (globalThis[name] ??= {})[prop] = value;
             return true;
@@ -51,28 +75,46 @@ function lateBound(name) {
         getOwnPropertyDescriptor: (_target, prop) => {
             const descriptor = Reflect.getOwnPropertyDescriptor(globalThis[name] ?? {}, prop);
             // A Proxy may not report a property as non-configurable when its own
-            // target does not have it, so the descriptor is relaxed on the way out.
+            // target lacks it, so the descriptor is relaxed on the way out.
             return descriptor ? { ...descriptor, configurable: true } : undefined;
         },
     });
 }
 
-// ── Eager: used in class heritage, so they must be real at import time ──────
+// ── The one global that is not ready when esmodules load ────────────────────
+export const game = lateBound('game');
+
+/**
+ * `ui` is populated during the same boot phase as `game`, so it is read through
+ * rather than captured. Safe as a Proxy because it is only ever used as a property
+ * bag: in `ui.notifications.warn(...)` the method belongs to `notifications`, which
+ * the trap hands back as the real object.
+ */
+export const ui = lateBound('ui');
+
+// ── Eager: fully defined before esmodules load ──────────────────────────────
+// Actor / Combatant / Combat are additionally *required* to be real classes here,
+// because they are extended at import time.
 export const Actor = globalThis.Actor;
 export const Combatant = globalThis.Combatant;
 export const Combat = globalThis.Combat;
+export const Hooks = globalThis.Hooks;
+export const ChatMessage = globalThis.ChatMessage;
+export const CONFIG = globalThis.CONFIG;
 
-// ── Late-bound namespaces ───────────────────────────────────────────────────
-export const game = lateBound('game');
-export const ChatMessage = lateBound('ChatMessage');
-export const Hooks = lateBound('Hooks');
-export const CONFIG = lateBound('CONFIG');
-export const ui = lateBound('ui');
+export const ActorSheet = globalThis.foundry?.appv1?.sheets?.ActorSheet || globalThis.ActorSheet;
+export const ActorSheetV2 = globalThis.foundry?.applications?.sheets?.ActorSheetV2
+    || globalThis.foundry?.applications?.api?.ApplicationV2;
+export const Actors = globalThis.foundry?.documents?.collections?.Actors || globalThis.Actors;
+
+export const Element = globalThis.Element || class {};
+export const DOMPack = globalThis.DOMPack || {};
 
 /**
- * Delegating constructor, so `new Roll(...)` builds whatever `globalThis.Roll` is
- * at the moment of the call. Foundry does define Roll before esmodules load, but
- * routing it through here costs nothing and removes the whole class of bug.
+ * Delegating constructors rather than captures, so `new Roll(...)` builds whatever
+ * the global is at the moment of the call. No `this` hazard here: construction
+ * returns a real instance, and every later read is against that instance rather
+ * than against this class.
  */
 export class Roll {
     constructor(...args) {
@@ -85,17 +127,6 @@ export class Dialog {
         return new globalThis.Dialog(...args);
     }
 }
-
-// ── Sheet / collection accessors ────────────────────────────────────────────
-// Resolved through getters because their Foundry v13+ namespaces (and the v12
-// fallbacks) are not all populated at the same point in the boot sequence.
-export const ActorSheet = globalThis.foundry?.appv1?.sheets?.ActorSheet || globalThis.ActorSheet;
-export const ActorSheetV2 = globalThis.foundry?.applications?.sheets?.ActorSheetV2
-    || globalThis.foundry?.applications?.api?.ApplicationV2;
-export const Actors = globalThis.foundry?.documents?.collections?.Actors || globalThis.Actors;
-
-export const Element = globalThis.Element || class {};
-export const DOMPack = globalThis.DOMPack || {};
 
 // ── Functions: resolved per call ────────────────────────────────────────────
 export const renderTemplate = (...args) => {

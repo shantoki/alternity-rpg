@@ -82,30 +82,62 @@ describe('src/module-info.js — late binding', () => {
 
     it('should not throw merely because a global is absent at import time', async () => {
         delete globalThis.game;
-        delete globalThis.ChatMessage;
-        delete globalThis.Hooks;
+        delete globalThis.ui;
 
         const shim = await importShim(nonce++);
 
         // Reading through a missing global yields undefined rather than exploding,
         // so a module can be imported before Foundry is ready.
         expect(shim.game.i18n).toBeUndefined();
-        expect(shim.ChatMessage.create).toBeUndefined();
-        expect(shim.Hooks.on).toBeUndefined();
+        expect(shim.ui.notifications).toBeUndefined();
     });
 
-    it('should late-bind ChatMessage and Hooks as well as game', async () => {
-        delete globalThis.ChatMessage;
-        delete globalThis.Hooks;
+    it('should read ui through to whatever Foundry installs later', async () => {
+        delete globalThis.ui;
         const shim = await importShim(nonce++);
 
-        const created = [];
-        globalThis.ChatMessage = { create: (d) => { created.push(d); return d; } };
-        globalThis.Hooks = { on: () => 'registered' };
+        const warned = [];
+        globalThis.ui = { notifications: { warn: (m) => warned.push(m) } };
 
-        expect(shim.ChatMessage.create({ content: 'hi' })).toEqual({ content: 'hi' });
-        expect(created).toHaveLength(1);
-        expect(shim.Hooks.on('event', () => {})).toBe('registered');
+        shim.ui.notifications.warn('careful');
+        expect(warned).toEqual(['careful']);
+    });
+
+    it('should call a method with the real object as `this`, not the Proxy', async () => {
+        // The reason a naive read-through Proxy is not enough. Foundry's classes use
+        // private fields, and a private-field lookup throws when the receiver is not
+        // the declaring class:
+        //
+        //   Hooks.on(...) -> TypeError: Cannot read private member #id from an
+        //                    object whose class did not declare it
+        //
+        // Foundry's `game` is a Game instance with private fields of its own, so this
+        // is not hypothetical for the one export that must be proxied.
+        class FakeGame {
+            #secret = 'hidden';
+            static #counter = 0;
+            reveal() { return this.#secret; }
+            bump() { return ++FakeGame.#counter; }
+        }
+        globalThis.game = new FakeGame();
+
+        const shim = await importShim(nonce++);
+
+        expect(() => shim.game.reveal()).not.toThrow();
+        expect(shim.game.reveal()).toBe('hidden');
+        expect(shim.game.bump()).toBe(1);
+    });
+
+    it('should hand back a class untouched rather than binding away its statics', async () => {
+        // A bound function loses the original's own static properties, so the trap
+        // must not bind a constructor it finds hanging off a proxied global.
+        class Widget { static make() { return 'made'; } }
+        globalThis.game = { Widget };
+
+        const shim = await importShim(nonce++);
+
+        expect(shim.game.Widget).toBe(Widget);
+        expect(shim.game.Widget.make()).toBe('made');
     });
 
     it('should build the Roll that exists at call time, not at import time', async () => {
@@ -146,27 +178,41 @@ describe('src/module-info.js — late binding', () => {
         expect(() => class Extended extends shim.Actor {}).not.toThrow();
     });
 
-    it('should late-bind every symbol used only as a namespace', async () => {
-        // A guard against a future "simplification" back to eager consts. Anything
-        // read as `X.y` rather than extended has to survive being defined late.
-        delete globalThis.game;
-        delete globalThis.ChatMessage;
-        delete globalThis.Hooks;
-        delete globalThis.CONFIG;
-        delete globalThis.ui;
+    it('should hand back the real Hooks object, not a Proxy over it', async () => {
+        // Hooks.on reads a private static field, so it MUST be the genuine class —
+        // this is the regression that a blanket "late-bind everything" caused:
+        //
+        //   TypeError: Cannot read private member #id from an object whose class
+        //   did not declare it
+        //     at Proxy.on
+        //
+        // Hooks is fully defined before Foundry loads a system's esmodules (index.js
+        // registers its own init hook at module scope), so an eager capture is both
+        // correct and the only safe option.
+        class FakeHooks {
+            static #id = 0;
+            static on() { return ++FakeHooks.#id; }
+        }
+        globalThis.Hooks = FakeHooks;
 
         const shim = await importShim(nonce++);
 
-        globalThis.game = { i18n: { localize: () => 'ok' } };
-        globalThis.ChatMessage = { create: () => 'ok' };
-        globalThis.Hooks = { callAll: () => 'ok' };
-        globalThis.CONFIG = { sounds: { dice: 'ok' } };
-        globalThis.ui = { notifications: { warn: () => 'ok' } };
+        expect(shim.Hooks).toBe(FakeHooks);
+        expect(() => shim.Hooks.on()).not.toThrow();
+    });
 
-        expect(shim.game.i18n.localize()).toBe('ok');
-        expect(shim.ChatMessage.create()).toBe('ok');
-        expect(shim.Hooks.callAll()).toBe('ok');
-        expect(shim.CONFIG.sounds.dice).toBe('ok');
-        expect(shim.ui.notifications.warn()).toBe('ok');
+    it('should hand back the real ChatMessage object, not a Proxy over it', async () => {
+        // Same reasoning as Hooks: ChatMessage.create and getSpeaker are called
+        // directly on it, and it is ready long before esmodules load.
+        class FakeChatMessage {
+            static #seq = 0;
+            static create() { return ++FakeChatMessage.#seq; }
+        }
+        globalThis.ChatMessage = FakeChatMessage;
+
+        const shim = await importShim(nonce++);
+
+        expect(shim.ChatMessage).toBe(FakeChatMessage);
+        expect(() => shim.ChatMessage.create()).not.toThrow();
     });
 });

@@ -13,10 +13,29 @@
  * that reads through to the global at the moment it is used.
  */
 
-/** Forward every property read to the named global, at read time. */
+/**
+ * Forward every property read to the named global, at read time — mirroring the
+ * production shim, including the method binding. That binding matters even here:
+ * without it, `this` inside a method is the Proxy, and a Foundry class that reads a
+ * private field throws ("Cannot read private member #id from an object whose class
+ * did not declare it"). Keeping the two in step means a test exercises the same
+ * semantics production does.
+ */
+function isClass(value) {
+    return typeof value === 'function'
+        && /^class[\s{]/.test(Function.prototype.toString.call(value));
+}
+
 function lateBound(name) {
     return new Proxy({}, {
-        get: (_t, prop) => globalThis[name]?.[prop],
+        get: (_t, prop) => {
+            const source = globalThis[name];
+            if (source === undefined || source === null) return undefined;
+            const value = source[prop];
+            return (typeof value === 'function' && !isClass(value))
+                ? value.bind(source)
+                : value;
+        },
         set: (_t, prop, value) => {
             (globalThis[name] ??= {})[prop] = value;
             return true;
