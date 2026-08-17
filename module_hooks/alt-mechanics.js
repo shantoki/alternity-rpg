@@ -114,20 +114,46 @@ export function initializeAlternityHooks() {
     // own `data-action` dispatcher never reaches it. The cards therefore mark
     // their buttons `data-alt-action` and are wired here.
     //
-    // Both hook names are registered: v13+ fires `renderChatMessageHTML` with a
-    // bare HTMLElement, while v12 fires `renderChatMessage` with a jQuery object.
-    // This system supports both, so the handler normalises whichever it receives.
+    // Exactly one hook is registered, chosen by Foundry generation — see
+    // chatCardHookName for why registering both is not an option.
     const bindCardButtons = (message, element) => {
+        // v12 hands over a jQuery object, v13+ a bare HTMLElement.
         const root = element?.[0] ?? element;
         if (!(root instanceof HTMLElement)) return;
         root.querySelectorAll('[data-alt-action]').forEach((button) => {
             button.addEventListener('click', (event) => onChatCardAction(event, message));
         });
     };
-    Hooks.on("renderChatMessageHTML", bindCardButtons);
-    Hooks.on("renderChatMessage", bindCardButtons);
+    Hooks.on(chatCardHookName(game.release?.generation), bindCardButtons);
 
     console.log("Alternity System Hooks: All core hooks successfully attached.");
+}
+
+/**
+ * Which chat-render hook to listen on for this Foundry generation.
+ *
+ * Registering both is tempting and wrong. `renderChatMessage` is deprecated from
+ * v13, and Foundry warns the moment it finds a *listener* on it — it does not wait
+ * for the hook to matter:
+ *
+ *   The renderChatMessage hook is deprecated. Please use renderChatMessageHTML
+ *   instead, which now passes an HTMLElement argument instead of jQuery.
+ *   Deprecated since Version 13. Support will be removed in Version 15.
+ *
+ * On v13+ that warning fires for every chat message ever rendered, and the
+ * callback would run twice per message, binding two click listeners to each
+ * button. So the generation picks one.
+ *
+ * `system.json` declares a minimum of 12, which is why the v12 name is still here
+ * at all; it can go once that floor rises to 13.
+ *
+ * @param {number} [generation] - `game.release.generation`. An unknown generation
+ *        is assumed modern: guessing v12 on a future release would register a hook
+ *        that no longer exists and silently kill every card button.
+ * @returns {string}
+ */
+export function chatCardHookName(generation) {
+    return (generation ?? 13) >= 13 ? 'renderChatMessageHTML' : 'renderChatMessage';
 }
 
 /**

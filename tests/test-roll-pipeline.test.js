@@ -20,7 +20,7 @@ installRollHarness();
 
 const { AlternityRollService } = await import('../src/services/alternity-roll-service.js');
 const { AlternityMathService, SUCCESS_DEGREES } = await import('../src/services/alternity-math.js');
-const { handleChatCardAction } = await import('../module_hooks/alt-mechanics.js');
+const { handleChatCardAction, chatCardHookName } = await import('../module_hooks/alt-mechanics.js');
 const { Hooks } = await import('../src/module-info.js');
 
 /** A trained specialty: score 12, so Good is 6 and Amazing is 3. */
@@ -645,6 +645,30 @@ describe('Chat card buttons', () => {
 
     it('should ignore an action it does not know', async () => {
         expect(await handleChatCardAction('somethingElse', { flags: {} })).toBeNull();
+    });
+
+    describe('which render hook the buttons are bound on', () => {
+        // Registering both names is tempting and wrong: `renderChatMessage` is
+        // deprecated from v13, and Foundry warns as soon as it finds a *listener* on
+        // it — for every chat message rendered, not just when the hook matters. It
+        // would also run the callback twice per message, binding two click listeners
+        // to every button.
+        it('should use the HTMLElement hook on v13 and later', () => {
+            expect(chatCardHookName(13)).toBe('renderChatMessageHTML');
+            expect(chatCardHookName(14)).toBe('renderChatMessageHTML');
+            expect(chatCardHookName(15)).toBe('renderChatMessageHTML');
+        });
+
+        it('should use the jQuery hook on v12, which system.json still declares support for', () => {
+            expect(chatCardHookName(12)).toBe('renderChatMessage');
+        });
+
+        it('should assume a modern Foundry when the generation is unreadable', () => {
+            // Guessing v12 on a future release would register a hook that no longer
+            // exists, silently killing every card button — so the default leans new.
+            expect(chatCardHookName(undefined)).toBe('renderChatMessageHTML');
+            expect(chatCardHookName(null)).toBe('renderChatMessageHTML');
+        });
     });
 });
 
