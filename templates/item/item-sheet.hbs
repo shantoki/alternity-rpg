@@ -217,8 +217,16 @@
                     </div>
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Armor.Toughness'}}</label>
+                        {{!-- Inline <option> markup rather than {{selectOptions config.…}},
+                              for the same reason damageCategory and attackAbility are:
+                              a select must not depend on a config key introduced in the
+                              same change as the markup. `selectOptions` calls
+                              Object.entries on its argument, so one missing key throws
+                              and takes the whole item sheet — every type — down with it. --}}
                         <select name="system.toughness">
-                            {{selectOptions config.toughnessClasses selected=system.toughness}}
+                            <option value="Ordinary" {{#if (eq system.toughness 'Ordinary')}}selected{{/if}}>Ordinary</option>
+                            <option value="Good" {{#if (eq system.toughness 'Good')}}selected{{/if}}>Good</option>
+                            <option value="Amazing" {{#if (eq system.toughness 'Amazing')}}selected{{/if}}>Amazing</option>
                         </select>
                     </div>
                 </div>

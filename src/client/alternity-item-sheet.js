@@ -3,7 +3,7 @@
  * @description Shared item sheet for every Alternity Fastplay item type.
  */
 
-import { DAMAGE_TYPE_LABELS, PERSONAL_TOUGHNESS_CLASSES } from '../services/alternity-math.js';
+import { DAMAGE_TYPE_LABELS } from '../services/alternity-math.js';
 
 const NS = 'alt';
 
@@ -116,20 +116,19 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
             },
             armorTypes: ['Light', 'Medium', 'Heavy', 'Powered']
                 .reduce((obj, val) => { obj[val] = val; return obj; }, {}),
-            // Ordinary / Good / Amazing. A weapon whose firepower falls short of the
-            // target's toughness has its damage degraded a grade before armour is
-            // even rolled, so this is a real mechanical setting and not a label.
-            toughnessClasses: PERSONAL_TOUGHNESS_CLASSES
-                .reduce((obj, val) => { obj[val] = val; return obj; }, {}),
             // The three damage forms Alternity has, long-labelled. This used to offer
             // a d20 list (Ballistic, Slashing, Laser…) that matched no rule and no
             // armour rating anywhere in the system: armour is rated against LI, HI and
             // En, so a weapon marked "Slashing" could never be armoured against, and
             // applyAlternityDamage's armour check silently did nothing.
             damageTypes: DAMAGE_TYPE_LABELS,
-            // NOTE: damageCategory and attackAbility deliberately have no entry here —
-            // the template renders those two selects with inline <option> markup so it
-            // does not depend on config keys introduced in the same change as the markup.
+            // NOTE: damageCategory, attackAbility and armour's toughness deliberately
+            // have no entry here — the template renders those selects with inline
+            // <option> markup so it does not depend on config keys introduced in the
+            // same change as the markup. Toughness learned this the hard way: the key
+            // was added here and used via `selectOptions` in the same commit, and on a
+            // deployment where the template synced ahead of the JS, `Object.entries`
+            // threw on the missing key and took down the item sheet for every type.
             perkFlawCategories: { Perk: 'Perk', Flaw: 'Flaw' },
             perkFlawAbilities: ['STR', 'DEX', 'CON', 'INT', 'WIL', 'PER', 'Special', 'None']
                 .reduce((obj, val) => { obj[val] = val; return obj; }, {}),
