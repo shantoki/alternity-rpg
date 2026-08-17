@@ -22,6 +22,7 @@ import {
 import { AlternityRollService } from '../services/alternity-roll-service.js';
 import { bindActorSheetDragDrop, claimDropHandling, tabForItemType } from './alternity-drag-drop.js';
 import { bindStatblockDragDrop } from './alternity-statblock-drops.js';
+import { bindOnce } from './alternity-sheet-binding.js';
 import { SHIP_TOUGHNESS_CLASSES, SHIP_HULL_TYPES, SHIP_STATUS_EFFECTS } from '../data/WarshipData.js';
 import {
     SPACESHIP_HULL_TYPES,
@@ -876,7 +877,28 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
     }
 
     _activateListeners(html) {
-        html.addEventListener('change', (e) => this._onSheetChange(e));
+        // Split by what the listener is attached to, not by what it does.
+        //
+        // `html` is `this.element`, which is created once and then reused for the
+        // life of the sheet — ApplicationV2 replaces the rendered *part* inside it.
+        // So a listener added here on every render accumulates one copy per render,
+        // and since `_onSheetChange` saves and re-renders, a single edit ended up
+        // firing that cycle once per render the sheet had been through. These three
+        // therefore go through `bindOnce`.
+        //
+        // Everything below them is attached to an element the template produced.
+        // Those elements are thrown away and rebuilt by each render, taking their
+        // listeners with them, so they must be re-attached every time.
+        bindOnce(html, 'sheetListeners', () => {
+            html.addEventListener('change', (e) => this._onSheetChange(e));
+            html.addEventListener('alternity:rollResult', (e) => console.log('[AlternitySheet] Roll result:', e.detail));
+            html.addEventListener('alternity:rollClosed', () => {
+                const mount = html.querySelector(`.${NS}-roll-mount`);
+                if (mount) mount.hidden = true;
+                this._activeRoller = null;
+            });
+        });
+
         html.querySelector(`[data-field="name"]`)?.addEventListener('blur', (e) => this.actor.update({ name: e.target.textContent.trim() }));
         const searchInput = html.querySelector(`.${NS}-skills-search-input`);
         if (searchInput) {
@@ -892,11 +914,6 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
         });
         html.querySelectorAll(`.${NS}-custom-skill-name[contenteditable="true"]`).forEach(el => {
             el.addEventListener('blur', (e) => this._onCustomSkillNameEdit(e));
-        });
-        html.addEventListener('alternity:rollResult', (e) => console.log('[AlternitySheet] Roll result:', e.detail));
-        html.addEventListener('alternity:rollClosed', () => {
-            html.querySelector(`.${NS}-roll-mount`).hidden = true;
-            this._activeRoller = null;
         });
     }
 
@@ -1609,8 +1626,13 @@ class AlternityNpcSheet extends foundry.applications.api.HandlebarsApplicationMi
     }
 
     _onRender(context, options) {
-        this.element.addEventListener('change', (e) => {
-            applySheetFieldChange(this.document, e.target, NPC_ARRAY_FIELDS);
+        // Bound once, not once per render: `this.element` outlives every render, so
+        // an unguarded listener here stacks a copy each time and turns one edit into
+        // one write per render the sheet has been through.
+        bindOnce(this.element, 'sheetChange', () => {
+            this.element.addEventListener('change', (e) => {
+                applySheetFieldChange(this.document, e.target, NPC_ARRAY_FIELDS);
+            });
         });
         bindRollMount(this);
         bindStatblockDragDrop(this, this.element, NPC_ARRAY_FIELDS);
@@ -1702,12 +1724,14 @@ class AlternityVehicleSheet extends foundry.applications.api.HandlebarsApplicati
         return context;
     }
     _onRender(context, options) {
-        this.element.addEventListener('change', (e) => {
-            const input = e.target;
-            if (input.name) {
-                const val = input.type === 'checkbox' ? input.checked : input.value;
-                this.document.update({ [input.name]: val });
-            }
+        bindOnce(this.element, 'sheetChange', () => {
+            this.element.addEventListener('change', (e) => {
+                const input = e.target;
+                if (input.name) {
+                    const val = input.type === 'checkbox' ? input.checked : input.value;
+                    this.document.update({ [input.name]: val });
+                }
+            });
         });
         // A vehicle has no attack or gear arrays to drop into — it is driven by a
         // character's own Vehicle Operation check. Bound anyway so a drop is
@@ -1764,8 +1788,10 @@ class AlternityWarshipSheet extends foundry.applications.api.HandlebarsApplicati
     }
 
     _onRender(context, options) {
-        this.element.addEventListener('change', (e) => {
-            applySheetFieldChange(this.document, e.target, WARSHIP_ARRAY_FIELDS);
+        bindOnce(this.element, 'sheetChange', () => {
+            this.element.addEventListener('change', (e) => {
+                applySheetFieldChange(this.document, e.target, WARSHIP_ARRAY_FIELDS);
+            });
         });
         bindRollMount(this);
         bindStatblockDragDrop(this, this.element, WARSHIP_ARRAY_FIELDS);
@@ -1958,8 +1984,10 @@ class AlternitySpaceshipSheet extends foundry.applications.api.HandlebarsApplica
     }
 
     _onRender(context, options) {
-        this.element.addEventListener('change', (e) => {
-            applySheetFieldChange(this.document, e.target, SPACESHIP_ARRAY_FIELDS);
+        bindOnce(this.element, 'sheetChange', () => {
+            this.element.addEventListener('change', (e) => {
+                applySheetFieldChange(this.document, e.target, SPACESHIP_ARRAY_FIELDS);
+            });
         });
         bindRollMount(this);
         bindStatblockDragDrop(this, this.element, SPACESHIP_ARRAY_FIELDS);
@@ -2409,8 +2437,10 @@ class AlternityRobotSheet extends foundry.applications.api.HandlebarsApplication
     }
 
     _onRender(context, options) {
-        this.element.addEventListener('change', (e) => {
-            applySheetFieldChange(this.document, e.target, ROBOT_ARRAY_FIELDS);
+        bindOnce(this.element, 'sheetChange', () => {
+            this.element.addEventListener('change', (e) => {
+                applySheetFieldChange(this.document, e.target, ROBOT_ARRAY_FIELDS);
+            });
         });
         bindRollMount(this);
         bindStatblockDragDrop(this, this.element, ROBOT_ARRAY_FIELDS);
@@ -2670,8 +2700,10 @@ class AlternityAISheet extends foundry.applications.api.HandlebarsApplicationMix
     }
 
     _onRender(context, options) {
-        this.element.addEventListener('change', (e) => {
-            applySheetFieldChange(this.document, e.target, AI_ARRAY_FIELDS);
+        bindOnce(this.element, 'sheetChange', () => {
+            this.element.addEventListener('change', (e) => {
+                applySheetFieldChange(this.document, e.target, AI_ARRAY_FIELDS);
+            });
         });
         bindRollMount(this);
         bindStatblockDragDrop(this, this.element, AI_ARRAY_FIELDS);
@@ -2929,8 +2961,10 @@ class AlternityCreatureSheet extends foundry.applications.api.HandlebarsApplicat
     }
 
     _onRender(context, options) {
-        this.element.addEventListener('change', (e) => {
-            applySheetFieldChange(this.document, e.target, CREATURE_ARRAY_FIELDS);
+        bindOnce(this.element, 'sheetChange', () => {
+            this.element.addEventListener('change', (e) => {
+                applySheetFieldChange(this.document, e.target, CREATURE_ARRAY_FIELDS);
+            });
         });
         bindRollMount(this);
         bindStatblockDragDrop(this, this.element, CREATURE_ARRAY_FIELDS);

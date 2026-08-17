@@ -49,6 +49,7 @@
  */
 
 import { fromUuid, game, performIntegerSort, ui } from '../module-info.js';
+import { bindOnce } from './alternity-sheet-binding.js';
 
 const NS = 'alt';
 
@@ -72,8 +73,8 @@ export const DEFAULT_ROW_SELECTOR = `.${NS}-item-card, .${NS}-computer-card`;
  */
 const FIELD_SELECTOR = 'input, textarea, select, [contenteditable="true"]';
 
-/** Dataset key on the root recording that listeners are already attached. */
-const BOUND_KEY = 'altDragDrop';
+/** Binding-group name for `bindOnce`, so these listeners attach exactly once. */
+const BOUND_KEY = 'dragDrop';
 
 /**
  * Gap left between the sort values of adjacent items, matching Foundry's own
@@ -366,46 +367,47 @@ export function bindActorSheetDragDrop(sheet, root, options = {}) {
     if (!root) return;
     const { rowSelector = DEFAULT_ROW_SELECTOR, onDropped = null, receive = null } = options;
 
+    // Re-applied on every render: the rows themselves are rebuilt each time, so
+    // the `draggable` attribute has to be put back. The listeners below are not,
+    // because the root element they sit on persists — see alternity-sheet-binding.
     if (rowSelector) markDraggableRows(root, rowSelector);
 
-    // The root element outlives every re-render, so binding on each one would
-    // stack a second copy of these handlers — and a doubled `drop` handler
-    // creates the dropped item twice.
-    if (root.dataset[BOUND_KEY]) return;
-    root.dataset[BOUND_KEY] = 'bound';
+    // A doubled `drop` handler creates the dropped item twice, which makes this
+    // the most important once-only binding in the system.
+    bindOnce(root, BOUND_KEY, () => {
+        const clearHover = () => root.classList.remove(DROP_HOVER_CLASS);
 
-    const clearHover = () => root.classList.remove(DROP_HOVER_CLASS);
+        // A sheet with no draggable rows — a statblock, whose rows are schema
+        // entries rather than documents — takes drops but never starts one.
+        if (rowSelector) bindRowDragging(sheet, root, rowSelector, clearHover);
 
-    // A sheet with no draggable rows — a statblock, whose rows are schema entries
-    // rather than documents — takes drops but never starts one.
-    if (rowSelector) bindRowDragging(sheet, root, rowSelector, clearHover);
+        root.addEventListener('dragover', (event) => {
+            // The payload is unreadable until `drop`, so this can only tell that
+            // *something* Foundry-shaped is being dragged, not what.
+            if (!event.dataTransfer?.types?.includes?.('text/plain')) return;
+            event.preventDefault();
+            root.classList.add(DROP_HOVER_CLASS);
+        });
 
-    root.addEventListener('dragover', (event) => {
-        // The payload is unreadable until `drop`, so this can only tell that
-        // *something* Foundry-shaped is being dragged, not what.
-        if (!event.dataTransfer?.types?.includes?.('text/plain')) return;
-        event.preventDefault();
-        root.classList.add(DROP_HOVER_CLASS);
-    });
+        root.addEventListener('dragleave', (event) => {
+            // dragleave also fires when crossing between children, so the highlight
+            // is only dropped once the cursor has left the sheet entirely.
+            if (!event.relatedTarget || !root.contains(event.relatedTarget)) clearHover();
+        });
 
-    root.addEventListener('dragleave', (event) => {
-        // dragleave also fires when crossing between children, so the highlight
-        // is only dropped once the cursor has left the sheet entirely.
-        if (!event.relatedTarget || !root.contains(event.relatedTarget)) clearHover();
-    });
-
-    root.addEventListener('drop', (event) => {
-        clearHover();
-        const data = parseDropData(event);
-        if (!isSupportedDrop(data)) return;
-        // Claim the drop synchronously: `preventDefault` after an await is too
-        // late, and the browser would follow its own default for the payload.
-        event.preventDefault();
-        event.stopPropagation();
-        // The row under the cursor has to be read now too — `event.target` is
-        // still valid, but resolving `closest` after a re-render is not.
-        const dropRow = rowSelector ? event.target?.closest?.(rowSelector) : null;
-        handleDrop(sheet, data, itemIdFromRow(dropRow), { onDropped, receive });
+        root.addEventListener('drop', (event) => {
+            clearHover();
+            const data = parseDropData(event);
+            if (!isSupportedDrop(data)) return;
+            // Claim the drop synchronously: `preventDefault` after an await is too
+            // late, and the browser would follow its own default for the payload.
+            event.preventDefault();
+            event.stopPropagation();
+            // The row under the cursor has to be read now too — `event.target` is
+            // still valid, but resolving `closest` after a re-render is not.
+            const dropRow = rowSelector ? event.target?.closest?.(rowSelector) : null;
+            handleDrop(sheet, data, itemIdFromRow(dropRow), { onDropped, receive });
+        });
     });
 }
 
