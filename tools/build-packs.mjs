@@ -73,11 +73,35 @@ async function build(filters) {
         try {
             await compilePack(source, destination, { recursive: true });
         } catch (error) {
+            reportLockedPack(error, name);
             reportNativeBindingFailure(error);
             throw error;
         }
         console.log(`${name.padEnd(24)} ${String(count).padStart(4)} documents -> packs/${name}`);
     }
+}
+
+/**
+ * A LevelDB allows exactly one writer, and a running Foundry is one.
+ *
+ * The raw failure is a `NotOpenError` wrapping "Resource temporarily unavailable" on the
+ * pack's LOCK file, which reads like a corrupt database rather than like something else
+ * having the pack open.
+ */
+function reportLockedPack(error, name) {
+    const detail = `${error?.message ?? ''} ${error?.cause?.message ?? ''}`;
+    if (!/LEVEL_LOCKED|lock .*LOCK|temporarily unavailable/i.test(detail)) return;
+    console.error([
+        '',
+        `packs/${name} is locked by another process.`,
+        '',
+        'A compendium can only have one writer, and Foundry holds the lock for as long as',
+        'it is running - it does not release it when the world is closed. Shut the Foundry',
+        'server down, then build.',
+        '',
+        'A stale packs/*/LOCK left behind by a killed process can be deleted; it is',
+        'gitignored and regenerated on open.',
+    ].join('\n'));
 }
 
 /**

@@ -23,6 +23,10 @@ opens one, so a committed pack collides with the local Foundry on every pull. Ig
 just the churn does not work, because `CURRENT` and `MANIFEST-*` are what make the store
 readable.
 
+This is a *contributor's* step only. A player installs the system from a manifest URL and
+gets a zip with the compiled packs already inside it, built by `.github/workflows/
+release.yml` on a `v*` tag. Nobody installing the system runs npm.
+
 | Pack | Documents | Item / Document types |
 | --- | --- | --- |
 | `alternity-weapons` | 252 | `weapon` |

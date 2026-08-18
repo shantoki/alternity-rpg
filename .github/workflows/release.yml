@@ -1,0 +1,74 @@
+# Publish a release a Foundry user can actually install.
+#
+# Foundry installs a system from a manifest URL: it reads system.json, follows its
+# `download` field to a zip, and unpacks that into Data/systems. So the zip has to carry
+# the *compiled* compendium packs - the LevelDB that this repository deliberately does
+# not track, because Foundry rewrites it whenever it opens one. Building it here is what
+# keeps `npm run build:packs` a contributor's step and not a player's.
+#
+# Triggered by pushing a tag: `git tag v1.3.0 && git push origin v1.3.0`. The tag is the
+# source of the version - it is written into the released system.json, so the manifest,
+# the zip and the tag can never disagree.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `npm ci` honours the allowScripts entry in package.json, which is what lets
+      # classic-level build its native binding - without it the pack build fails on a
+      # missing .node rather than on anything to do with the packs.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build compendium packs
+        run: npm run build:packs
+
+      - name: Stamp the release version and URLs into system.json
+        env:
+          TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+        run: node tools/stamp-release.mjs "$TAG" "$REPO"
+
+      # Staged by a Node script rather than by `rsync --exclude-from` so the file
+      # selection can be checked on a contributor's machine instead of only in CI.
+      - name: Stage the release files
+        run: node tools/stage-release.mjs dist/alternity-v2
+
+      - name: Assemble the release archive
+        run: cd dist/alternity-v2 && zip -r ../alternity-v2.zip .
+
+      # `gh` is preinstalled on the runner, so this needs no third-party action - one
+      # less thing with write access to the repository's releases.
+      #
+      # Both files are attached: the zip is what `download` points at, and system.json is
+      # what the manifest URL resolves to, which is how Foundry checks for updates.
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$TAG" \
+            dist/alternity-v2.zip \
+            system.json \
+            --title "$TAG" \
+            --generate-notes

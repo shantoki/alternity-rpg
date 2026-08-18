@@ -1,0 +1,36 @@
+# What stays out of the release archive.
+#
+# A player's Foundry needs the code, the templates, the language files and the *compiled*
+# compendium packs - nothing that only a contributor uses. Everything not listed here is
+# shipped, so a new runtime directory is included by default rather than silently left
+# out of the zip.
+
+.git
+.github
+.gitattributes
+.gitignore
+.releaseignore
+node_modules
+dist
+
+# Contributor tooling and its inputs.
+tools
+tests
+external
+scripts
+jest.config.js
+package.json
+package-lock.json
+
+# The editable form of the packs; the release carries the compiled LevelDB instead.
+packs/_source
+
+# Working notes and design docs.
+CLAUDE.md
+GEMINI.md
+PLANS_FOR_CHARACTER_SHEET.md
+PLANS_FOR_WARSHIP_SHEET.md
+PLANS_FOR_COMPENDIUM.md
+DESIGN_DOCUMENTATION.md
+alternity-core-mechanics.md
+plans
