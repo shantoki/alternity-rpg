@@ -2,7 +2,7 @@
   "id": "alternity",
   "title": "Alternity",
   "description": "The Alternity science fiction roleplaying game for Foundry VTT.",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "compatibility": {
     "minimum": "12",
     "verified": "14"

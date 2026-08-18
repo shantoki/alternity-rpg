@@ -144,25 +144,40 @@ function safeFloat(val, fallback = 0) {
 }
 
 /**
- * Disable a sheet's controls when its document cannot be written.
+ * Grey out the document-bound fields of a sheet whose document cannot be written.
  *
  * `DocumentSheetV2` does this itself in `_onRender`, but **no sheet in this system calls
  * `super._onRender`** — that is deliberate, and is what keeps core's `DragDrop` from
- * double-creating every dropped item (see `alternity-drag-drop.js`) — so the read-only
- * pass has to be done by hand. Without it a locked compendium sheet accepts edits that
- * then throw on write, and its add/delete-row buttons throw the same way.
+ * double-creating every dropped item (see `alternity-drag-drop.js`) — so it has to be
+ * done by hand. Without it a locked compendium sheet invites edits that go nowhere.
  *
- * **Only ever sets `disabled`, never clears it.** Several templates disable a control on
- * their own terms (an AI's barred programs, a robot's unloaded ones), and the rendered
- * part is rebuilt from scratch each render, so the template's own attributes are reapplied
- * for free. Clearing here would quietly re-enable buttons the template meant to bar.
+ * **Scope is deliberately narrow, and widening it broke the sheet once already.** It
+ * touches named form fields and nothing else:
+ *
+ * - **Never a `<button>`.** `sheet.element` is the whole ApplicationV2 element — with
+ *   `tag: "form"` it *is* the `<form class="application">` and the window header lives
+ *   inside it — so a bare `button` selector disabled the window's own Close control and
+ *   locked the sheet open. Nothing in that chrome carries a `name`.
+ * - Leaving buttons alone also keeps the roll buttons live on a compendium ship, which is
+ *   right: rolling posts a chat card and writes nothing to the document.
+ * - The row add/delete buttons therefore still throw if clicked on a locked document.
+ *   That is pre-existing, and it needs a human to click it; the path that fired *by
+ *   itself* was the change listener, which `applySheetFieldChange` now guards.
+ *
+ * **Only ever sets `disabled`, never clears it**, so a field the template disabled on its
+ * own terms is left as the template rendered it.
  *
  * @param {DocumentSheetV2} sheet
  */
 function applySheetEditableState(sheet) {
-    if (sheet.isEditable) return;
+    // Tested against `false` rather than for falsiness: if some Foundry version does not
+    // define `isEditable` on this sheet class, `!undefined` would be true and every sheet
+    // in the world would render read-only. An absent property leaves the sheet alone.
+    if (sheet.isEditable !== false) return;
     sheet.element.classList.add(`${NS}-sheet-readonly`);
-    for (const control of sheet.element.querySelectorAll('input, select, textarea, button, prose-mirror')) {
+    for (const control of sheet.element.querySelectorAll(
+        'input[name], select[name], textarea[name], prose-mirror[name]'
+    )) {
         control.disabled = true;
     }
 }
@@ -195,7 +210,7 @@ function applySheetFieldChange(sheet, input, arrayFields = {}) {
     // `disconnectedCallback`, so *closing* a compendium sheet dispatches a change
     // event, and without this guard that alone raised "You may not update documents
     // in the locked compendium".
-    if (!sheet.isEditable) return undefined;
+    if (sheet.isEditable === false) return undefined;
 
     const document = sheet.document;
 
@@ -1003,7 +1018,7 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
         // `saveAlternityState` or `actor.update`. The hero sheet keeps its inputs live
         // rather than taking the statblock sheets' blanket `applySheetEditableState`
         // pass: it has no <prose-mirror>, so nothing here writes unless a human edits.
-        if (!this.isEditable) return;
+        if (this.isEditable === false) return;
 
         const input  = e.target;
         const action = input.dataset.action;
@@ -1813,7 +1828,7 @@ class AlternityVehicleSheet extends foundry.applications.api.HandlebarsApplicati
                 const input = e.target;
                 // Same editability guard the shared `applySheetFieldChange` applies; this
                 // sheet writes inline because it has no array fields to read-modify-write.
-                if (input.name && this.isEditable) {
+                if (input.name && this.isEditable !== false) {
                     const val = input.type === 'checkbox' ? input.checked : input.value;
                     this.document.update({ [input.name]: val });
                 }
