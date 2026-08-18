@@ -8,6 +8,7 @@
     "skillId": "dex-sneak",
     "linkedAbility": "DEX",
     "rank": 0,
+    "baseCost": 5,
     "isBackground": false,
     "specialisation": "",
     "specialisationBonus": 2,

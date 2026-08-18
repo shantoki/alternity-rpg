@@ -178,6 +178,16 @@ export function convert() {
                 rangeClass: isMelee ? 'Melee' : rangeClassForSkill(requiredSkill),
                 range,
                 techPointCost: 0,
+                progressLevel: Math.min(9, Math.max(0, provenance.progressLevel)),
+                cost: provenance.cost,
+                availability,
+                // null, not 0: the tables print a dash for what cannot be hidden at
+                // all, and the source data writes -1000 for it.
+                concealment: provenance.concealment,
+                firingModes: modes,
+                actionsToReady: provenance.actionsToReady,
+                clipSize: provenance.clipSize,
+                clipCost: provenance.clipCost,
                 isEquipped: false,
                 quantity: 1,
                 weight: num(attr(record, 'Mass'), 0),

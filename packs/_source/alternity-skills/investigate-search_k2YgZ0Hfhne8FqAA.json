@@ -8,6 +8,7 @@
     "skillId": "wil-search",
     "linkedAbility": "WIL",
     "rank": 0,
+    "baseCost": 4,
     "isBackground": false,
     "specialisation": "",
     "specialisationBonus": 2,

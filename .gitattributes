@@ -1,0 +1,15 @@
+# Line endings
+#
+# Everything text is LF in the repository. This is here because the pack tooling
+# generates and rewrites files from scripts, and a script that writes in text mode on
+# Windows silently converts the whole file to CRLF — which turns a two-line change into
+# a one-thousand-line diff and hides what actually changed. `text=auto` leaves detected
+# binaries alone; the LevelDB files below are named anyway, because a compiled pack must
+# never be touched.
+* text=auto eol=lf
+
+# Compiled compendium packs are a LevelDB store, not source.
+packs/*/*.ldb      binary
+packs/*/*.log      binary
+packs/*/CURRENT    binary
+packs/*/MANIFEST-* binary

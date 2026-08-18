@@ -43,6 +43,7 @@ import {
     DEFAULT_PERSONAL_TOUGHNESS,
     AlternityMathService,
 } from '../services/alternity-math.js';
+import { progressLevelField, costField, availabilityField, concealmentField } from './item-acquisition.js';
 
 const { fields } = foundry.data;
 
@@ -136,6 +137,18 @@ export class ArmorData extends foundry.abstract.TypeDataModel {
                 initial:  0,
                 min:      0,
             }),
+
+            // ── The rest of the armour table's columns ─────────────────
+            /**
+             * Progress Level, Cost, Availability and Hide. Catalogue facts rather than
+             * mechanics — nothing in the damage pipeline reads them — but the armour
+             * table prints all four, and a suit that cannot state its own price is one
+             * the compendium has to describe in prose instead.
+             */
+            progressLevel: progressLevelField(),
+            cost:          costField(),
+            availability:  availabilityField(),
+            concealment:   concealmentField(),
 
             // ── Inventory state ──────────────────────────────────────────
             isEquipped: new fields.BooleanField({

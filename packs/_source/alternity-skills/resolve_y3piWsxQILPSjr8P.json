@@ -8,6 +8,7 @@
     "skillId": "wil-resolve",
     "linkedAbility": "WIL",
     "rank": 0,
+    "baseCost": 5,
     "isBackground": false,
     "specialisation": "",
     "specialisationBonus": 2,

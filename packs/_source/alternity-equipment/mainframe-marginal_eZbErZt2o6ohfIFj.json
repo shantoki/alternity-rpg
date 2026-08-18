@@ -7,6 +7,9 @@
   "system": {
     "mass": 6,
     "processorQuality": "Marginal",
+    "progressLevel": 0,
+    "cost": 4500,
+    "availability": "Controlled",
     "activeMemory": 0,
     "activeStorage": 0,
     "programs": "",

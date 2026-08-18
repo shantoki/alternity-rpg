@@ -16,9 +16,13 @@
     "skillPenalty": 0,
     "resistanceModifierBonus": 0,
     "techPointCost": 0,
+    "progressLevel": 8,
+    "cost": 4000,
+    "availability": "Military",
+    "concealment": 3,
     "isEquipped": false,
     "weight": 2,
-    "description": "<dl class=\"alternity-source-stats\"><dt>Protection</dt><dd>d6-1 (LI), d6-1 (HI), d6+2 (En)</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Action penalty</dt><dd>0</dd><dt>Hide</dt><dd>+3</dd><dt>Mass</dt><dd>2 kg</dd><dt>Progress level</dt><dd>8</dd><dt>Cost</dt><dd>4000 cr</dd><dt>Availability</dt><dd>Military</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+    "description": "<dl class=\"alternity-source-stats\"><dt>Protection</dt><dd>d6-1 (LI), d6-1 (HI), d6+2 (En)</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Action penalty</dt><dd>0</dd><dt>Hide</dt><dd>3</dd><dt>Mass</dt><dd>2 kg</dd><dt>Progress level</dt><dd>8</dd><dt>Cost</dt><dd>4000 cr</dd><dt>Availability</dt><dd>Military</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
   },
   "effects": [],
   "folder": "5Zx8N1XMO5IGeC9c",

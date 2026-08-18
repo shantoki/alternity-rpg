@@ -8,6 +8,7 @@
     "skillId": "",
     "linkedAbility": "DEX",
     "rank": 0,
+    "baseCost": 1,
     "isBackground": false,
     "specialisation": "",
     "specialisationBonus": 2,

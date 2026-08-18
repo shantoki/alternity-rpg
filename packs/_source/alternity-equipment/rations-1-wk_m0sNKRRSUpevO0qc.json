@@ -9,6 +9,7 @@
     "progressLevel": 4,
     "cost": 25,
     "mass": 2,
+    "availability": "Common",
     "bonusSkill": "",
     "bonusValue": 0,
     "maxCharges": 0,

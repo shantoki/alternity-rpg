@@ -8,6 +8,7 @@
     "skillId": "wil-animal-handling",
     "linkedAbility": "WIL",
     "rank": 0,
+    "baseCost": 3,
     "isBackground": false,
     "specialisation": "",
     "specialisationBonus": 2,

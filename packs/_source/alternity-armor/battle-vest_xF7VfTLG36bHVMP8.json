@@ -16,9 +16,13 @@
     "skillPenalty": 0,
     "resistanceModifierBonus": 0,
     "techPointCost": 0,
+    "progressLevel": 5,
+    "cost": 600,
+    "availability": "Controlled",
+    "concealment": 2,
     "isEquipped": false,
     "weight": 5,
-    "description": "<dl class=\"alternity-source-stats\"><dt>Protection</dt><dd>d6-3 (LI), d6-2 (HI), d4-2 (En)</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Action penalty</dt><dd>0</dd><dt>Hide</dt><dd>+2</dd><dt>Mass</dt><dd>5 kg</dd><dt>Progress level</dt><dd>5</dd><dt>Cost</dt><dd>600 cr</dd><dt>Availability</dt><dd>Controlled</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+    "description": "<dl class=\"alternity-source-stats\"><dt>Protection</dt><dd>d6-3 (LI), d6-2 (HI), d4-2 (En)</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Action penalty</dt><dd>0</dd><dt>Hide</dt><dd>2</dd><dt>Mass</dt><dd>5 kg</dd><dt>Progress level</dt><dd>5</dd><dt>Cost</dt><dd>600 cr</dd><dt>Availability</dt><dd>Controlled</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
   },
   "effects": [],
   "folder": "5Zx8N1XMO5IGeC9c",

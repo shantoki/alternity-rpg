@@ -16,9 +16,13 @@
     "skillPenalty": 1,
     "resistanceModifierBonus": 0,
     "techPointCost": 0,
+    "progressLevel": 7,
+    "cost": 6500,
+    "availability": "Controlled",
+    "concealment": null,
     "isEquipped": false,
     "weight": 8,
-    "description": "<dl class=\"alternity-source-stats\"><dt>Protection</dt><dd>+3 (LI), +2 (HI), +2 (En)</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Action penalty</dt><dd>+1</dd><dt>Mass</dt><dd>8 kg</dd><dt>Skill</dt><dd>Armor Operation - powered armor</dd><dt>Progress level</dt><dd>7</dd><dt>Cost</dt><dd>6500 cr</dd><dt>Availability</dt><dd>Controlled</dd><dt>Source</dt><dd>Star Drive Arms &amp; Equipment Guide</dd></dl>"
+    "description": "<dl class=\"alternity-source-stats\"><dt>Protection</dt><dd>+3 (LI), +2 (HI), +2 (En)</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Action penalty</dt><dd>+1</dd><dt>Hide</dt><dd>Cannot be concealed</dd><dt>Mass</dt><dd>8 kg</dd><dt>Skill</dt><dd>Armor Operation - powered armor</dd><dt>Progress level</dt><dd>7</dd><dt>Cost</dt><dd>6500 cr</dd><dt>Availability</dt><dd>Controlled</dd><dt>Source</dt><dd>Star Drive Arms &amp; Equipment Guide</dd></dl>"
   },
   "effects": [],
   "folder": "yAFKsBF48Oky8Ye9",
@@ -35,7 +39,7 @@
         "cost": 6500,
         "availability": "Controlled",
         "mass": 8,
-        "concealment": 0,
+        "concealment": null,
         "actionPenalty": 1,
         "requiredSkill": "Armor Operation - powered armor"
       }

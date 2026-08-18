@@ -17,11 +17,16 @@
     "requiresSkillPoints": true,
     "isInstalled": false,
     "isDamaged": false,
+    "durabilityBonus": {
+      "stun": 2,
+      "wound": 2,
+      "mortal": 2
+    },
     "actionCheckModifier": 0,
     "damageFormula": "",
     "isActivated": false,
     "activationCost": "",
-    "description": "<dl class=\"alternity-source-stats\"><dt>Quality</dt><dd>Amazing</dd><dt>Size</dt><dd>3</dd><dt>Mass</dt><dd>30 kg</dd><dt>Progress level</dt><dd>7</dd><dt>Cost</dt><dd>4000 cr</dd><dt>Multiple allowed</dt><dd>No</dd><dt>Requires nanocomputer</dt><dd>Yes</dd><dt>Costs skill points</dt><dd>Yes</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+    "description": "<dl class=\"alternity-source-stats\"><dt>Quality</dt><dd>Amazing</dd><dt>Size</dt><dd>3</dd><dt>Mass</dt><dd>30 kg</dd><dt>Progress level</dt><dd>7</dd><dt>Cost</dt><dd>4000 cr</dd><dt>Multiple allowed</dt><dd>No</dd><dt>Durability bonus</dt><dd>+2 stun, +2 wound, +2 mortal</dd><dt>Requires nanocomputer</dt><dd>Yes</dd><dt>Costs skill points</dt><dd>Yes</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
   },
   "effects": [],
   "folder": "CaItO8xE3W209wrK",
@@ -42,7 +47,12 @@
         "size": 3,
         "multipleAllowed": false,
         "requiresNanocomputer": true,
-        "requiresSkillPoints": true
+        "requiresSkillPoints": true,
+        "durabilityBonus": {
+          "stun": 2,
+          "wound": 2,
+          "mortal": 2
+        }
       }
     }
   }

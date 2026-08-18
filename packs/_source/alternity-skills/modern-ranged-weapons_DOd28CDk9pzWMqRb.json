@@ -8,6 +8,7 @@
     "skillId": "dex-ranged-mod",
     "linkedAbility": "DEX",
     "rank": 0,
+    "baseCost": 6,
     "isBackground": false,
     "specialisation": "",
     "specialisationBonus": 2,

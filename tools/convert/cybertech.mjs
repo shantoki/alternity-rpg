@@ -12,12 +12,35 @@
  */
 
 import { makeItem, statBlock } from '../lib/fvtt.mjs';
-import { readRecords, attr, num, int, bool, str, bookLabel, disambiguateNames } from '../lib/source-data.mjs';
+import { readRecords, asArray, attr, num, int, bool, str, bookLabel, disambiguateNames } from '../lib/source-data.mjs';
 
 export const PACK = 'alternity-cybertech';
 
 /** `@Quality` is an index into the Ordinary/Good/Amazing ladder. */
 const QUALITY = { 1: 'Ordinary', 2: 'Good', 3: 'Amazing' };
+
+/**
+ * A `SpecialItem` with `@Context="6"` is a durability bonus, and its `@Op` names the
+ * track: 1 stun, 2 wound, 3 mortal. The same encoding appears on the achievement
+ * records, where `Stun Rating Increase` carries `Context=6 Op=1`.
+ *
+ * Six records use it - CF Skinweave and the Exoskeleton, at each quality grade - and
+ * they are the only cyberware in the data set whose effect is stated mechanically
+ * rather than left to the Dataware text.
+ */
+const DURABILITY_TRACKS = { 1: 'stun', 2: 'wound', 3: 'mortal' };
+
+/** Read the durability bonuses off a record's `SpecialItems` block. */
+function parseDurabilityBonus(record) {
+    const bonus = { stun: 0, wound: 0, mortal: 0 };
+    for (const special of asArray(record.SpecialItems?.SpecialItem)) {
+        if (String(attr(special, 'Context')) !== '6') continue;
+        const track = DURABILITY_TRACKS[Number(attr(special, 'Op'))];
+        if (!track) continue;
+        bonus[track] += int(attr(special, 'Sub2'), 0);
+    }
+    return bonus;
+}
 
 /** Device -> `CYBERTECH_CATEGORIES` entry, following that constant's own commentary. */
 const CATEGORIES = {
@@ -63,6 +86,7 @@ export function convert() {
     disambiguateNames(entries);
 
     return entries.map(({ name, book, device, quality, record }) => {
+        const durabilityBonus = parseDurabilityBonus(record);
         const provenance = {
             book,
             sourceFile: record._sourceFile,
@@ -75,6 +99,7 @@ export function convert() {
             multipleAllowed: bool(attr(record, 'Multi')),
             requiresNanocomputer: bool(attr(record, 'NanoComp')),
             requiresSkillPoints: bool(attr(record, 'NeedSkill')),
+            durabilityBonus,
         };
 
         const description = statBlock([
@@ -84,6 +109,11 @@ export function convert() {
             ['Progress level', provenance.progressLevel || ''],
             ['Cost', provenance.cost ? `${provenance.cost} cr` : ''],
             ['Multiple allowed', provenance.multipleAllowed ? 'Yes' : 'No'],
+            ['Durability bonus', [
+                durabilityBonus.stun && `+${durabilityBonus.stun} stun`,
+                durabilityBonus.wound && `+${durabilityBonus.wound} wound`,
+                durabilityBonus.mortal && `+${durabilityBonus.mortal} mortal`,
+            ].filter(Boolean).join(', ')],
             ['Requires nanocomputer', provenance.requiresNanocomputer ? 'Yes' : 'No'],
             ['Costs skill points', provenance.requiresSkillPoints ? 'Yes' : 'No'],
             ['Source', book],
@@ -111,6 +141,7 @@ export function convert() {
                 requiresSkillPoints: provenance.requiresSkillPoints,
                 isInstalled: false,
                 isDamaged: false,
+                durabilityBonus,
                 actionCheckModifier: 0,
                 damageFormula: '',
                 isActivated: false,

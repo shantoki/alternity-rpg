@@ -16,9 +16,13 @@
     "skillPenalty": 1,
     "resistanceModifierBonus": 0,
     "techPointCost": 0,
+    "progressLevel": 1,
+    "cost": 200,
+    "availability": "Common",
+    "concealment": null,
     "isEquipped": false,
     "weight": 4,
-    "description": "<dl class=\"alternity-source-stats\"><dt>Protection</dt><dd>+1 (LI), 0 (HI), 0 (En)</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Action penalty</dt><dd>+1</dd><dt>Mass</dt><dd>4 kg</dd><dt>Skill</dt><dd>Armor Operation</dd><dt>Progress level</dt><dd>1</dd><dt>Cost</dt><dd>200 cr</dd><dt>Availability</dt><dd>Common</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+    "description": "<dl class=\"alternity-source-stats\"><dt>Protection</dt><dd>+1 (LI), 0 (HI), 0 (En)</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Action penalty</dt><dd>+1</dd><dt>Hide</dt><dd>Cannot be concealed</dd><dt>Mass</dt><dd>4 kg</dd><dt>Skill</dt><dd>Armor Operation</dd><dt>Progress level</dt><dd>1</dd><dt>Cost</dt><dd>200 cr</dd><dt>Availability</dt><dd>Common</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
   },
   "effects": [],
   "folder": "5Zx8N1XMO5IGeC9c",
@@ -35,7 +39,7 @@
         "cost": 200,
         "availability": "Common",
         "mass": 4,
-        "concealment": 0,
+        "concealment": null,
         "actionPenalty": 1,
         "requiredSkill": "Armor Operation"
       }

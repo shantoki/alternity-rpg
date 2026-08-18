@@ -95,6 +95,55 @@ describe('compendium source documents', () => {
     });
 });
 
+describe('the acquisition columns every gear table prints', () => {
+    const AVAILABILITY = ['Any', 'Common', 'Controlled', 'Military', 'Restricted'];
+    const GEAR_TYPES = ['weapon', 'armor', 'personalEquipment', 'computer'];
+
+    for (const type of GEAR_TYPES) {
+        const gear = itemsOfType(type);
+
+        test(`${type}: progress level, cost and availability are in range`, () => {
+            expectEach(gear, system => {
+                expect(Number.isInteger(system.progressLevel)).toBe(true);
+                expect(system.progressLevel).toBeGreaterThanOrEqual(0);
+                expect(system.progressLevel).toBeLessThanOrEqual(9);
+                expect(Number.isInteger(system.cost)).toBe(true);
+                expect(system.cost).toBeGreaterThanOrEqual(0);
+                expect(AVAILABILITY).toContain(system.availability);
+            });
+        });
+
+        test(`${type}: the printed price actually made it onto the item`, () => {
+            // Regression guard. These schemas had no `cost` field at all, so the
+            // converter read the credit price out of the source data and had nowhere
+            // to put it — every one of these items shipped priceless.
+            const priced = gear.filter(entry => entry.doc.system.cost > 0).length;
+            expect(priced / gear.length).toBeGreaterThan(0.5);
+        });
+
+        test(`${type}: cost agrees with the price the source data carried`, () => {
+            expectEach(gear, (system, doc) => {
+                const printed = doc.flags['alternity-v2'].provenance.cost;
+                if (printed !== undefined) expect(system.cost).toBe(printed);
+            });
+        });
+    }
+
+    test('concealment is an integer or null, never a stand-in zero', () => {
+        // The tables print a dash for what cannot be concealed at all, which is a
+        // different statement from a modifier of 0.
+        expectEach([...itemsOfType('weapon'), ...itemsOfType('armor')], system => {
+            expect(system.concealment === null || Number.isInteger(system.concealment)).toBe(true);
+        });
+    });
+
+    test('something unconcealable is recorded as such', () => {
+        const unconcealable = [...itemsOfType('weapon'), ...itemsOfType('armor')]
+            .filter(entry => entry.doc.system.concealment === null);
+        expect(unconcealable.length).toBeGreaterThan(0);
+    });
+});
+
 describe('weapon items', () => {
     const weapons = itemsOfType('weapon');
 
@@ -199,6 +248,15 @@ describe('skill items', () => {
         expectEach(skills, system => expect(system.rank).toBe(0));
     });
 
+    test('the skill point price comes across', () => {
+        expectEach(skills, (system, doc) => {
+            expect(system.baseCost).toBeGreaterThanOrEqual(0);
+            expect(system.baseCost).toBeLessThanOrEqual(15);
+            expect(system.baseCost).toBe(doc.flags['alternity-v2'].provenance.basePrice);
+        });
+        expect(skills.filter(entry => entry.doc.system.baseCost > 0).length).toBeGreaterThan(150);
+    });
+
     test('a stated skillId resolves against the skill tree', () => {
         expectEach(skills, system => {
             if (system.skillId) expect(known.has(system.skillId)).toBe(true);
@@ -260,6 +318,31 @@ describe('cybertech items', () => {
             expect(['Ordinary', 'Good', 'Amazing']).toContain(system.quality);
             expect(system.progressLevel).toBeGreaterThanOrEqual(0);
             expect(system.progressLevel).toBeLessThanOrEqual(9);
+        });
+    });
+
+    test('durability bonuses come across from the SpecialItems block', () => {
+        // Six records state their effect mechanically rather than in prose; the
+        // converter used to skip the block they state it in, so `durabilityBonus` was
+        // zero on all 57 pieces of cyberware.
+        const withBonus = cybertech.filter(entry => {
+            const bonus = entry.doc.system.durabilityBonus ?? {};
+            return (bonus.stun || 0) + (bonus.wound || 0) + (bonus.mortal || 0) > 0;
+        });
+        expect(withBonus.length).toBe(6);
+    });
+
+    test('the Amazing CF Skinweave protects all three tracks', () => {
+        const skinweave = cybertech.find(entry => entry.doc.name === 'CF Skinweave, Amazing');
+        expect(skinweave).toBeDefined();
+        expect(skinweave.doc.system.durabilityBonus).toEqual({ stun: 2, wound: 1, mortal: 1 });
+    });
+
+    test('bonuses stay non-negative', () => {
+        expectEach(cybertech, system => {
+            for (const track of ['stun', 'wound', 'mortal']) {
+                expect(system.durabilityBonus[track]).toBeGreaterThanOrEqual(0);
+            }
         });
     });
 });

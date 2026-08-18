@@ -16,9 +16,13 @@
     "skillPenalty": 1,
     "resistanceModifierBonus": 0,
     "techPointCost": 0,
+    "progressLevel": 5,
+    "cost": 500,
+    "availability": "Military",
+    "concealment": null,
     "isEquipped": false,
     "weight": 20,
-    "description": "<dl class=\"alternity-source-stats\"><dt>Protection</dt><dd>+1 (LI), +1 (HI), +1 (En)</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Action penalty</dt><dd>+1</dd><dt>Mass</dt><dd>20 kg</dd><dt>Skill</dt><dd>Armor Operation</dd><dt>Progress level</dt><dd>5</dd><dt>Cost</dt><dd>500 cr</dd><dt>Availability</dt><dd>Military</dd><dt>Source</dt><dd>Dark Matter Arms &amp; Equipment Guide</dd></dl>"
+    "description": "<dl class=\"alternity-source-stats\"><dt>Protection</dt><dd>+1 (LI), +1 (HI), +1 (En)</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Action penalty</dt><dd>+1</dd><dt>Hide</dt><dd>Cannot be concealed</dd><dt>Mass</dt><dd>20 kg</dd><dt>Skill</dt><dd>Armor Operation</dd><dt>Progress level</dt><dd>5</dd><dt>Cost</dt><dd>500 cr</dd><dt>Availability</dt><dd>Military</dd><dt>Source</dt><dd>Dark Matter Arms &amp; Equipment Guide</dd></dl>"
   },
   "effects": [],
   "folder": "be4m0ODZWAmhrVSa",
@@ -35,7 +39,7 @@
         "cost": 500,
         "availability": "Military",
         "mass": 20,
-        "concealment": 0,
+        "concealment": null,
         "actionPenalty": 1,
         "requiredSkill": "Armor Operation"
       }

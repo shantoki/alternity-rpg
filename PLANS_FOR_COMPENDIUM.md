@@ -107,22 +107,53 @@ Handbook renders "Battle jacket d6-1 (LI), d4+1 (HI), d4+1 (En)" as "Battle jack
       tolerances, effective Strength, composition. Decide whether those become schema
       fields or stay prose before writing any of them anywhere.
 
-## Phase 3: fields with no home - not started
+## Phase 3: fields with no home - mostly done
 
-Columns the source data prints that no schema models. They are all on `provenance` today,
-and rendered into the description, so nothing is lost - but nothing can read them either.
+An audit comparing every generated document against its TypeDataModel's declared
+initials turned up two kinds of gap: source columns the schemas had no field for at all,
+and one block of source data the converter simply skipped.
 
-- [ ] **`WeaponData`**: progress level, cost, availability, concealment, firing modes,
-      actions to ready, clip size, clip cost. Firing modes and clip size are the ones
-      with mechanical weight (burst and autofire change the attack).
-- [ ] **`ArmorData`**: progress level, cost, availability, concealment.
-- [ ] **`ComputerData`**: active memory and storage, which the source data has no column
-      for at all - they are printed in Dataware and the Arms & Equipment Guide.
-- [ ] **`CybertechData`**: `requiresExoskeleton` and `requiresCyberlimb` are false on
-      every converted item because the source data has no column for either; the
-      prerequisites are stated in the Dataware entries themselves.
-- [ ] Each of these needs a row on `templates/item/item-sheet.hbs` as well as a schema
-      field, which is why they were not added during the conversion.
+- [x] **Nothing priced.** `WeaponData`, `ArmorData` and `ComputerData` had no `cost`
+      field, so the converter read the credit price out of the source data — 400 for a
+      9mm pistol, 9,000 for a Tiger Mod 6 — and had nowhere to put it. Every weapon,
+      suit of armour and computer in the compendium shipped priceless. Progress level and
+      availability were missing the same way.
+- [x] **`item-acquisition.js`** now declares Progress Level, Cost, Availability and
+      Concealment once, and `WeaponData`, `ArmorData`, `ComputerData` and
+      `PersonalEquipmentData` share them. Five copies of an availability list is how it
+      ends up meaning one thing on a rifle and another on a program.
+- [x] **Concealment is nullable.** The tables print a dash for what cannot be hidden at
+      all, which is a different statement from a modifier of 0 — and for armour the
+      attribute stores both as a plain `0`, so the rendered element is the only place the
+      distinction survives.
+- [x] **The rest of the weapon table**: firing modes, actions to ready, clip size and
+      clip cost.
+- [x] **`SkillData.baseCost`**, the skill point price, mirroring `FXData.baseCost`.
+- [x] **Cyberware durability bonuses were being dropped.** Six records — CF Skinweave and
+      the Exoskeleton at each quality — state their effect mechanically in a
+      `SpecialItems` block the converter skipped, so `durabilityBonus` was zero on all 57
+      pieces. `@Context="6"` marks a durability bonus and `@Op` names the track (1 stun,
+      2 wound, 3 mortal), the same encoding the achievement records use.
+- [x] Each new field has a row on `templates/item/item-sheet.hbs`. The availability
+      selects use inline `<option>` markup rather than `{{selectOptions config.x}}`,
+      following the rule that file's own comments set out: an undefined config key makes
+      `selectOptions` throw, which aborts the render of the whole shared sheet for every
+      item type.
+
+Still open, because the source data has no column for them:
+
+- [ ] **`ComputerData`**: active memory and storage. Printed in Dataware and the Arms &
+      Equipment Guide. (Progress level is present but zero on all 27 computers, which is
+      what the source data carries, not a conversion loss.)
+- [ ] **`CybertechData`**: `requiresExoskeleton` and `requiresCyberlimb`, stated in the
+      Dataware entries themselves rather than in any column.
+- [ ] **`ArmorData.speedPenalty`** and **`techPointCost`** — the latter matters, since
+      powered armour costs tech points per scene by its own schema's description.
+
+Correctly left at their defaults, and not to be "fixed": catalogue skills at rank 0,
+`isEquipped` false, `quantity` 1, `timesPurchased` 0, and `resistanceModifierBonus` 0 on
+every suit of armour. The achievement `effectValue` of 1 was checked against the source
+data's own `SpecialItems` encoding and agrees with it, ability mappings included.
 
 ## Phase 4: species as a real Item subtype - not started
 

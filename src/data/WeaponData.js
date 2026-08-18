@@ -26,6 +26,7 @@
  */
 
 import { DAMAGE_TYPES, LEGACY_DAMAGE_TYPE_MAP } from '../services/alternity-math.js';
+import { progressLevelField, costField, availabilityField, concealmentField } from './item-acquisition.js';
 
 const { fields } = foundry.data;
 
@@ -164,6 +165,35 @@ export class WeaponData extends foundry.abstract.TypeDataModel {
                 integer:  true,
                 initial:  0,
                 min:      0,
+            }),
+
+            // ── The rest of the weapon table's columns ───────────────────
+            /**
+             * Progress Level, Cost, Availability, Hide, Mode, Actions and Clip.
+             *
+             * None of these feed the roll pipeline; they are here because the weapon
+             * table prints them, and a schema that cannot hold them forces the
+             * compendium to describe a weapon in prose that it should state in fields.
+             */
+            progressLevel: progressLevelField(),
+            cost:          costField(),
+            availability:  availabilityField(),
+            concealment:   concealmentField(),
+
+            /** Mode column: which of Full, Burst and Autofire the weapon can fire. */
+            firingModes: new fields.StringField({ required: false, initial: '' }),
+
+            /** Actions column: phases spent readying the weapon before it can fire. */
+            actionsToReady: new fields.NumberField({
+                required: true, nullable: false, integer: true, initial: 0, min: 0,
+            }),
+
+            /** Rounds per clip, and what a replacement clip costs in credits. */
+            clipSize: new fields.NumberField({
+                required: true, nullable: false, integer: true, initial: 0, min: 0,
+            }),
+            clipCost: new fields.NumberField({
+                required: true, nullable: false, integer: true, initial: 0, min: 0,
             }),
 
             // ── Inventory state ──────────────────────────────────────────

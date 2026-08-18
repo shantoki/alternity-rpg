@@ -88,6 +88,7 @@ export function convert() {
                 skillId: resolveSkillId(skill, allSkills),
                 linkedAbility: STAT_ID_TO_ABILITY[Number(attr(record, 'StatID'))] ?? 'INT',
                 rank: 0,
+                baseCost: Math.min(15, Math.max(0, basePrice)),
                 isBackground: false,
                 specialisation: '',
                 specialisationBonus: 2,

@@ -9,6 +9,7 @@
     "progressLevel": 0,
     "cost": 500,
     "mass": 70,
+    "availability": "Military",
     "bonusSkill": "",
     "bonusValue": 0,
     "maxCharges": 0,

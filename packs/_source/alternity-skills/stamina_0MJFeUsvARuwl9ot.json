@@ -8,6 +8,7 @@
     "skillId": "con-stamina",
     "linkedAbility": "CON",
     "rank": 0,
+    "baseCost": 3,
     "isBackground": false,
     "specialisation": "",
     "specialisationBonus": 2,

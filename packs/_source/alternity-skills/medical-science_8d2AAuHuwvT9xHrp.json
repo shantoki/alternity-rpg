@@ -8,6 +8,7 @@
     "skillId": "int-med-sci",
     "linkedAbility": "INT",
     "rank": 0,
+    "baseCost": 7,
     "isBackground": false,
     "specialisation": "",
     "specialisationBonus": 2,

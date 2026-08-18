@@ -132,6 +132,9 @@ export function convert() {
                 system: {
                     mass: provenance.mass,
                     processorQuality: parseQuality(name),
+                    progressLevel: Math.min(9, Math.max(0, provenance.progressLevel)),
+                    cost: provenance.cost,
+                    availability,
                     // The source data has no memory or storage columns - those are
                     // printed in Dataware and the Arms & Equipment Guide, so they stay
                     // at zero until the prose pass fills them in.
@@ -157,6 +160,7 @@ export function convert() {
                 progressLevel: Math.min(8, Math.max(0, provenance.progressLevel)),
                 cost: provenance.cost,
                 mass: provenance.mass,
+                availability,
                 bonusSkill: '',
                 bonusValue: 0,
                 maxCharges: 0,

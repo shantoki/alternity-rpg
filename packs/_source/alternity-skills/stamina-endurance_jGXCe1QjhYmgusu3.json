@@ -8,6 +8,7 @@
     "skillId": "con-endurance",
     "linkedAbility": "CON",
     "rank": 0,
+    "baseCost": 4,
     "isBackground": false,
     "specialisation": "",
     "specialisationBonus": 2,

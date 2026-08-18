@@ -45,6 +45,16 @@ export class SkillData extends foundry.abstract.TypeDataModel {
             }),
 
             // ── Rank ─────────────────────────────────────────────────────
+            /**
+             * What a rank costs in skill points, as the skill tables print it. The
+             * broad skill's price buys rank 1; a specialty's buys a rank in it once its
+             * broad skill is held. Mirrors `FXData.baseCost`, which is the same column
+             * on the psionic and FX tables.
+             */
+            baseCost: new fields.NumberField({
+                required: true, nullable: false, integer: true, initial: 0, min: 0, max: 15,
+            }),
+
             rank: new fields.NumberField({
                 required: true,
                 nullable: false,

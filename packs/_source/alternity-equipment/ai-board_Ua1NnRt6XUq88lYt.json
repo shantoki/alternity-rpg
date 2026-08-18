@@ -7,6 +7,9 @@
   "system": {
     "mass": 0,
     "processorQuality": "",
+    "progressLevel": 0,
+    "cost": 15000,
+    "availability": "Restricted",
     "activeMemory": 0,
     "activeStorage": 0,
     "programs": "",

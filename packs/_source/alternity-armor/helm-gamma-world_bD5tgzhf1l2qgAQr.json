@@ -16,9 +16,13 @@
     "skillPenalty": 1,
     "resistanceModifierBonus": 0,
     "techPointCost": 0,
+    "progressLevel": 0,
+    "cost": 50,
+    "availability": "Any",
+    "concealment": null,
     "isEquipped": false,
     "weight": 4,
-    "description": "<dl class=\"alternity-source-stats\"><dt>Protection</dt><dd>+1 (LI), 0 (HI), 0 (En)</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Action penalty</dt><dd>+1</dd><dt>Mass</dt><dd>4 kg</dd><dt>Skill</dt><dd>Armor Operation</dd><dt>Cost</dt><dd>50 cr</dd><dt>Availability</dt><dd>Any</dd><dt>Source</dt><dd>Gamma World</dd></dl>"
+    "description": "<dl class=\"alternity-source-stats\"><dt>Protection</dt><dd>+1 (LI), 0 (HI), 0 (En)</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Action penalty</dt><dd>+1</dd><dt>Hide</dt><dd>Cannot be concealed</dd><dt>Mass</dt><dd>4 kg</dd><dt>Skill</dt><dd>Armor Operation</dd><dt>Cost</dt><dd>50 cr</dd><dt>Availability</dt><dd>Any</dd><dt>Source</dt><dd>Gamma World</dd></dl>"
   },
   "effects": [],
   "folder": "2z85NSEcsi6g4DZQ",
@@ -35,7 +39,7 @@
         "cost": 50,
         "availability": "Any",
         "mass": 4,
-        "concealment": 0,
+        "concealment": null,
         "actionPenalty": 1,
         "requiredSkill": "Armor Operation"
       }

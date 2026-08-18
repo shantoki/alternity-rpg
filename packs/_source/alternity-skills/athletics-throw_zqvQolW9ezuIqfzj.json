@@ -8,6 +8,7 @@
     "skillId": "str-throw",
     "linkedAbility": "STR",
     "rank": 0,
+    "baseCost": 2,
     "isBackground": false,
     "specialisation": "",
     "specialisationBonus": 2,

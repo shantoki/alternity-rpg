@@ -60,6 +60,10 @@ export function convert() {
         };
         const actionPenalty = int(attr(record, 'AP'), 0);
         const availability = availabilityLabel(attr(record, 'Availability'));
+        // The printed Hide column is a dash for the suits that cannot be concealed at
+        // all - which the attribute stores as a plain 0, the same as "no modifier". The
+        // rendered element is the only place the two are still distinguishable.
+        const concealment = str(record.Hide) === '' ? null : int(attr(record, 'Hide'), 0);
 
         const provenance = {
             book,
@@ -68,7 +72,7 @@ export function convert() {
             cost: int(attr(record, 'Cost'), 0),
             availability,
             mass: num(attr(record, 'Mass'), 0),
-            concealment: int(attr(record, 'Hide'), 0),
+            concealment,
             actionPenalty,
             requiredSkill: SKILL_LABEL[skillId] ?? '',
         };
@@ -81,7 +85,7 @@ export function convert() {
             ].filter(Boolean).join(', ')],
             ['Toughness', TOUGHNESS[Number(attr(record, 'Toughness'))] ?? 'Ordinary'],
             ['Action penalty', actionPenalty ? `+${actionPenalty}` : '0'],
-            ['Hide', str(record.Hide)],
+            ['Hide', concealment === null ? 'Cannot be concealed' : concealment],
             ['Mass', provenance.mass ? `${provenance.mass} kg` : ''],
             ['Skill', provenance.requiredSkill],
             ['Progress level', provenance.progressLevel || ''],
@@ -105,6 +109,10 @@ export function convert() {
                 skillPenalty: Math.min(10, Math.max(0, actionPenalty)),
                 resistanceModifierBonus: 0,
                 techPointCost: 0,
+                progressLevel: Math.min(9, Math.max(0, provenance.progressLevel)),
+                cost: provenance.cost,
+                availability,
+                concealment: provenance.concealment,
                 isEquipped: false,
                 weight: num(attr(record, 'Mass'), 0),
                 description,

@@ -8,6 +8,7 @@
     "skillId": "str-melee",
     "linkedAbility": "STR",
     "rank": 0,
+    "baseCost": 6,
     "isBackground": false,
     "specialisation": "",
     "specialisationBonus": 2,

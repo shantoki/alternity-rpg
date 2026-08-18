@@ -16,9 +16,13 @@
     "skillPenalty": 0,
     "resistanceModifierBonus": 0,
     "techPointCost": 0,
+    "progressLevel": 6,
+    "cost": 8000,
+    "availability": "Restricted",
+    "concealment": 3,
     "isEquipped": false,
     "weight": 2,
-    "description": "<dl class=\"alternity-source-stats\"><dt>Toughness</dt><dd>Ordinary</dd><dt>Action penalty</dt><dd>0</dd><dt>Hide</dt><dd>+3</dd><dt>Mass</dt><dd>2 kg</dd><dt>Progress level</dt><dd>6</dd><dt>Cost</dt><dd>8000 cr</dd><dt>Availability</dt><dd>Restricted</dd><dt>Source</dt><dd>Gamma World</dd></dl>"
+    "description": "<dl class=\"alternity-source-stats\"><dt>Toughness</dt><dd>Ordinary</dd><dt>Action penalty</dt><dd>0</dd><dt>Hide</dt><dd>3</dd><dt>Mass</dt><dd>2 kg</dd><dt>Progress level</dt><dd>6</dd><dt>Cost</dt><dd>8000 cr</dd><dt>Availability</dt><dd>Restricted</dd><dt>Source</dt><dd>Gamma World</dd></dl>"
   },
   "effects": [],
   "folder": "2z85NSEcsi6g4DZQ",

@@ -23,6 +23,8 @@
  *   - powerNotes    : Free-text battery/power-source duration
  */
 
+import { availabilityField } from './item-acquisition.js';
+
 const { fields } = foundry.data;
 
 export class PersonalEquipmentData extends foundry.abstract.TypeDataModel {
@@ -62,6 +64,9 @@ export class PersonalEquipmentData extends foundry.abstract.TypeDataModel {
                 initial:  0,
                 min:      0,
             }),
+
+            /** How hard the gear is to come by legally (the tables' Com/Con/Mil/Res). */
+            availability: availabilityField(),
 
             // ── Situational skill modifier ───────────────────────────────
             // Free text since the source material names specialty skills

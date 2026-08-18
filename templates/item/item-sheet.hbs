@@ -187,6 +187,56 @@
                     </div>
                 </div>
 
+                {{!-- What the weapon table prints besides the attack line.
+                      Availability renders inline <option> markup rather than
+                      {{selectOptions config.x}}: it mirrors the schema's own choices, and
+                      an undefined config key makes selectOptions throw, which aborts the
+                      render of this whole shared sheet for every item type. --}}
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.ProgressLevel'}}</label>
+                        <input type="number" name="system.progressLevel" value="{{system.progressLevel}}" data-dtype="Number" min="0" max="9"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cost'}}</label>
+                        <input type="number" name="system.cost" value="{{system.cost}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Availability'}}</label>
+                        <select name="system.availability">
+                            <option value="Any" {{#if (eq system.availability 'Any')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Any'}}</option>
+                            <option value="Common" {{#if (eq system.availability 'Common')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Common'}}</option>
+                            <option value="Controlled" {{#if (eq system.availability 'Controlled')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Controlled'}}</option>
+                            <option value="Military" {{#if (eq system.availability 'Military')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Military'}}</option>
+                            <option value="Restricted" {{#if (eq system.availability 'Restricted')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Restricted'}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    {{!-- Blank means the thing cannot be concealed at all, which the
+                          tables print as a dash - not the same statement as a 0. --}}
+                    <label title="{{localize 'ALTERNITY.ConcealmentHint'}}">{{localize 'ALTERNITY.Concealment'}}</label>
+                    <input type="number" name="system.concealment" value="{{system.concealment}}" data-dtype="Number" placeholder="&mdash;"/>
+                </div>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label title="{{localize 'ALTERNITY.Weapon.FiringModesHint'}}">{{localize 'ALTERNITY.Weapon.FiringModes'}}</label>
+                        <input type="text" name="system.firingModes" value="{{system.firingModes}}" data-dtype="String" placeholder="Full, Burst"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Weapon.ClipSize'}}</label>
+                        <input type="number" name="system.clipSize" value="{{system.clipSize}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Weapon.ClipCost'}}</label>
+                        <input type="number" name="system.clipCost" value="{{system.clipCost}}" data-dtype="Number" min="0"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label title="{{localize 'ALTERNITY.Weapon.ActionsToReadyHint'}}">{{localize 'ALTERNITY.Weapon.ActionsToReady'}}</label>
+                    <input type="number" name="system.actionsToReady" value="{{system.actionsToReady}}" data-dtype="Number" min="0"/>
+                </div>
+
                 <div class="alt-item-summary">
                     {{!-- A situation-die step modifier, not a d20-style to-hit bonus:
                           the attack itself is a skill check rolled under the wielder's
@@ -282,6 +332,38 @@
                     </div>
                 </div>
 
+                {{!-- What the armour table prints besides the protection ratings.
+                      Availability renders inline <option> markup rather than
+                      {{selectOptions config.x}}: it mirrors the schema's own choices, and
+                      an undefined config key makes selectOptions throw, which aborts the
+                      render of this whole shared sheet for every item type. --}}
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.ProgressLevel'}}</label>
+                        <input type="number" name="system.progressLevel" value="{{system.progressLevel}}" data-dtype="Number" min="0" max="9"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cost'}}</label>
+                        <input type="number" name="system.cost" value="{{system.cost}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Availability'}}</label>
+                        <select name="system.availability">
+                            <option value="Any" {{#if (eq system.availability 'Any')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Any'}}</option>
+                            <option value="Common" {{#if (eq system.availability 'Common')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Common'}}</option>
+                            <option value="Controlled" {{#if (eq system.availability 'Controlled')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Controlled'}}</option>
+                            <option value="Military" {{#if (eq system.availability 'Military')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Military'}}</option>
+                            <option value="Restricted" {{#if (eq system.availability 'Restricted')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Restricted'}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    {{!-- Blank means the thing cannot be concealed at all, which the
+                          tables print as a dash - not the same statement as a 0. --}}
+                    <label title="{{localize 'ALTERNITY.ConcealmentHint'}}">{{localize 'ALTERNITY.Concealment'}}</label>
+                    <input type="number" name="system.concealment" value="{{system.concealment}}" data-dtype="Number" placeholder="&mdash;"/>
+                </div>
+
                 <div class="alt-item-summary">
                     <span class="alt-item-summary-entry"><strong>{{localize 'ALTERNITY.Armor.Protection'}}:</strong> {{system.protectionLabel}}</span>
                     {{#if system.raisesToughness}}
@@ -316,6 +398,32 @@
                         <input type="number" name="system.activeStorage" value="{{system.activeStorage}}" data-dtype="Number" min="0"/>
                     </div>
                 </div>
+                {{!-- What the hardware tables print alongside the specification.
+                      Availability renders inline <option> markup rather than
+                      {{selectOptions config.x}}: it mirrors the schema's own choices, and
+                      an undefined config key makes selectOptions throw, which aborts the
+                      render of this whole shared sheet for every item type. --}}
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.ProgressLevel'}}</label>
+                        <input type="number" name="system.progressLevel" value="{{system.progressLevel}}" data-dtype="Number" min="0" max="9"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Cost'}}</label>
+                        <input type="number" name="system.cost" value="{{system.cost}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Availability'}}</label>
+                        <select name="system.availability">
+                            <option value="Any" {{#if (eq system.availability 'Any')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Any'}}</option>
+                            <option value="Common" {{#if (eq system.availability 'Common')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Common'}}</option>
+                            <option value="Controlled" {{#if (eq system.availability 'Controlled')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Controlled'}}</option>
+                            <option value="Military" {{#if (eq system.availability 'Military')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Military'}}</option>
+                            <option value="Restricted" {{#if (eq system.availability 'Restricted')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Restricted'}}</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label>{{localize 'ALTERNITY.Computer.Programs'}}</label>
                     {{#if systemFields.programs}}
@@ -327,6 +435,10 @@
             {{/if}}
 
             {{#if (eq document.type 'skill')}}
+                <div class="form-group">
+                    <label title="{{localize 'ALTERNITY.Skill.BaseCostHint'}}">{{localize 'ALTERNITY.Skill.BaseCost'}}</label>
+                    <input type="number" name="system.baseCost" value="{{system.baseCost}}" data-dtype="Number" min="0" max="15"/>
+                </div>
                 <div class="grid grid-2col">
                     <div class="form-group">
                         <label>{{localize 'ALTERNITY.Skill.SkillId'}}</label>
@@ -555,9 +667,23 @@
                         <input type="number" name="system.progressLevel" value="{{system.progressLevel}}" data-dtype="Number" min="0" max="8"/>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>{{localize 'ALTERNITY.PersonalEquipment.Cost'}}</label>
-                    <input type="number" name="system.cost" value="{{system.cost}}" data-dtype="Number" min="0"/>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.PersonalEquipment.Cost'}}</label>
+                        <input type="number" name="system.cost" value="{{system.cost}}" data-dtype="Number" min="0"/>
+                    </div>
+                    {{!-- Inline <option> markup on purpose: an undefined config key makes
+                          selectOptions throw and takes down the whole shared sheet. --}}
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Availability'}}</label>
+                        <select name="system.availability">
+                            <option value="Any" {{#if (eq system.availability 'Any')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Any'}}</option>
+                            <option value="Common" {{#if (eq system.availability 'Common')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Common'}}</option>
+                            <option value="Controlled" {{#if (eq system.availability 'Controlled')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Controlled'}}</option>
+                            <option value="Military" {{#if (eq system.availability 'Military')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Military'}}</option>
+                            <option value="Restricted" {{#if (eq system.availability 'Restricted')}}selected{{/if}}>{{localize 'ALTERNITY.AvailabilityClass.Restricted'}}</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="grid grid-2col">
                     <div class="form-group">

@@ -8,6 +8,7 @@
     "skillId": "str-unarmed",
     "linkedAbility": "STR",
     "rank": 0,
+    "baseCost": 5,
     "isBackground": false,
     "specialisation": "",
     "specialisationBonus": 2,

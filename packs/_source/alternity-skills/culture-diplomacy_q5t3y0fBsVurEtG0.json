@@ -8,6 +8,7 @@
     "skillId": "per-diplomacy",
     "linkedAbility": "PER",
     "rank": 0,
+    "baseCost": 3,
     "isBackground": false,
     "specialisation": "",
     "specialisationBonus": 2,

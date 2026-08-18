@@ -17,6 +17,11 @@
     "requiresSkillPoints": true,
     "isInstalled": false,
     "isDamaged": false,
+    "durabilityBonus": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
     "actionCheckModifier": 0,
     "damageFormula": "",
     "isActivated": false,
@@ -42,7 +47,12 @@
         "size": 0,
         "multipleAllowed": true,
         "requiresNanocomputer": true,
-        "requiresSkillPoints": true
+        "requiresSkillPoints": true,
+        "durabilityBonus": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        }
       }
     }
   }
