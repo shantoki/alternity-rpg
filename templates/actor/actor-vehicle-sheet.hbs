@@ -105,7 +105,11 @@
 
         <div class="{{alt}}-vehicle-description">
             <label>{{localize 'ALTERNITY.Description'}}</label>
-            {{editor system.description target="system.description" button=true owner=owner editable=editable}}
+            {{#if systemFields.description}}
+                {{formInput systemFields.description value=system.description name="system.description"}}
+            {{else}}
+                <textarea name="system.description" rows="3">{{system.description}}</textarea>
+            {{/if}}
         </div>
     </section>
 </form>

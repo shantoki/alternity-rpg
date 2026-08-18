@@ -243,9 +243,17 @@
             <h3>{{localize 'ALTERNITY.Npc.Motivation'}}</h3>
             <input type="text" class="{{alt}}-robot-concept" name="system.motivation" value="{{system.motivation}}" placeholder="{{localize 'ALTERNITY.Npc.MotivationHint'}}" />
             <h3>{{localize 'ALTERNITY.Npc.Tactics'}}</h3>
-            <textarea name="system.tactics" rows="3">{{system.tactics}}</textarea>
+            {{#if systemFields.tactics}}
+                {{formInput systemFields.tactics value=system.tactics name="system.tactics"}}
+            {{else}}
+                <textarea name="system.tactics" rows="3">{{system.tactics}}</textarea>
+            {{/if}}
             <h3>{{localize 'ALTERNITY.Npc.Biography'}}</h3>
-            <textarea name="system.biography" rows="3">{{system.biography}}</textarea>
+            {{#if systemFields.biography}}
+                {{formInput systemFields.biography value=system.biography name="system.biography"}}
+            {{else}}
+                <textarea name="system.biography" rows="3">{{system.biography}}</textarea>
+            {{/if}}
         </section>
 
     </main>

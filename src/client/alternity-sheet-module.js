@@ -1595,6 +1595,9 @@ class AlternityNpcSheet extends foundry.applications.api.HandlebarsApplicationMi
 
         context.actor = this.document;
         context.system = system;
+        // Schema fields for {{formInput}}, which is how an HTMLField gets a <prose-mirror>
+        // editor instead of a <textarea> that shows its own markup as text.
+        context.systemFields = this.document.system?.schema?.fields ?? {};
         context.alt = NS;
         context.woundSeverity = WOUND_SEVERITY[system.woundLevel] || 'healthy';
         context.WOUND_LEVELS = WOUND_LEVELS;
@@ -1752,6 +1755,9 @@ class AlternityVehicleSheet extends foundry.applications.api.HandlebarsApplicati
         const context = await super._prepareContext(options);
         context.actor = this.document;
         context.system = this.document.system;
+        // Schema fields for {{formInput}}, which is how an HTMLField gets a <prose-mirror>
+        // editor instead of a <textarea> that shows its own markup as text.
+        context.systemFields = this.document.system?.schema?.fields ?? {};
         context.alt = NS;
         context.vehicleTypeChoices = ['Ground', 'Air', 'Space', 'Water'];
         context.sizeChoices = ['Tiny', 'Small', 'Medium', 'Large', 'Huge', 'Gargantuan'];
@@ -1807,6 +1813,9 @@ class AlternityWarshipSheet extends foundry.applications.api.HandlebarsApplicati
         const context = await super._prepareContext(options);
         context.actor = this.document;
         context.system = this.document.system;
+        // Schema fields for {{formInput}}, which is how an HTMLField gets a <prose-mirror>
+        // editor instead of a <textarea> that shows its own markup as text.
+        context.systemFields = this.document.system?.schema?.fields ?? {};
         context.alt = NS;
         context.hullCategoryChoices = SHIP_HULL_CATEGORIES;
         context.hullTypeChoices = SHIP_HULL_TYPES;
@@ -1957,6 +1966,9 @@ class AlternitySpaceshipSheet extends foundry.applications.api.HandlebarsApplica
 
         context.actor = this.document;
         context.system = system;
+        // Schema fields for {{formInput}}, which is how an HTMLField gets a <prose-mirror>
+        // editor instead of a <textarea> that shows its own markup as text.
+        context.systemFields = this.document.system?.schema?.fields ?? {};
         context.alt = NS;
 
         // ── Choice lists ────────────────────────────────────────────────────
@@ -2365,6 +2377,9 @@ class AlternityRobotSheet extends foundry.applications.api.HandlebarsApplication
 
         context.actor = this.document;
         context.system = system;
+        // Schema fields for {{formInput}}, which is how an HTMLField gets a <prose-mirror>
+        // editor instead of a <textarea> that shows its own markup as text.
+        context.systemFields = this.document.system?.schema?.fields ?? {};
         context.alt = NS;
 
         // ── Choice lists ────────────────────────────────────────────────────
@@ -2635,6 +2650,9 @@ class AlternityAISheet extends foundry.applications.api.HandlebarsApplicationMix
 
         context.actor = this.document;
         context.system = system;
+        // Schema fields for {{formInput}}, which is how an HTMLField gets a <prose-mirror>
+        // editor instead of a <textarea> that shows its own markup as text.
+        context.systemFields = this.document.system?.schema?.fields ?? {};
         context.alt = NS;
 
         // ── Choice lists ────────────────────────────────────────────────────
@@ -2927,6 +2945,9 @@ class AlternityCreatureSheet extends foundry.applications.api.HandlebarsApplicat
 
         context.actor = this.document;
         context.system = system;
+        // Schema fields for {{formInput}}, which is how an HTMLField gets a <prose-mirror>
+        // editor instead of a <textarea> that shows its own markup as text.
+        context.systemFields = this.document.system?.schema?.fields ?? {};
         context.alt = NS;
 
         // ── Choice lists ────────────────────────────────────────────────────

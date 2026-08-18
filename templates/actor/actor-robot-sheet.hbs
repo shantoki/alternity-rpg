@@ -357,9 +357,17 @@
             <input type="text" class="{{alt}}-robot-concept" name="system.concept" value="{{system.concept}}" placeholder="{{localize 'ALTERNITY.Robot.ConceptHint'}}" />
             <input type="text" class="{{alt}}-robot-concept" name="system.shape" value="{{system.shape}}" placeholder="{{localize 'ALTERNITY.Robot.ShapeHint'}}" />
             <h3>{{localize 'ALTERNITY.Description'}}</h3>
-            <textarea name="system.description" rows="3">{{system.description}}</textarea>
+            {{#if systemFields.description}}
+                {{formInput systemFields.description value=system.description name="system.description"}}
+            {{else}}
+                <textarea name="system.description" rows="3">{{system.description}}</textarea>
+            {{/if}}
             <h3>{{localize 'ALTERNITY.Notes'}}</h3>
-            <textarea name="system.notes" rows="3">{{system.notes}}</textarea>
+            {{#if systemFields.notes}}
+                {{formInput systemFields.notes value=system.notes name="system.notes"}}
+            {{else}}
+                <textarea name="system.notes" rows="3">{{system.notes}}</textarea>
+            {{/if}}
         </section>
 
     </main>

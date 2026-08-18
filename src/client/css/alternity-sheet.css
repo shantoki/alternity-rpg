@@ -1622,6 +1622,25 @@
 }
 .alt-item-sheet .tab[data-tab="description"] prose-mirror { flex: 1; }
 
+/* The same treatment for the actor sheets, which all carry `.alt-sheet-app`.
+   Their HTMLFields (a warship's notes and description, a creature's behaviour, an NPC's
+   tactics and biography, ...) used to render as a plain <textarea>, which showed the
+   stored markup as literal text — the compendium ships those fields as HTML, so a hull's
+   stat block read as tag soup. {{formInput}} on the schema field gives a real editor.
+
+   As above: set a height and framing, but do NOT set `display`. Foundry wraps an
+   activated editor in `.menu-container` and `.editor-container`, both of which take
+   their height from the host being a flex container. */
+.alt-sheet-app prose-mirror {
+    display: flex;
+    flex-direction: column;
+    min-height: 120px;
+    padding: 4px 6px;
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--alt-color-border);
+    border-radius: var(--alt-radius);
+}
+
 .alt-item-sheet .form-group {
     display: flex;
     flex-direction: column;

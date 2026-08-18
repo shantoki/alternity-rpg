@@ -246,9 +246,17 @@
         {{!-- ═══ Notes ═════════════════════════════════════════════════════ --}}
         <section class="{{alt}}-ship-table-section">
             <h3 title="{{localize 'ALTERNITY.Creature.BehaviourHint'}}">{{localize 'ALTERNITY.Creature.Behaviour'}}</h3>
-            <textarea name="system.behaviour" rows="3">{{system.behaviour}}</textarea>
+            {{#if systemFields.behaviour}}
+                {{formInput systemFields.behaviour value=system.behaviour name="system.behaviour"}}
+            {{else}}
+                <textarea name="system.behaviour" rows="3">{{system.behaviour}}</textarea>
+            {{/if}}
             <h3>{{localize 'ALTERNITY.Description'}}</h3>
-            <textarea name="system.description" rows="3">{{system.description}}</textarea>
+            {{#if systemFields.description}}
+                {{formInput systemFields.description value=system.description name="system.description"}}
+            {{else}}
+                <textarea name="system.description" rows="3">{{system.description}}</textarea>
+            {{/if}}
         </section>
 
     </main>
