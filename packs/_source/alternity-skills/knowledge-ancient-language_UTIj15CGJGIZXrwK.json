@@ -1,0 +1,38 @@
+{
+  "_id": "UTIj15CGJGIZXrwK",
+  "_key": "!items!UTIj15CGJGIZXrwK",
+  "name": "Knowledge - Ancient Language",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "skillId": "",
+    "linkedAbility": "INT",
+    "rank": 0,
+    "isBackground": false,
+    "specialisation": "",
+    "specialisationBonus": 2,
+    "effectiveRank": 0,
+    "targetNumber": 10,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill type</dt><dd>Specialty skill</dd><dt>Broad skill</dt><dd>Knowledge</dd><dt>Ability</dt><dd>INT</dd><dt>Cost</dt><dd>1 skill points</dd><dt>Untrained</dt><dd>Cannot be used untrained</dd><dt>Source</dt><dd>Gamma World</dd></dl>"
+  },
+  "effects": [],
+  "folder": "2h5KoYy3RjP0qIU0",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Gamma World",
+        "sourceFile": "data/skills_Gamma World.json",
+        "sourceSkillId": 196,
+        "broadSkill": "Knowledge",
+        "isBroad": false,
+        "basePrice": 1,
+        "usableUntrained": false,
+        "professions": ""
+      }
+    }
+  }
+}

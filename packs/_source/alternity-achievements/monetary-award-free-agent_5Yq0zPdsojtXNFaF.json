@@ -1,0 +1,43 @@
+{
+  "_id": "5Yq0zPdsojtXNFaF",
+  "_key": "!items!5Yq0zPdsojtXNFaF",
+  "name": "Monetary Award (Free Agent)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Monetary Award",
+    "profession": "Free Agent",
+    "cost": 6,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 3,
+    "maxPurchases": 8,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "None",
+    "effectAbility": "None",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Monetary Award</dd><dt>Profession</dt><dd>Free Agent</dd><dt>Minimum level</dt><dd>3</dd><dt>Cost</dt><dd>6 achievement points</dd><dt>Times purchasable</dt><dd>8</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "hCrh2XhPp4rxQb62",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "Monetary Award",
+        "profession": "Free Agent",
+        "minLevel": 3,
+        "cost": 6,
+        "maxPurchases": 8,
+        "folder": "Free Agent"
+      }
+    }
+  }
+}

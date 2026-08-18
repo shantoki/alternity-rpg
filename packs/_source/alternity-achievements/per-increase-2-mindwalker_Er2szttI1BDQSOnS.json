@@ -1,0 +1,43 @@
+{
+  "_id": "Er2szttI1BDQSOnS",
+  "_key": "!items!Er2szttI1BDQSOnS",
+  "name": "PER Increase 2 (Mindwalker)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Ability Score Increase",
+    "profession": "Mindwalker",
+    "cost": 30,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 7,
+    "maxPurchases": 1,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "AbilityScore",
+    "effectAbility": "PER",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Ability Score Increase</dd><dt>Profession</dt><dd>Mindwalker</dd><dt>Minimum level</dt><dd>7</dd><dt>Cost</dt><dd>30 achievement points</dd><dt>Times purchasable</dt><dd>1</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "VXqq0U4YmBvdOvrR",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "PER Increase 2",
+        "profession": "Mindwalker",
+        "minLevel": 7,
+        "cost": 30,
+        "maxPurchases": 1,
+        "folder": "Mindwalker"
+      }
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "_id": "xCdl8QGkUUfAB6uA",
+  "_key": "!items!xCdl8QGkUUfAB6uA",
+  "name": "DEX Increase 2 (Tech Op)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Ability Score Increase",
+    "profession": "Tech Op",
+    "cost": 20,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 6,
+    "maxPurchases": 1,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "AbilityScore",
+    "effectAbility": "DEX",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Ability Score Increase</dd><dt>Profession</dt><dd>Tech Op</dd><dt>Minimum level</dt><dd>6</dd><dt>Cost</dt><dd>20 achievement points</dd><dt>Times purchasable</dt><dd>1</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "kZWIqXCMRPD0qwn8",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "DEX Increase 2",
+        "profession": "Tech Op",
+        "minLevel": 6,
+        "cost": 20,
+        "maxPurchases": 1,
+        "folder": "Tech Op"
+      }
+    }
+  }
+}

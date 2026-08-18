@@ -1,0 +1,58 @@
+{
+  "_id": "T1wluEI0G9nKmOPz",
+  "_key": "!items!T1wluEI0G9nKmOPz",
+  "name": "Mass launcher",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Heavy",
+    "damageType": "En",
+    "damageCategory": "wound",
+    "firepower": "Good",
+    "damageOrdinary": "d6+1w",
+    "damageGood": "d6+3w",
+    "damageAmazing": "d4+1m",
+    "damageBonus": 0,
+    "attackBonus": -1,
+    "attackAbility": "dex",
+    "requiredSkill": "str-indirect-fire",
+    "rangeClass": "Rifle",
+    "range": {
+      "short": 20,
+      "medium": 300,
+      "long": 1000
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 15,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Heavy Weapons / Indirect Fire</dd><dt>Damage</dt><dd>d6+1w/d6+3w/d4+1m</dd><dt>Type</dt><dd>En/G</dd><dt>Accuracy</dt><dd>-1</dd><dt>Range</dt><dd>20/300/1000</dd><dt>Firing modes</dt><dd>Full</dd><dt>Actions to ready</dt><dd>2</dd><dt>Clip</dt><dd>5 rounds</dd><dt>Clip cost</dt><dd>500 cr</dd><dt>Mass</dt><dd>15 kg</dd><dt>Concealment</dt><dd>Cannot be concealed</dd><dt>Progress level</dt><dd>8</dd><dt>Cost</dt><dd>8000 cr</dd><dt>Availability</dt><dd>Restricted</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "dfw1Q0lPCIh8ySvk",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/weapon_Core.json",
+        "progressLevel": 8,
+        "cost": 8000,
+        "availability": "Restricted",
+        "mass": 15,
+        "concealment": null,
+        "firingModes": "Full",
+        "actionsToReady": 2,
+        "clipSize": 5,
+        "clipCost": 500,
+        "skillId": 10,
+        "skillName": "Heavy Weapons / Indirect Fire",
+        "printedDamage": "d6+1w/d6+3w/d4+1m",
+        "printedRange": "20/300/1000"
+      }
+    }
+  }
+}

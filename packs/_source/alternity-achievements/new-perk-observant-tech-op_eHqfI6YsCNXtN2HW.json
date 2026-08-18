@@ -1,0 +1,43 @@
+{
+  "_id": "eHqfI6YsCNXtN2HW",
+  "_key": "!items!eHqfI6YsCNXtN2HW",
+  "name": "New Perk: Observant (Tech Op)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "New Perk",
+    "profession": "Tech Op",
+    "cost": 6,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 5,
+    "maxPurchases": 1,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "None",
+    "effectAbility": "None",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>New Perk</dd><dt>Profession</dt><dd>Tech Op</dd><dt>Minimum level</dt><dd>5</dd><dt>Cost</dt><dd>6 achievement points</dd><dt>Times purchasable</dt><dd>1</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "kZWIqXCMRPD0qwn8",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "New Perk: Observant",
+        "profession": "Tech Op",
+        "minLevel": 5,
+        "cost": 6,
+        "maxPurchases": 1,
+        "folder": "Tech Op"
+      }
+    }
+  }
+}

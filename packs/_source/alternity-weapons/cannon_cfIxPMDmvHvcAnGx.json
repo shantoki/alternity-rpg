@@ -1,0 +1,58 @@
+{
+  "_id": "cfIxPMDmvHvcAnGx",
+  "_key": "!items!cfIxPMDmvHvcAnGx",
+  "name": "Cannon",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Heavy",
+    "damageType": "HI",
+    "damageCategory": "wound",
+    "firepower": "Good",
+    "damageOrdinary": "d6w",
+    "damageGood": "d6+2w",
+    "damageAmazing": "d6m",
+    "damageBonus": 0,
+    "attackBonus": 2,
+    "attackAbility": "dex",
+    "requiredSkill": "str-indirect-fire",
+    "rangeClass": "Rifle",
+    "range": {
+      "short": 100,
+      "medium": 250,
+      "long": 800
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 0,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Heavy Weapons / Indirect Fire</dd><dt>Damage</dt><dd>d6w/d6+2w/d6m</dd><dt>Type</dt><dd>HI/G</dd><dt>Accuracy</dt><dd>2</dd><dt>Range</dt><dd>100/250/800</dd><dt>Firing modes</dt><dd>Full</dd><dt>Actions to ready</dt><dd>1</dd><dt>Clip</dt><dd>1 rounds</dd><dt>Concealment</dt><dd>Cannot be concealed</dd><dt>Availability</dt><dd>Common</dd><dt>Source</dt><dd>Gamma World</dd></dl>"
+  },
+  "effects": [],
+  "folder": "k0TG00W1xDHOHNgB",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Gamma World",
+        "sourceFile": "data/weapon_Gamma World.json",
+        "progressLevel": 0,
+        "cost": 0,
+        "availability": "Common",
+        "mass": 0,
+        "concealment": null,
+        "firingModes": "Full",
+        "actionsToReady": 1,
+        "clipSize": 1,
+        "clipCost": 0,
+        "skillId": 10,
+        "skillName": "Heavy Weapons / Indirect Fire",
+        "printedDamage": "d6w/d6+2w/d6m",
+        "printedRange": "100/250/800"
+      }
+    }
+  }
+}

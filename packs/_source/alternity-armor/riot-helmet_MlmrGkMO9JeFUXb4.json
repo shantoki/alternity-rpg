@@ -1,0 +1,44 @@
+{
+  "_id": "MlmrGkMO9JeFUXb4",
+  "_key": "!items!MlmrGkMO9JeFUXb4",
+  "name": "Riot helmet",
+  "type": "armor",
+  "img": "icons/svg/shield.svg",
+  "system": {
+    "armorType": "Medium",
+    "protection": {
+      "li": "+1",
+      "hi": "+1",
+      "en": "0"
+    },
+    "toughness": "Ordinary",
+    "speedPenalty": 0,
+    "skillPenalty": 1,
+    "resistanceModifierBonus": 0,
+    "techPointCost": 0,
+    "isEquipped": false,
+    "weight": 2,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Protection</dt><dd>+1 (LI), +1 (HI), 0 (En)</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Action penalty</dt><dd>+1</dd><dt>Mass</dt><dd>2 kg</dd><dt>Skill</dt><dd>Armor Operation</dd><dt>Progress level</dt><dd>5</dd><dt>Cost</dt><dd>300 cr</dd><dt>Availability</dt><dd>Controlled</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "5Zx8N1XMO5IGeC9c",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/armor_Core.json",
+        "progressLevel": 5,
+        "cost": 300,
+        "availability": "Controlled",
+        "mass": 2,
+        "concealment": 0,
+        "actionPenalty": 1,
+        "requiredSkill": "Armor Operation"
+      }
+    }
+  }
+}

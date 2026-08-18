@@ -1,0 +1,41 @@
+{
+  "_id": "cVwANlnuYy5WkV4Z",
+  "_key": "!items!cVwANlnuYy5WkV4Z",
+  "name": "Pharmaceuticals Antivenom (dose)",
+  "type": "personalEquipment",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "category": "Medical",
+    "progressLevel": 5,
+    "cost": 75,
+    "mass": 0,
+    "bonusSkill": "",
+    "bonusValue": 0,
+    "maxCharges": 0,
+    "currentCharges": 0,
+    "powerNotes": "",
+    "isEquipped": false,
+    "quantity": 1,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Class</dt><dd>Medical Gear</dd><dt>Category</dt><dd>Medical Gear</dd><dt>Progress level</dt><dd>5</dd><dt>Cost</dt><dd>75 cr</dd><dt>Availability</dt><dd>Common</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "Ba3Km1zjqVDxREyM",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/equip_core.json",
+        "category": "Medical Gear",
+        "class": "Medical Gear",
+        "progressLevel": 5,
+        "cost": 75,
+        "availability": "Common",
+        "mass": 0
+      }
+    }
+  }
+}

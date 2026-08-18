@@ -1,0 +1,58 @@
+{
+  "_id": "VcqUEBd0o52oTULF",
+  "_key": "!items!VcqUEBd0o52oTULF",
+  "name": "Crossbow",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Ranged",
+    "damageType": "LI",
+    "damageCategory": "wound",
+    "firepower": "Ordinary",
+    "damageOrdinary": "d4+2w",
+    "damageGood": "d6+2w",
+    "damageAmazing": "d4+1m",
+    "damageBonus": 0,
+    "attackBonus": 0,
+    "attackAbility": "dex",
+    "requiredSkill": "dex-bow",
+    "rangeClass": "Primitive",
+    "range": {
+      "short": 50,
+      "medium": 100,
+      "long": 250
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 2,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Primitive Ranged Weapons / Bow</dd><dt>Damage</dt><dd>d4+2w/d6+2w/d4+1m</dd><dt>Type</dt><dd>LI/O</dd><dt>Accuracy</dt><dd>0</dd><dt>Range</dt><dd>50/100/250</dd><dt>Firing modes</dt><dd>Full</dd><dt>Actions to ready</dt><dd>1</dd><dt>Clip</dt><dd>10 rounds</dd><dt>Clip cost</dt><dd>15 cr</dd><dt>Mass</dt><dd>2 kg</dd><dt>Concealment</dt><dd>Cannot be concealed</dd><dt>Progress level</dt><dd>2</dd><dt>Cost</dt><dd>400 cr</dd><dt>Availability</dt><dd>Controlled</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "dfw1Q0lPCIh8ySvk",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/weapon_Core.json",
+        "progressLevel": 2,
+        "cost": 400,
+        "availability": "Controlled",
+        "mass": 2,
+        "concealment": null,
+        "firingModes": "Full",
+        "actionsToReady": 1,
+        "clipSize": 10,
+        "clipCost": 15,
+        "skillId": 35,
+        "skillName": "Primitive Ranged Weapons / Bow",
+        "printedDamage": "d4+2w/d6+2w/d4+1m",
+        "printedRange": "50/100/250"
+      }
+    }
+  }
+}

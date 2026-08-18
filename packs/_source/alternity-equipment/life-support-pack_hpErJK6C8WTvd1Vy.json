@@ -1,0 +1,41 @@
+{
+  "_id": "hpErJK6C8WTvd1Vy",
+  "_key": "!items!hpErJK6C8WTvd1Vy",
+  "name": "Life support pack",
+  "type": "personalEquipment",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "category": "Medical",
+    "progressLevel": 7,
+    "cost": 500,
+    "mass": 3,
+    "bonusSkill": "",
+    "bonusValue": 0,
+    "maxCharges": 0,
+    "currentCharges": 0,
+    "powerNotes": "",
+    "isEquipped": false,
+    "quantity": 1,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Class</dt><dd>Medical Gear</dd><dt>Category</dt><dd>Medical Gear</dd><dt>Mass</dt><dd>3 kg</dd><dt>Progress level</dt><dd>7</dd><dt>Cost</dt><dd>500 cr</dd><dt>Availability</dt><dd>Common</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "Ba3Km1zjqVDxREyM",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/equip_core.json",
+        "category": "Medical Gear",
+        "class": "Medical Gear",
+        "progressLevel": 7,
+        "cost": 500,
+        "availability": "Common",
+        "mass": 3
+      }
+    }
+  }
+}

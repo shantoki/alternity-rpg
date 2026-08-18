@@ -43,3 +43,8 @@ GEMINI.md
 plans/
 external/
 CLAUDE.md
+
+# Compendium packs: the LevelDB payload is committed, its lock and logs are not
+packs/**/LOCK
+packs/**/LOG
+packs/**/LOG.old

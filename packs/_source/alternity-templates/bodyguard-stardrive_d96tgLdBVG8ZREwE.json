@@ -1,0 +1,779 @@
+{
+  "_id": "d96tgLdBVG8ZREwE",
+  "_key": "!actors!d96tgLdBVG8ZREwE",
+  "name": "Bodyguard (Star*Drive)",
+  "type": "character",
+  "img": "icons/svg/mystery-man.svg",
+  "system": {
+    "abilities": {
+      "str": 10,
+      "dex": 10,
+      "con": 10,
+      "int": 10,
+      "wil": 10,
+      "per": 10
+    },
+    "lastResort": {
+      "value": 1,
+      "max": 1,
+      "cost": 3
+    },
+    "woundLevel": "Healthy",
+    "details": {
+      "species": "Human",
+      "level": 1
+    },
+    "actionsPerRound": 2,
+    "combatMovement": {
+      "sprint": 20,
+      "run": 12,
+      "walk": 4,
+      "easySwim": 2,
+      "swim": 4,
+      "glide": 0,
+      "fly": 0
+    },
+    "achievementTrack": {
+      "level": 1,
+      "pointsSpent": 0,
+      "pointsStored": 0
+    },
+    "biography": "<dl class=\"alternity-source-stats\"><dt>Career</dt><dd>Bodyguard</dd><dt>Profession</dt><dd>Combat Spec</dd><dt>Species</dt><dd>Human</dd><dt>Setting</dt><dd>Star*Drive</dd><dt>Skill points</dt><dd>65</dd></dl><h2>Skill Package</h2><p>Athletics; Modern Ranged Weapons; Modern Ranged Weapons / Pistol 2; Vehicle Operation; Stamina; Knowledge; Security; Security / Protection Protocols; Awareness; Awareness / Intuition; Awareness / Perception; Interaction; Interaction / Intimidate</p><h2>Profession &amp; Species Benefits</h2><ul><li>Combat Spec Action Check Increase: action check score increased by 3</li><li>Combat Spec Situation Bonus of -1 to a selected skill</li><li>Human 5 point skill bonus</li><li>Human 1 extra broad skill bonus</li></ul>",
+    "durability": {
+      "stun": {
+        "value": 0,
+        "max": 10
+      },
+      "wound": {
+        "value": 0,
+        "max": 10
+      },
+      "mortal": {
+        "value": 0,
+        "max": 5
+      },
+      "fatigue": {
+        "value": 0,
+        "max": 5
+      }
+    },
+    "psionics": {
+      "energy": {
+        "value": 0,
+        "max": 10
+      },
+      "powers": []
+    }
+  },
+  "items": [],
+  "effects": [],
+  "folder": "gMBRmjmMDrHLMLam",
+  "sort": 500,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Bodyguard (Star*Drive)",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/mystery-man.svg"
+    }
+  },
+  "flags": {
+    "alternity-v2": {
+      "characterState": {
+        "actorId": "d96tgLdBVG8ZREwE",
+        "abilitySets": [],
+        "specialRules": [
+          {
+            "id": "combat-spec-action-check-increase-action-0",
+            "name": "Combat Spec Action Check Increase",
+            "description": "Combat Spec Action Check Increase: action check score increased by 3",
+            "isEnabled": true,
+            "config": {}
+          },
+          {
+            "id": "combat-spec-situation-bonus-of-1-to-a-se-1",
+            "name": "Combat Spec Situation Bonus of -1 to a selected skill",
+            "description": "Combat Spec Situation Bonus of -1 to a selected skill",
+            "isEnabled": true,
+            "config": {}
+          },
+          {
+            "id": "human-5-point-skill-bonus-2",
+            "name": "Human 5 point skill bonus",
+            "description": "Human 5 point skill bonus",
+            "isEnabled": true,
+            "config": {}
+          },
+          {
+            "id": "human-1-extra-broad-skill-bonus-3",
+            "name": "Human 1 extra broad skill bonus",
+            "description": "Human 1 extra broad skill bonus",
+            "isEnabled": true,
+            "config": {}
+          }
+        ],
+        "durability": {
+          "stun": 0,
+          "stunMax": 10,
+          "wound": 0,
+          "woundMax": 10,
+          "mortal": 0,
+          "mortalMax": 5,
+          "fatigue": 0,
+          "fatigueMax": 5
+        },
+        "lastResort": {
+          "value": 1,
+          "max": 1,
+          "cost": 3
+        },
+        "species": "Human",
+        "abilityScores": {
+          "STR": 10,
+          "DEX": 10,
+          "CON": 10,
+          "INT": 10,
+          "WIL": 10,
+          "PER": 10
+        },
+        "skills": {
+          "str-armor": {
+            "rank": 0
+          },
+          "str-combat": {
+            "rank": 0
+          },
+          "str-powered-combat": {
+            "rank": 0
+          },
+          "str-athletics": {
+            "rank": 1
+          },
+          "str-climb": {
+            "rank": 0
+          },
+          "str-jump": {
+            "rank": 0
+          },
+          "str-throw": {
+            "rank": 0
+          },
+          "str-heavy-wpns": {
+            "rank": 0
+          },
+          "str-direct-fire": {
+            "rank": 0
+          },
+          "str-indirect-fire": {
+            "rank": 0
+          },
+          "str-melee": {
+            "rank": 0
+          },
+          "str-blade": {
+            "rank": 0
+          },
+          "str-bludgeon": {
+            "rank": 0
+          },
+          "str-powered-melee": {
+            "rank": 0
+          },
+          "str-unarmed": {
+            "rank": 0
+          },
+          "str-brawl": {
+            "rank": 0
+          },
+          "str-power": {
+            "rank": 0
+          },
+          "str-martial-arts": {
+            "rank": 0
+          },
+          "dex-acrobatics": {
+            "rank": 0
+          },
+          "dex-daredevil": {
+            "rank": 0
+          },
+          "dex-defensive-ma": {
+            "rank": 0
+          },
+          "dex-dodge": {
+            "rank": 0
+          },
+          "dex-fall": {
+            "rank": 0
+          },
+          "dex-flight": {
+            "rank": 0
+          },
+          "dex-zero-g": {
+            "rank": 0
+          },
+          "dex-manipulation": {
+            "rank": 0
+          },
+          "dex-lockpick": {
+            "rank": 0
+          },
+          "dex-pickpocket": {
+            "rank": 0
+          },
+          "dex-prestidigation": {
+            "rank": 0
+          },
+          "dex-ranged-mod": {
+            "rank": 1
+          },
+          "dex-pistol": {
+            "rank": 2
+          },
+          "dex-rifle": {
+            "rank": 0
+          },
+          "dex-smg": {
+            "rank": 0
+          },
+          "dex-ranged-prim": {
+            "rank": 0
+          },
+          "dex-bow": {
+            "rank": 0
+          },
+          "dex-crossbow": {
+            "rank": 0
+          },
+          "dex-flintlock": {
+            "rank": 0
+          },
+          "dex-sling": {
+            "rank": 0
+          },
+          "dex-stealth": {
+            "rank": 0
+          },
+          "dex-hide": {
+            "rank": 0
+          },
+          "dex-shadow": {
+            "rank": 0
+          },
+          "dex-sneak": {
+            "rank": 0
+          },
+          "dex-vehicle-op": {
+            "rank": 1
+          },
+          "dex-air": {
+            "rank": 0
+          },
+          "dex-land": {
+            "rank": 0
+          },
+          "dex-space": {
+            "rank": 0
+          },
+          "dex-water": {
+            "rank": 0
+          },
+          "con-movement": {
+            "rank": 0
+          },
+          "con-race": {
+            "rank": 0
+          },
+          "con-swim": {
+            "rank": 0
+          },
+          "con-trailblazing": {
+            "rank": 0
+          },
+          "con-stamina": {
+            "rank": 1
+          },
+          "con-endurance": {
+            "rank": 0
+          },
+          "con-resist-pain": {
+            "rank": 0
+          },
+          "con-survival": {
+            "rank": 0
+          },
+          "con-survival-train": {
+            "rank": 0
+          },
+          "int-business": {
+            "rank": 0
+          },
+          "int-corporate": {
+            "rank": 0
+          },
+          "int-illicit-biz": {
+            "rank": 0
+          },
+          "int-small-biz": {
+            "rank": 0
+          },
+          "int-computer-sci": {
+            "rank": 0
+          },
+          "int-hacking": {
+            "rank": 0
+          },
+          "int-hardware": {
+            "rank": 0
+          },
+          "int-programming": {
+            "rank": 0
+          },
+          "int-demolitions": {
+            "rank": 0
+          },
+          "int-disarm": {
+            "rank": 0
+          },
+          "int-scratch-built": {
+            "rank": 0
+          },
+          "int-set-explosives": {
+            "rank": 0
+          },
+          "int-knowledge": {
+            "rank": 1
+          },
+          "int-computer-op": {
+            "rank": 0
+          },
+          "int-deduce": {
+            "rank": 0
+          },
+          "int-firstaid": {
+            "rank": 0
+          },
+          "int-language": {
+            "rank": 0
+          },
+          "int-law": {
+            "rank": 0
+          },
+          "int-court-proc": {
+            "rank": 0
+          },
+          "int-law-enforc": {
+            "rank": 0
+          },
+          "int-life-sci": {
+            "rank": 0
+          },
+          "int-biology": {
+            "rank": 0
+          },
+          "int-botany": {
+            "rank": 0
+          },
+          "int-genetics": {
+            "rank": 0
+          },
+          "int-xenology": {
+            "rank": 0
+          },
+          "int-zoology": {
+            "rank": 0
+          },
+          "int-med-sci": {
+            "rank": 0
+          },
+          "int-forensics": {
+            "rank": 0
+          },
+          "int-medical-know": {
+            "rank": 0
+          },
+          "int-psychology": {
+            "rank": 0
+          },
+          "int-surgery": {
+            "rank": 0
+          },
+          "int-treatment": {
+            "rank": 0
+          },
+          "int-xenomedicine": {
+            "rank": 0
+          },
+          "int-navigation": {
+            "rank": 0
+          },
+          "int-drivespace": {
+            "rank": 0
+          },
+          "int-system-nav": {
+            "rank": 0
+          },
+          "int-surface": {
+            "rank": 0
+          },
+          "int-physical-sci": {
+            "rank": 0
+          },
+          "int-astronomy": {
+            "rank": 0
+          },
+          "int-chemistry": {
+            "rank": 0
+          },
+          "int-physics": {
+            "rank": 0
+          },
+          "int-planetology": {
+            "rank": 0
+          },
+          "int-security": {
+            "rank": 1
+          },
+          "int-protection": {
+            "rank": 1
+          },
+          "int-sec-devices": {
+            "rank": 0
+          },
+          "int-system-op": {
+            "rank": 0
+          },
+          "int-communication": {
+            "rank": 0
+          },
+          "int-defenses": {
+            "rank": 0
+          },
+          "int-engineering": {
+            "rank": 0
+          },
+          "int-sensors": {
+            "rank": 0
+          },
+          "int-weapons-op": {
+            "rank": 0
+          },
+          "int-tactics": {
+            "rank": 0
+          },
+          "int-infantry": {
+            "rank": 0
+          },
+          "int-space": {
+            "rank": 0
+          },
+          "int-vehicle-tactics": {
+            "rank": 0
+          },
+          "int-technical-sci": {
+            "rank": 0
+          },
+          "int-invention": {
+            "rank": 0
+          },
+          "int-juryrig": {
+            "rank": 0
+          },
+          "int-repair": {
+            "rank": 0
+          },
+          "int-technical-know": {
+            "rank": 0
+          },
+          "wil-administration": {
+            "rank": 0
+          },
+          "wil-bureaucracy": {
+            "rank": 0
+          },
+          "wil-management": {
+            "rank": 0
+          },
+          "wil-animal-handling": {
+            "rank": 0
+          },
+          "wil-animal-riding": {
+            "rank": 0
+          },
+          "wil-animal-training": {
+            "rank": 0
+          },
+          "wil-awareness": {
+            "rank": 1
+          },
+          "wil-intuition": {
+            "rank": 1
+          },
+          "wil-perception": {
+            "rank": 1
+          },
+          "wil-creativity": {
+            "rank": 0
+          },
+          "wil-investigate": {
+            "rank": 0
+          },
+          "wil-interrogate": {
+            "rank": 0
+          },
+          "wil-search": {
+            "rank": 0
+          },
+          "wil-track": {
+            "rank": 0
+          },
+          "wil-resolve": {
+            "rank": 0
+          },
+          "wil-mental": {
+            "rank": 0
+          },
+          "wil-physical": {
+            "rank": 0
+          },
+          "wil-street-smart": {
+            "rank": 0
+          },
+          "wil-criminal-elem": {
+            "rank": 0
+          },
+          "wil-street-know": {
+            "rank": 0
+          },
+          "wil-teach": {
+            "rank": 0
+          },
+          "per-culture": {
+            "rank": 0
+          },
+          "per-diplomacy": {
+            "rank": 0
+          },
+          "per-etiquette": {
+            "rank": 0
+          },
+          "per-first-encounter": {
+            "rank": 0
+          },
+          "per-deception": {
+            "rank": 0
+          },
+          "per-bluff": {
+            "rank": 0
+          },
+          "per-bribe": {
+            "rank": 0
+          },
+          "per-gamble": {
+            "rank": 0
+          },
+          "per-entertainment": {
+            "rank": 0
+          },
+          "per-act": {
+            "rank": 0
+          },
+          "per-dance": {
+            "rank": 0
+          },
+          "per-musical-inst": {
+            "rank": 0
+          },
+          "per-sing": {
+            "rank": 0
+          },
+          "per-interaction": {
+            "rank": 1
+          },
+          "per-bargain": {
+            "rank": 0
+          },
+          "per-charm": {
+            "rank": 0
+          },
+          "per-interview": {
+            "rank": 0
+          },
+          "per-intimidate": {
+            "rank": 1
+          },
+          "per-seduce": {
+            "rank": 0
+          },
+          "per-taunt": {
+            "rank": 0
+          },
+          "per-leadership": {
+            "rank": 0
+          },
+          "per-command": {
+            "rank": 0
+          },
+          "per-inspire": {
+            "rank": 0
+          },
+          "con-biokinesis": {
+            "rank": 0
+          },
+          "con-bioweapon": {
+            "rank": 0
+          },
+          "con-control-metab": {
+            "rank": 0
+          },
+          "con-heal": {
+            "rank": 0
+          },
+          "con-morph": {
+            "rank": 0
+          },
+          "con-rejuvenate": {
+            "rank": 0
+          },
+          "con-transfer-dmg": {
+            "rank": 0
+          },
+          "int-esp": {
+            "rank": 0
+          },
+          "int-battle-mind": {
+            "rank": 0
+          },
+          "int-clairaudience": {
+            "rank": 0
+          },
+          "int-clairvoyance": {
+            "rank": 0
+          },
+          "int-empathy": {
+            "rank": 0
+          },
+          "int-mind-reading": {
+            "rank": 0
+          },
+          "int-navcognition": {
+            "rank": 0
+          },
+          "int-postcognition": {
+            "rank": 0
+          },
+          "int-precognition": {
+            "rank": 0
+          },
+          "int-psychometry": {
+            "rank": 0
+          },
+          "int-sensitivity": {
+            "rank": 0
+          },
+          "wil-telekinesis": {
+            "rank": 0
+          },
+          "wil-electrokinetics": {
+            "rank": 0
+          },
+          "wil-kinetic-shield": {
+            "rank": 0
+          },
+          "wil-levitation": {
+            "rank": 0
+          },
+          "wil-photokinetics": {
+            "rank": 0
+          },
+          "wil-psychokinetics": {
+            "rank": 0
+          },
+          "wil-pyrokinesis": {
+            "rank": 0
+          },
+          "per-telepathy": {
+            "rank": 0
+          },
+          "per-contact": {
+            "rank": 0
+          },
+          "per-datalink": {
+            "rank": 0
+          },
+          "per-illusion": {
+            "rank": 0
+          },
+          "per-mind-blast": {
+            "rank": 0
+          },
+          "per-mind-shield": {
+            "rank": 0
+          },
+          "per-suggest": {
+            "rank": 0
+          },
+          "per-tire": {
+            "rank": 0
+          }
+        },
+        "customSkills": [],
+        "woundLevel": "Healthy",
+        "profession": "Combat Spec",
+        "career": "Bodyguard",
+        "background": "",
+        "actionsPerRound": 2,
+        "armor": {
+          "li": "",
+          "hi": "",
+          "en": ""
+        },
+        "features": {
+          "usePsionics": false,
+          "useMutations": false,
+          "useCybertech": false
+        },
+        "psionics": {
+          "energy": {
+            "value": 0,
+            "max": 10
+          },
+          "powers": []
+        },
+        "mutations": {
+          "origin": "",
+          "uniqueness": "",
+          "points": 0,
+          "drawbackPoints": 0,
+          "ordinary": "",
+          "good": "",
+          "amazing": "",
+          "slightDrawbacks": "",
+          "moderateDrawbacks": "",
+          "extremeDrawback": ""
+        },
+        "cybertech": {
+          "tolerance": {
+            "value": 0,
+            "max": 0
+          },
+          "cykosis": 0,
+          "gearInstalled": ""
+        },
+        "computers": []
+      },
+      "provenance": {
+        "book": "Star*Drive",
+        "sourceFile": "Templates/Bodyguard (Star Drive).json",
+        "career": "Bodyguard",
+        "profession": "Combat Spec",
+        "species": "Human",
+        "folder": "Combat Spec",
+        "skillPoints": 65
+      }
+    }
+  }
+}

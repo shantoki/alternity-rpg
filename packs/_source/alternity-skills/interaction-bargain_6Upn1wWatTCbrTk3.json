@@ -1,0 +1,38 @@
+{
+  "_id": "6Upn1wWatTCbrTk3",
+  "_key": "!items!6Upn1wWatTCbrTk3",
+  "name": "Interaction - Bargain",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "skillId": "per-bargain",
+    "linkedAbility": "PER",
+    "rank": 0,
+    "isBackground": false,
+    "specialisation": "",
+    "specialisationBonus": 2,
+    "effectiveRank": 0,
+    "targetNumber": 10,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill type</dt><dd>Specialty skill</dd><dt>Broad skill</dt><dd>Interaction</dd><dt>Ability</dt><dd>PER</dd><dt>Cost</dt><dd>3 skill points</dd><dt>Untrained</dt><dd>Can be used untrained</dd><dt>Professions</dt><dd>Diplomat, Tech Op</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "sGBb7uLiXegXpzFb",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/skills_core.json",
+        "sourceSkillId": 156,
+        "broadSkill": "Interaction",
+        "isBroad": false,
+        "basePrice": 3,
+        "usableUntrained": true,
+        "professions": "Diplomat, Tech Op"
+      }
+    }
+  }
+}

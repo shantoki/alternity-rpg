@@ -6,7 +6,10 @@
   "main": "src/index.js",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./jest.config.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "convert:source": "node tools/convert-source-data.mjs",
+    "build:packs": "node tools/build-packs.mjs",
+    "extract:packs": "node tools/build-packs.mjs --extract"
   },
   "keywords": [
     "foundryvtt",
@@ -15,6 +18,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@foundryvtt/foundryvtt-cli": "^3.0.4",
     "@types/jest": "^29.5.10",
     "jest": "^29.7.0"
   }

@@ -1,0 +1,43 @@
+{
+  "_id": "bwUpNm4Hxt3VKXGc",
+  "_key": "!items!bwUpNm4Hxt3VKXGc",
+  "name": "Action Check Increase (Diplomat)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Action Check Increase",
+    "profession": "Diplomat",
+    "cost": 4,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 3,
+    "maxPurchases": 3,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "ActionCheckScore",
+    "effectAbility": "None",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Action Check Increase</dd><dt>Profession</dt><dd>Diplomat</dd><dt>Minimum level</dt><dd>3</dd><dt>Cost</dt><dd>4 achievement points</dd><dt>Times purchasable</dt><dd>3</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "CQIHAuGvPryoNwTK",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "Action Check Increase",
+        "profession": "Diplomat",
+        "minLevel": 3,
+        "cost": 4,
+        "maxPurchases": 3,
+        "folder": "Diplomat"
+      }
+    }
+  }
+}

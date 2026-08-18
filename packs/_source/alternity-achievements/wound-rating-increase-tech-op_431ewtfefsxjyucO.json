@@ -1,0 +1,43 @@
+{
+  "_id": "431ewtfefsxjyucO",
+  "_key": "!items!431ewtfefsxjyucO",
+  "name": "Wound Rating Increase (Tech Op)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Durability Increase",
+    "profession": "Tech Op",
+    "cost": 7,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 4,
+    "maxPurchases": 2,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "WoundRating",
+    "effectAbility": "None",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Durability Increase</dd><dt>Profession</dt><dd>Tech Op</dd><dt>Minimum level</dt><dd>4</dd><dt>Cost</dt><dd>7 achievement points</dd><dt>Times purchasable</dt><dd>2</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "kZWIqXCMRPD0qwn8",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "Wound Rating Increase",
+        "profession": "Tech Op",
+        "minLevel": 4,
+        "cost": 7,
+        "maxPurchases": 2,
+        "folder": "Tech Op"
+      }
+    }
+  }
+}

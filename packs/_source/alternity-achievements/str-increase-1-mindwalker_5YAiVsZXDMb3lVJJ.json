@@ -1,0 +1,43 @@
+{
+  "_id": "5YAiVsZXDMb3lVJJ",
+  "_key": "!items!5YAiVsZXDMb3lVJJ",
+  "name": "STR Increase 1 (Mindwalker)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Ability Score Increase",
+    "profession": "Mindwalker",
+    "cost": 15,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 9,
+    "maxPurchases": 1,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "AbilityScore",
+    "effectAbility": "STR",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Ability Score Increase</dd><dt>Profession</dt><dd>Mindwalker</dd><dt>Minimum level</dt><dd>9</dd><dt>Cost</dt><dd>15 achievement points</dd><dt>Times purchasable</dt><dd>1</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "VXqq0U4YmBvdOvrR",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "STR Increase 1",
+        "profession": "Mindwalker",
+        "minLevel": 9,
+        "cost": 15,
+        "maxPurchases": 1,
+        "folder": "Mindwalker"
+      }
+    }
+  }
+}

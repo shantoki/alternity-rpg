@@ -1,0 +1,58 @@
+{
+  "_id": "1tnTIok3KoytWJOH",
+  "_key": "!items!1tnTIok3KoytWJOH",
+  "name": "Stalwart ZF Repulser Pistol",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Ranged",
+    "damageType": "En",
+    "damageCategory": "stun",
+    "firepower": "Ordinary",
+    "damageOrdinary": "d4s",
+    "damageGood": "d4w",
+    "damageAmazing": "d6w",
+    "damageBonus": 0,
+    "attackBonus": 0,
+    "attackAbility": "dex",
+    "requiredSkill": "dex-pistol",
+    "rangeClass": "Pistol",
+    "range": {
+      "short": 20,
+      "medium": 40,
+      "long": 100
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 1.75,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Modern Ranged Weapons / Pistol</dd><dt>Damage</dt><dd>d4s/d4w/d6w</dd><dt>Type</dt><dd>En/O</dd><dt>Accuracy</dt><dd>0</dd><dt>Range</dt><dd>20/40/100</dd><dt>Firing modes</dt><dd>Full</dd><dt>Actions to ready</dt><dd>3</dd><dt>Clip</dt><dd>20 rounds</dd><dt>Clip cost</dt><dd>100 cr</dd><dt>Mass</dt><dd>1.75 kg</dd><dt>Concealment</dt><dd>2</dd><dt>Progress level</dt><dd>7</dd><dt>Cost</dt><dd>1325 cr</dd><dt>Availability</dt><dd>Restricted</dd><dt>Source</dt><dd>Dragon Magazine 273</dd></dl>"
+  },
+  "effects": [],
+  "folder": "yrAKpKf349CCdQVc",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Dragon Magazine 273",
+        "sourceFile": "data/weapon_Dragon 273.json",
+        "progressLevel": 7,
+        "cost": 1325,
+        "availability": "Restricted",
+        "mass": 1.75,
+        "concealment": 2,
+        "firingModes": "Full",
+        "actionsToReady": 3,
+        "clipSize": 20,
+        "clipCost": 100,
+        "skillId": 31,
+        "skillName": "Modern Ranged Weapons / Pistol",
+        "printedDamage": "d4s/d4w/d6w",
+        "printedRange": "20/40/100"
+      }
+    }
+  }
+}

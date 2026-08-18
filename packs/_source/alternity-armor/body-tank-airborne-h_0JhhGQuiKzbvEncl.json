@@ -1,0 +1,44 @@
+{
+  "_id": "0JhhGQuiKzbvEncl",
+  "_key": "!items!0JhhGQuiKzbvEncl",
+  "name": "Body tank, airborne (h)",
+  "type": "armor",
+  "img": "icons/svg/shield.svg",
+  "system": {
+    "armorType": "Powered",
+    "protection": {
+      "li": "2d4-1",
+      "hi": "2d4-1",
+      "en": "2d4-1"
+    },
+    "toughness": "Good",
+    "speedPenalty": 0,
+    "skillPenalty": 3,
+    "resistanceModifierBonus": 0,
+    "techPointCost": 0,
+    "isEquipped": false,
+    "weight": 40,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Protection</dt><dd>2d4-1 (LI), 2d4-1 (HI), 2d4-1 (En)</dd><dt>Toughness</dt><dd>Good</dd><dt>Action penalty</dt><dd>+3</dd><dt>Mass</dt><dd>40 kg</dd><dt>Skill</dt><dd>Armor Operation - powered armor</dd><dt>Progress level</dt><dd>6</dd><dt>Availability</dt><dd>Restricted</dd><dt>Source</dt><dd>Gamma World</dd></dl>"
+  },
+  "effects": [],
+  "folder": "2z85NSEcsi6g4DZQ",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Gamma World",
+        "sourceFile": "data/armor_Gamma World.json",
+        "progressLevel": 6,
+        "cost": 0,
+        "availability": "Restricted",
+        "mass": 40,
+        "concealment": 0,
+        "actionPenalty": 3,
+        "requiredSkill": "Armor Operation - powered armor"
+      }
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "_id": "awXrpROChthWuniF",
+  "_key": "!items!awXrpROChthWuniF",
+  "name": "Musket, flintlock",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Ranged",
+    "damageType": "HI",
+    "damageCategory": "wound",
+    "firepower": "Ordinary",
+    "damageOrdinary": "d6+1w",
+    "damageGood": "d6+3w",
+    "damageAmazing": "d6+1m",
+    "damageBonus": 0,
+    "attackBonus": 2,
+    "attackAbility": "dex",
+    "requiredSkill": "dex-flintlock",
+    "rangeClass": "Primitive",
+    "range": {
+      "short": 20,
+      "medium": 40,
+      "long": 100
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 4,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Primitive Ranged Weapons / Flintlock</dd><dt>Damage</dt><dd>d6+1w/d6+3w/d6+1m</dd><dt>Type</dt><dd>HI/O</dd><dt>Accuracy</dt><dd>2</dd><dt>Range</dt><dd>20/40/100</dd><dt>Firing modes</dt><dd>Full</dd><dt>Actions to ready</dt><dd>1</dd><dt>Clip</dt><dd>1 rounds</dd><dt>Clip cost</dt><dd>5 cr</dd><dt>Mass</dt><dd>4 kg</dd><dt>Concealment</dt><dd>Cannot be concealed</dd><dt>Progress level</dt><dd>3</dd><dt>Cost</dt><dd>350 cr</dd><dt>Availability</dt><dd>Common</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "dfw1Q0lPCIh8ySvk",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/weapon_Core.json",
+        "progressLevel": 3,
+        "cost": 350,
+        "availability": "Common",
+        "mass": 4,
+        "concealment": null,
+        "firingModes": "Full",
+        "actionsToReady": 1,
+        "clipSize": 1,
+        "clipCost": 5,
+        "skillId": 37,
+        "skillName": "Primitive Ranged Weapons / Flintlock",
+        "printedDamage": "d6+1w/d6+3w/d6+1m",
+        "printedRange": "20/40/100"
+      }
+    }
+  }
+}

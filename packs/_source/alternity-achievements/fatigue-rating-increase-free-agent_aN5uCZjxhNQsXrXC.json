@@ -1,0 +1,43 @@
+{
+  "_id": "aN5uCZjxhNQsXrXC",
+  "_key": "!items!aN5uCZjxhNQsXrXC",
+  "name": "Fatigue Rating Increase (Free Agent)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Durability Increase",
+    "profession": "Free Agent",
+    "cost": 10,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 3,
+    "maxPurchases": 1,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "FatigueRating",
+    "effectAbility": "None",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Durability Increase</dd><dt>Profession</dt><dd>Free Agent</dd><dt>Minimum level</dt><dd>3</dd><dt>Cost</dt><dd>10 achievement points</dd><dt>Times purchasable</dt><dd>1</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "hCrh2XhPp4rxQb62",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "Fatigue Rating Increase",
+        "profession": "Free Agent",
+        "minLevel": 3,
+        "cost": 10,
+        "maxPurchases": 1,
+        "folder": "Free Agent"
+      }
+    }
+  }
+}

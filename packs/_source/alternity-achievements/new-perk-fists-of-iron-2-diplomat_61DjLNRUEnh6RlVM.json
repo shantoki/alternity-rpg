@@ -1,0 +1,43 @@
+{
+  "_id": "61DjLNRUEnh6RlVM",
+  "_key": "!items!61DjLNRUEnh6RlVM",
+  "name": "New Perk: Fists of Iron 2 (Diplomat)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "New Perk",
+    "profession": "Diplomat",
+    "cost": 4,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 9,
+    "maxPurchases": 1,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "None",
+    "effectAbility": "None",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>New Perk</dd><dt>Profession</dt><dd>Diplomat</dd><dt>Minimum level</dt><dd>9</dd><dt>Cost</dt><dd>4 achievement points</dd><dt>Times purchasable</dt><dd>1</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "CQIHAuGvPryoNwTK",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "New Perk: Fists of Iron 2",
+        "profession": "Diplomat",
+        "minLevel": 9,
+        "cost": 4,
+        "maxPurchases": 1,
+        "folder": "Diplomat"
+      }
+    }
+  }
+}

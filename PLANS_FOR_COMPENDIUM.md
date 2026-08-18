@@ -1,0 +1,199 @@
+# Plans for the compendium
+
+Running roadmap for the compendium packs, in the same spirit as
+`PLANS_FOR_CHARACTER_SHEET.md`: what is done, what was deliberately left out, and what
+the next pass has to pick up. Check here before assuming a gap is an oversight.
+
+## What exists
+
+Nine packs, built from the Alternity character generator's data set. The pipeline is two
+steps and the middle is committed:
+
+```
+external/json/**            npm run convert:source     packs/_source/**       npm run build:packs     packs/**
+(gitignored source data) ------------------------->  (JSON, one file/doc)  ------------------------> (LevelDB)
+```
+
+| Pack | Documents | Item / Document types |
+| --- | --- | --- |
+| `alternity-weapons` | 252 | `weapon` |
+| `alternity-armor` | 90 | `armor` |
+| `alternity-equipment` | 224 | `personalEquipment`, `computer` |
+| `alternity-skills` | 208 | `skill` |
+| `alternity-fx` | 228 | `fx` |
+| `alternity-cybertech` | 57 | `cybertech` |
+| `alternity-achievements` | 185 | `achievementBenefit` |
+| `alternity-species` | 18 | `JournalEntry` |
+| `alternity-templates` | 54 | `character` Actors |
+
+Each pack folders its contents by source book, except `alternity-achievements`, which
+folders by profession because every achievement comes from the same book.
+
+Two rules the tooling depends on:
+
+- **Ids are hashed, not drawn.** `stableId(pack, type, name)` means re-running the
+  converter against unchanged data rewrites identical bytes, so a source fix diffs only
+  the records that changed and an item already dragged onto an actor keeps pointing at
+  the same compendium entry. Renaming a document *does* change its id, and that is the
+  one edit that breaks existing links.
+- **Nothing printed is thrown away.** Columns with no schema field land on the item's
+  `flags['alternity-v2'].provenance` and are rendered into the description inside
+  `<dl class="alternity-source-stats">`. The prose pass prepends to that element rather
+  than replacing the description.
+
+`tests/test-pack-source.test.js` validates every document against the choice lists and
+bounds its TypeDataModel declares, because `compilePack` writes whatever it is handed and
+Foundry only complains when a GM opens the offending row.
+
+## Phase 1: mechanical conversion - done
+
+- [x] **Weapons carry the whole attack line.** Damage form and firepower split out of the
+      Type column (`HI/O`), the three damage grades out of the Damage column, accuracy
+      into `attackBonus` unflipped (Alternity step modifiers and this codebase's
+      modifiers share the positive-is-a-penalty convention), and the range bands into
+      `range`. `rangeClass` is derived from the governing skill rather than from
+      `weaponType`, because Table P22 keys off what kind of gun a weapon is.
+- [x] **`weaponType` is read off the record's flags, not its `@Type` code.** That code
+      conflates thrown weapons with the class they were thrown from - grenades are
+      `@Type=2` with `@Throw=True`, a thrown knife is `@Type=0` with the same flag.
+- [x] **Ten weapons get no damage codes at all.** The launchers print "As Load" and a
+      handful of effect weapons print "Special"; a guessed run would let
+      `selectDamageGrade` roll damage the book does not define. The printed word is in
+      the description instead.
+- [x] **Armour's `@AP` column is the Action Penalty**, confirmed against the Star Drive
+      Arms & Equipment Guide (the Tiger Mod 6 prints "Action Penalty: +2" and carries
+      `@AP="2"`). It lands on `skillPenalty`. `resistanceModifierBonus` stays 0 on
+      everything - it is a property of specific field gear, not of armour thickness.
+- [x] **Equipment is categorised by `@Class`, not `@Category`.** The Arms & Equipment
+      Guide files gear under brand lines ("Terra X", "TrailTech EcoTour Gear"); `@Class`
+      says what the gear actually is.
+- [x] **The Computers category becomes `computer` items**, not generic gear, and reads
+      its processor quality off the name suffix ("Microcomputer, Good").
+- [x] **The source data's numeric skill ids are bridged onto `SKILL_DEFINITIONS`** by
+      matching names, with an alias table for the ~30 entries the two lists abbreviate
+      differently ("Law Enforcement" vs "Law enforc."). A skill that resolves to nothing
+      still becomes an item, with a blank `skillId`.
+- [x] **FX traditions are decoded from `@FXSource`** - 0 Arcane Magic, 1 Faith, 2 Super
+      Power - which the broad skills under each value confirm. The real broad skill
+      (Necromancy, Voodoo, Chi) goes to `category`, because `FXData.broadSkill` only
+      admits the eight canonical ones.
+- [x] **Achievements are one item per profession.** The same +1 Strength costs a Combat
+      Spec 10 points at level 3 and a Mindwalker 15 at level 9, and the schema holds one
+      profession, cost and minimum level. Profession slots 5 and 6 in the source data sit
+      permanently at minimum level 99, its "never available" sentinel, and are skipped.
+- [x] **Career templates write both actor data layers**, as `saveAltState` would: the
+      `characterState` flag is built by instantiating the real `AlternityCharacterState`
+      (it imports nothing Foundry-specific, so it runs under Node) and the mirrored
+      `system` fields come from the same numbers.
+
+Not done, deliberately: **descriptions are stat blocks, not rules text.** The character
+generator's data set carries no prose at all - every record is columns. The rules text
+lives in the Markdown conversions of the books, and matching 1,300 items against it is a
+separate pass with a different failure mode (see Phase 2).
+
+## Phase 2: rules text from the books - not started
+
+The books are Markdown conversions of OCR'd scans, and the OCR is rough - the Player's
+Handbook renders "Battle jacket d6-1 (LI), d4+1 (HI), d4+1 (En)" as "Battle jacket 6-1
+(LI), d4+1 (HN), d44 (En)". So this pass has to be checkable rather than trusted.
+
+- [ ] Match each item to its entry in the Markdown by name, and write the prose *above*
+      the existing `<dl class="alternity-source-stats">` element rather than replacing
+      the description.
+- [ ] Record what matched and how confidently on `provenance.prose`, so a bad match can
+      be found without re-reading 1,300 items.
+- [ ] Report the unmatched. A silent 60% match rate reads exactly like a 100% one.
+- [ ] The Arms & Equipment Guide entries carry fields the tables do not - environmental
+      tolerances, effective Strength, composition. Decide whether those become schema
+      fields or stay prose before writing any of them anywhere.
+
+## Phase 3: fields with no home - not started
+
+Columns the source data prints that no schema models. They are all on `provenance` today,
+and rendered into the description, so nothing is lost - but nothing can read them either.
+
+- [ ] **`WeaponData`**: progress level, cost, availability, concealment, firing modes,
+      actions to ready, clip size, clip cost. Firing modes and clip size are the ones
+      with mechanical weight (burst and autofire change the attack).
+- [ ] **`ArmorData`**: progress level, cost, availability, concealment.
+- [ ] **`ComputerData`**: active memory and storage, which the source data has no column
+      for at all - they are printed in Dataware and the Arms & Equipment Guide.
+- [ ] **`CybertechData`**: `requiresExoskeleton` and `requiresCyberlimb` are false on
+      every converted item because the source data has no column for either; the
+      prerequisites are stated in the Dataware entries themselves.
+- [ ] Each of these needs a row on `templates/item/item-sheet.hbs` as well as a schema
+      field, which is why they were not added during the conversion.
+
+## Phase 4: species as a real Item subtype - not started
+
+**This is the tracked follow-up for the species pack.** The 18 species are JournalEntries
+today because there is no `species` Item type, but each entry already carries its full
+structured record on `flags['alternity-v2'].provenance`:
+
+```jsonc
+{
+  "abilityRanges": { "STR": { "min": 9, "max": 16 }, /* ...all six... */ },
+  "bonusSkillPoints": 0,
+  "bonusBroadSkills": 0,
+  "durabilityMultiplier": 1.5,     // Weren: CON x 1.5 for durability scores
+  "psionicMultiplier": 1,
+  "isPsionic": false,
+  "canGlide": false,
+  "canFly": false,
+  "actionCheckStep": 0,
+  "freeSkills": ["Athletics", "Unarmed Attack", "Stamina", /* ... */],
+  "specialAbilities": ["Weren Superior Durability: CON x 1.5 for durability scores", /* ... */]
+}
+```
+
+So the promotion reads that flag rather than re-running the conversion against
+`external/`, and the compendium entries can be updated in place.
+
+- [ ] Add a `species` Item type to `system.json`'s `documentTypes` and a `SpeciesData`
+      TypeDataModel: ability minimum/maximum per ability, bonus skill points, bonus broad
+      skills, durability and psionic multipliers, action check step, flight/glide flags,
+      free skill ids, and special abilities as an array of `{name, description}`.
+- [ ] **Retire the `isWeren` special case.** `AlternityCharacterState` currently derives
+      durability by asking `AlternityMathService.calculateDurabilityRatings` whether the
+      species name contains "weren", because that multiplier had nowhere else to live. A
+      `durabilityMultiplier` on a real species item is where it belongs, and every other
+      species in the data set carries the same field.
+- [ ] Parse `specialAbilities` into something mechanical where the note is mechanical.
+      Several are step modifiers stated in prose ("Weren Camouflage: +1 step to ranged
+      attacks vs. weren"), which `collectTargetModifiers` could read.
+- [ ] Add a species row to the item sheet, and make the character sheet accept a dropped
+      species - the drag-and-drop path already exists (`alternity-drag-drop.js`).
+- [ ] Convert the pack to `species` items and keep the ids stable, so a world that
+      already references the journal entries is not orphaned. The pack changes document
+      type, so this is a migration, not a rebuild.
+
+## Phase 5: career templates - partly done
+
+The 54 templates convert, but they are career *packages* rather than finished heroes:
+every ability sits at 10, there is no gear, and the only attack form is Unarmed. That is
+what the character generator shipped, not something the conversion lost.
+
+- [ ] **`system.details.career` still admits only `Soldier | Explorer | Expert`**, a
+      legacy d20-shaped list that no Alternity career fits. The templates put their real
+      career and profession on the character state and in the biography, and leave the
+      system field at its default. The choice list should become the five professions -
+      or the field should be free text and the profession a separate one.
+- [ ] Templates carry no equipment. The Player's Handbook prints "Signature Equipment"
+      for each career ("Assault rifle, battle jacket, rations, survival gear") - those
+      could be resolved against the weapons, armour and equipment packs and embedded as
+      real Items, which is the first thing that would make a template usable as-is.
+- [ ] The profession and species benefits arrive as prose notes and become special rules
+      that are enabled but do nothing. Several are mechanical ("Free Agent Action Check
+      Increase: action check score increased by 2") and could be real modifiers.
+
+## Sources not yet mined
+
+- `external/json/Reports/*.json` are the generator's XSL report stylesheets, not data.
+  They are worth keeping as a decoder ring - `walter_weapons.xsl` is where the numeric
+  availability codes were confirmed - but there is nothing in them to convert.
+- Vehicles, starships and creatures have actor types and sheets in this system but no
+  records in the character generator data set. Those come from the Warships, Star Drive
+  Campaign Setting and Gamemaster Guide Markdown, and would be a Phase 2-style pass with
+  no stats to anchor against.
+- `PerkFlawData`, `ProgramData` and `MutationData` have no source records either. Perks
+  and flaws are in the Player's Handbook, programs in Dataware, mutations in Gamma World.

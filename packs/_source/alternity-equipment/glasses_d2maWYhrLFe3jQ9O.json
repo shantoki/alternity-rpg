@@ -1,0 +1,41 @@
+{
+  "_id": "d2maWYhrLFe3jQ9O",
+  "_key": "!items!d2maWYhrLFe3jQ9O",
+  "name": "Glasses",
+  "type": "personalEquipment",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "category": "Clothing",
+    "progressLevel": 3,
+    "cost": 50,
+    "mass": 0,
+    "bonusSkill": "",
+    "bonusValue": 0,
+    "maxCharges": 0,
+    "currentCharges": 0,
+    "powerNotes": "",
+    "isEquipped": false,
+    "quantity": 1,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Class</dt><dd>Accessories</dd><dt>Category</dt><dd>Accessories and Clothing</dd><dt>Progress level</dt><dd>3</dd><dt>Cost</dt><dd>50 cr</dd><dt>Availability</dt><dd>Common</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "Ba3Km1zjqVDxREyM",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/equip_core.json",
+        "category": "Accessories and Clothing",
+        "class": "Accessories",
+        "progressLevel": 3,
+        "cost": 50,
+        "availability": "Common",
+        "mass": 0
+      }
+    }
+  }
+}

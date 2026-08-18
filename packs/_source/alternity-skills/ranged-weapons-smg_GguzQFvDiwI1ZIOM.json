@@ -1,0 +1,38 @@
+{
+  "_id": "GguzQFvDiwI1ZIOM",
+  "_key": "!items!GguzQFvDiwI1ZIOM",
+  "name": "Ranged Weapons - SMG",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "skillId": "dex-smg",
+    "linkedAbility": "DEX",
+    "rank": 0,
+    "isBackground": false,
+    "specialisation": "",
+    "specialisationBonus": 2,
+    "effectiveRank": 0,
+    "targetNumber": 10,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill type</dt><dd>Specialty skill</dd><dt>Broad skill</dt><dd>Ranged Weapons</dd><dt>Ability</dt><dd>DEX</dd><dt>Cost</dt><dd>5 skill points</dd><dt>Untrained</dt><dd>Can be used untrained</dd><dt>Professions</dt><dd>Combat Spec</dd><dt>Source</dt><dd>Gamma World</dd></dl>"
+  },
+  "effects": [],
+  "folder": "2h5KoYy3RjP0qIU0",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Gamma World",
+        "sourceFile": "data/skills_Gamma World.json",
+        "sourceSkillId": 195,
+        "broadSkill": "Ranged Weapons",
+        "isBroad": false,
+        "basePrice": 5,
+        "usableUntrained": true,
+        "professions": "Combat Spec"
+      }
+    }
+  }
+}

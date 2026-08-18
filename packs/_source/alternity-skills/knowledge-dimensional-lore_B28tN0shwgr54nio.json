@@ -1,0 +1,38 @@
+{
+  "_id": "B28tN0shwgr54nio",
+  "_key": "!items!B28tN0shwgr54nio",
+  "name": "Knowledge - Dimensional Lore",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "skillId": "",
+    "linkedAbility": "INT",
+    "rank": 0,
+    "isBackground": false,
+    "specialisation": "",
+    "specialisationBonus": 2,
+    "effectiveRank": 0,
+    "targetNumber": 10,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill type</dt><dd>Specialty skill</dd><dt>Broad skill</dt><dd>Knowledge</dd><dt>Ability</dt><dd>INT</dd><dt>Cost</dt><dd>3 skill points</dd><dt>Untrained</dt><dd>Cannot be used untrained</dd><dt>Source</dt><dd>Tangents</dd></dl>"
+  },
+  "effects": [],
+  "folder": "dGqYNUhDe5DqNBi8",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Tangents",
+        "sourceFile": "data/skills_Tangents.json",
+        "sourceSkillId": 180,
+        "broadSkill": "Knowledge",
+        "isBroad": false,
+        "basePrice": 3,
+        "usableUntrained": false,
+        "professions": ""
+      }
+    }
+  }
+}

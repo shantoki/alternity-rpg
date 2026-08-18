@@ -1,0 +1,43 @@
+{
+  "_id": "oP8eTpKzsWh1lMOC",
+  "_key": "!items!oP8eTpKzsWh1lMOC",
+  "name": "Remove Flaw (Free Agent)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Remove Flaw",
+    "profession": "Free Agent",
+    "cost": 0,
+    "costIsDoubleFlawValue": true,
+    "minLevel": 6,
+    "maxPurchases": 1,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "None",
+    "effectAbility": "None",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Remove Flaw</dd><dt>Profession</dt><dd>Free Agent</dd><dt>Minimum level</dt><dd>6</dd><dt>Cost</dt><dd>Double the flaw&amp;#39;s value</dd><dt>Times purchasable</dt><dd>1</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "hCrh2XhPp4rxQb62",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "Remove Flaw",
+        "profession": "Free Agent",
+        "minLevel": 6,
+        "cost": 0,
+        "maxPurchases": 1,
+        "folder": "Free Agent"
+      }
+    }
+  }
+}

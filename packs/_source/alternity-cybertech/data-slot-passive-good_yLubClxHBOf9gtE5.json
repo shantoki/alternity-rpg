@@ -1,0 +1,49 @@
+{
+  "_id": "yLubClxHBOf9gtE5",
+  "_key": "!items!yLubClxHBOf9gtE5",
+  "name": "Data Slot (passive), Good",
+  "type": "cybertech",
+  "img": "icons/svg/upgrade.svg",
+  "system": {
+    "category": "Interface",
+    "quality": "Good",
+    "progressLevel": 7,
+    "cost": 700,
+    "mass": 1,
+    "size": 1,
+    "requiresNanocomputer": false,
+    "requiresExoskeleton": false,
+    "requiresCyberlimb": false,
+    "requiresSkillPoints": false,
+    "isInstalled": false,
+    "isDamaged": false,
+    "actionCheckModifier": 0,
+    "damageFormula": "",
+    "isActivated": false,
+    "activationCost": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Quality</dt><dd>Good</dd><dt>Size</dt><dd>1</dd><dt>Mass</dt><dd>1 kg</dd><dt>Progress level</dt><dd>7</dd><dt>Cost</dt><dd>700 cr</dd><dt>Multiple allowed</dt><dd>Yes</dd><dt>Requires nanocomputer</dt><dd>No</dd><dt>Costs skill points</dt><dd>No</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "CaItO8xE3W209wrK",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/cyberware.json",
+        "device": "Data Slot (passive)",
+        "quality": "Good",
+        "progressLevel": 7,
+        "cost": 700,
+        "mass": 1,
+        "size": 1,
+        "multipleAllowed": true,
+        "requiresNanocomputer": false,
+        "requiresSkillPoints": false
+      }
+    }
+  }
+}

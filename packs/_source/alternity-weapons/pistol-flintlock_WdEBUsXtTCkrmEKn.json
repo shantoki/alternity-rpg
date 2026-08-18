@@ -1,0 +1,58 @@
+{
+  "_id": "WdEBUsXtTCkrmEKn",
+  "_key": "!items!WdEBUsXtTCkrmEKn",
+  "name": "Pistol, flintlock",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Ranged",
+    "damageType": "HI",
+    "damageCategory": "wound",
+    "firepower": "Ordinary",
+    "damageOrdinary": "d4+2w",
+    "damageGood": "d6+2w",
+    "damageAmazing": "d4+1m",
+    "damageBonus": 0,
+    "attackBonus": 2,
+    "attackAbility": "dex",
+    "requiredSkill": "dex-flintlock",
+    "rangeClass": "Primitive",
+    "range": {
+      "short": 4,
+      "medium": 8,
+      "long": 16
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 2,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Primitive Ranged Weapons / Flintlock</dd><dt>Damage</dt><dd>d4+2w/d6+2w/d4+1m</dd><dt>Type</dt><dd>HI/O</dd><dt>Accuracy</dt><dd>2</dd><dt>Range</dt><dd>4/8/16</dd><dt>Firing modes</dt><dd>Full</dd><dt>Actions to ready</dt><dd>2</dd><dt>Clip</dt><dd>1 rounds</dd><dt>Clip cost</dt><dd>5 cr</dd><dt>Mass</dt><dd>2 kg</dd><dt>Concealment</dt><dd>2</dd><dt>Progress level</dt><dd>3</dd><dt>Cost</dt><dd>200 cr</dd><dt>Availability</dt><dd>Common</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "dfw1Q0lPCIh8ySvk",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/weapon_Core.json",
+        "progressLevel": 3,
+        "cost": 200,
+        "availability": "Common",
+        "mass": 2,
+        "concealment": 2,
+        "firingModes": "Full",
+        "actionsToReady": 2,
+        "clipSize": 1,
+        "clipCost": 5,
+        "skillId": 37,
+        "skillName": "Primitive Ranged Weapons / Flintlock",
+        "printedDamage": "d4+2w/d6+2w/d4+1m",
+        "printedRange": "4/8/16"
+      }
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "_id": "Ez6BdNGWXMzHyKNh",
+  "_key": "!items!Ez6BdNGWXMzHyKNh",
+  "name": "Nighthawk A5 Pulse Baton",
+  "type": "weapon",
+  "img": "icons/svg/sword.svg",
+  "system": {
+    "weaponType": "Melee",
+    "damageType": "En",
+    "damageCategory": "stun",
+    "firepower": "Ordinary",
+    "damageOrdinary": "d8s",
+    "damageGood": "d4+2w",
+    "damageAmazing": "d6+2w",
+    "damageBonus": 0,
+    "attackBonus": 0,
+    "attackAbility": "str",
+    "requiredSkill": "str-powered-melee",
+    "rangeClass": "Melee",
+    "range": {
+      "short": 0,
+      "medium": 0,
+      "long": 0
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 1.15,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Melee Weapons / Powered weapon</dd><dt>Damage</dt><dd>d8s/d4+2w/d6+2w</dd><dt>Type</dt><dd>En/O</dd><dt>Accuracy</dt><dd>0</dd><dt>Range</dt><dd>Personal</dd><dt>Actions to ready</dt><dd>3</dd><dt>Clip</dt><dd>10 rounds</dd><dt>Clip cost</dt><dd>75 cr</dd><dt>Mass</dt><dd>1.15 kg</dd><dt>Concealment</dt><dd>4</dd><dt>Progress level</dt><dd>7</dd><dt>Cost</dt><dd>500 cr</dd><dt>Availability</dt><dd>Controlled</dd><dt>Source</dt><dd>Star Drive Arms &amp; Equipment Guide</dd></dl>"
+  },
+  "effects": [],
+  "folder": "fvzufl27vezs394E",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Star Drive Arms & Equipment Guide",
+        "sourceFile": "data/weapon_SD AEG.json",
+        "progressLevel": 7,
+        "cost": 500,
+        "availability": "Controlled",
+        "mass": 1.15,
+        "concealment": 4,
+        "firingModes": "",
+        "actionsToReady": 3,
+        "clipSize": 10,
+        "clipCost": 75,
+        "skillId": 14,
+        "skillName": "Melee Weapons / Powered weapon",
+        "printedDamage": "d8s/d4+2w/d6+2w",
+        "printedRange": "Personal"
+      }
+    }
+  }
+}

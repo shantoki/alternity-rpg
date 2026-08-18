@@ -1,0 +1,58 @@
+{
+  "_id": "5L8VDi0QzalVObEV",
+  "_key": "!items!5L8VDi0QzalVObEV",
+  "name": "Cluster Rocket, Launcher",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Heavy",
+    "damageType": "HI",
+    "damageCategory": "wound",
+    "firepower": "Good",
+    "damageOrdinary": "d6+3w",
+    "damageGood": "d4m",
+    "damageAmazing": "d4+3m",
+    "damageBonus": 0,
+    "attackBonus": 0,
+    "attackAbility": "dex",
+    "requiredSkill": "str-indirect-fire",
+    "rangeClass": "Rifle",
+    "range": {
+      "short": 200,
+      "medium": 400,
+      "long": 1200
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 10,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Heavy Weapons / Indirect Fire</dd><dt>Damage</dt><dd>d6+3w/d4m/d4+3m</dd><dt>Type</dt><dd>HI/G</dd><dt>Accuracy</dt><dd>0</dd><dt>Range</dt><dd>200/400/1200</dd><dt>Firing modes</dt><dd>Autofire</dd><dt>Actions to ready</dt><dd>1</dd><dt>Clip</dt><dd>6 rounds</dd><dt>Mass</dt><dd>10 kg</dd><dt>Concealment</dt><dd>Cannot be concealed</dd><dt>Progress level</dt><dd>8</dd><dt>Availability</dt><dd>Restricted</dd><dt>Source</dt><dd>Externals</dd></dl>"
+  },
+  "effects": [],
+  "folder": "SGmZ0eVls4LoTEBL",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Externals",
+        "sourceFile": "data/weapon_Externals.json",
+        "progressLevel": 8,
+        "cost": 0,
+        "availability": "Restricted",
+        "mass": 10,
+        "concealment": null,
+        "firingModes": "Autofire",
+        "actionsToReady": 1,
+        "clipSize": 6,
+        "clipCost": 0,
+        "skillId": 10,
+        "skillName": "Heavy Weapons / Indirect Fire",
+        "printedDamage": "d6+3w/d4m/d4+3m",
+        "printedRange": "200/400/1200"
+      }
+    }
+  }
+}

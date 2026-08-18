@@ -1,0 +1,58 @@
+{
+  "_id": "UX5HsYDHGsP9UAFt",
+  "_key": "!items!UX5HsYDHGsP9UAFt",
+  "name": "Blacklaser, Pistol",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Ranged",
+    "damageType": "En",
+    "damageCategory": "wound",
+    "firepower": "Ordinary",
+    "damageOrdinary": "d4+2w",
+    "damageGood": "d6+2w",
+    "damageAmazing": "d4m",
+    "damageBonus": 0,
+    "attackBonus": -1,
+    "attackAbility": "dex",
+    "requiredSkill": "dex-pistol",
+    "rangeClass": "Pistol",
+    "range": {
+      "short": 20,
+      "medium": 40,
+      "long": 200
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 1,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Modern Ranged Weapons / Pistol</dd><dt>Damage</dt><dd>d4+2w/d6+2w/d4m</dd><dt>Type</dt><dd>En/O</dd><dt>Accuracy</dt><dd>-1</dd><dt>Range</dt><dd>20/40/200</dd><dt>Firing modes</dt><dd>Full</dd><dt>Actions to ready</dt><dd>4</dd><dt>Clip</dt><dd>10 rounds</dd><dt>Mass</dt><dd>1 kg</dd><dt>Concealment</dt><dd>3</dd><dt>Progress level</dt><dd>8</dd><dt>Availability</dt><dd>Restricted</dd><dt>Source</dt><dd>Externals</dd></dl>"
+  },
+  "effects": [],
+  "folder": "SGmZ0eVls4LoTEBL",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Externals",
+        "sourceFile": "data/weapon_Externals.json",
+        "progressLevel": 8,
+        "cost": 0,
+        "availability": "Restricted",
+        "mass": 1,
+        "concealment": 3,
+        "firingModes": "Full",
+        "actionsToReady": 4,
+        "clipSize": 10,
+        "clipCost": 0,
+        "skillId": 31,
+        "skillName": "Modern Ranged Weapons / Pistol",
+        "printedDamage": "d4+2w/d6+2w/d4m",
+        "printedRange": "20/40/200"
+      }
+    }
+  }
+}

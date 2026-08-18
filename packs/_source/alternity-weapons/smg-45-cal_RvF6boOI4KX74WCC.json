@@ -1,0 +1,58 @@
+{
+  "_id": "RvF6boOI4KX74WCC",
+  "_key": "!items!RvF6boOI4KX74WCC",
+  "name": "SMG, .45 cal",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Ranged",
+    "damageType": "HI",
+    "damageCategory": "wound",
+    "firepower": "Ordinary",
+    "damageOrdinary": "d4+1w",
+    "damageGood": "d4+2w",
+    "damageAmazing": "d6m",
+    "damageBonus": 0,
+    "attackBonus": 2,
+    "attackAbility": "dex",
+    "requiredSkill": "dex-smg",
+    "rangeClass": "SMG",
+    "range": {
+      "short": 8,
+      "medium": 16,
+      "long": 40
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 4,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Modern Ranged Weapons / SMG</dd><dt>Damage</dt><dd>d4+1w/d4+2w/d6m</dd><dt>Type</dt><dd>HI/O</dd><dt>Accuracy</dt><dd>2</dd><dt>Range</dt><dd>8/16/40</dd><dt>Firing modes</dt><dd>Burst, Autofire</dd><dt>Actions to ready</dt><dd>4</dd><dt>Clip</dt><dd>24 rounds</dd><dt>Clip cost</dt><dd>40 cr</dd><dt>Mass</dt><dd>4 kg</dd><dt>Concealment</dt><dd>Cannot be concealed</dd><dt>Progress level</dt><dd>4</dd><dt>Cost</dt><dd>600 cr</dd><dt>Availability</dt><dd>Controlled</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "dfw1Q0lPCIh8ySvk",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/weapon_Core.json",
+        "progressLevel": 4,
+        "cost": 600,
+        "availability": "Controlled",
+        "mass": 4,
+        "concealment": null,
+        "firingModes": "Burst, Autofire",
+        "actionsToReady": 4,
+        "clipSize": 24,
+        "clipCost": 40,
+        "skillId": 33,
+        "skillName": "Modern Ranged Weapons / SMG",
+        "printedDamage": "d4+1w/d4+2w/d6m",
+        "printedRange": "8/16/40"
+      }
+    }
+  }
+}

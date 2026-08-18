@@ -1,0 +1,43 @@
+{
+  "_id": "lOJRzSSg8OKfnaY0",
+  "_key": "!items!lOJRzSSg8OKfnaY0",
+  "name": "PER Increase 1 (Combat Spec)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Ability Score Increase",
+    "profession": "Combat Spec",
+    "cost": 10,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 4,
+    "maxPurchases": 1,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "AbilityScore",
+    "effectAbility": "PER",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Ability Score Increase</dd><dt>Profession</dt><dd>Combat Spec</dd><dt>Minimum level</dt><dd>4</dd><dt>Cost</dt><dd>10 achievement points</dd><dt>Times purchasable</dt><dd>1</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "INB5v5SqkWKen2r4",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "PER Increase 1",
+        "profession": "Combat Spec",
+        "minLevel": 4,
+        "cost": 10,
+        "maxPurchases": 1,
+        "folder": "Combat Spec"
+      }
+    }
+  }
+}

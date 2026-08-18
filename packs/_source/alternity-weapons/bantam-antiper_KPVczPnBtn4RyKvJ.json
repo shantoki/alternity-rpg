@@ -1,0 +1,58 @@
+{
+  "_id": "KPVczPnBtn4RyKvJ",
+  "_key": "!items!KPVczPnBtn4RyKvJ",
+  "name": "Bantam, antiper.",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Heavy",
+    "damageType": "En",
+    "damageCategory": "wound",
+    "firepower": "Ordinary",
+    "damageOrdinary": "d6w",
+    "damageGood": "d6+2w",
+    "damageAmazing": "d8+2w",
+    "damageBonus": 0,
+    "attackBonus": 0,
+    "attackAbility": "dex",
+    "requiredSkill": "str-indirect-fire",
+    "rangeClass": "Rifle",
+    "range": {
+      "short": 100,
+      "medium": 800,
+      "long": 4000
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 3,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Heavy Weapons / Indirect Fire</dd><dt>Damage</dt><dd>d6w/d6+2w/d8+2w</dd><dt>Type</dt><dd>En/O</dd><dt>Accuracy</dt><dd>0</dd><dt>Range</dt><dd>100/800/4000</dd><dt>Firing modes</dt><dd>Full</dd><dt>Actions to ready</dt><dd>2</dd><dt>Mass</dt><dd>3 kg</dd><dt>Concealment</dt><dd>1</dd><dt>Progress level</dt><dd>6</dd><dt>Cost</dt><dd>500 cr</dd><dt>Availability</dt><dd>Military</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "dfw1Q0lPCIh8ySvk",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/weapon_Core.json",
+        "progressLevel": 6,
+        "cost": 500,
+        "availability": "Military",
+        "mass": 3,
+        "concealment": 1,
+        "firingModes": "Full",
+        "actionsToReady": 2,
+        "clipSize": 0,
+        "clipCost": 0,
+        "skillId": 10,
+        "skillName": "Heavy Weapons / Indirect Fire",
+        "printedDamage": "d6w/d6+2w/d8+2w",
+        "printedRange": "100/800/4000"
+      }
+    }
+  }
+}

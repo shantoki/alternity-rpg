@@ -1,0 +1,68 @@
+{
+  "_id": "kkqiROAvT2aAWsPq",
+  "_key": "!items!kkqiROAvT2aAWsPq",
+  "name": "Wield the Ley Line",
+  "type": "fx",
+  "img": "icons/svg/aura.svg",
+  "system": {
+    "tradition": "Faith",
+    "broadSkill": "Faith",
+    "category": "Druidism",
+    "linkedAbility": "INT",
+    "isBroadSkill": false,
+    "cannotBeUsedUntrained": false,
+    "rank": 0,
+    "baseCost": 4,
+    "energyCostOverride": 1,
+    "maintenanceCost": "",
+    "hasExtendedDuration": false,
+    "requiresVisualRange": false,
+    "range": {
+      "short": 0,
+      "medium": 0,
+      "long": 0
+    },
+    "area": "",
+    "target": "",
+    "duration": "",
+    "resistance": "None",
+    "damage": {
+      "ordinary": "",
+      "good": "",
+      "amazing": ""
+    },
+    "damageType": "None",
+    "outcomes": {
+      "ordinary": "",
+      "good": "",
+      "amazing": ""
+    },
+    "criticalFailure": "",
+    "mentalCombatClass": "None",
+    "rankBenefits": [],
+    "trappings": {},
+    "limitations": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Tradition</dt><dd>Faith</dd><dt>Broad skill</dt><dd>Druidism</dd><dt>Skill type</dt><dd>Specialty skill</dd><dt>Ability</dt><dd>INT</dd><dt>Cost</dt><dd>4 skill points</dd><dt>Energy</dt><dd>1</dd><dt>Untrained</dt><dd>Can be used untrained</dd><dt>Source</dt><dd>Beyond Science</dd></dl>"
+  },
+  "effects": [],
+  "folder": "l1I5WMrqhsem1SAO",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Beyond Science",
+        "sourceFile": "data/fxskills_Beyond Science.json",
+        "sourceSkillId": 5074,
+        "list": "Beyond Science",
+        "tradition": "Faith",
+        "broadSkill": "Druidism",
+        "isBroad": false,
+        "basePrice": 4,
+        "energy": "1"
+      }
+    }
+  }
+}

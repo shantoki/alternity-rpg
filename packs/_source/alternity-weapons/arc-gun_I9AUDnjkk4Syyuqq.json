@@ -1,0 +1,58 @@
+{
+  "_id": "I9AUDnjkk4Syyuqq",
+  "_key": "!items!I9AUDnjkk4Syyuqq",
+  "name": "Arc gun",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Heavy",
+    "damageType": "En",
+    "damageCategory": "stun",
+    "firepower": "Good",
+    "damageOrdinary": "d8+1s",
+    "damageGood": "d8w",
+    "damageAmazing": "d6+3w",
+    "damageBonus": 0,
+    "attackBonus": -1,
+    "attackAbility": "dex",
+    "requiredSkill": "str-direct-fire",
+    "rangeClass": "Rifle",
+    "range": {
+      "short": 20,
+      "medium": 40,
+      "long": 100
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 10,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Heavy Weapons / Direct Fire</dd><dt>Damage</dt><dd>d8+1s/d8w/d6+3w</dd><dt>Type</dt><dd>En/G</dd><dt>Accuracy</dt><dd>-1</dd><dt>Range</dt><dd>20/40/100</dd><dt>Firing modes</dt><dd>Full</dd><dt>Actions to ready</dt><dd>2</dd><dt>Clip</dt><dd>6 rounds</dd><dt>Clip cost</dt><dd>150 cr</dd><dt>Mass</dt><dd>10 kg</dd><dt>Concealment</dt><dd>Cannot be concealed</dd><dt>Progress level</dt><dd>7</dd><dt>Cost</dt><dd>2000 cr</dd><dt>Availability</dt><dd>Military</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "dfw1Q0lPCIh8ySvk",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/weapon_Core.json",
+        "progressLevel": 7,
+        "cost": 2000,
+        "availability": "Military",
+        "mass": 10,
+        "concealment": null,
+        "firingModes": "Full",
+        "actionsToReady": 2,
+        "clipSize": 6,
+        "clipCost": 150,
+        "skillId": 9,
+        "skillName": "Heavy Weapons / Direct Fire",
+        "printedDamage": "d8+1s/d8w/d6+3w",
+        "printedRange": "20/40/100"
+      }
+    }
+  }
+}

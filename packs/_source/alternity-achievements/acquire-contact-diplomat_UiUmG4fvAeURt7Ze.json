@@ -1,0 +1,43 @@
+{
+  "_id": "UiUmG4fvAeURt7Ze",
+  "_key": "!items!UiUmG4fvAeURt7Ze",
+  "name": "Acquire Contact (Diplomat)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Acquire Contact",
+    "profession": "Diplomat",
+    "cost": 3,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 2,
+    "maxPurchases": 99,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "None",
+    "effectAbility": "None",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Acquire Contact</dd><dt>Profession</dt><dd>Diplomat</dd><dt>Minimum level</dt><dd>2</dd><dt>Cost</dt><dd>3 achievement points</dd><dt>Times purchasable</dt><dd>Unlimited</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "CQIHAuGvPryoNwTK",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "Acquire Contact",
+        "profession": "Diplomat",
+        "minLevel": 2,
+        "cost": 3,
+        "maxPurchases": 99,
+        "folder": "Diplomat"
+      }
+    }
+  }
+}

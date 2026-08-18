@@ -1,0 +1,43 @@
+{
+  "_id": "OZq0NMXQSZQBivCU",
+  "_key": "!items!OZq0NMXQSZQBivCU",
+  "name": "Stun Rating Increase (Tech Op)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Durability Increase",
+    "profession": "Tech Op",
+    "cost": 4,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 5,
+    "maxPurchases": 3,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "StunRating",
+    "effectAbility": "None",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Durability Increase</dd><dt>Profession</dt><dd>Tech Op</dd><dt>Minimum level</dt><dd>5</dd><dt>Cost</dt><dd>4 achievement points</dd><dt>Times purchasable</dt><dd>3</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "kZWIqXCMRPD0qwn8",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "Stun Rating Increase",
+        "profession": "Tech Op",
+        "minLevel": 5,
+        "cost": 4,
+        "maxPurchases": 3,
+        "folder": "Tech Op"
+      }
+    }
+  }
+}

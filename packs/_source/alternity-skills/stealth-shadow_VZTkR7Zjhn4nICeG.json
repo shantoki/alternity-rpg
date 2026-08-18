@@ -1,0 +1,38 @@
+{
+  "_id": "VZTkR7Zjhn4nICeG",
+  "_key": "!items!VZTkR7Zjhn4nICeG",
+  "name": "Stealth - Shadow",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "skillId": "dex-shadow",
+    "linkedAbility": "DEX",
+    "rank": 0,
+    "isBackground": false,
+    "specialisation": "",
+    "specialisationBonus": 2,
+    "effectiveRank": 0,
+    "targetNumber": 10,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill type</dt><dd>Specialty skill</dd><dt>Broad skill</dt><dd>Stealth</dd><dt>Ability</dt><dd>DEX</dd><dt>Cost</dt><dd>4 skill points</dd><dt>Untrained</dt><dd>Can be used untrained</dd><dt>Professions</dt><dd>Free Agent</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "sGBb7uLiXegXpzFb",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/skills_core.json",
+        "sourceSkillId": 41,
+        "broadSkill": "Stealth",
+        "isBroad": false,
+        "basePrice": 4,
+        "usableUntrained": true,
+        "professions": "Free Agent"
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "_id": "v9ZtOgr6gFWEEgtw",
+  "_key": "!items!v9ZtOgr6gFWEEgtw",
+  "name": "BioArt, Ordinary",
+  "type": "cybertech",
+  "img": "icons/svg/upgrade.svg",
+  "system": {
+    "category": "Cosmetic",
+    "quality": "Ordinary",
+    "progressLevel": 6,
+    "cost": 50,
+    "mass": 0,
+    "size": 0,
+    "requiresNanocomputer": false,
+    "requiresExoskeleton": false,
+    "requiresCyberlimb": false,
+    "requiresSkillPoints": false,
+    "isInstalled": false,
+    "isDamaged": false,
+    "actionCheckModifier": 0,
+    "damageFormula": "",
+    "isActivated": false,
+    "activationCost": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Quality</dt><dd>Ordinary</dd><dt>Size</dt><dd>0</dd><dt>Progress level</dt><dd>6</dd><dt>Cost</dt><dd>50 cr</dd><dt>Multiple allowed</dt><dd>Yes</dd><dt>Requires nanocomputer</dt><dd>No</dd><dt>Costs skill points</dt><dd>No</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "CaItO8xE3W209wrK",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/cyberware.json",
+        "device": "BioArt",
+        "quality": "Ordinary",
+        "progressLevel": 6,
+        "cost": 50,
+        "mass": 0,
+        "size": 0,
+        "multipleAllowed": true,
+        "requiresNanocomputer": false,
+        "requiresSkillPoints": false
+      }
+    }
+  }
+}

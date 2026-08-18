@@ -1,0 +1,41 @@
+{
+  "_id": "3eXSFk8nzWKgDYiC",
+  "_key": "!items!3eXSFk8nzWKgDYiC",
+  "name": "Water condenser",
+  "type": "personalEquipment",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "category": "Survival",
+    "progressLevel": 5,
+    "cost": 250,
+    "mass": 5,
+    "bonusSkill": "",
+    "bonusValue": 0,
+    "maxCharges": 0,
+    "currentCharges": 0,
+    "powerNotes": "",
+    "isEquipped": false,
+    "quantity": 1,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Class</dt><dd>Survival Gear</dd><dt>Category</dt><dd>Survival Gear</dd><dt>Mass</dt><dd>5 kg</dd><dt>Progress level</dt><dd>5</dd><dt>Cost</dt><dd>250 cr</dd><dt>Availability</dt><dd>Common</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "Ba3Km1zjqVDxREyM",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/equip_core.json",
+        "category": "Survival Gear",
+        "class": "Survival Gear",
+        "progressLevel": 5,
+        "cost": 250,
+        "availability": "Common",
+        "mass": 5
+      }
+    }
+  }
+}

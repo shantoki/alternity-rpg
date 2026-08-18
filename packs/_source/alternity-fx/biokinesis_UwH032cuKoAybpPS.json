@@ -1,0 +1,68 @@
+{
+  "_id": "UwH032cuKoAybpPS",
+  "_key": "!items!UwH032cuKoAybpPS",
+  "name": "Biokinesis",
+  "type": "fx",
+  "img": "icons/svg/aura.svg",
+  "system": {
+    "tradition": "Psionic",
+    "broadSkill": "Biokinesis",
+    "category": "",
+    "linkedAbility": "CON",
+    "isBroadSkill": true,
+    "cannotBeUsedUntrained": true,
+    "rank": 0,
+    "baseCost": 7,
+    "energyCostOverride": 0,
+    "maintenanceCost": "",
+    "hasExtendedDuration": false,
+    "requiresVisualRange": false,
+    "range": {
+      "short": 0,
+      "medium": 0,
+      "long": 0
+    },
+    "area": "",
+    "target": "",
+    "duration": "",
+    "resistance": "None",
+    "damage": {
+      "ordinary": "",
+      "good": "",
+      "amazing": ""
+    },
+    "damageType": "None",
+    "outcomes": {
+      "ordinary": "",
+      "good": "",
+      "amazing": ""
+    },
+    "criticalFailure": "",
+    "mentalCombatClass": "None",
+    "rankBenefits": [],
+    "trappings": {},
+    "limitations": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Tradition</dt><dd>Psionic</dd><dt>Broad skill</dt><dd>Biokinesis</dd><dt>Skill type</dt><dd>Broad skill</dd><dt>Ability</dt><dd>CON</dd><dt>Cost</dt><dd>7 skill points</dd><dt>Untrained</dt><dd>Cannot be used untrained</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "Pukpxgx9CKKqEqKv",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/psiskills_core.json",
+        "sourceSkillId": 500,
+        "list": "core",
+        "tradition": "Psionic",
+        "broadSkill": "Biokinesis",
+        "isBroad": true,
+        "basePrice": 7,
+        "energy": ""
+      }
+    }
+  }
+}

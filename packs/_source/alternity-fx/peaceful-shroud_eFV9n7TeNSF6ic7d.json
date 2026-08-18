@@ -1,0 +1,68 @@
+{
+  "_id": "eFV9n7TeNSF6ic7d",
+  "_key": "!items!eFV9n7TeNSF6ic7d",
+  "name": "Peaceful Shroud",
+  "type": "fx",
+  "img": "icons/svg/aura.svg",
+  "system": {
+    "tradition": "Arcane Magic",
+    "broadSkill": "Arcane Magic",
+    "category": "Enochian",
+    "linkedAbility": "WIL",
+    "isBroadSkill": false,
+    "cannotBeUsedUntrained": true,
+    "rank": 0,
+    "baseCost": 3,
+    "energyCostOverride": 1,
+    "maintenanceCost": "",
+    "hasExtendedDuration": false,
+    "requiresVisualRange": false,
+    "range": {
+      "short": 0,
+      "medium": 0,
+      "long": 0
+    },
+    "area": "",
+    "target": "",
+    "duration": "",
+    "resistance": "None",
+    "damage": {
+      "ordinary": "",
+      "good": "",
+      "amazing": ""
+    },
+    "damageType": "None",
+    "outcomes": {
+      "ordinary": "",
+      "good": "",
+      "amazing": ""
+    },
+    "criticalFailure": "",
+    "mentalCombatClass": "None",
+    "rankBenefits": [],
+    "trappings": {},
+    "limitations": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Tradition</dt><dd>Arcane Magic</dd><dt>Broad skill</dt><dd>Enochian</dd><dt>Skill type</dt><dd>Specialty skill</dd><dt>Ability</dt><dd>WIL</dd><dt>Cost</dt><dd>3 skill points</dd><dt>Energy</dt><dd>1</dd><dt>Untrained</dt><dd>Cannot be used untrained</dd><dt>Source</dt><dd>Dark*Matter</dd></dl>"
+  },
+  "effects": [],
+  "folder": "9zwolvgRHmqTINUP",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Dark*Matter",
+        "sourceFile": "data/fxskills_Dark_Matter.json",
+        "sourceSkillId": 5165,
+        "list": "Dark*Matter",
+        "tradition": "Arcane Magic",
+        "broadSkill": "Enochian",
+        "isBroad": false,
+        "basePrice": 3,
+        "energy": "1"
+      }
+    }
+  }
+}

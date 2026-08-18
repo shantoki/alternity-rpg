@@ -1,0 +1,35 @@
+{
+  "_id": "cqHr1v7CQRV4Bi1G",
+  "_key": "!items!cqHr1v7CQRV4Bi1G",
+  "name": "Microcomputer, Marginal",
+  "type": "computer",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "mass": 0.5,
+    "processorQuality": "Marginal",
+    "activeMemory": 0,
+    "activeStorage": 0,
+    "programs": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Class</dt><dd>Business Systems</dd><dt>Category</dt><dd>Computers</dd><dt>Mass</dt><dd>0.5 kg</dd><dt>Cost</dt><dd>1500 cr</dd><dt>Availability</dt><dd>Controlled</dd><dt>Source</dt><dd>Star Drive Arms &amp; Equipment Guide</dd></dl>"
+  },
+  "effects": [],
+  "folder": "KJlP3hiFAngh0kOG",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Star Drive Arms & Equipment Guide",
+        "sourceFile": "data/equip_SD AEG.json",
+        "category": "Computers",
+        "class": "Business Systems",
+        "progressLevel": 0,
+        "cost": 1500,
+        "availability": "Controlled",
+        "mass": 0.5
+      }
+    }
+  }
+}

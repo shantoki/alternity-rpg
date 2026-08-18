@@ -1,0 +1,38 @@
+{
+  "_id": "ZLeUJY3NLtHistzN",
+  "_key": "!items!ZLeUJY3NLtHistzN",
+  "name": "Unarmed Attack - Brawl",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "skillId": "str-brawl",
+    "linkedAbility": "STR",
+    "rank": 0,
+    "isBackground": false,
+    "specialisation": "",
+    "specialisationBonus": 2,
+    "effectiveRank": 0,
+    "targetNumber": 10,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill type</dt><dd>Specialty skill</dd><dt>Broad skill</dt><dd>Unarmed Attack</dd><dt>Ability</dt><dd>STR</dd><dt>Cost</dt><dd>3 skill points</dd><dt>Untrained</dt><dd>Can be used untrained</dd><dt>Professions</dt><dd>Combat Spec</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "sGBb7uLiXegXpzFb",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/skills_core.json",
+        "sourceSkillId": 16,
+        "broadSkill": "Unarmed Attack",
+        "isBroad": false,
+        "basePrice": 3,
+        "usableUntrained": true,
+        "professions": "Combat Spec"
+      }
+    }
+  }
+}

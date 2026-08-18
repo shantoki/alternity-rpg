@@ -1,0 +1,38 @@
+{
+  "_id": "Z0zOXiO8eEQDNW4m",
+  "_key": "!items!Z0zOXiO8eEQDNW4m",
+  "name": "Social Science",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "skillId": "",
+    "linkedAbility": "INT",
+    "rank": 0,
+    "isBackground": false,
+    "specialisation": "",
+    "specialisationBonus": 2,
+    "effectiveRank": 0,
+    "targetNumber": 10,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill type</dt><dd>Broad skill</dd><dt>Ability</dt><dd>INT</dd><dt>Cost</dt><dd>6 skill points</dd><dt>Untrained</dt><dd>Can be used untrained</dd><dt>Professions</dt><dd>Diplomat, Tech Op</dd><dt>Source</dt><dd>Dark*Matter</dd></dl>"
+  },
+  "effects": [],
+  "folder": "QnujvcYtTGGRE5yZ",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Dark*Matter",
+        "sourceFile": "data/skills_Dark_Matter.json",
+        "sourceSkillId": 165,
+        "broadSkill": "",
+        "isBroad": true,
+        "basePrice": 6,
+        "usableUntrained": true,
+        "professions": "Diplomat, Tech Op"
+      }
+    }
+  }
+}

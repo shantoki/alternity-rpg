@@ -1,0 +1,58 @@
+{
+  "_id": "5v8DLeV06DFnZ9BC",
+  "_key": "!items!5v8DLeV06DFnZ9BC",
+  "name": "Rifle, .44 lever",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Ranged",
+    "damageType": "HI",
+    "damageCategory": "wound",
+    "firepower": "Ordinary",
+    "damageOrdinary": "d6w",
+    "damageGood": "d8+1w",
+    "damageAmazing": "d6m",
+    "damageBonus": 0,
+    "attackBonus": 1,
+    "attackAbility": "dex",
+    "requiredSkill": "dex-rifle",
+    "rangeClass": "Rifle",
+    "range": {
+      "short": 40,
+      "medium": 80,
+      "long": 240
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 3,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Modern Ranged Weapons / Rifle</dd><dt>Damage</dt><dd>d6w/d8+1w/d6m</dd><dt>Type</dt><dd>HI/O</dd><dt>Accuracy</dt><dd>1</dd><dt>Range</dt><dd>40/80/240</dd><dt>Firing modes</dt><dd>Full</dd><dt>Actions to ready</dt><dd>2</dd><dt>Clip</dt><dd>12 rounds</dd><dt>Clip cost</dt><dd>20 cr</dd><dt>Mass</dt><dd>3 kg</dd><dt>Concealment</dt><dd>Cannot be concealed</dd><dt>Progress level</dt><dd>4</dd><dt>Cost</dt><dd>400 cr</dd><dt>Availability</dt><dd>Common</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "dfw1Q0lPCIh8ySvk",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/weapon_Core.json",
+        "progressLevel": 4,
+        "cost": 400,
+        "availability": "Common",
+        "mass": 3,
+        "concealment": null,
+        "firingModes": "Full",
+        "actionsToReady": 2,
+        "clipSize": 12,
+        "clipCost": 20,
+        "skillId": 32,
+        "skillName": "Modern Ranged Weapons / Rifle",
+        "printedDamage": "d6w/d8+1w/d6m",
+        "printedRange": "40/80/240"
+      }
+    }
+  }
+}

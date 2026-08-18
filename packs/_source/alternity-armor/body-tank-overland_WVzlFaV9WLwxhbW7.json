@@ -1,0 +1,44 @@
+{
+  "_id": "WVzlFaV9WLwxhbW7",
+  "_key": "!items!WVzlFaV9WLwxhbW7",
+  "name": "Body tank, overland",
+  "type": "armor",
+  "img": "icons/svg/shield.svg",
+  "system": {
+    "armorType": "Powered",
+    "protection": {
+      "li": "2d6+1",
+      "hi": "2d6+1",
+      "en": "2d6"
+    },
+    "toughness": "Good",
+    "speedPenalty": 0,
+    "skillPenalty": 3,
+    "resistanceModifierBonus": 0,
+    "techPointCost": 0,
+    "isEquipped": false,
+    "weight": 40,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Protection</dt><dd>2d6+1 (LI), 2d6+1 (HI), 2d6 (En)</dd><dt>Toughness</dt><dd>Good</dd><dt>Action penalty</dt><dd>+3</dd><dt>Mass</dt><dd>40 kg</dd><dt>Skill</dt><dd>Armor Operation - powered armor</dd><dt>Progress level</dt><dd>8</dd><dt>Cost</dt><dd>70000 cr</dd><dt>Availability</dt><dd>Restricted</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "5Zx8N1XMO5IGeC9c",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/armor_Core.json",
+        "progressLevel": 8,
+        "cost": 70000,
+        "availability": "Restricted",
+        "mass": 40,
+        "concealment": 0,
+        "actionPenalty": 3,
+        "requiredSkill": "Armor Operation - powered armor"
+      }
+    }
+  }
+}

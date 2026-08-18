@@ -1,0 +1,44 @@
+{
+  "_id": "gGrOVVCQPaSGfvwO",
+  "_key": "!items!gGrOVVCQPaSGfvwO",
+  "name": "Enviro-suit",
+  "type": "armor",
+  "img": "icons/svg/shield.svg",
+  "system": {
+    "armorType": "Light",
+    "protection": {
+      "li": "d6-3",
+      "hi": "d6-2",
+      "en": "d4-2"
+    },
+    "toughness": "Ordinary",
+    "speedPenalty": 0,
+    "skillPenalty": 0,
+    "resistanceModifierBonus": 0,
+    "techPointCost": 0,
+    "isEquipped": false,
+    "weight": 10,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Protection</dt><dd>d6-3 (LI), d6-2 (HI), d4-2 (En)</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Action penalty</dt><dd>0</dd><dt>Mass</dt><dd>10 kg</dd><dt>Progress level</dt><dd>5</dd><dt>Cost</dt><dd>5500 cr</dd><dt>Availability</dt><dd>Controlled</dd><dt>Source</dt><dd>Gamma World</dd></dl>"
+  },
+  "effects": [],
+  "folder": "2z85NSEcsi6g4DZQ",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Gamma World",
+        "sourceFile": "data/armor_Gamma World.json",
+        "progressLevel": 5,
+        "cost": 5500,
+        "availability": "Controlled",
+        "mass": 10,
+        "concealment": 0,
+        "actionPenalty": 0,
+        "requiredSkill": ""
+      }
+    }
+  }
+}

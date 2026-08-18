@@ -1,0 +1,58 @@
+{
+  "_id": "A2G7DAUTud9sjjcU",
+  "_key": "!items!A2G7DAUTud9sjjcU",
+  "name": "Apache LX Reflex Bow",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Ranged",
+    "damageType": "LI",
+    "damageCategory": "wound",
+    "firepower": "Ordinary",
+    "damageOrdinary": "d4+2w",
+    "damageGood": "d6+2w",
+    "damageAmazing": "d4+1m",
+    "damageBonus": 0,
+    "attackBonus": 0,
+    "attackAbility": "dex",
+    "requiredSkill": "dex-bow",
+    "rangeClass": "Primitive",
+    "range": {
+      "short": 50,
+      "medium": 100,
+      "long": 250
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 1,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Primitive Ranged Weapons / Bow</dd><dt>Damage</dt><dd>d4+2w/d6+2w/d4+1m</dd><dt>Type</dt><dd>LI/O</dd><dt>Accuracy</dt><dd>0</dd><dt>Range</dt><dd>50/100/250</dd><dt>Firing modes</dt><dd>Full</dd><dt>Actions to ready</dt><dd>2</dd><dt>Clip</dt><dd>1 rounds</dd><dt>Clip cost</dt><dd>25 cr</dd><dt>Mass</dt><dd>1 kg</dd><dt>Concealment</dt><dd>Cannot be concealed</dd><dt>Progress level</dt><dd>7</dd><dt>Cost</dt><dd>650 cr</dd><dt>Availability</dt><dd>Common</dd><dt>Source</dt><dd>Star Drive Arms &amp; Equipment Guide</dd></dl>"
+  },
+  "effects": [],
+  "folder": "fvzufl27vezs394E",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Star Drive Arms & Equipment Guide",
+        "sourceFile": "data/weapon_SD AEG.json",
+        "progressLevel": 7,
+        "cost": 650,
+        "availability": "Common",
+        "mass": 1,
+        "concealment": null,
+        "firingModes": "Full",
+        "actionsToReady": 2,
+        "clipSize": 1,
+        "clipCost": 25,
+        "skillId": 35,
+        "skillName": "Primitive Ranged Weapons / Bow",
+        "printedDamage": "d4+2w/d6+2w/d4+1m",
+        "printedRange": "50/100/250"
+      }
+    }
+  }
+}

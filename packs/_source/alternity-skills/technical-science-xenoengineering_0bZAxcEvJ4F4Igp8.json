@@ -1,0 +1,38 @@
+{
+  "_id": "0bZAxcEvJ4F4Igp8",
+  "_key": "!items!0bZAxcEvJ4F4Igp8",
+  "name": "Technical Science - Xenoengineering",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "skillId": "",
+    "linkedAbility": "INT",
+    "rank": 0,
+    "isBackground": false,
+    "specialisation": "",
+    "specialisationBonus": 2,
+    "effectiveRank": 0,
+    "targetNumber": 10,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill type</dt><dd>Specialty skill</dd><dt>Broad skill</dt><dd>Technical Science</dd><dt>Ability</dt><dd>INT</dd><dt>Cost</dt><dd>5 skill points</dd><dt>Untrained</dt><dd>Cannot be used untrained</dd><dt>Professions</dt><dd>Tech Op</dd><dt>Source</dt><dd>Dark*Matter</dd></dl>"
+  },
+  "effects": [],
+  "folder": "QnujvcYtTGGRE5yZ",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Dark*Matter",
+        "sourceFile": "data/skills_Dark_Matter.json",
+        "sourceSkillId": 169,
+        "broadSkill": "Technical Science",
+        "isBroad": false,
+        "basePrice": 5,
+        "usableUntrained": false,
+        "professions": "Tech Op"
+      }
+    }
+  }
+}

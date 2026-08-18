@@ -1,0 +1,68 @@
+{
+  "_id": "auFMsxZo587kHUUE",
+  "_key": "!items!auFMsxZo587kHUUE",
+  "name": "Sensitivity",
+  "type": "fx",
+  "img": "icons/svg/aura.svg",
+  "system": {
+    "tradition": "Psionic",
+    "broadSkill": "Extrasensory Perception",
+    "category": "",
+    "linkedAbility": "INT",
+    "isBroadSkill": false,
+    "cannotBeUsedUntrained": false,
+    "rank": 0,
+    "baseCost": 3,
+    "energyCostOverride": 0,
+    "maintenanceCost": "",
+    "hasExtendedDuration": false,
+    "requiresVisualRange": false,
+    "range": {
+      "short": 0,
+      "medium": 0,
+      "long": 0
+    },
+    "area": "",
+    "target": "",
+    "duration": "",
+    "resistance": "None",
+    "damage": {
+      "ordinary": "",
+      "good": "",
+      "amazing": ""
+    },
+    "damageType": "None",
+    "outcomes": {
+      "ordinary": "",
+      "good": "",
+      "amazing": ""
+    },
+    "criticalFailure": "",
+    "mentalCombatClass": "None",
+    "rankBenefits": [],
+    "trappings": {},
+    "limitations": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Tradition</dt><dd>Psionic</dd><dt>Broad skill</dt><dd>ESP</dd><dt>Skill type</dt><dd>Specialty skill</dd><dt>Ability</dt><dd>INT</dd><dt>Cost</dt><dd>3 skill points</dd><dt>Untrained</dt><dd>Can be used untrained</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "Pukpxgx9CKKqEqKv",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/psiskills_core.json",
+        "sourceSkillId": 517,
+        "list": "core",
+        "tradition": "Psionic",
+        "broadSkill": "ESP",
+        "isBroad": false,
+        "basePrice": 3,
+        "energy": ""
+      }
+    }
+  }
+}

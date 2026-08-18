@@ -1,0 +1,49 @@
+{
+  "_id": "H9DsHfhf84NB2CYz",
+  "_key": "!items!H9DsHfhf84NB2CYz",
+  "name": "Subdermal NIJack, Good",
+  "type": "cybertech",
+  "img": "icons/svg/upgrade.svg",
+  "system": {
+    "category": "Interface",
+    "quality": "Good",
+    "progressLevel": 7,
+    "cost": 700,
+    "mass": 0,
+    "size": 1,
+    "requiresNanocomputer": true,
+    "requiresExoskeleton": false,
+    "requiresCyberlimb": false,
+    "requiresSkillPoints": true,
+    "isInstalled": false,
+    "isDamaged": false,
+    "actionCheckModifier": 0,
+    "damageFormula": "",
+    "isActivated": false,
+    "activationCost": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Quality</dt><dd>Good</dd><dt>Size</dt><dd>1</dd><dt>Progress level</dt><dd>7</dd><dt>Cost</dt><dd>700 cr</dd><dt>Multiple allowed</dt><dd>No</dd><dt>Requires nanocomputer</dt><dd>Yes</dd><dt>Costs skill points</dt><dd>Yes</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "CaItO8xE3W209wrK",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/cyberware.json",
+        "device": "Subdermal NIJack",
+        "quality": "Good",
+        "progressLevel": 7,
+        "cost": 700,
+        "mass": 0,
+        "size": 1,
+        "multipleAllowed": false,
+        "requiresNanocomputer": true,
+        "requiresSkillPoints": true
+      }
+    }
+  }
+}

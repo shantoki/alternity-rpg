@@ -1,0 +1,44 @@
+{
+  "_id": "tQvSl3zVwbB7n5UI",
+  "_key": "!items!tQvSl3zVwbB7n5UI",
+  "name": "Buchmaster Cerametal Armor",
+  "type": "armor",
+  "img": "icons/svg/shield.svg",
+  "system": {
+    "armorType": "Medium",
+    "protection": {
+      "li": "d4+2",
+      "hi": "d6",
+      "en": "d6"
+    },
+    "toughness": "Ordinary",
+    "speedPenalty": 0,
+    "skillPenalty": 1,
+    "resistanceModifierBonus": 0,
+    "techPointCost": 0,
+    "isEquipped": false,
+    "weight": 7,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Protection</dt><dd>d4+2 (LI), d6 (HI), d6 (En)</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Action penalty</dt><dd>+1</dd><dt>Hide</dt><dd>+1</dd><dt>Mass</dt><dd>7 kg</dd><dt>Skill</dt><dd>Armor Operation</dd><dt>Progress level</dt><dd>7</dd><dt>Cost</dt><dd>2650 cr</dd><dt>Availability</dt><dd>Controlled</dd><dt>Source</dt><dd>Star Drive Arms &amp; Equipment Guide</dd></dl>"
+  },
+  "effects": [],
+  "folder": "yAFKsBF48Oky8Ye9",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Star Drive Arms & Equipment Guide",
+        "sourceFile": "data/armor_SD AEG.json",
+        "progressLevel": 7,
+        "cost": 2650,
+        "availability": "Controlled",
+        "mass": 7,
+        "concealment": 1,
+        "actionPenalty": 1,
+        "requiredSkill": "Armor Operation"
+      }
+    }
+  }
+}

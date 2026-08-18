@@ -1,0 +1,58 @@
+{
+  "_id": "nZGL57jWqpKhkFCt",
+  "_key": "!items!nZGL57jWqpKhkFCt",
+  "name": "Bola",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Ranged",
+    "damageType": "LI",
+    "damageCategory": "stun",
+    "firepower": "Ordinary",
+    "damageOrdinary": "d4s",
+    "damageGood": "d4+1s",
+    "damageAmazing": "d4+2s",
+    "damageBonus": 0,
+    "attackBonus": 1,
+    "attackAbility": "dex",
+    "requiredSkill": "str-throw",
+    "rangeClass": "Primitive",
+    "range": {
+      "short": 6,
+      "medium": 12,
+      "long": 30
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 4,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Athletics / Throw</dd><dt>Damage</dt><dd>d4s/d4+1s/d4+2s</dd><dt>Type</dt><dd>LI/O</dd><dt>Accuracy</dt><dd>1</dd><dt>Range</dt><dd>6/12/30</dd><dt>Firing modes</dt><dd>Full</dd><dt>Actions to ready</dt><dd>1</dd><dt>Mass</dt><dd>4 kg</dd><dt>Concealment</dt><dd>1</dd><dt>Cost</dt><dd>5 cr</dd><dt>Availability</dt><dd>Common</dd><dt>Source</dt><dd>Gamma World</dd></dl>"
+  },
+  "effects": [],
+  "folder": "k0TG00W1xDHOHNgB",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Gamma World",
+        "sourceFile": "data/weapon_Gamma World.json",
+        "progressLevel": 0,
+        "cost": 5,
+        "availability": "Common",
+        "mass": 4,
+        "concealment": 1,
+        "firingModes": "Full",
+        "actionsToReady": 1,
+        "clipSize": 0,
+        "clipCost": 0,
+        "skillId": 6,
+        "skillName": "Athletics / Throw",
+        "printedDamage": "d4s/d4+1s/d4+2s",
+        "printedRange": "6/12/30"
+      }
+    }
+  }
+}

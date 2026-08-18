@@ -1,0 +1,43 @@
+{
+  "_id": "RUX2kZTw8em4qSZx",
+  "_key": "!items!RUX2kZTw8em4qSZx",
+  "name": "Action Check Bonus (Diplomat)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Action Check Bonus",
+    "profession": "Diplomat",
+    "cost": 12,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 5,
+    "maxPurchases": 1,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "ActionCheckStep",
+    "effectAbility": "None",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Action Check Bonus</dd><dt>Profession</dt><dd>Diplomat</dd><dt>Minimum level</dt><dd>5</dd><dt>Cost</dt><dd>12 achievement points</dd><dt>Times purchasable</dt><dd>1</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "CQIHAuGvPryoNwTK",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "Action Check Bonus",
+        "profession": "Diplomat",
+        "minLevel": 5,
+        "cost": 12,
+        "maxPurchases": 1,
+        "folder": "Diplomat"
+      }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "_id": "Lj1wTwhHE9LEwNgV",
+  "_key": "!items!Lj1wTwhHE9LEwNgV",
+  "name": "Plate, partial (Gamma World)",
+  "type": "armor",
+  "img": "icons/svg/shield.svg",
+  "system": {
+    "armorType": "Heavy",
+    "protection": {
+      "li": "d6",
+      "hi": "d8-5",
+      "en": "d6-4"
+    },
+    "toughness": "Ordinary",
+    "speedPenalty": 0,
+    "skillPenalty": 2,
+    "resistanceModifierBonus": 0,
+    "techPointCost": 0,
+    "isEquipped": false,
+    "weight": 20,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Protection</dt><dd>d6 (LI), d8-5 (HI), d6-4 (En)</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Action penalty</dt><dd>+2</dd><dt>Hide</dt><dd>+1</dd><dt>Mass</dt><dd>20 kg</dd><dt>Skill</dt><dd>Armor Operation - combat armor</dd><dt>Cost</dt><dd>500 cr</dd><dt>Availability</dt><dd>Any</dd><dt>Source</dt><dd>Gamma World</dd></dl>"
+  },
+  "effects": [],
+  "folder": "2z85NSEcsi6g4DZQ",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Gamma World",
+        "sourceFile": "data/armor_Gamma World.json",
+        "progressLevel": 0,
+        "cost": 500,
+        "availability": "Any",
+        "mass": 20,
+        "concealment": 1,
+        "actionPenalty": 2,
+        "requiredSkill": "Armor Operation - combat armor"
+      }
+    }
+  }
+}

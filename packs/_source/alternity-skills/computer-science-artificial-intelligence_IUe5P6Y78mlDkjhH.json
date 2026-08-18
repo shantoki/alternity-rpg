@@ -1,0 +1,38 @@
+{
+  "_id": "IUe5P6Y78mlDkjhH",
+  "_key": "!items!IUe5P6Y78mlDkjhH",
+  "name": "Computer Science - Artificial Intelligence",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "skillId": "",
+    "linkedAbility": "INT",
+    "rank": 0,
+    "isBackground": false,
+    "specialisation": "",
+    "specialisationBonus": 2,
+    "effectiveRank": 0,
+    "targetNumber": 10,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill type</dt><dd>Specialty skill</dd><dt>Broad skill</dt><dd>Computer Science</dd><dt>Ability</dt><dd>INT</dd><dt>Cost</dt><dd>5 skill points</dd><dt>Untrained</dt><dd>Cannot be used untrained</dd><dt>Professions</dt><dd>Tech Op</dd><dt>Source</dt><dd>Dataware</dd></dl>"
+  },
+  "effects": [],
+  "folder": "3GkSh8yVLSGmrJFy",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Dataware",
+        "sourceFile": "data/skills_Dataware.json",
+        "sourceSkillId": 184,
+        "broadSkill": "Computer Science",
+        "isBroad": false,
+        "basePrice": 5,
+        "usableUntrained": false,
+        "professions": "Tech Op"
+      }
+    }
+  }
+}

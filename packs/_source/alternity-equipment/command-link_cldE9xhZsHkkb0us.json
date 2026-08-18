@@ -1,0 +1,41 @@
+{
+  "_id": "cldE9xhZsHkkb0us",
+  "_key": "!items!cldE9xhZsHkkb0us",
+  "name": "Command link",
+  "type": "personalEquipment",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "category": "Communications",
+    "progressLevel": 5,
+    "cost": 250,
+    "mass": 1,
+    "bonusSkill": "",
+    "bonusValue": 0,
+    "maxCharges": 0,
+    "currentCharges": 0,
+    "powerNotes": "",
+    "isEquipped": false,
+    "quantity": 1,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Class</dt><dd>Communications</dd><dt>Category</dt><dd>Communications</dd><dt>Mass</dt><dd>1 kg</dd><dt>Progress level</dt><dd>5</dd><dt>Cost</dt><dd>250 cr</dd><dt>Availability</dt><dd>Common</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "Ba3Km1zjqVDxREyM",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/equip_core.json",
+        "category": "Communications",
+        "class": "Communications",
+        "progressLevel": 5,
+        "cost": 250,
+        "availability": "Common",
+        "mass": 1
+      }
+    }
+  }
+}

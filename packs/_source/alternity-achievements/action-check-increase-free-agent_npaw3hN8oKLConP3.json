@@ -1,0 +1,43 @@
+{
+  "_id": "npaw3hN8oKLConP3",
+  "_key": "!items!npaw3hN8oKLConP3",
+  "name": "Action Check Increase (Free Agent)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Action Check Increase",
+    "profession": "Free Agent",
+    "cost": 3,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 3,
+    "maxPurchases": 3,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "ActionCheckScore",
+    "effectAbility": "None",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Action Check Increase</dd><dt>Profession</dt><dd>Free Agent</dd><dt>Minimum level</dt><dd>3</dd><dt>Cost</dt><dd>3 achievement points</dd><dt>Times purchasable</dt><dd>3</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "hCrh2XhPp4rxQb62",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "Action Check Increase",
+        "profession": "Free Agent",
+        "minLevel": 3,
+        "cost": 3,
+        "maxPurchases": 3,
+        "folder": "Free Agent"
+      }
+    }
+  }
+}

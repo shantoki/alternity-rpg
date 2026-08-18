@@ -1,0 +1,41 @@
+{
+  "_id": "KJQ1bW36nFOkWRaW",
+  "_key": "!items!KJQ1bW36nFOkWRaW",
+  "name": "Lighter",
+  "type": "personalEquipment",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "category": "Survival",
+    "progressLevel": 4,
+    "cost": 5,
+    "mass": 0,
+    "bonusSkill": "",
+    "bonusValue": 0,
+    "maxCharges": 0,
+    "currentCharges": 0,
+    "powerNotes": "",
+    "isEquipped": false,
+    "quantity": 1,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Class</dt><dd>Survival Gear</dd><dt>Category</dt><dd>Survival Gear</dd><dt>Progress level</dt><dd>4</dd><dt>Cost</dt><dd>5 cr</dd><dt>Availability</dt><dd>Common</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "Ba3Km1zjqVDxREyM",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/equip_core.json",
+        "category": "Survival Gear",
+        "class": "Survival Gear",
+        "progressLevel": 4,
+        "cost": 5,
+        "availability": "Common",
+        "mass": 0
+      }
+    }
+  }
+}

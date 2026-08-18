@@ -1,0 +1,43 @@
+{
+  "_id": "QlAz9a5bz0evsaZZ",
+  "_key": "!items!QlAz9a5bz0evsaZZ",
+  "name": "New Perk: Celebrity (Diplomat)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "New Perk",
+    "profession": "Diplomat",
+    "cost": 4,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 3,
+    "maxPurchases": 1,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "None",
+    "effectAbility": "None",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>New Perk</dd><dt>Profession</dt><dd>Diplomat</dd><dt>Minimum level</dt><dd>3</dd><dt>Cost</dt><dd>4 achievement points</dd><dt>Times purchasable</dt><dd>1</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "CQIHAuGvPryoNwTK",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "New Perk: Celebrity",
+        "profession": "Diplomat",
+        "minLevel": 3,
+        "cost": 4,
+        "maxPurchases": 1,
+        "folder": "Diplomat"
+      }
+    }
+  }
+}

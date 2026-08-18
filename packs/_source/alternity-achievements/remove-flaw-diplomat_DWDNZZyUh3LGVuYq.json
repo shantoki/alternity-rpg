@@ -1,0 +1,43 @@
+{
+  "_id": "DWDNZZyUh3LGVuYq",
+  "_key": "!items!DWDNZZyUh3LGVuYq",
+  "name": "Remove Flaw (Diplomat)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Remove Flaw",
+    "profession": "Diplomat",
+    "cost": 0,
+    "costIsDoubleFlawValue": true,
+    "minLevel": 2,
+    "maxPurchases": 1,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "None",
+    "effectAbility": "None",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Remove Flaw</dd><dt>Profession</dt><dd>Diplomat</dd><dt>Minimum level</dt><dd>2</dd><dt>Cost</dt><dd>Double the flaw&amp;#39;s value</dd><dt>Times purchasable</dt><dd>1</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "CQIHAuGvPryoNwTK",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "Remove Flaw",
+        "profession": "Diplomat",
+        "minLevel": 2,
+        "cost": 0,
+        "maxPurchases": 1,
+        "folder": "Diplomat"
+      }
+    }
+  }
+}

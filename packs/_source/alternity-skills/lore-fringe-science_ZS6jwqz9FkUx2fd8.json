@@ -1,0 +1,38 @@
+{
+  "_id": "ZS6jwqz9FkUx2fd8",
+  "_key": "!items!ZS6jwqz9FkUx2fd8",
+  "name": "Lore - Fringe Science",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "skillId": "",
+    "linkedAbility": "WIL",
+    "rank": 0,
+    "isBackground": false,
+    "specialisation": "",
+    "specialisationBonus": 2,
+    "effectiveRank": 0,
+    "targetNumber": 10,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill type</dt><dd>Specialty skill</dd><dt>Broad skill</dt><dd>Lore</dd><dt>Ability</dt><dd>WIL</dd><dt>Cost</dt><dd>3 skill points</dd><dt>Untrained</dt><dd>Cannot be used untrained</dd><dt>Professions</dt><dd>Free Agent, Tech Op</dd><dt>Source</dt><dd>Dark*Matter</dd></dl>"
+  },
+  "effects": [],
+  "folder": "QnujvcYtTGGRE5yZ",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Dark*Matter",
+        "sourceFile": "data/skills_Dark_Matter.json",
+        "sourceSkillId": 176,
+        "broadSkill": "Lore",
+        "isBroad": false,
+        "basePrice": 3,
+        "usableUntrained": false,
+        "professions": "Free Agent, Tech Op"
+      }
+    }
+  }
+}

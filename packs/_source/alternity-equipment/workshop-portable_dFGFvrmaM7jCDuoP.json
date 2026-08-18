@@ -1,0 +1,41 @@
+{
+  "_id": "dFGFvrmaM7jCDuoP",
+  "_key": "!items!dFGFvrmaM7jCDuoP",
+  "name": "Workshop, portable",
+  "type": "personalEquipment",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "category": "Professional",
+    "progressLevel": 6,
+    "cost": 1000,
+    "mass": 100,
+    "bonusSkill": "",
+    "bonusValue": 0,
+    "maxCharges": 0,
+    "currentCharges": 0,
+    "powerNotes": "",
+    "isEquipped": false,
+    "quantity": 1,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Class</dt><dd>Professional Equipment</dd><dt>Category</dt><dd>Professional Equipment</dd><dt>Mass</dt><dd>100 kg</dd><dt>Progress level</dt><dd>6</dd><dt>Cost</dt><dd>1000 cr</dd><dt>Availability</dt><dd>Common</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "Ba3Km1zjqVDxREyM",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/equip_core.json",
+        "category": "Professional Equipment",
+        "class": "Professional Equipment",
+        "progressLevel": 6,
+        "cost": 1000,
+        "availability": "Common",
+        "mass": 100
+      }
+    }
+  }
+}

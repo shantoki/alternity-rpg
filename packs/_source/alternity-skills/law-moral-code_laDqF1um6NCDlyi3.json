@@ -1,0 +1,38 @@
+{
+  "_id": "laDqF1um6NCDlyi3",
+  "_key": "!items!laDqF1um6NCDlyi3",
+  "name": "Law - Moral Code",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "skillId": "",
+    "linkedAbility": "INT",
+    "rank": 0,
+    "isBackground": false,
+    "specialisation": "",
+    "specialisationBonus": 2,
+    "effectiveRank": 0,
+    "targetNumber": 10,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill type</dt><dd>Specialty skill</dd><dt>Broad skill</dt><dd>Law</dd><dt>Ability</dt><dd>INT</dd><dt>Cost</dt><dd>3 skill points</dd><dt>Untrained</dt><dd>Can be used untrained</dd><dt>Professions</dt><dd>Combat Spec, Free Agent</dd><dt>Source</dt><dd>Gamma World</dd></dl>"
+  },
+  "effects": [],
+  "folder": "2h5KoYy3RjP0qIU0",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Gamma World",
+        "sourceFile": "data/skills_Gamma World.json",
+        "sourceSkillId": 199,
+        "broadSkill": "Law",
+        "isBroad": false,
+        "basePrice": 3,
+        "usableUntrained": true,
+        "professions": "Combat Spec, Free Agent"
+      }
+    }
+  }
+}

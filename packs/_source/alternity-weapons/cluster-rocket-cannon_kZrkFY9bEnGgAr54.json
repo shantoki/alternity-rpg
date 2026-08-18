@@ -1,0 +1,58 @@
+{
+  "_id": "kZrkFY9bEnGgAr54",
+  "_key": "!items!kZrkFY9bEnGgAr54",
+  "name": "Cluster Rocket, Cannon",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Heavy",
+    "damageType": "HI",
+    "damageCategory": "wound",
+    "firepower": "Good",
+    "damageOrdinary": "3d6w",
+    "damageGood": "3d4m",
+    "damageAmazing": "3d6m",
+    "damageBonus": 0,
+    "attackBonus": 0,
+    "attackAbility": "dex",
+    "requiredSkill": "str-indirect-fire",
+    "rangeClass": "Rifle",
+    "range": {
+      "short": 400,
+      "medium": 800,
+      "long": 2400
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 25,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Heavy Weapons / Indirect Fire</dd><dt>Damage</dt><dd>3d6w/3d4m/3d6m</dd><dt>Type</dt><dd>HI/G</dd><dt>Accuracy</dt><dd>0</dd><dt>Range</dt><dd>400/800/2400</dd><dt>Firing modes</dt><dd>Autofire</dd><dt>Actions to ready</dt><dd>1</dd><dt>Clip</dt><dd>60 rounds</dd><dt>Mass</dt><dd>25 kg</dd><dt>Concealment</dt><dd>Cannot be concealed</dd><dt>Progress level</dt><dd>8</dd><dt>Availability</dt><dd>Restricted</dd><dt>Source</dt><dd>Externals</dd></dl>"
+  },
+  "effects": [],
+  "folder": "SGmZ0eVls4LoTEBL",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Externals",
+        "sourceFile": "data/weapon_Externals.json",
+        "progressLevel": 8,
+        "cost": 0,
+        "availability": "Restricted",
+        "mass": 25,
+        "concealment": null,
+        "firingModes": "Autofire",
+        "actionsToReady": 1,
+        "clipSize": 60,
+        "clipCost": 0,
+        "skillId": 10,
+        "skillName": "Heavy Weapons / Indirect Fire",
+        "printedDamage": "3d6w/3d4m/3d6m",
+        "printedRange": "400/800/2400"
+      }
+    }
+  }
+}

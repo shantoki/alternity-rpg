@@ -1,0 +1,43 @@
+{
+  "_id": "nhvY7hOV2JQVjIcp",
+  "_key": "!items!nhvY7hOV2JQVjIcp",
+  "name": "CON Increase 2 (Free Agent)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Ability Score Increase",
+    "profession": "Free Agent",
+    "cost": 30,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 8,
+    "maxPurchases": 1,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "AbilityScore",
+    "effectAbility": "CON",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Ability Score Increase</dd><dt>Profession</dt><dd>Free Agent</dd><dt>Minimum level</dt><dd>8</dd><dt>Cost</dt><dd>30 achievement points</dd><dt>Times purchasable</dt><dd>1</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "hCrh2XhPp4rxQb62",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "CON Increase 2",
+        "profession": "Free Agent",
+        "minLevel": 8,
+        "cost": 30,
+        "maxPurchases": 1,
+        "folder": "Free Agent"
+      }
+    }
+  }
+}

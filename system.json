@@ -50,5 +50,131 @@
       "mutation": {},
       "achievementBenefit": {}
     }
-  }
+  },
+  "packs": [
+    {
+      "name": "alternity-weapons",
+      "label": "Alternity: Weapons",
+      "path": "packs/alternity-weapons",
+      "type": "Item",
+      "system": "alternity-v2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "alternity-armor",
+      "label": "Alternity: Armor",
+      "path": "packs/alternity-armor",
+      "type": "Item",
+      "system": "alternity-v2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "alternity-equipment",
+      "label": "Alternity: Equipment & Computers",
+      "path": "packs/alternity-equipment",
+      "type": "Item",
+      "system": "alternity-v2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "alternity-cybertech",
+      "label": "Alternity: Cybertech",
+      "path": "packs/alternity-cybertech",
+      "type": "Item",
+      "system": "alternity-v2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "alternity-skills",
+      "label": "Alternity: Skills",
+      "path": "packs/alternity-skills",
+      "type": "Item",
+      "system": "alternity-v2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "alternity-fx",
+      "label": "Alternity: Psionics & FX",
+      "path": "packs/alternity-fx",
+      "type": "Item",
+      "system": "alternity-v2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "alternity-achievements",
+      "label": "Alternity: Achievement Benefits",
+      "path": "packs/alternity-achievements",
+      "type": "Item",
+      "system": "alternity-v2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "alternity-species",
+      "label": "Alternity: Species",
+      "path": "packs/alternity-species",
+      "type": "JournalEntry",
+      "system": "alternity-v2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "alternity-templates",
+      "label": "Alternity: Career Templates",
+      "path": "packs/alternity-templates",
+      "type": "Actor",
+      "system": "alternity-v2",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    }
+  ],
+  "packFolders": [
+    {
+      "name": "Alternity Data",
+      "sorting": "m",
+      "color": "#5d4a8c",
+      "packs": [
+        "alternity-weapons",
+        "alternity-armor",
+        "alternity-equipment",
+        "alternity-cybertech"
+      ]
+    },
+    {
+      "name": "Alternity Rules",
+      "sorting": "m",
+      "color": "#4a6f8c",
+      "packs": [
+        "alternity-skills",
+        "alternity-fx",
+        "alternity-achievements",
+        "alternity-species",
+        "alternity-templates"
+      ]
+    }
+  ]
 }

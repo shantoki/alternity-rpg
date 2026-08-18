@@ -1,0 +1,38 @@
+{
+  "_id": "YUoC0zKXh7bNcAc5",
+  "_key": "!items!YUoC0zKXh7bNcAc5",
+  "name": "Athletics - Jump",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "skillId": "str-jump",
+    "linkedAbility": "STR",
+    "rank": 0,
+    "isBackground": false,
+    "specialisation": "",
+    "specialisationBonus": 2,
+    "effectiveRank": 0,
+    "targetNumber": 10,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill type</dt><dd>Specialty skill</dd><dt>Broad skill</dt><dd>Athletics</dd><dt>Ability</dt><dd>STR</dd><dt>Cost</dt><dd>1 skill points</dd><dt>Untrained</dt><dd>Can be used untrained</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "sGBb7uLiXegXpzFb",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/skills_core.json",
+        "sourceSkillId": 5,
+        "broadSkill": "Athletics",
+        "isBroad": false,
+        "basePrice": 1,
+        "usableUntrained": true,
+        "professions": ""
+      }
+    }
+  }
+}

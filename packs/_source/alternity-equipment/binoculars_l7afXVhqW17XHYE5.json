@@ -1,0 +1,41 @@
+{
+  "_id": "l7afXVhqW17XHYE5",
+  "_key": "!items!l7afXVhqW17XHYE5",
+  "name": "Binoculars",
+  "type": "personalEquipment",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "category": "Sensors",
+    "progressLevel": 4,
+    "cost": 225,
+    "mass": 1,
+    "bonusSkill": "",
+    "bonusValue": 0,
+    "maxCharges": 0,
+    "currentCharges": 0,
+    "powerNotes": "",
+    "isEquipped": false,
+    "quantity": 1,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Class</dt><dd>Sensors</dd><dt>Category</dt><dd>Sensors</dd><dt>Mass</dt><dd>1 kg</dd><dt>Progress level</dt><dd>4</dd><dt>Cost</dt><dd>225 cr</dd><dt>Availability</dt><dd>Common</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "Ba3Km1zjqVDxREyM",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/equip_core.json",
+        "category": "Sensors",
+        "class": "Sensors",
+        "progressLevel": 4,
+        "cost": 225,
+        "availability": "Common",
+        "mass": 1
+      }
+    }
+  }
+}

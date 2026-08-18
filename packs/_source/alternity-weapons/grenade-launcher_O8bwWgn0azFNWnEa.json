@@ -1,0 +1,58 @@
+{
+  "_id": "O8bwWgn0azFNWnEa",
+  "_key": "!items!O8bwWgn0azFNWnEa",
+  "name": "Grenade launcher",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Heavy",
+    "damageType": "LI",
+    "damageCategory": "wound",
+    "firepower": "Ordinary",
+    "damageOrdinary": "",
+    "damageGood": "",
+    "damageAmazing": "",
+    "damageBonus": 0,
+    "attackBonus": 0,
+    "attackAbility": "dex",
+    "requiredSkill": "str-indirect-fire",
+    "rangeClass": "Rifle",
+    "range": {
+      "short": 50,
+      "medium": 200,
+      "long": 350
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 2,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Heavy Weapons / Indirect Fire</dd><dt>Damage</dt><dd>As Load</dd><dt>Type</dt><dd>LI/O</dd><dt>Accuracy</dt><dd>0</dd><dt>Range</dt><dd>50/200/350</dd><dt>Firing modes</dt><dd>Full</dd><dt>Actions to ready</dt><dd>3</dd><dt>Clip</dt><dd>1 rounds</dd><dt>Mass</dt><dd>2 kg</dd><dt>Concealment</dt><dd>Cannot be concealed</dd><dt>Progress level</dt><dd>5</dd><dt>Cost</dt><dd>1000 cr</dd><dt>Availability</dt><dd>Military</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "dfw1Q0lPCIh8ySvk",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/weapon_Core.json",
+        "progressLevel": 5,
+        "cost": 1000,
+        "availability": "Military",
+        "mass": 2,
+        "concealment": null,
+        "firingModes": "Full",
+        "actionsToReady": 3,
+        "clipSize": 1,
+        "clipCost": 0,
+        "skillId": 10,
+        "skillName": "Heavy Weapons / Indirect Fire",
+        "printedDamage": "As Load",
+        "printedRange": "50/200/350"
+      }
+    }
+  }
+}

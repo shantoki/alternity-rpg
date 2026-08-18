@@ -1,0 +1,89 @@
+{
+  "_id": "X6gVhjyEc8Djt8Iz",
+  "_key": "!journal!X6gVhjyEc8Djt8Iz",
+  "name": "Sesheyan",
+  "pages": [
+    {
+      "_id": "YNr7OoeHmFO0Rm69",
+      "_key": "!journal.pages!X6gVhjyEc8Djt8Iz.YNr7OoeHmFO0Rm69",
+      "name": "Sesheyan",
+      "type": "text",
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "text": {
+        "format": 1,
+        "content": "<h2>Ability Ranges</h2><table><thead><tr><th>Ability</th><th>Minimum</th><th>Maximum</th></tr></thead><tbody><tr><th>STR</th><td>6</td><td>12</td></tr><tr><th>DEX</th><td>7</td><td>15</td></tr><tr><th>CON</th><td>4</td><td>10</td></tr><tr><th>INT</th><td>4</td><td>12</td></tr><tr><th>WIL</th><td>9</td><td>15</td></tr><tr><th>PER</th><td>4</td><td>12</td></tr></tbody></table><h2>Species Traits</h2><ul><li>Can fly</li><li>Can glide</li></ul><h2>Free Skills</h2><ul><li>Melee Weapons</li><li>Acrobatics</li><li>Stamina</li><li>Knowledge</li><li>Awareness</li><li>Interaction</li></ul><h2>Special Abilities</h2><ul><li>Sesheyan Flight Ability</li><li>Sesheyan Zero-G Training: equivalent of the Zero-G Training skill at rank 1</li><li>Sesheyan Falling: do not suffer impact damage if conscious and can use wings</li><li>Sesheyan Night Vision: ignore low illumination penalties</li><li>Sesheyan Light Sensitivity: +1/+2/+3 step penalty for ordinary/good/amazing illumination</li></ul><p><em>Source: Core Rulebook</em></p>"
+      },
+      "sort": 0,
+      "ownership": {
+        "default": -1
+      },
+      "flags": {}
+    }
+  ],
+  "folder": "TgY9cvkaCBBPjCVW",
+  "sort": 300,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/species.json",
+        "sourceSpeciesId": 3,
+        "abilityRanges": {
+          "STR": {
+            "min": 6,
+            "max": 12
+          },
+          "DEX": {
+            "min": 7,
+            "max": 15
+          },
+          "CON": {
+            "min": 4,
+            "max": 10
+          },
+          "INT": {
+            "min": 4,
+            "max": 12
+          },
+          "WIL": {
+            "min": 9,
+            "max": 15
+          },
+          "PER": {
+            "min": 4,
+            "max": 12
+          }
+        },
+        "bonusSkillPoints": 0,
+        "bonusBroadSkills": 0,
+        "durabilityMultiplier": 1,
+        "psionicMultiplier": 1,
+        "isPsionic": false,
+        "canGlide": true,
+        "canFly": true,
+        "actionCheckStep": 0,
+        "freeSkills": [
+          "Melee Weapons",
+          "Acrobatics",
+          "Stamina",
+          "Knowledge",
+          "Awareness",
+          "Interaction"
+        ],
+        "specialAbilities": [
+          "Sesheyan Flight Ability",
+          "Sesheyan Zero-G Training: equivalent of the Zero-G Training skill at rank 1",
+          "Sesheyan Falling: do not suffer impact damage if conscious and can use wings",
+          "Sesheyan Night Vision: ignore low illumination penalties",
+          "Sesheyan Light Sensitivity: +1/+2/+3 step penalty for ordinary/good/amazing illumination"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "_id": "vL5a2MSjc9vSL93a",
+  "_key": "!journal!vL5a2MSjc9vSL93a",
+  "name": "Riglia",
+  "pages": [
+    {
+      "_id": "2pIWMuxCNbMqq1Vf",
+      "_key": "!journal.pages!vL5a2MSjc9vSL93a.2pIWMuxCNbMqq1Vf",
+      "name": "Riglia",
+      "type": "text",
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "text": {
+        "format": 1,
+        "content": "<h2>Ability Ranges</h2><table><thead><tr><th>Ability</th><th>Minimum</th><th>Maximum</th></tr></thead><tbody><tr><th>STR</th><td>4</td><td>7</td></tr><tr><th>DEX</th><td>8</td><td>14</td></tr><tr><th>CON</th><td>4</td><td>7</td></tr><tr><th>INT</th><td>7</td><td>13</td></tr><tr><th>WIL</th><td>9</td><td>16</td></tr><tr><th>PER</th><td>4</td><td>11</td></tr></tbody></table><h2>Species Traits</h2><ul><li>Psionically active</li><li>Can fly</li><li>Can glide</li></ul><h2>Free Skills</h2><ul><li>Acrobatics</li><li>Stamina</li><li>Awareness</li><li>ESP</li><li>Telekinesis</li><li>Telepathy</li></ul><p><em>Source: Star*Drive</em></p>"
+      },
+      "sort": 0,
+      "ownership": {
+        "default": -1
+      },
+      "flags": {}
+    }
+  ],
+  "folder": "93xEtKfSGHjtSroo",
+  "sort": 1000,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Star*Drive",
+        "sourceFile": "data/species.json",
+        "sourceSpeciesId": 102,
+        "abilityRanges": {
+          "STR": {
+            "min": 4,
+            "max": 7
+          },
+          "DEX": {
+            "min": 8,
+            "max": 14
+          },
+          "CON": {
+            "min": 4,
+            "max": 7
+          },
+          "INT": {
+            "min": 7,
+            "max": 13
+          },
+          "WIL": {
+            "min": 9,
+            "max": 16
+          },
+          "PER": {
+            "min": 4,
+            "max": 11
+          }
+        },
+        "bonusSkillPoints": 0,
+        "bonusBroadSkills": 0,
+        "durabilityMultiplier": 1,
+        "psionicMultiplier": 1,
+        "isPsionic": true,
+        "canGlide": true,
+        "canFly": true,
+        "actionCheckStep": 0,
+        "freeSkills": [
+          "Acrobatics",
+          "Stamina",
+          "Awareness",
+          "ESP",
+          "Telekinesis",
+          "Telepathy"
+        ],
+        "specialAbilities": []
+      }
+    }
+  }
+}

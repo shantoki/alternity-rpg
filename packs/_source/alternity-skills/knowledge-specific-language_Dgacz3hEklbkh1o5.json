@@ -1,0 +1,38 @@
+{
+  "_id": "Dgacz3hEklbkh1o5",
+  "_key": "!items!Dgacz3hEklbkh1o5",
+  "name": "Knowledge - (specific language)",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "skillId": "int-language",
+    "linkedAbility": "INT",
+    "rank": 0,
+    "isBackground": false,
+    "specialisation": "",
+    "specialisationBonus": 2,
+    "effectiveRank": 0,
+    "targetNumber": 10,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill type</dt><dd>Specialty skill</dd><dt>Broad skill</dt><dd>Knowledge</dd><dt>Ability</dt><dd>INT</dd><dt>Cost</dt><dd>1 skill points</dd><dt>Untrained</dt><dd>Cannot be used untrained</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "sGBb7uLiXegXpzFb",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/skills_core.json",
+        "sourceSkillId": 73,
+        "broadSkill": "Knowledge",
+        "isBroad": false,
+        "basePrice": 1,
+        "usableUntrained": false,
+        "professions": ""
+      }
+    }
+  }
+}

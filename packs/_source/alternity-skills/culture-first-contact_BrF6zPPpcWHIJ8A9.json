@@ -1,0 +1,38 @@
+{
+  "_id": "BrF6zPPpcWHIJ8A9",
+  "_key": "!items!BrF6zPPpcWHIJ8A9",
+  "name": "Culture - First Contact",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "skillId": "",
+    "linkedAbility": "PER",
+    "rank": 0,
+    "isBackground": false,
+    "specialisation": "",
+    "specialisationBonus": 2,
+    "effectiveRank": 0,
+    "targetNumber": 10,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill type</dt><dd>Specialty skill</dd><dt>Broad skill</dt><dd>Culture</dd><dt>Ability</dt><dd>PER</dd><dt>Cost</dt><dd>2 skill points</dd><dt>Untrained</dt><dd>Cannot be used untrained</dd><dt>Professions</dt><dd>Diplomat</dd><dt>Source</dt><dd>Gamma World</dd></dl>"
+  },
+  "effects": [],
+  "folder": "2h5KoYy3RjP0qIU0",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Gamma World",
+        "sourceFile": "data/skills_Gamma World.json",
+        "sourceSkillId": 207,
+        "broadSkill": "Culture",
+        "isBroad": false,
+        "basePrice": 2,
+        "usableUntrained": false,
+        "professions": "Diplomat"
+      }
+    }
+  }
+}

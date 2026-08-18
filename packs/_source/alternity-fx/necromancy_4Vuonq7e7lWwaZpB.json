@@ -1,0 +1,68 @@
+{
+  "_id": "4Vuonq7e7lWwaZpB",
+  "_key": "!items!4Vuonq7e7lWwaZpB",
+  "name": "Necromancy",
+  "type": "fx",
+  "img": "icons/svg/aura.svg",
+  "system": {
+    "tradition": "Arcane Magic",
+    "broadSkill": "Arcane Magic",
+    "category": "Necromancy",
+    "linkedAbility": "WIL",
+    "isBroadSkill": true,
+    "cannotBeUsedUntrained": true,
+    "rank": 0,
+    "baseCost": 10,
+    "energyCostOverride": 0,
+    "maintenanceCost": "",
+    "hasExtendedDuration": false,
+    "requiresVisualRange": false,
+    "range": {
+      "short": 0,
+      "medium": 0,
+      "long": 0
+    },
+    "area": "",
+    "target": "",
+    "duration": "",
+    "resistance": "None",
+    "damage": {
+      "ordinary": "",
+      "good": "",
+      "amazing": ""
+    },
+    "damageType": "None",
+    "outcomes": {
+      "ordinary": "",
+      "good": "",
+      "amazing": ""
+    },
+    "criticalFailure": "",
+    "mentalCombatClass": "None",
+    "rankBenefits": [],
+    "trappings": {},
+    "limitations": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Tradition</dt><dd>Arcane Magic</dd><dt>Broad skill</dt><dd>Necromancy</dd><dt>Skill type</dt><dd>Broad skill</dd><dt>Ability</dt><dd>WIL</dd><dt>Cost</dt><dd>10 skill points</dd><dt>Untrained</dt><dd>Cannot be used untrained</dd><dt>Source</dt><dd>Beyond Science</dd></dl>"
+  },
+  "effects": [],
+  "folder": "l1I5WMrqhsem1SAO",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Beyond Science",
+        "sourceFile": "data/fxskills_Beyond Science.json",
+        "sourceSkillId": 5042,
+        "list": "Beyond Science",
+        "tradition": "Arcane Magic",
+        "broadSkill": "Necromancy",
+        "isBroad": true,
+        "basePrice": 10,
+        "energy": ""
+      }
+    }
+  }
+}

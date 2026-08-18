@@ -1,0 +1,58 @@
+{
+  "_id": "DfmX3xcadtFDF5xs",
+  "_key": "!items!DfmX3xcadtFDF5xs",
+  "name": "Rail gun",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Heavy",
+    "damageType": "HI",
+    "damageCategory": "wound",
+    "firepower": "Good",
+    "damageOrdinary": "d6w",
+    "damageGood": "d6+2w",
+    "damageAmazing": "d6m",
+    "damageBonus": 0,
+    "attackBonus": -1,
+    "attackAbility": "dex",
+    "requiredSkill": "str-direct-fire",
+    "rangeClass": "Rifle",
+    "range": {
+      "short": 150,
+      "medium": 500,
+      "long": 1500
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 20,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Heavy Weapons / Direct Fire</dd><dt>Damage</dt><dd>d6w/d6+2w/d6m</dd><dt>Type</dt><dd>HI/G</dd><dt>Accuracy</dt><dd>-1</dd><dt>Range</dt><dd>150/500/1500</dd><dt>Firing modes</dt><dd>Burst, Autofire</dd><dt>Actions to ready</dt><dd>4</dd><dt>Clip</dt><dd>90 rounds</dd><dt>Clip cost</dt><dd>100 cr</dd><dt>Mass</dt><dd>20 kg</dd><dt>Concealment</dt><dd>Cannot be concealed</dd><dt>Progress level</dt><dd>6</dd><dt>Cost</dt><dd>20000 cr</dd><dt>Availability</dt><dd>Restricted</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "dfw1Q0lPCIh8ySvk",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/weapon_Core.json",
+        "progressLevel": 6,
+        "cost": 20000,
+        "availability": "Restricted",
+        "mass": 20,
+        "concealment": null,
+        "firingModes": "Burst, Autofire",
+        "actionsToReady": 4,
+        "clipSize": 90,
+        "clipCost": 100,
+        "skillId": 9,
+        "skillName": "Heavy Weapons / Direct Fire",
+        "printedDamage": "d6w/d6+2w/d6m",
+        "printedRange": "150/500/1500"
+      }
+    }
+  }
+}

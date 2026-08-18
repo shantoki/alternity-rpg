@@ -1,0 +1,43 @@
+{
+  "_id": "LfAjuIxfkePhG7UW",
+  "_key": "!items!LfAjuIxfkePhG7UW",
+  "name": "Acquire Contact (Free Agent)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Acquire Contact",
+    "profession": "Free Agent",
+    "cost": 4,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 3,
+    "maxPurchases": 99,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "None",
+    "effectAbility": "None",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Acquire Contact</dd><dt>Profession</dt><dd>Free Agent</dd><dt>Minimum level</dt><dd>3</dd><dt>Cost</dt><dd>4 achievement points</dd><dt>Times purchasable</dt><dd>Unlimited</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "hCrh2XhPp4rxQb62",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "Acquire Contact",
+        "profession": "Free Agent",
+        "minLevel": 3,
+        "cost": 4,
+        "maxPurchases": 99,
+        "folder": "Free Agent"
+      }
+    }
+  }
+}

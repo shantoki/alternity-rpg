@@ -1,0 +1,68 @@
+{
+  "_id": "JDDdGBscfxDivogN",
+  "_key": "!items!JDDdGBscfxDivogN",
+  "name": "Alter Speed",
+  "type": "fx",
+  "img": "icons/svg/aura.svg",
+  "system": {
+    "tradition": "Psionic",
+    "broadSkill": "Psychoportation",
+    "category": "",
+    "linkedAbility": "WIL",
+    "isBroadSkill": false,
+    "cannotBeUsedUntrained": false,
+    "rank": 0,
+    "baseCost": 5,
+    "energyCostOverride": 0,
+    "maintenanceCost": "",
+    "hasExtendedDuration": false,
+    "requiresVisualRange": false,
+    "range": {
+      "short": 0,
+      "medium": 0,
+      "long": 0
+    },
+    "area": "",
+    "target": "",
+    "duration": "",
+    "resistance": "None",
+    "damage": {
+      "ordinary": "",
+      "good": "",
+      "amazing": ""
+    },
+    "damageType": "None",
+    "outcomes": {
+      "ordinary": "",
+      "good": "",
+      "amazing": ""
+    },
+    "criticalFailure": "",
+    "mentalCombatClass": "None",
+    "rankBenefits": [],
+    "trappings": {},
+    "limitations": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Tradition</dt><dd>Psionic</dd><dt>Broad skill</dt><dd>Psychoportation</dd><dt>Skill type</dt><dd>Specialty skill</dd><dt>Ability</dt><dd>WIL</dd><dt>Cost</dt><dd>5 skill points</dd><dt>Untrained</dt><dd>Can be used untrained</dd><dt>Source</dt><dd>Mindwalking</dd></dl>"
+  },
+  "effects": [],
+  "folder": "3x8f5S5JASHrAQkG",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Mindwalking",
+        "sourceFile": "data/psiskills_Mindwalking.json",
+        "sourceSkillId": 538,
+        "list": "Mindwalking",
+        "tradition": "Psionic",
+        "broadSkill": "Psychoportation",
+        "isBroad": false,
+        "basePrice": 5,
+        "energy": ""
+      }
+    }
+  }
+}

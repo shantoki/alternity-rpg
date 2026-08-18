@@ -1,0 +1,68 @@
+{
+  "_id": "U5aoyeRMtfxJZE4b",
+  "_key": "!items!U5aoyeRMtfxJZE4b",
+  "name": "Transmutation",
+  "type": "fx",
+  "img": "icons/svg/aura.svg",
+  "system": {
+    "tradition": "Arcane Magic",
+    "broadSkill": "Arcane Magic",
+    "category": "Hermeticism",
+    "linkedAbility": "INT",
+    "isBroadSkill": false,
+    "cannotBeUsedUntrained": true,
+    "rank": 0,
+    "baseCost": 4,
+    "energyCostOverride": 0,
+    "maintenanceCost": "",
+    "hasExtendedDuration": false,
+    "requiresVisualRange": false,
+    "range": {
+      "short": 0,
+      "medium": 0,
+      "long": 0
+    },
+    "area": "",
+    "target": "",
+    "duration": "",
+    "resistance": "None",
+    "damage": {
+      "ordinary": "",
+      "good": "",
+      "amazing": ""
+    },
+    "damageType": "None",
+    "outcomes": {
+      "ordinary": "",
+      "good": "",
+      "amazing": ""
+    },
+    "criticalFailure": "",
+    "mentalCombatClass": "None",
+    "rankBenefits": [],
+    "trappings": {},
+    "limitations": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Tradition</dt><dd>Arcane Magic</dd><dt>Broad skill</dt><dd>Hermeticism</dd><dt>Skill type</dt><dd>Specialty skill</dd><dt>Ability</dt><dd>INT</dd><dt>Cost</dt><dd>4 skill points</dd><dt>Energy</dt><dd>1,2</dd><dt>Untrained</dt><dd>Cannot be used untrained</dd><dt>Source</dt><dd>Beyond Science|Dark*Matter</dd></dl>"
+  },
+  "effects": [],
+  "folder": "wEL4HQEZ8Gb6QbDa",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Beyond Science|Dark*Matter",
+        "sourceFile": "data/fxskills_Beyond Science_Dark_Matter.json",
+        "sourceSkillId": 5025,
+        "list": "Beyond Science|Dark*Matter",
+        "tradition": "Arcane Magic",
+        "broadSkill": "Hermeticism",
+        "isBroad": false,
+        "basePrice": 4,
+        "energy": "1,2"
+      }
+    }
+  }
+}

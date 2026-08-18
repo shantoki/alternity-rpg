@@ -1,0 +1,58 @@
+{
+  "_id": "Zl3a8gEhDmnQB4rh",
+  "_key": "!items!Zl3a8gEhDmnQB4rh",
+  "name": "Bantam, antiair",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Heavy",
+    "damageType": "HI",
+    "damageCategory": "wound",
+    "firepower": "Good",
+    "damageOrdinary": "d4w",
+    "damageGood": "d4+2w",
+    "damageAmazing": "d4m",
+    "damageBonus": 0,
+    "attackBonus": -2,
+    "attackAbility": "dex",
+    "requiredSkill": "str-indirect-fire",
+    "rangeClass": "Rifle",
+    "range": {
+      "short": 100,
+      "medium": 800,
+      "long": 4000
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 3,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Heavy Weapons / Indirect Fire</dd><dt>Damage</dt><dd>d4w/d4+2w/d4m</dd><dt>Type</dt><dd>HI/G</dd><dt>Accuracy</dt><dd>-2</dd><dt>Range</dt><dd>100/800/4000</dd><dt>Firing modes</dt><dd>Full</dd><dt>Actions to ready</dt><dd>2</dd><dt>Mass</dt><dd>3 kg</dd><dt>Concealment</dt><dd>1</dd><dt>Progress level</dt><dd>6</dd><dt>Cost</dt><dd>1000 cr</dd><dt>Availability</dt><dd>Restricted</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "dfw1Q0lPCIh8ySvk",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/weapon_Core.json",
+        "progressLevel": 6,
+        "cost": 1000,
+        "availability": "Restricted",
+        "mass": 3,
+        "concealment": 1,
+        "firingModes": "Full",
+        "actionsToReady": 2,
+        "clipSize": 0,
+        "clipCost": 0,
+        "skillId": 10,
+        "skillName": "Heavy Weapons / Indirect Fire",
+        "printedDamage": "d4w/d4+2w/d4m",
+        "printedRange": "100/800/4000"
+      }
+    }
+  }
+}

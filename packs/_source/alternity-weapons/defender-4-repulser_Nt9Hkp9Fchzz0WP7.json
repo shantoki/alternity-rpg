@@ -1,0 +1,58 @@
+{
+  "_id": "Nt9Hkp9Fchzz0WP7",
+  "_key": "!items!Nt9Hkp9Fchzz0WP7",
+  "name": "Defender 4 Repulser",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Ranged",
+    "damageType": "En",
+    "damageCategory": "stun",
+    "firepower": "Ordinary",
+    "damageOrdinary": "d6s",
+    "damageGood": "d6w",
+    "damageAmazing": "d4m",
+    "damageBonus": 0,
+    "attackBonus": 0,
+    "attackAbility": "dex",
+    "requiredSkill": "dex-smg",
+    "rangeClass": "SMG",
+    "range": {
+      "short": 40,
+      "medium": 80,
+      "long": 200
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 3.75,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Modern Ranged Weapons / SMG</dd><dt>Damage</dt><dd>d6s/d6w/d4m</dd><dt>Type</dt><dd>En/O</dd><dt>Accuracy</dt><dd>0</dd><dt>Range</dt><dd>40/80/200</dd><dt>Firing modes</dt><dd>Full, Burst, Autofire</dd><dt>Actions to ready</dt><dd>3</dd><dt>Clip</dt><dd>30 rounds</dd><dt>Clip cost</dt><dd>100 cr</dd><dt>Mass</dt><dd>3.75 kg</dd><dt>Concealment</dt><dd>Cannot be concealed</dd><dt>Progress level</dt><dd>7</dd><dt>Cost</dt><dd>1825 cr</dd><dt>Availability</dt><dd>Restricted</dd><dt>Source</dt><dd>Dragon Magazine 273</dd></dl>"
+  },
+  "effects": [],
+  "folder": "yrAKpKf349CCdQVc",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Dragon Magazine 273",
+        "sourceFile": "data/weapon_Dragon 273.json",
+        "progressLevel": 7,
+        "cost": 1825,
+        "availability": "Restricted",
+        "mass": 3.75,
+        "concealment": null,
+        "firingModes": "Full, Burst, Autofire",
+        "actionsToReady": 3,
+        "clipSize": 30,
+        "clipCost": 100,
+        "skillId": 33,
+        "skillName": "Modern Ranged Weapons / SMG",
+        "printedDamage": "d6s/d6w/d4m",
+        "printedRange": "40/80/200"
+      }
+    }
+  }
+}

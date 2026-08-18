@@ -1,0 +1,43 @@
+{
+  "_id": "1xkVmhe1XPw7FYQx",
+  "_key": "!items!1xkVmhe1XPw7FYQx",
+  "name": "New Perk: Tough as Nails (Combat Spec)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "New Perk",
+    "profession": "Combat Spec",
+    "cost": 5,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 3,
+    "maxPurchases": 1,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "None",
+    "effectAbility": "None",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>New Perk</dd><dt>Profession</dt><dd>Combat Spec</dd><dt>Minimum level</dt><dd>3</dd><dt>Cost</dt><dd>5 achievement points</dd><dt>Times purchasable</dt><dd>1</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "INB5v5SqkWKen2r4",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "New Perk: Tough as Nails",
+        "profession": "Combat Spec",
+        "minLevel": 3,
+        "cost": 5,
+        "maxPurchases": 1,
+        "folder": "Combat Spec"
+      }
+    }
+  }
+}

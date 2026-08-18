@@ -1,0 +1,43 @@
+{
+  "_id": "dymxXPAjZtCBv1jW",
+  "_key": "!items!dymxXPAjZtCBv1jW",
+  "name": "Wound Rating Increase (Free Agent)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Durability Increase",
+    "profession": "Free Agent",
+    "cost": 7,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 4,
+    "maxPurchases": 2,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "WoundRating",
+    "effectAbility": "None",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Durability Increase</dd><dt>Profession</dt><dd>Free Agent</dd><dt>Minimum level</dt><dd>4</dd><dt>Cost</dt><dd>7 achievement points</dd><dt>Times purchasable</dt><dd>2</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "hCrh2XhPp4rxQb62",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "Wound Rating Increase",
+        "profession": "Free Agent",
+        "minLevel": 4,
+        "cost": 7,
+        "maxPurchases": 2,
+        "folder": "Free Agent"
+      }
+    }
+  }
+}

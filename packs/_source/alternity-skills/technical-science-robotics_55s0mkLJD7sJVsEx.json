@@ -1,0 +1,38 @@
+{
+  "_id": "55s0mkLJD7sJVsEx",
+  "_key": "!items!55s0mkLJD7sJVsEx",
+  "name": "Technical Science - Robotics",
+  "type": "skill",
+  "img": "icons/svg/book.svg",
+  "system": {
+    "skillId": "",
+    "linkedAbility": "INT",
+    "rank": 0,
+    "isBackground": false,
+    "specialisation": "",
+    "specialisationBonus": 2,
+    "effectiveRank": 0,
+    "targetNumber": 10,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill type</dt><dd>Specialty skill</dd><dt>Broad skill</dt><dd>Technical Science</dd><dt>Ability</dt><dd>INT</dd><dt>Cost</dt><dd>3 skill points</dd><dt>Untrained</dt><dd>Can be used untrained</dd><dt>Professions</dt><dd>Tech Op</dd><dt>Source</dt><dd>Dataware</dd></dl>"
+  },
+  "effects": [],
+  "folder": "3GkSh8yVLSGmrJFy",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Dataware",
+        "sourceFile": "data/skills_Dataware.json",
+        "sourceSkillId": 185,
+        "broadSkill": "Technical Science",
+        "isBroad": false,
+        "basePrice": 3,
+        "usableUntrained": true,
+        "professions": "Tech Op"
+      }
+    }
+  }
+}

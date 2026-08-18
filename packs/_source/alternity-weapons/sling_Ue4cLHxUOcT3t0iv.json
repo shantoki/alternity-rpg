@@ -1,0 +1,58 @@
+{
+  "_id": "Ue4cLHxUOcT3t0iv",
+  "_key": "!items!Ue4cLHxUOcT3t0iv",
+  "name": "Sling",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Ranged",
+    "damageType": "LI",
+    "damageCategory": "stun",
+    "firepower": "Ordinary",
+    "damageOrdinary": "d4s",
+    "damageGood": "d4+2s",
+    "damageAmazing": "d4w",
+    "damageBonus": 0,
+    "attackBonus": 1,
+    "attackAbility": "dex",
+    "requiredSkill": "dex-sling",
+    "rangeClass": "Primitive",
+    "range": {
+      "short": 10,
+      "medium": 20,
+      "long": 60
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 0.5,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Primitive Ranged Weapons / Sling</dd><dt>Damage</dt><dd>d4s/d4+2s/d4w</dd><dt>Type</dt><dd>LI/O</dd><dt>Accuracy</dt><dd>1</dd><dt>Range</dt><dd>10/20/60</dd><dt>Firing modes</dt><dd>Full</dd><dt>Actions to ready</dt><dd>2</dd><dt>Clip</dt><dd>10 rounds</dd><dt>Clip cost</dt><dd>5 cr</dd><dt>Mass</dt><dd>0.5 kg</dd><dt>Concealment</dt><dd>2</dd><dt>Cost</dt><dd>25 cr</dd><dt>Availability</dt><dd>Any</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "dfw1Q0lPCIh8ySvk",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/weapon_Core.json",
+        "progressLevel": 0,
+        "cost": 25,
+        "availability": "Any",
+        "mass": 0.5,
+        "concealment": 2,
+        "firingModes": "Full",
+        "actionsToReady": 2,
+        "clipSize": 10,
+        "clipCost": 5,
+        "skillId": 38,
+        "skillName": "Primitive Ranged Weapons / Sling",
+        "printedDamage": "d4s/d4+2s/d4w",
+        "printedRange": "10/20/60"
+      }
+    }
+  }
+}

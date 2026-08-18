@@ -1,0 +1,83 @@
+{
+  "_id": "9noXPzJOPieQrAeA",
+  "_key": "!journal!9noXPzJOPieQrAeA",
+  "name": "Xe'reen",
+  "pages": [
+    {
+      "_id": "E8CJ3vSMwP3W1jd6",
+      "_key": "!journal.pages!9noXPzJOPieQrAeA.E8CJ3vSMwP3W1jd6",
+      "name": "Xe'reen",
+      "type": "text",
+      "title": {
+        "show": true,
+        "level": 1
+      },
+      "text": {
+        "format": 1,
+        "content": "<h2>Ability Ranges</h2><table><thead><tr><th>Ability</th><th>Minimum</th><th>Maximum</th></tr></thead><tbody><tr><th>STR</th><td>6</td><td>12</td></tr><tr><th>DEX</th><td>8</td><td>15</td></tr><tr><th>CON</th><td>8</td><td>15</td></tr><tr><th>INT</th><td>4</td><td>12</td></tr><tr><th>WIL</th><td>6</td><td>14</td></tr><tr><th>PER</th><td>4</td><td>10</td></tr></tbody></table><h2>Free Skills</h2><ul><li>Unarmed Attack</li><li>Acrobatics</li><li>Movement</li><li>Stamina</li><li>Awareness</li><li>Resolve</li></ul><p><em>Source: Star*Drive</em></p>"
+      },
+      "sort": 0,
+      "ownership": {
+        "default": -1
+      },
+      "flags": {}
+    }
+  ],
+  "folder": "93xEtKfSGHjtSroo",
+  "sort": 1100,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Star*Drive",
+        "sourceFile": "data/species.json",
+        "sourceSpeciesId": 104,
+        "abilityRanges": {
+          "STR": {
+            "min": 6,
+            "max": 12
+          },
+          "DEX": {
+            "min": 8,
+            "max": 15
+          },
+          "CON": {
+            "min": 8,
+            "max": 15
+          },
+          "INT": {
+            "min": 4,
+            "max": 12
+          },
+          "WIL": {
+            "min": 6,
+            "max": 14
+          },
+          "PER": {
+            "min": 4,
+            "max": 10
+          }
+        },
+        "bonusSkillPoints": 0,
+        "bonusBroadSkills": 0,
+        "durabilityMultiplier": 1,
+        "psionicMultiplier": 1,
+        "isPsionic": false,
+        "canGlide": false,
+        "canFly": false,
+        "actionCheckStep": 0,
+        "freeSkills": [
+          "Unarmed Attack",
+          "Acrobatics",
+          "Movement",
+          "Stamina",
+          "Awareness",
+          "Resolve"
+        ],
+        "specialAbilities": []
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "_id": "o3s17j7Vvac0W65I",
+  "_key": "!items!o3s17j7Vvac0W65I",
+  "name": "Candle",
+  "type": "personalEquipment",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "category": "Survival",
+    "progressLevel": 1,
+    "cost": 1,
+    "mass": 0,
+    "bonusSkill": "",
+    "bonusValue": 0,
+    "maxCharges": 0,
+    "currentCharges": 0,
+    "powerNotes": "",
+    "isEquipped": false,
+    "quantity": 1,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Class</dt><dd>Survival Gear</dd><dt>Category</dt><dd>Survival Gear</dd><dt>Progress level</dt><dd>1</dd><dt>Cost</dt><dd>1 cr</dd><dt>Availability</dt><dd>Common</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "Ba3Km1zjqVDxREyM",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/equip_core.json",
+        "category": "Survival Gear",
+        "class": "Survival Gear",
+        "progressLevel": 1,
+        "cost": 1,
+        "availability": "Common",
+        "mass": 0
+      }
+    }
+  }
+}

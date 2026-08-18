@@ -1,0 +1,43 @@
+{
+  "_id": "RZdRPfnoWNXVtnQZ",
+  "_key": "!items!RZdRPfnoWNXVtnQZ",
+  "name": "Remove Flaw (Combat Spec)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Remove Flaw",
+    "profession": "Combat Spec",
+    "cost": 0,
+    "costIsDoubleFlawValue": true,
+    "minLevel": 6,
+    "maxPurchases": 1,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "None",
+    "effectAbility": "None",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Remove Flaw</dd><dt>Profession</dt><dd>Combat Spec</dd><dt>Minimum level</dt><dd>6</dd><dt>Cost</dt><dd>Double the flaw&amp;#39;s value</dd><dt>Times purchasable</dt><dd>1</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "INB5v5SqkWKen2r4",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "Remove Flaw",
+        "profession": "Combat Spec",
+        "minLevel": 6,
+        "cost": 0,
+        "maxPurchases": 1,
+        "folder": "Combat Spec"
+      }
+    }
+  }
+}

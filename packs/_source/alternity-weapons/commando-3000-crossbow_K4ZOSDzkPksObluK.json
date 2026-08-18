@@ -1,0 +1,58 @@
+{
+  "_id": "K4ZOSDzkPksObluK",
+  "_key": "!items!K4ZOSDzkPksObluK",
+  "name": "Commando 3000 Crossbow",
+  "type": "weapon",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "weaponType": "Ranged",
+    "damageType": "HI",
+    "damageCategory": "wound",
+    "firepower": "Ordinary",
+    "damageOrdinary": "d6+1w",
+    "damageGood": "d8+1w",
+    "damageAmazing": "d6m",
+    "damageBonus": 0,
+    "attackBonus": 0,
+    "attackAbility": "dex",
+    "requiredSkill": "dex-bow",
+    "rangeClass": "Primitive",
+    "range": {
+      "short": 60,
+      "medium": 120,
+      "long": 300
+    },
+    "techPointCost": 0,
+    "isEquipped": false,
+    "quantity": 1,
+    "weight": 2,
+    "description": "<dl class=\"alternity-source-stats\"><dt>Skill</dt><dd>Primitive Ranged Weapons / Bow</dd><dt>Damage</dt><dd>d6+1w/d8+1w/d6m</dd><dt>Type</dt><dd>HI/O</dd><dt>Accuracy</dt><dd>0</dd><dt>Range</dt><dd>60/120/300</dd><dt>Firing modes</dt><dd>Full</dd><dt>Actions to ready</dt><dd>1</dd><dt>Clip</dt><dd>1 rounds</dd><dt>Clip cost</dt><dd>25 cr</dd><dt>Mass</dt><dd>2 kg</dd><dt>Concealment</dt><dd>Cannot be concealed</dd><dt>Progress level</dt><dd>7</dd><dt>Cost</dt><dd>950 cr</dd><dt>Availability</dt><dd>Controlled</dd><dt>Source</dt><dd>Star Drive Arms &amp; Equipment Guide</dd></dl>"
+  },
+  "effects": [],
+  "folder": "fvzufl27vezs394E",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Star Drive Arms & Equipment Guide",
+        "sourceFile": "data/weapon_SD AEG.json",
+        "progressLevel": 7,
+        "cost": 950,
+        "availability": "Controlled",
+        "mass": 2,
+        "concealment": null,
+        "firingModes": "Full",
+        "actionsToReady": 1,
+        "clipSize": 1,
+        "clipCost": 25,
+        "skillId": 35,
+        "skillName": "Primitive Ranged Weapons / Bow",
+        "printedDamage": "d6+1w/d8+1w/d6m",
+        "printedRange": "60/120/300"
+      }
+    }
+  }
+}

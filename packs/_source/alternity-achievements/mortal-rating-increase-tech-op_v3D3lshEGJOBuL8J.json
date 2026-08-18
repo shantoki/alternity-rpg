@@ -1,0 +1,43 @@
+{
+  "_id": "v3D3lshEGJOBuL8J",
+  "_key": "!items!v3D3lshEGJOBuL8J",
+  "name": "Mortal Rating Increase (Tech Op)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Durability Increase",
+    "profession": "Tech Op",
+    "cost": 20,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 6,
+    "maxPurchases": 1,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "MortalRating",
+    "effectAbility": "None",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Durability Increase</dd><dt>Profession</dt><dd>Tech Op</dd><dt>Minimum level</dt><dd>6</dd><dt>Cost</dt><dd>20 achievement points</dd><dt>Times purchasable</dt><dd>1</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "kZWIqXCMRPD0qwn8",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "Mortal Rating Increase",
+        "profession": "Tech Op",
+        "minLevel": 6,
+        "cost": 20,
+        "maxPurchases": 1,
+        "folder": "Tech Op"
+      }
+    }
+  }
+}

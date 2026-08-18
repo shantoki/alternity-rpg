@@ -1,0 +1,43 @@
+{
+  "_id": "1aA20a86FJXsoE9D",
+  "_key": "!items!1aA20a86FJXsoE9D",
+  "name": "DEX Increase 2 (Combat Spec)",
+  "type": "achievementBenefit",
+  "img": "icons/svg/lightning.svg",
+  "system": {
+    "benefitType": "Ability Score Increase",
+    "profession": "Combat Spec",
+    "cost": 30,
+    "costIsDoubleFlawValue": false,
+    "minLevel": 8,
+    "maxPurchases": 1,
+    "timesPurchased": 0,
+    "allowedLevels": [],
+    "onePerLevel": false,
+    "effectTarget": "AbilityScore",
+    "effectAbility": "DEX",
+    "effectValue": 1,
+    "prerequisites": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Benefit</dt><dd>Ability Score Increase</dd><dt>Profession</dt><dd>Combat Spec</dd><dt>Minimum level</dt><dd>8</dd><dt>Cost</dt><dd>30 achievement points</dd><dt>Times purchasable</dt><dd>1</dd><dt>Source</dt><dd>Core Rulebook</dd></dl>"
+  },
+  "effects": [],
+  "folder": "INB5v5SqkWKen2r4",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/achieve.json",
+        "achievement": "DEX Increase 2",
+        "profession": "Combat Spec",
+        "minLevel": 8,
+        "cost": 30,
+        "maxPurchases": 1,
+        "folder": "Combat Spec"
+      }
+    }
+  }
+}
