@@ -3496,6 +3496,8 @@ async function registerAlternitySheet() {
         "systems/alternity/templates/roll/roll-card.hbs",
         "systems/alternity/templates/roll/damage-card.hbs",
         "systems/alternity/templates/roll/armor-card.hbs",
+        "systems/alternity/templates/roll/apply-damage-dialog.hbs",
+        "systems/alternity/templates/roll/manual-damage-dialog.hbs",
         "systems/alternity/templates/roll/action-check-card.hbs",
     ]);
 

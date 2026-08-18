@@ -74,6 +74,13 @@ export const renderTemplate = (...args) => {
     return fn(...args);
 };
 
+/** Mirrors the production shim: resolved per call, throws when DialogV2 is absent. */
+export const dialogWait = (config) => {
+    const DialogV2 = globalThis.foundry?.applications?.api?.DialogV2;
+    if (!DialogV2) throw new Error('[Alternity] foundry.applications.api.DialogV2 is unavailable.');
+    return DialogV2.wait(config);
+};
+
 export const fromUuid = (...args) => {
     const fn = globalThis.foundry?.utils?.fromUuid || globalThis.fromUuid;
     return fn(...args);

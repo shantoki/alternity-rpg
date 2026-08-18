@@ -117,6 +117,43 @@ export const renderLog = [];
 export const notifications = { warn: [], info: [], error: [] };
 
 // ---------------------------------------------------------------------------
+// Dialogs
+// ---------------------------------------------------------------------------
+
+/** Answers `DialogV2.wait` hands back, in order. Refilled by `queueDialogs`. */
+let scriptedDialogs = [];
+
+/** Every dialog configuration the code under test asked for. */
+export const dialogLog = [];
+
+/**
+ * Fix what the next dialogs return.
+ *
+ * Each value is an object of form values keyed by control `name`, or `null` for a
+ * dialog the user dismissed. An unscripted dialog counts as dismissed, so a test
+ * that forgets to queue one sees a cancellation rather than a phantom submission.
+ *
+ * The values are handed to the *real* accept-button callback through a stand-in
+ * form, so `_readFormValues` is exercised rather than bypassed — that function is
+ * the one piece of dialog plumbing with a Foundry-generation hazard in it.
+ *
+ * @param {...(object|null)} answers
+ */
+export function queueDialogs(...answers) {
+    scriptedDialogs = [...answers];
+}
+
+/** A form whose named controls are the scripted answer. */
+function _stubForm(values) {
+    const controls = Object.entries(values).map(([name, value]) => (
+        typeof value === 'boolean'
+            ? { name, type: 'checkbox', checked: value }
+            : { name, type: 'text', value: String(value) }
+    ));
+    return { querySelectorAll: () => controls };
+}
+
+// ---------------------------------------------------------------------------
 // Installation
 // ---------------------------------------------------------------------------
 
@@ -148,7 +185,7 @@ export function installRollHarness() {
         },
     };
 
-    globalThis.canvas = { tokens: { controlled: [] } };
+    globalThis.canvas = { tokens: { controlled: [], placeables: [] } };
 
     globalThis.game = {
         // Localization is identity-with-interpolation: a test asserting on a
@@ -159,6 +196,9 @@ export function installRollHarness() {
         },
         user: { targets: new Set(), name: 'Tester' },
         combat: null,
+        // The actor picker offers world actors as well as placed tokens, which is
+        // the only reason it can reach an NPC that never got a token.
+        actors: { contents: [] },
     };
 
     // Templates render to a marker holding their context, so a test can inspect
@@ -168,6 +208,19 @@ export function installRollHarness() {
             renderTemplate: async (path, context) => {
                 renderLog.push({ path, context });
                 return `<!--${path}-->`;
+            },
+        },
+    };
+
+    globalThis.foundry.applications.api = {
+        DialogV2: {
+            wait: async (config) => {
+                dialogLog.push(config);
+                const answer = scriptedDialogs.length ? scriptedDialogs.shift() : null;
+                if (!answer) return null;   // dismissed — DialogV2 resolves null
+                const accept = config.buttons?.find((b) => b.action === 'accept')
+                    ?? config.buttons?.[0];
+                return accept?.callback?.({}, { form: _stubForm(answer) }, {}) ?? null;
             },
         },
     };
@@ -186,10 +239,15 @@ export function resetHarness() {
     notifications.info.length = 0;
     notifications.error.length = 0;
     scriptedResults = [];
+    scriptedDialogs = [];
+    dialogLog.length = 0;
     registry.clear();
+    tokenCount = 0;
     globalThis.game.user.targets = new Set();
     globalThis.game.combat = null;
+    globalThis.game.actors = { contents: [] };
     globalThis.canvas.tokens.controlled = [];
+    globalThis.canvas.tokens.placeables = [];
 }
 
 /**
@@ -245,4 +303,40 @@ export function makeActor(options = {}) {
 /** Put a token in front of the user's crosshairs, so target modifiers apply. */
 export function targetActor(actor) {
     globalThis.game.user.targets = new Set([{ actor }]);
+}
+
+/** Tokens handed out by `placeToken`, so each gets its own uuid. */
+let tokenCount = 0;
+
+/**
+ * Put a token for an actor on the scene, optionally selected or targeted.
+ *
+ * The token's own uuid is registered with `fromUuid`, resolving to something with an
+ * `.actor` — which is what a TokenDocument does, and what the apply paths rely on so
+ * an unlinked token takes damage on its own delta rather than on the world actor.
+ *
+ * @param {object} actor
+ * @param {object} [options]
+ * @param {string}  [options.name]
+ * @param {boolean} [options.controlled=false]
+ * @param {boolean} [options.targeted=false]
+ * @returns {object} The placed token.
+ */
+export function placeToken(actor, options = {}) {
+    const { name, controlled = false, targeted = false } = options;
+    const token = {
+        name: name ?? actor.name,
+        actor,
+        document: { uuid: `Scene.scene-1.Token.token-${++tokenCount}` },
+    };
+    registry.set(token.document.uuid, { actor });
+    globalThis.canvas.tokens.placeables.push(token);
+    if (controlled) globalThis.canvas.tokens.controlled.push(token);
+    if (targeted) globalThis.game.user.targets.add(token);
+    return token;
+}
+
+/** Put actors in the world collection, so the actor picker can offer them. */
+export function worldActors(...actors) {
+    globalThis.game.actors = { contents: [...actors] };
 }

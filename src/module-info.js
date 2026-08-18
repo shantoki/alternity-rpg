@@ -135,6 +135,27 @@ export const renderTemplate = (...args) => {
     return fn(...args);
 };
 
+/**
+ * Await a dialog and hand back whatever its accepting button produced.
+ *
+ * Resolved per call for the same reason `renderTemplate` is, and reached through
+ * the `foundry.applications.api` namespace rather than the bare `Dialog` global,
+ * which is deprecated from v13. There is no v12-global fallback: `DialogV2` has
+ * existed since v12 — the same release that brought the ApplicationV2 sheets this
+ * whole system is built on. It throws when the class is genuinely absent rather
+ * than resolving to nothing, so a caller can say so instead of appearing to open a
+ * prompt the user never saw.
+ *
+ * @param {object} config - A DialogV2 configuration.
+ * @returns {Promise<*>} The accepting button's callback value, or null when the
+ *          dialog was dismissed (callers pass `rejectClose: false`).
+ */
+export const dialogWait = (config) => {
+    const DialogV2 = globalThis.foundry?.applications?.api?.DialogV2;
+    if (!DialogV2) throw new Error('[Alternity] foundry.applications.api.DialogV2 is unavailable.');
+    return DialogV2.wait(config);
+};
+
 export const fromUuid = (...args) => {
     const fn = globalThis.foundry?.utils?.fromUuid || globalThis.fromUuid;
     return fn(...args);

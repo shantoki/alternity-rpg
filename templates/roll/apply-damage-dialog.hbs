@@ -1,0 +1,31 @@
+{{!--
+    "Apply damage to…" — the actor picker behind the damage card's Choose actor
+    button. Read back by `_readFormValues`, so every control that matters carries a
+    `name`; there is no <form> element because DialogV2 supplies one around the
+    content it is given.
+
+    Scene tokens are listed by token uuid rather than actor uuid: an unlinked token
+    keeps its own actor delta, and damaging the world actor it was stamped from would
+    leave the token on the map untouched.
+--}}
+<div class="alt-dialog alt-apply-dialog">
+    <p class="alt-dialog-summary">
+        {{#if name}}{{name}} — {{/if}}<strong>{{total}}</strong> {{trackLabel}}
+    </p>
+
+    <div class="form-group">
+        <label for="alt-apply-uuid">{{localize "ALTERNITY.Roll.PickActor"}}</label>
+        <div class="form-fields">
+            <select id="alt-apply-uuid" name="uuid">
+                {{#each groups}}
+                <optgroup label="{{this.label}}">
+                    {{#each this.options}}
+                    <option value="{{this.uuid}}">{{this.label}}</option>
+                    {{/each}}
+                </optgroup>
+                {{/each}}
+            </select>
+        </div>
+        <p class="hint">{{localize "ALTERNITY.Roll.PickActorHint"}}</p>
+    </div>
+</div>

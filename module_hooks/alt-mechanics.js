@@ -197,9 +197,25 @@ export async function handleChatCardAction(action, message) {
         });
     }
 
-    if (action === 'applyDamage') {
+    // The four apply buttons differ only in how the recipient is found, so they all
+    // land on the same damage payload. The two canvas ones name their scope rather
+    // than sharing one target-then-selection fallback: with both a target and a
+    // selection present, only the click knows which the hit was for.
+    if (action === 'applyDamage' || action === 'applyDamageSelected') {
         if (!flags.damage) return null;
-        return AlternityRollService.applyDamageToTargets(flags.damage);
+        return AlternityRollService.applyDamageToTargets(flags.damage, {
+            scope: action === 'applyDamageSelected' ? 'selected' : 'targets',
+        });
+    }
+
+    if (action === 'applyDamageActor') {
+        if (!flags.damage) return null;
+        return AlternityRollService.promptApplyDamage(flags.damage);
+    }
+
+    if (action === 'applyDamageManual') {
+        if (!flags.damage) return null;
+        return AlternityRollService.promptManualDamage(flags.damage);
     }
 
     return null;

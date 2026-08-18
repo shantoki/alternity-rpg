@@ -24,19 +24,23 @@ import {
     PERSONAL_DAMAGE_GRADES,
     DAMAGE_TYPES,
     DEFAULT_PERSONAL_TOUGHNESS,
+    PERSONAL_TOUGHNESS_CLASSES,
+    FIREPOWER_CLASSES,
 } from './alternity-math.js';
 import {
     getAlternityState,
     ABILITY_TYPES,
 } from '../data/alternity-actor-data.js';
 import { speciesDefenseModifiers } from '../data/SpeciesData.js';
-import { Roll, ChatMessage, Hooks, game, renderTemplate } from '../module-info.js';
+import { Roll, ChatMessage, Hooks, game, renderTemplate, dialogWait, fromUuid } from '../module-info.js';
 
 const NAMESPACE = 'alternity';
 
 const CHECK_CARD  = `systems/${NAMESPACE}/templates/roll/roll-card.hbs`;
 const DAMAGE_CARD = `systems/${NAMESPACE}/templates/roll/damage-card.hbs`;
 const ARMOR_CARD  = `systems/${NAMESPACE}/templates/roll/armor-card.hbs`;
+const PICK_DIALOG   = `systems/${NAMESPACE}/templates/roll/apply-damage-dialog.hbs`;
+const MANUAL_DIALOG = `systems/${NAMESPACE}/templates/roll/manual-damage-dialog.hbs`;
 
 /** Actor types that keep an AlternityCharacterState alongside their schema. */
 const STATEFUL_TYPES = Object.freeze(['character', 'npc']);
@@ -59,6 +63,43 @@ function _rollStyle() {
 
 function _whisperTo(whisper) {
     return whisper ? { whisper: ChatMessage.getWhisperRecipients('GM') } : {};
+}
+
+/**
+ * Read every named control out of a dialog's form.
+ *
+ * Deliberately not FormDataExtended: that class is `foundry.applications.ux
+ * .FormDataExtended` on the newer generations and a bare global on v12, so using it
+ * would mean one more shim for the sake of a handful of selects. Checkboxes come
+ * back as booleans; everything else as its string value, which the callers coerce
+ * themselves because they also have to bound it.
+ *
+ * @param {HTMLElement|null} root
+ * @returns {object}
+ */
+function _readFormValues(root) {
+    const out = {};
+    for (const el of root?.querySelectorAll?.('[name]') ?? []) {
+        out[el.name] = el.type === 'checkbox' ? el.checked : el.value;
+    }
+    return out;
+}
+
+/**
+ * The localized name of a damage track.
+ *
+ * 'none' is a degrade outcome rather than a track, so it has no label of its own and
+ * borrows the negation wording; anything unrecognised comes back as itself rather
+ * than as a raw localization key.
+ *
+ * @param {string} track - 'stun' | 'wound' | 'mortal' | 'none'
+ * @returns {string}
+ */
+function _trackLabel(track) {
+    const key = String(track ?? '');
+    if (key === 'none') return game.i18n.localize('ALTERNITY.Armor.Negated');
+    if (!PERSONAL_DAMAGE_GRADES.includes(key)) return key;
+    return game.i18n.localize(`ALTERNITY.${key.charAt(0).toUpperCase()}${key.slice(1)}`);
 }
 
 /**
@@ -656,28 +697,69 @@ export const AlternityRollService = {
     // -----------------------------------------------------------------------
 
     /**
-     * Apply a rolled damage total to whoever the user has targeted, falling back
-     * to their controlled tokens.
+     * Who a damage application lands on, for one scope.
      *
-     * Targets are preferred over selection because targeting is the deliberate
-     * "this is who I am shooting" gesture; a player usually has their own token
-     * selected while shooting someone else, and applying damage to themselves
-     * would be the one outcome nobody wants.
+     * The default ('auto') prefers targets over selection, because targeting is the
+     * deliberate "this is who I am shooting" gesture; a player usually has their own
+     * token selected while shooting someone else, and applying damage to themselves
+     * would be the one outcome nobody wants. The damage card asks for 'targets' and
+     * 'selected' explicitly, one per button, so neither can silently become the
+     * other — a Gamemaster who has both a target and a selection needs to be able to
+     * say which one this hit was for.
+     *
+     * A token's own actor is what takes the damage rather than the world actor it
+     * points at, because an unlinked token has its own. Repeats are dropped: two
+     * tokens of the same linked actor are one creature, and damaging it twice for one
+     * hit is never what was meant.
+     *
+     * @param {'auto'|'targets'|'selected'} [scope='auto']
+     * @returns {Actor[]}
+     * @private
+     */
+    _damageRecipients(scope = 'auto') {
+        const targeted   = Array.from(game.user?.targets ?? []);
+        const controlled = Array.from(canvas?.tokens?.controlled ?? []);
+        const tokens = scope === 'targets'  ? targeted
+            : scope === 'selected' ? controlled
+            : (targeted.length ? targeted : controlled);
+
+        const actors = [];
+        for (const token of tokens) {
+            const actor = token?.actor;
+            if (actor && !actors.includes(actor)) actors.push(actor);
+        }
+        return actors;
+    },
+
+    /**
+     * Apply a rolled damage total to a set of actors.
      *
      * @param {object} damageData - The `flags['alternity'].damage` payload.
+     * @param {object} [options]
+     * @param {'auto'|'targets'|'selected'} [options.scope='auto'] - How to find the
+     *        recipients; see `_damageRecipients`.
+     * @param {Actor[]} [options.actors] - Recipients chosen already, bypassing the
+     *        canvas entirely. This is how `promptApplyDamage` reaches an actor with
+     *        no token on the scene.
      * @returns {Promise<number>} How many actors were damaged.
      */
-    async applyDamageToTargets(damageData) {
+    async applyDamageToTargets(damageData, options = {}) {
         const { total, category, damageType, firepower, name } = damageData ?? {};
         if (!PERSONAL_DAMAGE_GRADES.includes(category)) {
             ui.notifications?.warn(game.i18n.localize('ALTERNITY.Roll.UnknownDamageCategory'));
             return 0;
         }
 
-        const targeted = Array.from(game.user?.targets ?? []);
-        const tokens = targeted.length ? targeted : (canvas?.tokens?.controlled ?? []);
-        if (!tokens.length) {
-            ui.notifications?.warn(game.i18n.localize('ALTERNITY.Roll.NoTargets'));
+        const scope = options.scope ?? 'auto';
+        const recipients = options.actors ?? this._damageRecipients(scope);
+        if (!recipients.length) {
+            // Each scope says what it was actually looking for. "Target or select a
+            // token" is unhelpful advice from a button that only reads the selection.
+            ui.notifications?.warn(game.i18n.localize(
+                scope === 'targets'  ? 'ALTERNITY.Roll.NoTargeted'
+                : scope === 'selected' ? 'ALTERNITY.Roll.NoSelection'
+                : 'ALTERNITY.Roll.NoTargets'
+            ));
             return 0;
         }
 
@@ -689,8 +771,7 @@ export const AlternityRollService = {
         const context = name ? `${name} damage` : 'Damage';
 
         let applied = 0;
-        for (const token of tokens) {
-            const target = token.actor;
+        for (const target of recipients) {
             if (!target) continue;
 
             // Armour is rolled per target, before the damage is handed over: each
@@ -729,6 +810,259 @@ export const AlternityRollService = {
         return applied;
     },
 
+
+    // -----------------------------------------------------------------------
+    // The two prompted apply paths
+    // -----------------------------------------------------------------------
+
+    /**
+     * Run a small form dialog and hand back what the user typed.
+     *
+     * The values are read straight off the form's named controls rather than through
+     * FormDataExtended, which moved namespace between the supported generations and
+     * would need its own resolution for the sake of five fields.
+     *
+     * A dismissed dialog is `null`, not an error — cancelling a prompt is a normal
+     * outcome. A Foundry with no DialogV2 at all *is* reported, because otherwise the
+     * button would appear to do nothing whatsoever.
+     *
+     * @param {object} config
+     * @param {string} config.title
+     * @param {string} config.content - Rendered HTML containing the form controls.
+     * @param {string} config.label   - Label for the accepting button.
+     * @returns {Promise<object|null>} `{name: value}` per named control, or null.
+     * @private
+     */
+    async _promptForm({ title, content, label }) {
+        try {
+            const result = await dialogWait({
+                window: { title },
+                content,
+                position: { width: 400 },
+                // rejectClose keeps a dismissal a resolved null rather than an
+                // exception every caller would have to swallow.
+                rejectClose: false,
+                buttons: [
+                    {
+                        action: 'accept',
+                        label,
+                        default: true,
+                        callback: (_event, button) => _readFormValues(button?.form),
+                    },
+                    { action: 'cancel', label: game.i18n.localize('ALTERNITY.Cancel') },
+                ],
+            });
+            return (result && typeof result === 'object') ? result : null;
+        } catch (error) {
+            console.error('[Alternity] Could not open a damage dialog.', error);
+            ui.notifications?.error(game.i18n.localize('ALTERNITY.Roll.DialogUnavailable'));
+            return null;
+        }
+    },
+
+    /**
+     * Everything this damage could be applied to, grouped for a picker.
+     *
+     * Scene tokens come first and are listed by *token* uuid, so an unlinked token
+     * takes the damage on its own delta rather than on the world actor it was made
+     * from. World actors follow, which is the whole reason this prompt exists: an
+     * off-screen NPC that never got a token cannot be targeted or selected, and until
+     * now there was no way to hand it a hit.
+     *
+     * Actors the user does not own are left out, because this is an invitation to
+     * pick rather than a report of what exists.
+     *
+     * @returns {Array<{label: string, options: Array<{uuid: string, label: string}>}>}
+     * @private
+     */
+    _damageTargetChoices() {
+        const byName = (a, b) => String(a.label).localeCompare(String(b.label));
+
+        const scene = [];
+        for (const token of canvas?.tokens?.placeables ?? []) {
+            const actor = token?.actor;
+            if (!actor || actor.isOwner === false) continue;
+            scene.push({
+                uuid:  token.document?.uuid ?? actor.uuid,
+                label: token.name ?? actor.name,
+            });
+        }
+
+        const world = [];
+        for (const actor of game.actors?.contents ?? []) {
+            // Offering a player an actor they cannot update would be inviting them to
+            // pick a choice the update then refuses. Tested against `false` rather than
+            // for truth so an actor stand-in without the getter is not filtered out.
+            if (!actor?.uuid || actor.isOwner === false) continue;
+            world.push({ uuid: actor.uuid, label: actor.name });
+        }
+
+        return [
+            { label: game.i18n.localize('ALTERNITY.Roll.SceneTokens'), options: scene.sort(byName) },
+            { label: game.i18n.localize('ALTERNITY.Roll.WorldActors'), options: world.sort(byName) },
+        ].filter((group) => group.options.length);
+    },
+
+    /**
+     * Ask which actor takes this damage, then apply it exactly as the target button
+     * would — armour roll, degrade, secondary damage and mitigation card included.
+     *
+     * @param {object} damageData - The `flags['alternity'].damage` payload.
+     * @returns {Promise<number>} How many actors were damaged.
+     */
+    async promptApplyDamage(damageData) {
+        const groups = this._damageTargetChoices();
+        if (!groups.length) {
+            ui.notifications?.warn(game.i18n.localize('ALTERNITY.Roll.NoActorsToDamage'));
+            return 0;
+        }
+
+        const { total, category, name } = damageData ?? {};
+        const content = await renderTemplate(PICK_DIALOG, {
+            groups,
+            total:      total ?? 0,
+            name:       name ?? '',
+            trackLabel: _trackLabel(category),
+        });
+
+        const form = await this._promptForm({
+            title: game.i18n.localize('ALTERNITY.Roll.PickActorTitle'),
+            content,
+            label: game.i18n.localize('ALTERNITY.Roll.Apply'),
+        });
+        if (!form?.uuid) return 0;
+
+        // A token uuid resolves to a TokenDocument, whose `.actor` is the one holding
+        // the tracks; an Actor uuid resolves to the actor itself.
+        const resolved = await fromUuid(form.uuid);
+        const actor = resolved?.actor ?? resolved;
+        if (!actor) {
+            ui.notifications?.warn(game.i18n.localize('ALTERNITY.Roll.NoActorsToDamage'));
+            return 0;
+        }
+
+        return this.applyDamageToTargets(damageData, { actors: [actor] });
+    },
+
+    /**
+     * Resolve a hit against numbers the Gamemaster types in, and write nothing.
+     *
+     * This is for a defender who is not in the world at all — a mook improvised at
+     * the table, an object, a wall. The full sequence still runs through the math
+     * service, so the answer obeys degrade-then-secondary-then-armour exactly as an
+     * applied hit does; the only difference is that no document is updated, which the
+     * card says on its face.
+     *
+     * @param {object} damageData - The `flags['alternity'].damage` payload, used to
+     *        prefill the form. Every field stays editable, because a manual resolution
+     *        is also how a Gamemaster tries one hit against a different defence.
+     * @returns {Promise<object|null>} The posted card, or null if cancelled.
+     */
+    async promptManualDamage(damageData) {
+        const { total, category, damageType, firepower, name } = damageData ?? {};
+
+        const content = await renderTemplate(MANUAL_DIALOG, {
+            name:        name ?? '',
+            total:       total ?? 0,
+            category:    PERSONAL_DAMAGE_GRADES.includes(category) ? category : 'wound',
+            grades:      PERSONAL_DAMAGE_GRADES.map((grade) => ({ value: grade, label: _trackLabel(grade) })),
+            damageType:  DAMAGE_TYPES.includes(damageType) ? damageType : 'LI',
+            forms:       DAMAGE_TYPES,
+            firepower:   FIREPOWER_CLASSES.includes(firepower) ? firepower : '',
+            firepowers:  FIREPOWER_CLASSES,
+            toughness:   DEFAULT_PERSONAL_TOUGHNESS,
+            toughnesses: PERSONAL_TOUGHNESS_CLASSES,
+        });
+
+        const form = await this._promptForm({
+            title: game.i18n.localize('ALTERNITY.Roll.ManualTitle'),
+            content,
+            label: game.i18n.localize('ALTERNITY.Roll.Resolve'),
+        });
+        if (!form) return null;
+
+        const rawDamage  = Math.max(0, Math.round(Number(form.total) || 0));
+        const grade      = PERSONAL_DAMAGE_GRADES.includes(form.category) ? form.category : 'wound';
+        const damageForm = DAMAGE_TYPES.includes(form.damageType) ? form.damageType : 'LI';
+        // Degrade needs both halves, so a blank on either side means no degrade rather
+        // than a guessed one — the same rule resolvePersonalDamage states.
+        const pickedFirepower = FIREPOWER_CLASSES.includes(form.firepower) ? form.firepower : null;
+        const pickedToughness = PERSONAL_TOUGHNESS_CLASSES.includes(form.toughness) ? form.toughness : null;
+
+        const armor = await this._rollEnteredArmor(form.armor, damageForm);
+        if (!armor) {
+            ui.notifications?.warn(game.i18n.localize('ALTERNITY.Armor.UnreadableRating'));
+            return null;
+        }
+
+        const defender = String(form.name ?? '').trim()
+            || game.i18n.localize('ALTERNITY.Roll.ManualDefender');
+
+        const outcome = AlternityMathService.resolvePersonalDamage({
+            rawDamage,
+            damageGrade: grade,
+            damageForm,
+            firepower:   pickedFirepower,
+            toughness:   pickedToughness,
+            armorRoll:   armor.value,
+            armorSource: armor.source,
+            context:     defender + ' (manual)',
+        });
+
+        return this._postMitigationCard(null, {
+            rawDamage,
+            damageForm,
+            armor,
+            outcome,
+            name,
+            targetName: defender,
+            // Forced, because a manual resolution's whole output *is* this card: with
+            // nothing written anywhere, suppressing it for an unmitigated hit would
+            // leave the click with no result at all.
+            force:      true,
+            notApplied: true,
+        });
+    },
+
+    /**
+     * Roll a protection rating the user typed, in the shape `rollArmorProtection`
+     * returns, so the mitigation card and the math service can consume either.
+     *
+     * @param {string} text       - A printed rating: `d6-1`, `4`, blank, `none`, `0`.
+     * @param {string} damageForm - Reported only; the caller already chose the form.
+     * @returns {Promise<object|null>} The armour, or null when the text is unreadable
+     *          — which is a refusal, not zero protection.
+     * @private
+     */
+    async _rollEnteredArmor(text, damageForm) {
+        const source = game.i18n.localize('ALTERNITY.Armor.Label');
+        const none = {
+            value: 0, source: '', rolls: [], considered: [], modifierTrace: [],
+            toughness: DEFAULT_PERSONAL_TOUGHNESS,
+        };
+
+        const raw = String(text ?? '').trim();
+        // Blank, a dash, "none" and a plain 0 all mean "no armour" and must not be
+        // reported as unreadable. parseArmorValue calls all four invalid, because for
+        // a rating read off a page there is no difference between them that matters
+        // to it; here there is, because one of them is what the user typed on purpose.
+        if (!raw || /^(0|none|no|n\/a|-)$/i.test(raw)) return none;
+
+        const parsed = AlternityMathService.parseArmorValue(raw);
+        if (!parsed.isValid) {
+            console.warn(
+                `[Alternity] Could not read the manually entered ${damageForm} armour rating "${raw}".`
+            );
+            return null;
+        }
+        if (!parsed.isDie) return { ...none, value: parsed.flat, source };
+
+        const roll = new Roll(parsed.formula);
+        await roll.evaluate();
+        // A rating can genuinely come up zero — d6-3 does it half the time — and it
+        // floors there rather than letting armour heal.
+        return { ...none, value: Math.max(0, roll.total), source, rolls: [{ source, roll }] };
+    },
     /**
      * Show what happened between the damage roll and the target's tracks — but only
      * when something did. A hit that lands in full is already fully described by the
@@ -738,14 +1072,22 @@ export const AlternityRollService = {
      * inside the Apply handler, long after the attacker's card was posted, and "why
      * did 6 wounds become 4" is not something a player should have to take on trust.
      *
+     * `promptManualDamage` posts through here as well, with no target at all, and
+     * forces the card: with nothing written to a document, the card is the only output
+     * that click has.
+     *
+     * @param {Actor|null} target - null for a manual resolution.
      * @private
      */
-    async _postMitigationCard(target, { rawDamage, damageForm, armor, outcome, name }) {
+    async _postMitigationCard(target, {
+        rawDamage, damageForm, armor, outcome, name,
+        targetName, force = false, notApplied = false,
+    }) {
         const hasMitigation = outcome.isNegated
             || (outcome.armorAbsorbed ?? 0) > 0
             || (outcome.degradeSteps ?? 0) > 0
             || (outcome.mitigated ?? 0) > 0;
-        if (!hasMitigation) return null;
+        if (!hasMitigation && !force) return null;
 
         const grade = outcome.grade ?? outcome.category ?? 'wound';
         const secondary = outcome.secondary ?? { stun: 0, wound: 0 };
@@ -754,15 +1096,12 @@ export const AlternityRollService = {
         if (secondary.stun) secondaryParts.push(`${secondary.stun} ${game.i18n.localize('ALTERNITY.Stun')}`);
 
         const content = await renderTemplate(ARMOR_CARD, {
-            targetName:  target.name,
+            targetName:  targetName ?? target?.name ?? '',
+            notApplied,
             damageForm,
             rawDamage,
             grade,
-            // 'none' is a degrade outcome, not a track, so it has no track label —
-            // localizing it would render the raw key on the card.
-            gradeLabel:  grade === 'none'
-                ? game.i18n.localize('ALTERNITY.Armor.Negated')
-                : game.i18n.localize(`ALTERNITY.${grade.charAt(0).toUpperCase()}${grade.slice(1)}`),
+            gradeLabel:  _trackLabel(grade),
             isNegated:   outcome.isNegated ?? false,
             primary:     outcome.finalDamage ?? outcome.primary ?? 0,
             degradeSteps: outcome.degradeSteps ?? 0,
@@ -783,11 +1122,15 @@ export const AlternityRollService = {
         });
 
         return ChatMessage.create({
-            speaker: ChatMessage.getSpeaker({ actor: target }),
+            speaker: ChatMessage.getSpeaker(target ? { actor: target } : {}),
             content,
             style: _rollStyle(),
             rolls: armor.rolls.map((r) => r.roll),
-            flags: { [NAMESPACE]: { mitigation: { targetUuid: target.uuid, rawDamage, damageForm } } },
+            flags: {
+                [NAMESPACE]: {
+                    mitigation: { targetUuid: target?.uuid ?? null, rawDamage, damageForm, notApplied },
+                },
+            },
         });
     },
 

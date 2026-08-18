@@ -34,10 +34,26 @@
         </p>
         {{/if}}
 
+        {{!--
+            Four ways to land the same rolled damage, because the recipient is not
+            always on the canvas. The first two read the canvas and are deliberately
+            *not* one button with a fallback: a Gamemaster who has both a target and a
+            selection has to be able to say which of them this hit was for. The third
+            reaches an actor with no token at all, and the fourth resolves against
+            typed-in numbers and writes to nothing.
+        --}}
         <div class="alt-roll-card-buttons">
-            {{!-- Targets first, then controlled tokens; the handler decides. --}}
             <button type="button" class="alt-card-btn" data-alt-action="applyDamage">
                 {{localize "ALTERNITY.Roll.ApplyDamage"}}
+            </button>
+            <button type="button" class="alt-card-btn" data-alt-action="applyDamageSelected">
+                {{localize "ALTERNITY.Roll.ApplyDamageSelected"}}
+            </button>
+            <button type="button" class="alt-card-btn" data-alt-action="applyDamageActor">
+                {{localize "ALTERNITY.Roll.ApplyDamageActor"}}
+            </button>
+            <button type="button" class="alt-card-btn" data-alt-action="applyDamageManual">
+                {{localize "ALTERNITY.Roll.ApplyDamageManual"}}
             </button>
         </div>
         <p class="alt-roll-note">{{localize "ALTERNITY.Roll.ApplyHint"}}</p>

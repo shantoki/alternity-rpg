@@ -6,6 +6,10 @@
     It has no buttons: by the time this renders the damage is already applied, and the
     card exists so the roll behind the reduction is visible rather than hidden inside
     the apply handler.
+
+    The exception is a manual resolution, which forces this card even with nothing to
+    report and sets `notApplied` — there, the card is the whole result, and it has to
+    say plainly that no actor's tracks moved.
 --}}
 <div class="alt-roll-card alt-armor-card">
     <header class="alt-roll-card-header">
@@ -24,6 +28,10 @@
             {{/if}}
             {{#if damageForm}}<span class="alt-damage-type">{{damageForm}}</span>{{/if}}
         </div>
+
+        {{#if notApplied}}
+        <p class="alt-roll-note alt-roll-note--warn">{{localize "ALTERNITY.Roll.NotApplied"}}</p>
+        {{/if}}
 
         <p class="alt-roll-note">
             {{localize "ALTERNITY.Armor.RawDamage"}}: {{rawDamage}}

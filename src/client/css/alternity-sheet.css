@@ -1242,6 +1242,13 @@
     color: var(--alt-color-text-muted);
 }
 
+/* A mitigation card that changed no document says so, and has to be read as a
+   caveat rather than as one more detail line. */
+.alt-roll-note--warn {
+    font-style: normal;
+    color: var(--alt-color-danger);
+}
+
 /* ── Degree colours, shared by the panel and the chat card ──────────────── */
 .degree--marginal          { color: var(--alt-color-text-muted); }
 .degree--ordinary          { color: var(--alt-color-success); }
@@ -1382,12 +1389,15 @@
 /* These are bound by hand in module_hooks/alt-mechanics.js; see roll-card.hbs. */
 .alt-roll-card-buttons {
     display: flex;
+    flex-wrap: wrap;
     gap: 4px;
     margin: 8px 0 0;
 }
 
 .alt-card-btn {
-    flex: 1 1 auto;
+    /* A basis rather than auto, so four buttons break onto two rows of two instead
+       of shrinking to slivers of a word each. */
+    flex: 1 1 40%;
     padding: 4px 6px;
     background: var(--alt-color-primary);
     color: white;

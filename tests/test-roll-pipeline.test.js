@@ -12,8 +12,8 @@
  */
 
 import {
-    installRollHarness, resetHarness, queueRolls, makeActor, targetActor,
-    chatLog, renderLog, notifications,
+    installRollHarness, resetHarness, queueRolls, queueDialogs, makeActor, targetActor,
+    placeToken, worldActors, chatLog, renderLog, notifications, dialogLog,
 } from './mocks/roll-harness.js';
 
 installRollHarness();
@@ -531,6 +531,228 @@ describe('AlternityRollService.applyDamageToTargets', () => {
     });
 });
 
+/**
+ * A robot-shaped target: flat damage tracks, so an assertion can name the number
+ * written rather than dig through a nested {value, max}.
+ */
+const damageableActor = (name = 'Target') => makeActor({
+    type: 'robot',
+    name,
+    system: {
+        damage: { stun: 0, wound: 0, mortal: 0 },
+        durability: { stun: { max: 12 }, wound: { max: 12 }, mortal: { max: 6 } },
+    },
+});
+
+/** One rolled hit, as the damage card stashes it in its flags. */
+const HIT = Object.freeze({ total: 4, category: 'wound', damageType: 'LI', name: 'Rifle' });
+
+/** The most recent render of a given template. */
+const renderOf = (suffix) => renderLog.filter((r) => r.path.endsWith(suffix)).pop();
+
+describe('Which actors a damage application lands on', () => {
+    it('should read only the crosshairs when the scope is targets', async () => {
+        const shot = damageableActor('Shot at');
+        const mine = damageableActor('My own token');
+        placeToken(shot, { targeted: true });
+        placeToken(mine, { controlled: true });
+
+        const applied = await AlternityRollService.applyDamageToTargets(HIT, { scope: 'targets' });
+
+        expect(applied).toBe(1);
+        expect(shot.updates[0]['system.damage.wound']).toBe(4);
+        expect(mine.updates).toHaveLength(0);
+    });
+
+    it('should read only the selection when the scope is selected', async () => {
+        const shot = damageableActor('Shot at');
+        const picked = damageableActor('Picked by hand');
+        placeToken(shot, { targeted: true });
+        placeToken(picked, { controlled: true });
+
+        const applied = await AlternityRollService.applyDamageToTargets(HIT, { scope: 'selected' });
+
+        expect(applied).toBe(1);
+        expect(picked.updates[0]['system.damage.wound']).toBe(4);
+        // The point of a separate button: a live target must not soak the hit the
+        // Gamemaster deliberately aimed at their selection.
+        expect(shot.updates).toHaveLength(0);
+    });
+
+    it('should say which gesture it was looking for when it finds nothing', async () => {
+        placeToken(damageableActor(), { controlled: true });
+        expect(await AlternityRollService.applyDamageToTargets(HIT, { scope: 'targets' })).toBe(0);
+        expect(notifications.warn).toContain('ALTERNITY.Roll.NoTargeted');
+
+        resetHarness();
+        placeToken(damageableActor(), { targeted: true });
+        expect(await AlternityRollService.applyDamageToTargets(HIT, { scope: 'selected' })).toBe(0);
+        expect(notifications.warn).toContain('ALTERNITY.Roll.NoSelection');
+    });
+
+    it('should damage an actor once even with two of its tokens selected', async () => {
+        const target = damageableActor();
+        placeToken(target, { controlled: true });
+        placeToken(target, { controlled: true });
+
+        const applied = await AlternityRollService.applyDamageToTargets(HIT, { scope: 'selected' });
+
+        expect(applied).toBe(1);
+        expect(target.updates).toHaveLength(1);
+    });
+});
+
+describe('AlternityRollService.promptApplyDamage', () => {
+    it('should offer placed tokens by token uuid and world actors by actor uuid', async () => {
+        const placed = damageableActor('On the map');
+        const token = placeToken(placed);
+        const offstage = damageableActor('Never got a token');
+        worldActors(placed, offstage);
+
+        queueDialogs({ uuid: token.document.uuid });
+        await AlternityRollService.promptApplyDamage(HIT);
+
+        const { groups } = renderOf('apply-damage-dialog.hbs').context;
+        expect(groups[0].label).toBe('ALTERNITY.Roll.SceneTokens');
+        // A token is offered as itself, so an unlinked one takes the damage on its
+        // own delta rather than on the world actor it was stamped from.
+        expect(groups[0].options).toEqual([{ uuid: token.document.uuid, label: 'On the map' }]);
+        expect(groups[1].options.map((o) => o.label)).toEqual(['Never got a token', 'On the map']);
+    });
+
+    it('should apply to an actor that has no token at all', async () => {
+        const offstage = damageableActor('Offstage');
+        worldActors(offstage);
+
+        queueDialogs({ uuid: offstage.uuid });
+        const applied = await AlternityRollService.promptApplyDamage(HIT);
+
+        expect(applied).toBe(1);
+        expect(offstage.updates[0]['system.damage.wound']).toBe(4);
+    });
+
+    it('should apply nothing when the prompt is dismissed', async () => {
+        const offstage = damageableActor('Offstage');
+        worldActors(offstage);
+
+        queueDialogs(null);
+        expect(await AlternityRollService.promptApplyDamage(HIT)).toBe(0);
+        expect(offstage.updates).toHaveLength(0);
+    });
+
+    it('should leave out actors the user does not own', async () => {
+        const mine = damageableActor('Mine');
+        const theirs = damageableActor('Not mine');
+        theirs.isOwner = false;
+        placeToken(theirs);
+        worldActors(mine, theirs);
+
+        queueDialogs({ uuid: mine.uuid });
+        await AlternityRollService.promptApplyDamage(HIT);
+
+        const { groups } = renderOf('apply-damage-dialog.hbs').context;
+        // Its token goes too: a picker is an invitation, and offering a choice the
+        // update then refuses is worse than not offering it.
+        expect(groups.map((g) => g.label)).toEqual(['ALTERNITY.Roll.WorldActors']);
+        expect(groups[0].options).toEqual([{ uuid: mine.uuid, label: 'Mine' }]);
+    });
+
+    it('should not open a picker with nothing in it', async () => {
+        expect(await AlternityRollService.promptApplyDamage(HIT)).toBe(0);
+        expect(dialogLog).toHaveLength(0);
+        expect(notifications.warn).toContain('ALTERNITY.Roll.NoActorsToDamage');
+    });
+});
+
+describe('AlternityRollService.promptManualDamage', () => {
+    /** The form as the dialog hands it back, all fields present. */
+    const manualForm = (overrides = {}) => ({
+        name: 'Bulkhead', total: 6, category: 'wound', damageType: 'LI',
+        firepower: '', toughness: 'Ordinary', armor: '', ...overrides,
+    });
+
+    it('should resolve the whole sequence against typed-in numbers and write nothing', async () => {
+        const bystander = damageableActor('Selected and targeted');
+        placeToken(bystander, { controlled: true, targeted: true });
+
+        queueDialogs(manualForm({ armor: 'd6-1' }));
+        queueRolls([4]);                       // d6-1 -> 3 points of protection
+
+        await AlternityRollService.promptManualDamage({ ...HIT, total: 6 });
+
+        const { context } = renderOf('armor-card.hbs');
+        expect(context).toMatchObject({
+            targetName:    'Bulkhead',
+            notApplied:    true,
+            rawDamage:     6,
+            armorAbsorbed: 3,
+            primary:       3,          // 6 wound less 3 armour
+        });
+        // Armour never touches secondary damage: 6 wound still carries 3 stun.
+        expect(context.secondaryLabel).toBe('3 ALTERNITY.Stun');
+        // Nothing on the canvas is involved, however tempting the selection looks.
+        expect(bystander.updates).toHaveLength(0);
+    });
+
+    it('should degrade the grade when the entered firepower falls short', async () => {
+        queueDialogs(manualForm({ firepower: 'Ordinary', toughness: 'Good' }));
+
+        await AlternityRollService.promptManualDamage(HIT);
+
+        // Ordinary firepower against Good toughness: 6 wounds become 6 stuns, and a
+        // stun grade carries no secondary damage.
+        expect(renderOf('armor-card.hbs').context).toMatchObject({
+            grade: 'stun', primary: 6, degradeSteps: 1, secondaryLabel: '',
+        });
+    });
+
+    it('should post the card even when nothing was mitigated', async () => {
+        queueDialogs(manualForm());
+
+        await AlternityRollService.promptManualDamage(HIT);
+
+        // The applied path suppresses an unmitigated card as noise; here the card is
+        // the only output the click has, so it is forced.
+        expect(renderOf('armor-card.hbs').context)
+            .toMatchObject({ armorAbsorbed: 0, primary: 6, notApplied: true });
+    });
+
+    it('should refuse a protection rating it cannot read rather than assume zero', async () => {
+        queueDialogs(manualForm({ armor: 'a good coat' }));
+
+        expect(await AlternityRollService.promptManualDamage(HIT)).toBeNull();
+        expect(notifications.warn).toContain('ALTERNITY.Armor.UnreadableRating');
+        expect(chatLog).toHaveLength(0);
+    });
+
+    it('should treat a blank, a dash and a 0 as no armour, not as unreadable', async () => {
+        for (const armor of ['', '-', '0', 'none']) {
+            resetHarness();
+            queueDialogs(manualForm({ armor }));
+
+            await AlternityRollService.promptManualDamage(HIT);
+
+            expect(notifications.warn).toHaveLength(0);
+            expect(renderOf('armor-card.hbs').context.armorAbsorbed).toBe(0);
+        }
+    });
+
+    it('should name the defender itself when the field is left empty', async () => {
+        queueDialogs(manualForm({ name: '  ' }));
+
+        await AlternityRollService.promptManualDamage(HIT);
+
+        expect(renderOf('armor-card.hbs').context.targetName)
+            .toBe('ALTERNITY.Roll.ManualDefender');
+    });
+
+    it('should post nothing when the prompt is dismissed', async () => {
+        queueDialogs(null);
+        expect(await AlternityRollService.promptManualDamage(HIT)).toBeNull();
+        expect(chatLog).toHaveLength(0);
+    });
+});
+
 describe('Armour mitigation', () => {
     /** An armour item as the item sheet stores one. */
     const armorItem = (name, protection, extra = {}) => ({
@@ -982,6 +1204,58 @@ describe('Chat card buttons', () => {
 
         expect(applied).toBe(1);
         expect(target.updates[0]['system.damage.wound']).toBe(5);
+    });
+
+    it('should send the selected-token button to the selection, not the crosshairs', async () => {
+        const attacker = makeActor();
+        queueRolls([5]);
+        await AlternityRollService.rollDamage({ actor: attacker, name: 'Rifle', code: 'd8w' });
+
+        const aimed  = damageableActor('Aimed at');
+        const picked = damageableActor('Picked');
+        placeToken(aimed, { targeted: true });
+        placeToken(picked, { controlled: true });
+
+        expect(await handleChatCardAction('applyDamageSelected', chatLog[0])).toBe(1);
+        expect(picked.updates[0]['system.damage.wound']).toBe(5);
+        expect(aimed.updates).toHaveLength(0);
+    });
+
+    it('should send the choose-actor button through the picker', async () => {
+        const attacker = makeActor();
+        queueRolls([5]);
+        await AlternityRollService.rollDamage({ actor: attacker, name: 'Rifle', code: 'd8w' });
+
+        const offstage = damageableActor('Offstage');
+        worldActors(offstage);
+        queueDialogs({ uuid: offstage.uuid });
+
+        expect(await handleChatCardAction('applyDamageActor', chatLog[0])).toBe(1);
+        expect(offstage.updates[0]['system.damage.wound']).toBe(5);
+    });
+
+    it('should send the manual button to a resolution that changes no document', async () => {
+        const attacker = makeActor();
+        queueRolls([5]);
+        await AlternityRollService.rollDamage({ actor: attacker, name: 'Rifle', code: 'd8w' });
+
+        const bystander = damageableActor('Bystander');
+        placeToken(bystander, { controlled: true, targeted: true });
+        queueDialogs({
+            name: 'A wall', total: 5, category: 'wound', damageType: 'LI',
+            firepower: '', toughness: 'Ordinary', armor: '',
+        });
+
+        expect(await handleChatCardAction('applyDamageManual', chatLog[0])).not.toBeNull();
+        expect(bystander.updates).toHaveLength(0);
+        expect(renderLog.some((r) => r.path.endsWith('armor-card.hbs'))).toBe(true);
+    });
+
+    it('should do nothing for any apply button on a card with no damage in its flags', async () => {
+        for (const action of ['applyDamage', 'applyDamageSelected', 'applyDamageActor', 'applyDamageManual']) {
+            expect(await handleChatCardAction(action, { flags: {} })).toBeNull();
+        }
+        expect(dialogLog).toHaveLength(0);
     });
 
     it('should ignore an action it does not know', async () => {

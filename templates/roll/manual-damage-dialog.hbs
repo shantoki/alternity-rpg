@@ -1,0 +1,73 @@
+{{!--
+    "Resolve damage manually" — for a defender who is not in the world: an improvised
+    mook, an object, a wall. Everything the actor path would have read off a document
+    is asked for here instead, and nothing is written back.
+
+    Prefilled from the damage card's own flags and then left editable, because this is
+    also how one rolled hit gets tried against a second defence.
+--}}
+<div class="alt-dialog alt-manual-dialog">
+    <div class="form-group">
+        <label for="alt-manual-name">{{localize "ALTERNITY.Roll.DefenderName"}}</label>
+        <div class="form-fields">
+            <input id="alt-manual-name" type="text" name="name" value="{{name}}"
+                   placeholder="{{localize 'ALTERNITY.Roll.ManualDefender'}}">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="alt-manual-total">{{localize "ALTERNITY.Roll.DamageTotal"}}</label>
+        <div class="form-fields">
+            <input id="alt-manual-total" type="number" name="total" value="{{total}}" min="0" step="1">
+            <select name="category" aria-label="{{localize 'ALTERNITY.Roll.DamageTrack'}}">
+                {{#each grades}}
+                <option value="{{this.value}}" {{#if (eq this.value ../category)}}selected{{/if}}>{{this.label}}</option>
+                {{/each}}
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="alt-manual-form">{{localize "ALTERNITY.DamageType"}}</label>
+        <div class="form-fields">
+            <select id="alt-manual-form" name="damageType">
+                {{#each forms}}
+                <option value="{{this}}" {{#if (eq this ../damageType)}}selected{{/if}}>{{this}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <p class="hint">{{localize "ALTERNITY.Roll.ManualFormHint"}}</p>
+    </div>
+
+    <div class="form-group">
+        <label for="alt-manual-firepower">{{localize "ALTERNITY.Weapon.Firepower"}}</label>
+        <div class="form-fields">
+            <select id="alt-manual-firepower" name="firepower">
+                <option value="">{{localize "ALTERNITY.Roll.NoFirepower"}}</option>
+                {{#each firepowers}}
+                <option value="{{this}}" {{#if (eq this ../firepower)}}selected{{/if}}>{{this}}</option>
+                {{/each}}
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="alt-manual-toughness">{{localize "ALTERNITY.Armor.Toughness"}}</label>
+        <div class="form-fields">
+            <select id="alt-manual-toughness" name="toughness">
+                {{#each toughnesses}}
+                <option value="{{this}}" {{#if (eq this ../toughness)}}selected{{/if}}>{{this}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <p class="hint">{{localize "ALTERNITY.Roll.ManualToughnessHint"}}</p>
+    </div>
+
+    <div class="form-group">
+        <label for="alt-manual-armor">{{localize "ALTERNITY.Armor.Protection"}}</label>
+        <div class="form-fields">
+            <input id="alt-manual-armor" type="text" name="armor" value="" placeholder="d6-1">
+        </div>
+        <p class="hint">{{localize "ALTERNITY.Roll.ManualArmorHint"}}</p>
+    </div>
+</div>
