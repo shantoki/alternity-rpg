@@ -100,10 +100,16 @@ all arithmetic owned by the math service.
       and 'Slashing' as *stun* damage. The grade now comes only from the damage code's own
       trailing s/w/m letter.
 
-Not done, deliberately: the **vehicle** sheet has no roll buttons, because `VehicleData`
-holds no skill, attack or action-check scores to roll — a vehicle is driven by a
-character's own Vehicle Operation check. The **warship** sheet rolls weapon damage but
-has no crew checks, for the same reason.
+- [x] **The vehicle sheet rolls the driver's check, not its own.** A vehicle has no
+      attack score and no action check — Table P42 prints neither, because a vehicle is
+      driven. What it does own is a step penalty, so the Vehicle Operation button finds
+      the operator (selected token, else the user's assigned character), reads *their*
+      specialty score, and rolls as them with the vehicle's `Drv`, speed band and damage
+      penalties attached. The two **durability checks** are the vehicle's own, and are
+      rolled against its *original* stun and wound ratings.
+
+Not done, deliberately: the **warship** sheet rolls weapon damage but has no crew checks,
+because its crew are separate actors.
 
 ## Phase 5: Drag and drop — done
 
@@ -129,6 +135,7 @@ has no crew checks, for the same reason.
       | ai | weapon, armor, program, skill | `physicalForm` (Weapon / CPU Armor), `gridPrograms`, `skills` |
       | spaceship | weapon | `weapons` |
       | warship | weapon | `weapons` |
+      | vehicle | weapon | `weapons` |
 
       Nothing is guessed at. A field with no honest source on the item keeps the same
       default the sheet's own "+ Add row" button gives it — most importantly the attack
@@ -142,10 +149,9 @@ has no crew checks, for the same reason.
       swallowed. Rows are grouped and written one array at a time, because an
       `ArrayField` update replaces the array rather than merging into it.
 
-Not done, deliberately: the **vehicle** sheet accepts nothing, because `VehicleData` has
-no attack or gear arrays at all — a vehicle is driven by a character's own Vehicle
-Operation check. It is still wired up, so a drop there says so rather than looking as
-though it worked.
+The **vehicle** sheet takes weapons and nothing else. It has no skill array to drop into,
+because a vehicle is driven — the Vehicle Operation score belongs to whoever is at the
+controls, and a dropped skill is refused out loud rather than silently swallowed.
 
 ## Current Status
 - [x] Basic Ability/Skill management.

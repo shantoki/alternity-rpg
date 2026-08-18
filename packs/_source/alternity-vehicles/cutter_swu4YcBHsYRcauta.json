@@ -1,0 +1,84 @@
+{
+  "_id": "swu4YcBHsYRcauta",
+  "_key": "!actors!swu4YcBHsYRcauta",
+  "name": "Cutter",
+  "type": "vehicle",
+  "img": "icons/svg/sun.svg",
+  "system": {
+    "operationSkill": "Space vehicle",
+    "scale": "Space",
+    "progressLevel": 7,
+    "drvModifier": -1,
+    "acceleration": "2M",
+    "cruiseSpeed": "1.5AU",
+    "maxSpeed": "",
+    "speedBand": "Cruising",
+    "toughness": "Amazing",
+    "durabilityRatings": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "damage": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "hull": {
+      "size": 20,
+      "compartments": 4
+    },
+    "isConkedOut": false,
+    "armor": {
+      "type": "",
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": ""
+    },
+    "crew": {
+      "capacity": 0,
+      "current": 0
+    },
+    "weapons": [],
+    "availability": "Military",
+    "cost": "1000K",
+    "notes": "<p>Hull-rated: the Dur column prints hull size and compartments rather than a stun/wound/mortal run, because this craft is resolved with the spaceship rules in the second half of Chapter 12. See the Spaceships and Warships compendia for full statblocks.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Alternity Player's Handbook, Table P42: Vehicles (Ch.12, p.194)</dd><dt>Progress Level</dt><dd>7 - PL 7: Gravity Age</dd><dt>Skill</dt><dd>Space vehicle</dd><dt>Drv</dt><dd>-1</dd><dt>Acceleration</dt><dd>2M</dd><dt>Cruising speed</dt><dd>1.5AU</dd><dt>Toughness</dt><dd>Amazing</dd><dt>Durability</dt><dd>Hull 20/4</dd><dt>Availability</dt><dd>Military</dd><dt>Cost</dt><dd>1000K</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "MDwkF3H8wFVqmCOT",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Cutter",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/sun.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Alternity Player's Handbook",
+        "folder": "PL 7: Gravity Age",
+        "table": "Table P42: Vehicles (Ch.12, p.194)",
+        "progressLevel": 7,
+        "printed": {
+          "skill": "Space",
+          "drv": "-1",
+          "acc": "2M",
+          "cruise": "1.5AU",
+          "max": "-",
+          "type": "A",
+          "dur": "Hull 20/4",
+          "avail": "Mil",
+          "cost": "1000K"
+        }
+      }
+    }
+  }
+}

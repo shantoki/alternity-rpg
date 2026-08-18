@@ -1,0 +1,84 @@
+{
+  "_id": "mGDXBgqs3I4DmsGC",
+  "_key": "!actors!mGDXBgqs3I4DmsGC",
+  "name": "Fighter jet",
+  "type": "vehicle",
+  "img": "icons/svg/wing.svg",
+  "system": {
+    "operationSkill": "Air vehicle",
+    "scale": "Air",
+    "progressLevel": 5,
+    "drvModifier": -1,
+    "acceleration": "100",
+    "cruiseSpeed": "700",
+    "maxSpeed": "3000",
+    "speedBand": "Cruising",
+    "toughness": "Good",
+    "durabilityRatings": {
+      "stun": 13,
+      "wound": 13,
+      "mortal": 5
+    },
+    "damage": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "hull": {
+      "size": 0,
+      "compartments": 0
+    },
+    "isConkedOut": false,
+    "armor": {
+      "type": "",
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": ""
+    },
+    "crew": {
+      "capacity": 0,
+      "current": 0
+    },
+    "weapons": [],
+    "availability": "Military",
+    "cost": "1.2M",
+    "notes": "<p>A 25mm chain gun (244w/3d4w/2d4m, HIG). [Damage code as it survives in the scan, and the sentence is orphaned at a page break, so even the attribution to this row is uncertain.]</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Alternity Player's Handbook, Table P42: Vehicles (Ch.12, p.194)</dd><dt>Progress Level</dt><dd>5 - PL 5: Information Age</dd><dt>Skill</dt><dd>Air vehicle</dd><dt>Drv</dt><dd>-1</dd><dt>Acceleration</dt><dd>100</dd><dt>Cruising speed</dt><dd>700</dd><dt>Maximum speed</dt><dd>3000</dd><dt>Toughness</dt><dd>Good</dd><dt>Durability</dt><dd>13/13/5</dd><dt>Availability</dt><dd>Military</dd><dt>Cost</dt><dd>1.2M</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "KQXdrYjbZbL2cAlJ",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Fighter jet",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/wing.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Alternity Player's Handbook",
+        "folder": "PL 5: Information Age",
+        "table": "Table P42: Vehicles (Ch.12, p.194)",
+        "progressLevel": 5,
+        "printed": {
+          "skill": "Air",
+          "drv": "-1",
+          "acc": "100",
+          "cruise": "700",
+          "max": "3000",
+          "type": "G",
+          "dur": "13/13/5",
+          "avail": "Mil",
+          "cost": "1.2M"
+        }
+      }
+    }
+  }
+}

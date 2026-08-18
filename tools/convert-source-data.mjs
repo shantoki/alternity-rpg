@@ -9,9 +9,10 @@
  * without the source data can still edit `packs/_source` by hand and run
  * `npm run build:packs`.
  *
- * The two ship packs are the exception: the generator data set has no starships in it, so
- * `convert/warships.mjs` and `convert/spaceships.mjs` carry their tables inline and run
- * anywhere. They mark themselves with `NEEDS_SOURCE_DATA = false`.
+ * Three packs are the exception: the generator data set has no starships and no vehicles
+ * in it, so `convert/warships.mjs`, `convert/spaceships.mjs` and `convert/vehicles.mjs`
+ * carry their tables inline and run anywhere. They mark themselves with
+ * `NEEDS_SOURCE_DATA = false`.
  *
  * Document ids are hashed from the pack, type and name (`stableId`), so re-running this
  * against unchanged data rewrites the same bytes: a source-data fix shows up as a diff
@@ -35,17 +36,19 @@ import * as species from './convert/species.mjs';
 import * as templates from './convert/templates.mjs';
 import * as warships from './convert/warships.mjs';
 import * as spaceships from './convert/spaceships.mjs';
+import * as vehicles from './convert/vehicles.mjs';
 
 /**
- * Every converter here reads `external/json` except the two ship packs, which have no
- * input file at all - the character generator's data set has no starships in it, so their
- * tables are transcribed inside the converter and they declare `NEEDS_SOURCE_DATA = false`.
- * That is why the missing-source-data check below is per converter rather than a single
- * gate on the whole run: a clone without the generator data can still rebuild the ships.
+ * Every converter here reads `external/json` except the two ship packs and the vehicle
+ * pack, which have no input file at all - the character generator's data set has neither
+ * starships nor vehicles in it, so their tables are transcribed inside the converter and
+ * they declare `NEEDS_SOURCE_DATA = false`. That is why the missing-source-data check
+ * below is per converter rather than a single gate on the whole run: a clone without the
+ * generator data can still rebuild the ships and the vehicles.
  */
 const CONVERTERS = [
     weapons, armor, equipment, skills, fx, cybertech, achievements, species, templates,
-    warships, spaceships,
+    warships, spaceships, vehicles,
 ];
 
 const SOURCE_DIR = path.join(REPO_ROOT, 'packs', '_source');

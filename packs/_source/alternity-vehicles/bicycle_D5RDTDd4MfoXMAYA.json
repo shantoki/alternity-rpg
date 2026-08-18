@@ -1,0 +1,84 @@
+{
+  "_id": "D5RDTDd4MfoXMAYA",
+  "_key": "!actors!D5RDTDd4MfoXMAYA",
+  "name": "Bicycle",
+  "type": "vehicle",
+  "img": "icons/svg/upgrade.svg",
+  "system": {
+    "operationSkill": "Daredevil",
+    "scale": "Personal",
+    "progressLevel": 4,
+    "drvModifier": 0,
+    "acceleration": "8",
+    "cruiseSpeed": "28",
+    "maxSpeed": "40",
+    "speedBand": "Cruising",
+    "toughness": "Ordinary",
+    "durabilityRatings": {
+      "stun": 1,
+      "wound": 1,
+      "mortal": 1
+    },
+    "damage": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "hull": {
+      "size": 0,
+      "compartments": 0
+    },
+    "isConkedOut": false,
+    "armor": {
+      "type": "",
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": ""
+    },
+    "crew": {
+      "capacity": 0,
+      "current": 0
+    },
+    "weapons": [],
+    "availability": "Any",
+    "cost": "300",
+    "notes": "<p>A simple one-person multi-speed bike; two-wheeled vehicles come in many styles.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Alternity Player's Handbook, Table P42: Vehicles (Ch.12, p.194)</dd><dt>Progress Level</dt><dd>4 - PL 4: Industrial Age</dd><dt>Skill</dt><dd>Daredevil</dd><dt>Drv</dt><dd>None</dd><dt>Acceleration</dt><dd>8</dd><dt>Cruising speed</dt><dd>28</dd><dt>Maximum speed</dt><dd>40</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Durability</dt><dd>1/1/1</dd><dt>Availability</dt><dd>Any</dd><dt>Cost</dt><dd>300</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "VVGL711zXHCiD3ly",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Bicycle",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/upgrade.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Alternity Player's Handbook",
+        "folder": "PL 4: Industrial Age",
+        "table": "Table P42: Vehicles (Ch.12, p.194)",
+        "progressLevel": 4,
+        "printed": {
+          "skill": "Daredevil",
+          "drv": "-",
+          "acc": "8",
+          "cruise": "28",
+          "max": "40",
+          "type": "O",
+          "dur": "1/1/1",
+          "avail": "Any",
+          "cost": "300"
+        }
+      }
+    }
+  }
+}

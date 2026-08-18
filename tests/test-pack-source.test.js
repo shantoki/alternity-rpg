@@ -904,3 +904,163 @@ describe('spaceships', () => {
         ]);
     });
 });
+
+describe('vehicles', () => {
+    const OPERATION_SKILLS = ['Land vehicle', 'Water vehicle', 'Air vehicle',
+        'Space vehicle', 'Daredevil', 'None'];
+    const SCALES = ['Personal', 'Surface', 'Air', 'Space'];
+    const TOUGHNESS = ['Ordinary', 'Good', 'Amazing'];
+    const AVAILABILITY = ['Any', 'Common', 'Controlled', 'Military', 'Restricted'];
+    /** Skill -> scale, the one column the converter infers rather than transcribes. */
+    const SCALE_FOR_SKILL = {
+        'Land vehicle': 'Surface', 'Water vehicle': 'Surface', 'Air vehicle': 'Air',
+        'Space vehicle': 'Space', 'Daredevil': 'Personal', 'None': 'Space',
+    };
+
+    const vehicles = ALL.filter(entry =>
+        entry.pack === 'alternity-vehicles' && entry.doc._key?.startsWith('!actors!'));
+
+    test('the pack is populated', () => expect(vehicles.length).toBe(42));
+
+    test('the pack holds nothing but vehicles', () => {
+        const strays = vehicles.filter(entry => entry.doc.type !== 'vehicle');
+        expect(strays.map(entry => `${entry.doc.name} (${entry.doc.type})`)).toEqual([]);
+    });
+
+    test('classification fields validate against the schema choice lists', () => {
+        expectEach(vehicles, system => {
+            expect(OPERATION_SKILLS).toContain(system.operationSkill);
+            expect(SCALES).toContain(system.scale);
+            expect(TOUGHNESS).toContain(system.toughness);
+            expect(AVAILABILITY).toContain(system.availability);
+            expect(Number.isInteger(system.progressLevel)).toBe(true);
+            expect(system.progressLevel).toBeGreaterThanOrEqual(0);
+            expect(system.progressLevel).toBeLessThanOrEqual(9);
+            expect(Number.isInteger(system.drvModifier)).toBe(true);
+            expect(Math.abs(system.drvModifier)).toBeLessThanOrEqual(5);
+        });
+    });
+
+    /**
+     * The scale is the only column here that is not read off the page - Table P45 did
+     * not survive the scan - so it is a pure function of the printed Skill column, and
+     * this is the check that it stayed one.
+     */
+    test('scale is exactly the documented function of the skill', () => {
+        expectEach(vehicles, system => {
+            expect(system.scale).toBe(SCALE_FOR_SKILL[system.operationSkill]);
+        });
+    });
+
+    /** Every row prints either a stun/wound/mortal run or a hull, and never both. */
+    test('a row is damage-rated or hull-rated, not both and not neither', () => {
+        expectEach(vehicles, system => {
+            const hasRun = system.durabilityRatings.stun > 0;
+            const hasHull = system.hull.size > 0;
+            expect(hasRun !== hasHull).toBe(true);
+            if (hasHull) expect(system.hull.compartments).toBeGreaterThan(0);
+        });
+    });
+
+    /**
+     * Table P42 prints stun and wound as the same number on every row that has them.
+     * That is exact across all thirty-two damage-rated rows, so a transcription slip of
+     * a single digit in either column breaks this.
+     */
+    test('stun and wound are the same number, the way the table prints them', () => {
+        const rated = vehicles.filter(entry => entry.doc.system.durabilityRatings.stun > 0);
+        expect(rated).toHaveLength(32);
+        expectEach(rated, system => {
+            expect(system.durabilityRatings.stun).toBe(system.durabilityRatings.wound);
+            expect(system.durabilityRatings.mortal).toBeGreaterThan(0);
+            expect(system.durabilityRatings.mortal).toBeLessThanOrEqual(system.durabilityRatings.wound);
+        });
+    });
+
+    /**
+     * Mortal is otherwise half the wound rating, rounded either way - the book does
+     * both, so this only checks it is within a point. **Rows printed outside even that
+     * are pinned here rather than quietly corrected**: if a later pass over the page
+     * scan finds the fighter jet is really 13/13/6, this test failing is the intended
+     * signal to change it on purpose.
+     */
+    test('mortal is half the wound rating, bar the row the table prints otherwise', () => {
+        const outliers = vehicles
+            .filter(entry => {
+                const { wound, mortal } = entry.doc.system.durabilityRatings;
+                return wound > 0 && Math.abs(mortal - wound / 2) > 1;
+            })
+            .map(entry => {
+                const { stun, wound, mortal } = entry.doc.system.durabilityRatings;
+                return `${entry.doc.name} ${stun}/${wound}/${mortal}`;
+            });
+        expect(outliers.sort()).toEqual(['Fighter jet 13/13/5']);
+    });
+
+    test('nothing in the compendium arrives pre-damaged or pre-armed', () => {
+        expectEach(vehicles, system => {
+            expect(system.damage).toEqual({ stun: 0, wound: 0, mortal: 0 });
+            expect(system.isConkedOut).toBe(false);
+            expect(system.speedBand).toBe('Cruising');
+            // Every printed weapon code in Ch.12 is OCR-damaged past the point of
+            // honesty, so the rows are left for a human with the book open.
+            expect(system.weapons).toEqual([]);
+        });
+    });
+
+    /**
+     * The printed cells are kept verbatim on the provenance flag, so the parsed fields
+     * can be checked back against them without going to the scan. This is the whole
+     * transcription, round-tripped.
+     */
+    test('every parsed field still agrees with the cell it was read from', () => {
+        expectEach(vehicles, (system, doc) => {
+            const printed = doc.flags['alternity'].provenance.printed;
+            const { stun, wound, mortal } = system.durabilityRatings;
+            const dur = system.hull.size > 0
+                ? `Hull ${system.hull.size}/${system.hull.compartments}`
+                : `${stun}/${wound}/${mortal}`;
+            expect(dur).toBe(printed.dur);
+            expect(system.drvModifier).toBe(printed.drv === '-' ? 0 : Number(printed.drv));
+            expect(system.acceleration).toBe(printed.acc === '-' ? '' : printed.acc);
+            expect(system.cruiseSpeed).toBe(printed.cruise === '-' ? '' : printed.cruise);
+            expect(system.maxSpeed).toBe(printed.max === '-' ? '' : printed.max);
+            expect(system.cost).toBe(printed.cost);
+        });
+    });
+
+    /**
+     * The two rows the rest of the book independently states a number for. These are
+     * what says the page was read correctly at all, so they are pinned as data.
+     */
+    test('the two rows the prose corroborates match the prose', () => {
+        const car = vehicles.find(entry => entry.doc.name === 'Mid-sized car');
+        // "a mid-sized car with 10 stun points needs a 10 or less to pass its check"
+        expect(car.doc.system.durabilityRatings).toEqual({ stun: 10, wound: 10, mortal: 5 });
+
+        const shuttle = vehicles.find(entry => entry.doc.name === 'STG shuttle');
+        // "Statistics: Hull size 16, 4 compartments."
+        expect(shuttle.doc.system.hull).toEqual({ size: 16, compartments: 4 });
+    });
+
+    /** Armour is transcribed from prose, not from the table, so only three rows have it. */
+    test('armour is a die range per damage form, on the three rows that print one', () => {
+        const armoured = vehicles.filter(entry => entry.doc.system.armor.type !== '');
+        expect(armoured.map(entry => entry.doc.name).sort())
+            .toEqual(['STG shuttle', 'Skytank', 'Tank']);
+        expectEach(armoured, system => {
+            for (const form of ['lowImpact', 'highImpact', 'energy']) {
+                const code = system.armor[form];
+                if (code) expect(code).toMatch(/^d\d+([+-]\d+)?$/);
+            }
+        });
+    });
+
+    test('every row records the table it came from', () => {
+        expectEach(vehicles, (_system, doc) => {
+            const provenance = doc.flags['alternity'].provenance;
+            expect(provenance.table).toMatch(/^Table P42/);
+            expect(provenance.folder).toMatch(/^PL /);
+        });
+    });
+});

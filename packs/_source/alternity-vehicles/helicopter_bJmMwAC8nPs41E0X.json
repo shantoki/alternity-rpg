@@ -1,0 +1,84 @@
+{
+  "_id": "bJmMwAC8nPs41E0X",
+  "_key": "!actors!bJmMwAC8nPs41E0X",
+  "name": "Helicopter",
+  "type": "vehicle",
+  "img": "icons/svg/wing.svg",
+  "system": {
+    "operationSkill": "Air vehicle",
+    "scale": "Air",
+    "progressLevel": 5,
+    "drvModifier": 1,
+    "acceleration": "40",
+    "cruiseSpeed": "110",
+    "maxSpeed": "400",
+    "speedBand": "Cruising",
+    "toughness": "Good",
+    "durabilityRatings": {
+      "stun": 10,
+      "wound": 10,
+      "mortal": 5
+    },
+    "damage": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "hull": {
+      "size": 0,
+      "compartments": 0
+    },
+    "isConkedOut": false,
+    "armor": {
+      "type": "",
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": ""
+    },
+    "crew": {
+      "capacity": 7,
+      "current": 0
+    },
+    "weapons": [],
+    "availability": "Common",
+    "cost": "80K",
+    "notes": "<p>A light utility helicopter holding a pilot and six passengers, with a range of about 500 kilometres per load of fuel.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Alternity Player's Handbook, Table P42: Vehicles (Ch.12, p.194)</dd><dt>Progress Level</dt><dd>5 - PL 5: Information Age</dd><dt>Skill</dt><dd>Air vehicle</dd><dt>Drv</dt><dd>+1</dd><dt>Acceleration</dt><dd>40</dd><dt>Cruising speed</dt><dd>110</dd><dt>Maximum speed</dt><dd>400</dd><dt>Toughness</dt><dd>Good</dd><dt>Durability</dt><dd>10/10/5</dd><dt>Availability</dt><dd>Common</dd><dt>Cost</dt><dd>80K</dd><dt>Crew</dt><dd>7</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "KQXdrYjbZbL2cAlJ",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Helicopter",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/wing.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Alternity Player's Handbook",
+        "folder": "PL 5: Information Age",
+        "table": "Table P42: Vehicles (Ch.12, p.194)",
+        "progressLevel": 5,
+        "printed": {
+          "skill": "Air",
+          "drv": "+1",
+          "acc": "40",
+          "cruise": "110",
+          "max": "400",
+          "type": "G",
+          "dur": "10/10/5",
+          "avail": "Com",
+          "cost": "80K"
+        }
+      }
+    }
+  }
+}

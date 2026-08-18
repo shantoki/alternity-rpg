@@ -372,23 +372,57 @@ describe('warship', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Actors with nowhere to put anything
+// Vehicles, and the actors with nowhere to put anything
 // ---------------------------------------------------------------------------
 
+const VEHICLE_DEFAULTS = {
+    weapons: {
+        name: '', score: 0, damageOrdinary: '', damageGood: '', damageAmazing: '',
+        damageType: 'HI', firepower: 'Ordinary', notes: '',
+    },
+};
+
 describe('vehicle', () => {
-    test('refuses everything, because VehicleData has no arrays', () => {
-        const actor = makeActor('vehicle', {});
-        const { update, added, rejected } = planStatblockDrop(actor, [makeWeapon()], {});
-        expect(update).toBeNull();
-        expect(added).toEqual([]);
-        expect(rejected).toHaveLength(1);
+    test('a weapon becomes a mounted-weapon row', () => {
+        const actor = makeActor('vehicle', { weapons: [] });
+        const { update, added, rejected } = planStatblockDrop(actor, [makeWeapon()], VEHICLE_DEFAULTS);
+
+        expect(rejected).toEqual([]);
+        expect(added).toEqual([{ name: 'Charge Rifle', array: 'weapons' }]);
+        expect(update['system.weapons']).toHaveLength(1);
+        expect(update['system.weapons'][0]).toMatchObject({
+            name: 'Charge Rifle',
+            damageOrdinary: 'd6+1w',
+            damageGood: 'd6+3w',
+            damageAmazing: 'd8+2m',
+            damageType: 'En',
+            firepower: 'Good',
+        });
     });
 
-    test('so does the hero sheet\'s type, which embeds items instead', () => {
+    /**
+     * The same rule every other statblock drop follows: an attack score belongs to
+     * whoever is shooting, not to the weapon. On a vehicle that is the gunner.
+     */
+    test('the score stays at the row default, because it is the gunner\'s', () => {
+        const actor = makeActor('vehicle', { weapons: [] });
+        const { update } = planStatblockDrop(actor, [makeWeapon()], VEHICLE_DEFAULTS);
+        expect(update['system.weapons'][0].score).toBe(0);
+    });
+
+    test('a vehicle has no skills to drop into, because it is driven', () => {
+        const actor = makeActor('vehicle', { weapons: [] });
+        const { added, rejected } = planStatblockDrop(
+            actor, [item('skill', 'Vehicle Operation')], VEHICLE_DEFAULTS,
+        );
+        expect(added).toEqual([]);
+        expect(rejected.map(i => i.type)).toEqual(['skill']);
+    });
+
+    test('the hero sheet\'s type embeds items instead, so it is absent from the map', () => {
         // `character` is deliberately absent from the map: a hero's gear is embedded
         // Items, handled by alternity-drag-drop.js.
         expect(STATBLOCK_DROP_TARGETS.character).toBeUndefined();
-        expect(STATBLOCK_DROP_TARGETS.vehicle).toBeUndefined();
     });
 });
 

@@ -1,0 +1,84 @@
+{
+  "_id": "eAux55GMZACACqw4",
+  "_key": "!actors!eAux55GMZACACqw4",
+  "name": "Motorcar",
+  "type": "vehicle",
+  "img": "icons/svg/cart.svg",
+  "system": {
+    "operationSkill": "Land vehicle",
+    "scale": "Surface",
+    "progressLevel": 4,
+    "drvModifier": 1,
+    "acceleration": "30",
+    "cruiseSpeed": "50",
+    "maxSpeed": "80",
+    "speedBand": "Cruising",
+    "toughness": "Ordinary",
+    "durabilityRatings": {
+      "stun": 5,
+      "wound": 5,
+      "mortal": 3
+    },
+    "damage": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "hull": {
+      "size": 0,
+      "compartments": 0
+    },
+    "isConkedOut": false,
+    "armor": {
+      "type": "",
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": ""
+    },
+    "crew": {
+      "capacity": 0,
+      "current": 0
+    },
+    "weapons": [],
+    "availability": "Any",
+    "cost": "8000",
+    "notes": "<p>The first automobile. Lacking aerodynamics and comfort, but cars quickly replaced animal power as the popular form of transport.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Alternity Player's Handbook, Table P42: Vehicles (Ch.12, p.194)</dd><dt>Progress Level</dt><dd>4 - PL 4: Industrial Age</dd><dt>Skill</dt><dd>Land vehicle</dd><dt>Drv</dt><dd>+1</dd><dt>Acceleration</dt><dd>30</dd><dt>Cruising speed</dt><dd>50</dd><dt>Maximum speed</dt><dd>80</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Durability</dt><dd>5/5/3</dd><dt>Availability</dt><dd>Any</dd><dt>Cost</dt><dd>8000</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "VVGL711zXHCiD3ly",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Motorcar",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/cart.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Alternity Player's Handbook",
+        "folder": "PL 4: Industrial Age",
+        "table": "Table P42: Vehicles (Ch.12, p.194)",
+        "progressLevel": 4,
+        "printed": {
+          "skill": "Land",
+          "drv": "+1",
+          "acc": "30",
+          "cruise": "50",
+          "max": "80",
+          "type": "O",
+          "dur": "5/5/3",
+          "avail": "Any",
+          "cost": "8000"
+        }
+      }
+    }
+  }
+}

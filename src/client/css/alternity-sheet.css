@@ -442,16 +442,6 @@
     text-align: center;
 }
 
-.alt-vehicle-type-badge {
-    background: var(--alt-color-primary);
-    color: white;
-    padding: 1px 6px;
-    border-radius: 4px;
-    font-size: 10px;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
 .alt-stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -2398,3 +2388,54 @@
 /* Lets the Species field take the slack in the header meta row. */
 .alt-meta-field--grow { flex: 1 1 auto; min-width: 0; }
 .alt-meta-field--grow input { width: 100%; }
+
+/* ═══ Vehicle sheet ══════════════════════════════════════════════════════════ */
+
+/*
+ * The vehicle sheet was rebuilt around Table P42 and dropped the hull/shield/tech-point
+ * bars the old d20-shaped schema carried. `.alt-vehicle-type-badge` went with them; what
+ * is left of the old block is the `.alt-sheet-body` padding rule near the NPC sheet.
+ *
+ * Statuses share `.alt-ship-status-badge` with the ship, robot and creature sheets — the
+ * badge is the same object, only the state names differ, so only the colours are new.
+ */
+.alt-vehicle-status--Operational { background: rgba(74, 217, 122, 0.15); color: var(--alt-color-success); }
+.alt-vehicle-status--Unstable    { background: rgba(217, 164, 74, 0.15); color: var(--alt-color-warning); }
+.alt-vehicle-status--Failing,
+.alt-vehicle-status--Stalled     { background: rgba(217, 74, 74, 0.15); color: var(--alt-color-danger); }
+.alt-vehicle-status--Wrecked     { background: rgba(0, 0, 0, 0.4); color: var(--alt-color-text-muted); }
+
+/*
+ * The itemised step penalty the vehicle hands its operator. Shown as a list rather than
+ * a single number because the four contributions come and go independently — Drv is
+ * constant, the speed band is a choice, and the two damage penalties appear as the
+ * vehicle is shot at.
+ */
+.alt-vehicle-modifier-list {
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 10px;
+    color: var(--alt-color-text-muted);
+}
+.alt-vehicle-modifier-list li {
+    display: flex;
+    gap: 6px;
+    padding: 2px 0;
+    border-bottom: 1px solid var(--alt-color-border);
+}
+.alt-vehicle-modifier-list li:last-child { border-bottom: none; }
+
+/* A penalty is the common case, so the value column is sized for two characters. */
+.alt-vehicle-modifier-value {
+    flex: 0 0 28px;
+    text-align: right;
+    font-weight: bold;
+    color: var(--alt-color-text);
+}
+
+/*
+ * The durability rating is editable inline in the bar label, because a Gamemaster
+ * copying a row out of Table P42 types the maximum far more often than the damage.
+ */
+.alt-vehicle-sheet .alt-bar-values input { width: 44px; text-align: center; }

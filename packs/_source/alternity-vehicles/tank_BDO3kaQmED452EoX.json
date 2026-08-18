@@ -1,0 +1,84 @@
+{
+  "_id": "BDO3kaQmED452EoX",
+  "_key": "!actors!BDO3kaQmED452EoX",
+  "name": "Tank",
+  "type": "vehicle",
+  "img": "icons/svg/cart.svg",
+  "system": {
+    "operationSkill": "Land vehicle",
+    "scale": "Surface",
+    "progressLevel": 4,
+    "drvModifier": 1,
+    "acceleration": "10",
+    "cruiseSpeed": "40",
+    "maxSpeed": "60",
+    "speedBand": "Cruising",
+    "toughness": "Amazing",
+    "durabilityRatings": {
+      "stun": 20,
+      "wound": 20,
+      "mortal": 10
+    },
+    "damage": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "hull": {
+      "size": 0,
+      "compartments": 0
+    },
+    "isConkedOut": false,
+    "armor": {
+      "type": "Thick alloy",
+      "lowImpact": "",
+      "highImpact": "d6+1",
+      "energy": "d6"
+    },
+    "crew": {
+      "capacity": 0,
+      "current": 0
+    },
+    "weapons": [],
+    "availability": "Military",
+    "cost": "250K",
+    "notes": "<p>Armoured and tracked, the tank replaced cavalry.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Alternity Player's Handbook, Table P42: Vehicles (Ch.12, p.194)</dd><dt>Progress Level</dt><dd>4 - PL 4: Industrial Age</dd><dt>Skill</dt><dd>Land vehicle</dd><dt>Drv</dt><dd>+1</dd><dt>Acceleration</dt><dd>10</dd><dt>Cruising speed</dt><dd>40</dd><dt>Maximum speed</dt><dd>60</dd><dt>Toughness</dt><dd>Amazing</dd><dt>Durability</dt><dd>20/20/10</dd><dt>Availability</dt><dd>Military</dd><dt>Cost</dt><dd>250K</dd><dt>Armor</dt><dd>d6+1 (HI), d6 (En)</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "VVGL711zXHCiD3ly",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Tank",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/cart.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Alternity Player's Handbook",
+        "folder": "PL 4: Industrial Age",
+        "table": "Table P42: Vehicles (Ch.12, p.194)",
+        "progressLevel": 4,
+        "printed": {
+          "skill": "Land",
+          "drv": "+1",
+          "acc": "10",
+          "cruise": "40",
+          "max": "60",
+          "type": "A",
+          "dur": "20/20/10",
+          "avail": "Mil",
+          "cost": "250K"
+        }
+      }
+    }
+  }
+}

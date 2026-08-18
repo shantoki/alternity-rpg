@@ -1,0 +1,84 @@
+{
+  "_id": "h7XxYnIZlDt0KvuH",
+  "_key": "!actors!h7XxYnIZlDt0KvuH",
+  "name": "STG shuttle",
+  "type": "vehicle",
+  "img": "icons/svg/sun.svg",
+  "system": {
+    "operationSkill": "Space vehicle",
+    "scale": "Space",
+    "progressLevel": 6,
+    "drvModifier": 0,
+    "acceleration": "500",
+    "cruiseSpeed": "50K",
+    "maxSpeed": "",
+    "speedBand": "Cruising",
+    "toughness": "Amazing",
+    "durabilityRatings": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "damage": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "hull": {
+      "size": 16,
+      "compartments": 4
+    },
+    "isConkedOut": false,
+    "armor": {
+      "type": "Light polymeric",
+      "lowImpact": "d4-1",
+      "highImpact": "d4-1",
+      "energy": "d4-2"
+    },
+    "crew": {
+      "capacity": 0,
+      "current": 0
+    },
+    "weapons": [],
+    "availability": "Controlled",
+    "cost": "400K",
+    "notes": "<p>The space-to-ground shuttle moves people and cargo between a planet and orbit. A planetary thruster and a fusion generator let it reach orbital velocity like an airplane, without separate rockets. It cannot travel in deep space. Compartments: C1 Command 6/6/3, C2 Engineering 16/16/8, C3 Cargo 6/6/3, C4 Passenger hold 4/4/2. Random damage: 1-2 = C1, 3-5 = C2, 6-12 = C3, 13-20 = C4.</p><p>Hull-rated: the Dur column prints hull size and compartments rather than a stun/wound/mortal run, because this craft is resolved with the spaceship rules in the second half of Chapter 12. See the Spaceships and Warships compendia for full statblocks.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Alternity Player's Handbook, Table P42: Vehicles (Ch.12, p.194)</dd><dt>Progress Level</dt><dd>6 - PL 6: Fusion Age</dd><dt>Skill</dt><dd>Space vehicle</dd><dt>Drv</dt><dd>None</dd><dt>Acceleration</dt><dd>500</dd><dt>Cruising speed</dt><dd>50K</dd><dt>Toughness</dt><dd>Amazing</dd><dt>Durability</dt><dd>Hull 16/4</dd><dt>Availability</dt><dd>Controlled</dd><dt>Cost</dt><dd>400K</dd><dt>Armor</dt><dd>d4-1 (LI), d4-1 (HI), d4-2 (En)</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "RP2ciKiZweyIILhd",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "STG shuttle",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/sun.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Alternity Player's Handbook",
+        "folder": "PL 6: Fusion Age",
+        "table": "Table P42: Vehicles (Ch.12, p.194)",
+        "progressLevel": 6,
+        "printed": {
+          "skill": "Space",
+          "drv": "-",
+          "acc": "500",
+          "cruise": "50K",
+          "max": "-",
+          "type": "A",
+          "dur": "Hull 16/4",
+          "avail": "Con",
+          "cost": "400K"
+        }
+      }
+    }
+  }
+}

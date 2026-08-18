@@ -1,0 +1,84 @@
+{
+  "_id": "El3kijZQcLLHMBrf",
+  "_key": "!actors!El3kijZQcLLHMBrf",
+  "name": "Reentry capsule",
+  "type": "vehicle",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "operationSkill": "None",
+    "scale": "Space",
+    "progressLevel": 6,
+    "drvModifier": 0,
+    "acceleration": "",
+    "cruiseSpeed": "",
+    "maxSpeed": "",
+    "speedBand": "Cruising",
+    "toughness": "Good",
+    "durabilityRatings": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "damage": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "hull": {
+      "size": 1,
+      "compartments": 1
+    },
+    "isConkedOut": false,
+    "armor": {
+      "type": "",
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": ""
+    },
+    "crew": {
+      "capacity": 1,
+      "current": 0
+    },
+    "weapons": [],
+    "availability": "Any",
+    "cost": "5000",
+    "notes": "<p>A personal escape device about the size of an ejection seat, with 48 hours of air and rations, an emergency beacon, a survival kit, braking rockets, a parachute and an automatic flotation ring. It may run out of air coming down from a high orbit.</p><p>Hull-rated: the Dur column prints hull size and compartments rather than a stun/wound/mortal run, because this craft is resolved with the spaceship rules in the second half of Chapter 12. See the Spaceships and Warships compendia for full statblocks.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Alternity Player's Handbook, Table P42: Vehicles (Ch.12, p.194)</dd><dt>Progress Level</dt><dd>6 - PL 6: Fusion Age</dd><dt>Skill</dt><dd>None - not steered</dd><dt>Drv</dt><dd>None</dd><dt>Toughness</dt><dd>Good</dd><dt>Durability</dt><dd>Hull 1/1</dd><dt>Availability</dt><dd>Any</dd><dt>Cost</dt><dd>5000</dd><dt>Crew</dt><dd>1</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "RP2ciKiZweyIILhd",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Reentry capsule",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/item-bag.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Alternity Player's Handbook",
+        "folder": "PL 6: Fusion Age",
+        "table": "Table P42: Vehicles (Ch.12, p.194)",
+        "progressLevel": 6,
+        "printed": {
+          "skill": "-",
+          "drv": "-",
+          "acc": "-",
+          "cruise": "-",
+          "max": "-",
+          "type": "G",
+          "dur": "Hull 1/1",
+          "avail": "Any",
+          "cost": "5000"
+        }
+      }
+    }
+  }
+}

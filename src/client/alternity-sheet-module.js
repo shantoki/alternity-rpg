@@ -68,6 +68,14 @@ import {
     ANIMAL_SCALE_ABILITIES,
 } from '../data/CreatureData.js';
 import {
+    VEHICLE_OPERATION_SKILLS,
+    VEHICLE_SCALES,
+    VEHICLE_AVAILABILITY,
+    VEHICLE_SPEED_BANDS,
+    VEHICLE_SKILL_IDS,
+    VEHICLE_TRACKS,
+} from '../data/VehicleData.js';
+import {
     AI_QUALITIES,
     AI_PROCESSORS,
     AI_AVATAR_PROGRAMS,
@@ -254,6 +262,10 @@ function applySheetFieldChange(sheet, input, arrayFields = {}) {
  * @param {object} check   - { name, scores, baseStep, modifiers?, rangeClass? }.
  * @param {string} context
  * @param {object} [options] - Forwarded to AlternityRollComponent.
+ * @param {Actor}  [options.actor] - Who is making the check, when that is not the
+ *        sheet's own document. The vehicle sheet needs this: a vehicle has no Vehicle
+ *        Operation score, so its control check is rolled by whoever is driving, and it
+ *        is the *driver's* standing modifiers (wound level, stances) that apply.
  * @returns {AlternityRollComponent|null}
  */
 function mountRoller(sheet, check, context, options = {}) {
@@ -264,7 +276,7 @@ function mountRoller(sheet, check, context, options = {}) {
     }
     mount.hidden = false;
     mount.innerHTML = '';
-    const roller = new AlternityRollComponent(mount, sheet.document, check, context, options);
+    const roller = new AlternityRollComponent(mount, options.actor ?? sheet.document, check, context, options);
     roller.render();
     mount.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     return roller;
@@ -1801,46 +1813,310 @@ class AlternityNpcSheet extends foundry.applications.api.HandlebarsApplicationMi
 // AlternityVehicleSheet
 // ---------------------------------------------------------------------------
 
+const VEHICLE_ARRAY_FIELDS = Object.freeze({
+    weapons: {
+        name: '', score: 0, damageOrdinary: '', damageGood: '', damageAmazing: '',
+        damageType: 'HI', firepower: 'Ordinary', notes: '',
+    },
+});
+
+/**
+ * Who is driving.
+ *
+ * A vehicle has no Vehicle Operation score of its own — Table P42 has no such column,
+ * because the score belongs to the driver. So the control check needs a character, and
+ * this resolves one the way a Foundry user expects: the token they have selected first,
+ * then the character assigned to their user.
+ *
+ * @returns {Actor|null}
+ */
+function currentVehicleOperator() {
+    const controlled = game.canvas?.tokens?.controlled ?? [];
+    const fromToken = controlled.map((token) => token?.actor).find(Boolean);
+    return fromToken ?? game.user?.character ?? null;
+}
+
+/**
+ * Find an operator's score in the Vehicle Operation specialty a vehicle needs.
+ *
+ * Two storage shapes are in play and both are read, because both kinds of actor drive:
+ * heroes and supporting cast keep their skill tree in `AlternityCharacterState`, while
+ * creatures, robots and AIs keep printed skill rows in a `system.skills` array.
+ *
+ * The state path is a **read**, never `getAlternityState` — that function writes a
+ * default state flag when it finds none, and merely opening a vehicle sheet should not
+ * stamp a character state onto whatever token happened to be selected.
+ *
+ * @param {Actor} operator
+ * @param {string} operationSkill - A VEHICLE_OPERATION_SKILLS value.
+ * @returns {{scores: object, baseStep: number}|null}
+ */
+function findOperatorVehicleCheck(operator, operationSkill) {
+    const skillId = VEHICLE_SKILL_IDS[operationSkill];
+    if (!skillId) return null;
+
+    const raw = operator?.getFlag?.('alternity', 'characterState');
+    if (raw) {
+        const state = AlternityCharacterState.deserialize(raw);
+        const scores = state.getSkillScores(skillId);
+        if (scores?.ordinary > 0) return { scores, baseStep: state.getSkillBaseStep(skillId) };
+    }
+
+    // A printed statblock row. `Land vehicle` matches a row called "Land vehicle",
+    // "Vehicle Operation-land" or plain "Vehicle Operation" — in that order of
+    // preference, since a specialty rolls at a better base step than its broad skill.
+    const [specialty] = operationSkill.toLowerCase().split(' ');
+    const rows = operator?.system?.skills ?? [];
+    const match = rows.find((row) => new RegExp(specialty, 'i').test(row?.name ?? ''))
+        ?? rows.find((row) => /vehicle/i.test(row?.name ?? ''));
+    if (match) {
+        const parsed = AlternityMathService.parseScoreRun(match.scoreRun || match.score);
+        if (parsed.isValid && parsed.ordinary > 0) {
+            return {
+                scores: { ordinary: parsed.ordinary, good: parsed.good, amazing: parsed.amazing },
+                baseStep: (match.isSpecialty ?? !match.isBroad) ? 0 : 1,
+            };
+        }
+    }
+
+    return null;
+}
+
+/**
+ * The vehicle record sheet, following Table P42's own column order.
+ *
+ * Three things make it unlike the other statblock sheets:
+ *
+ * - **It has no abilities and no action check.** A vehicle is not a combatant; it is
+ *   driven. So there is no `rollAbility` and no `rollActionCheck` here.
+ * - **Its control check belongs to somebody else.** `rollControl` finds the driver,
+ *   rolls *their* Vehicle Operation specialty, and hands the vehicle's own
+ *   contributions — Drv, the speed band, damage penalties — across as modifiers.
+ * - **Its durability check is genuinely its own**, and is the only roll that is. The
+ *   skill score is the printed stun (or wound) rating, per PHB p.203.
+ */
 class AlternityVehicleSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ActorSheetV2) {
     static DEFAULT_OPTIONS = foundry.utils.mergeObject(super.DEFAULT_OPTIONS, {
         classes: [NS, `${NS}-sheet-app`, `${NS}-vehicle-sheet`],
         tag: "form",
-        window: { resizable: true, width: 560, height: 600 }
+        window: { resizable: true, width: 640, height: 760 },
+        actions: {
+            addVehicleRow:      this._onAddVehicleRowAction,
+            deleteVehicleRow:   this._onDeleteVehicleRowAction,
+            setVehicleDamage:   this._onSetVehicleDamageAction,
+            clearVehicleDamage: this._onClearVehicleDamageAction,
+            rollControl:        this._onRollControlAction,
+            rollDurability:     this._onRollDurabilityAction,
+            rollAttack:         this._onRollAttackAction,
+        }
     });
+
     static PARTS = {
         sheet: { template: "systems/alternity/templates/actor/actor-vehicle-sheet.hbs" }
     };
+
     async _prepareContext(options) {
         const context = await super._prepareContext(options);
+        const system = this.document.system;
+
         context.actor = this.document;
-        context.system = this.document.system;
+        context.system = system;
         // Schema fields for {{formInput}}, which is how an HTMLField gets a <prose-mirror>
         // editor instead of a <textarea> that shows its own markup as text.
-        context.systemFields = this.document.system?.schema?.fields ?? {};
+        context.systemFields = system?.schema?.fields ?? {};
         context.alt = NS;
-        context.vehicleTypeChoices = ['Ground', 'Air', 'Space', 'Water'];
-        context.sizeChoices = ['Tiny', 'Small', 'Medium', 'Large', 'Huge', 'Gargantuan'];
+
+        // ── Choice lists ────────────────────────────────────────────────────
+        context.operationSkillChoices = VEHICLE_OPERATION_SKILLS;
+        context.scaleChoices = VEHICLE_SCALES;
+        context.availabilityChoices = VEHICLE_AVAILABILITY;
+        context.toughnessChoices = PERSONAL_TOUGHNESS_CLASSES;
+        context.damageTypeChoices = DAMAGE_TYPES;
+        context.firepowerChoices = FIREPOWER_CLASSES;
+        context.speedBandChoices = Object.entries(VEHICLE_SPEED_BANDS).map(([key, steps]) => ({
+            // `Band`, not `SpeedBand`: a lang key cannot be both a value and a
+            // namespace, and `ALTERNITY.Vehicle.SpeedBand` is the field's own label.
+            key, steps, label: game.i18n.localize(`ALTERNITY.Vehicle.Band.${key.replace(/\s/g, '')}`),
+        }));
+
+        // ── Damage tracks ───────────────────────────────────────────────────
+        context.tracks = VEHICLE_TRACKS.map((key) => {
+            const track = system.durability?.[key] ?? { value: 0, max: 0 };
+            return {
+                key,
+                label: game.i18n.localize(`ALTERNITY.${key.charAt(0).toUpperCase()}${key.slice(1)}`),
+                value: track.value, max: track.max,
+                pct: pct(track.value, track.max),
+            };
+        });
+
+        // ── The operator's step penalty, itemised ───────────────────────────
+        // Shown even when nobody is selected, because a Gamemaster rolling on the
+        // driver's own sheet still needs the number.
+        context.controlModifiers = (system.controlModifiers ?? []).map((mod) => ({
+            ...mod, display: fmtMod(mod.value),
+        }));
+        context.controlPenalty = fmtMod(system.controlPenalty ?? 0);
+        context.isSteered = !!VEHICLE_SKILL_IDS[system.operationSkill];
+
+        context.armorSlots = [
+            { key: 'lowImpact',  label: 'LI', value: system.armor?.lowImpact ?? '' },
+            { key: 'highImpact', label: 'HI', value: system.armor?.highImpact ?? '' },
+            { key: 'energy',     label: 'En', value: system.armor?.energy ?? '' },
+        ];
+
+        context.attackRows = system.attackRows ?? [];
+
         return context;
     }
+
     _onRender(context, options) {
         bindOnce(this.element, 'sheetChange', () => {
             this.element.addEventListener('change', (e) => {
-                const input = e.target;
-                // Same editability guard the shared `applySheetFieldChange` applies; this
-                // sheet writes inline because it has no array fields to read-modify-write.
-                if (input.name && this.isEditable !== false) {
-                    const val = input.type === 'checkbox' ? input.checked : input.value;
-                    this.document.update({ [input.name]: val });
-                }
+                applySheetFieldChange(this, e.target, VEHICLE_ARRAY_FIELDS);
             });
         });
-        // A vehicle has no attack or gear arrays to drop into — it is driven by a
-        // character's own Vehicle Operation check. Bound anyway so a drop is
-        // refused out loud instead of appearing to have worked.
-        bindStatblockDragDrop(this, this.element, {});
+        bindRollMount(this);
+        bindStatblockDragDrop(this, this.element, VEHICLE_ARRAY_FIELDS);
         // Read-only when the document cannot be written (a locked compendium, or no
         // update permission). Runs every render, because the rendered part is replaced.
         applySheetEditableState(this);
+    }
+
+    // -----------------------------------------------------------------------
+    // Rolling
+    // -----------------------------------------------------------------------
+
+    /**
+     * The driver's Vehicle Operation check, carrying the vehicle's contributions.
+     *
+     * Rolled as the operator, not as the vehicle, so the card is attributed to the
+     * person steering and their own standing modifiers are collected.
+     */
+    static async _onRollControlAction() {
+        const system = this.document.system;
+
+        if (!VEHICLE_SKILL_IDS[system.operationSkill]) {
+            ui.notifications?.warn(game.i18n.localize('ALTERNITY.Vehicle.NotSteered'));
+            return null;
+        }
+
+        const operator = currentVehicleOperator();
+        if (!operator) {
+            ui.notifications?.warn(game.i18n.localize('ALTERNITY.Vehicle.NoOperator'));
+            return null;
+        }
+
+        const check = findOperatorVehicleCheck(operator, system.operationSkill);
+        if (!check) {
+            ui.notifications?.warn(game.i18n.format('ALTERNITY.Vehicle.OperatorUntrained', {
+                name: operator.name, skill: system.operationSkill,
+            }));
+            return null;
+        }
+
+        return mountRoller(
+            this,
+            {
+                name: game.i18n.format('ALTERNITY.Vehicle.ControlCheckName', {
+                    name: operator.name, vehicle: this.document.name,
+                }),
+                scores: check.scores,
+                baseStep: check.baseStep,
+                modifiers: system.controlModifiers ?? [],
+            },
+            game.i18n.localize('ALTERNITY.Vehicle.ControlCheck'),
+            { actor: operator },
+        );
+    }
+
+    /**
+     * The vehicle's own durability check.
+     *
+     * "A vehicle's skill score for this check is equal to its original stun point
+     * total" — the *original* rating, not what is left of it — and the wound total for
+     * the check that mortal damage forces.
+     */
+    static async _onRollDurabilityAction(event, target) {
+        const track = target.dataset.track === 'wound' ? 'wound' : 'stun';
+        const system = this.document.system;
+        const scores = system.durabilityChecks?.[track];
+
+        if (!scores?.ordinary) {
+            ui.notifications?.warn(game.i18n.localize('ALTERNITY.Vehicle.NoDurabilityRating'));
+            return null;
+        }
+
+        return mountRoller(
+            this,
+            {
+                name: game.i18n.format('ALTERNITY.Vehicle.DurabilityCheckName', {
+                    track: game.i18n.localize(`ALTERNITY.${track === 'wound' ? 'Wound' : 'Stun'}`),
+                }),
+                scores,
+                // A durability check is rolled against a printed score, like a trained
+                // specialty rather than a bare ability.
+                baseStep: 0,
+                modifiers: system.durabilityCheckModifiers ?? [],
+            },
+            game.i18n.localize('ALTERNITY.Vehicle.DurabilityCheck'),
+        );
+    }
+
+    /**
+     * Fire a mounted weapon. Every vehicle weapon is a ranged attack, so the target's
+     * ranged resistance modifier is the one that applies.
+     */
+    static async _onRollAttackAction(event, target) {
+        const row = this.document.system.attackRows?.[safeInt(target.dataset.index, -1)];
+        return rollStatblockAttack(this, row, { attackKind: 'ranged' });
+    }
+
+    // -----------------------------------------------------------------------
+    // Row management
+    // -----------------------------------------------------------------------
+
+    static async _onAddVehicleRowAction(event, target) {
+        const arrayKey = target.dataset.array;
+        const defaults = VEHICLE_ARRAY_FIELDS[arrayKey];
+        if (!defaults) return;
+        const current = foundry.utils.getProperty(this.document.system, arrayKey) ?? [];
+        await this.document.update({
+            [`system.${arrayKey}`]: [...current, foundry.utils.deepClone(defaults)],
+        });
+    }
+
+    static async _onDeleteVehicleRowAction(event, target) {
+        const arrayKey = target.dataset.array;
+        const idx = safeInt(target.dataset.index, -1);
+        if (idx < 0 || !VEHICLE_ARRAY_FIELDS[arrayKey]) return;
+        const current = foundry.utils.getProperty(this.document.system, arrayKey) ?? [];
+        await this.document.update({ [`system.${arrayKey}`]: current.filter((_, i) => i !== idx) });
+    }
+
+    // -----------------------------------------------------------------------
+    // Damage
+    // -----------------------------------------------------------------------
+
+    static async _onSetVehicleDamageAction(event, target) {
+        const track = target.dataset.track;
+        const delta = safeInt(target.dataset.delta, 0);
+        if (!VEHICLE_TRACKS.includes(track)) return;
+
+        const max = this.document.system.durabilityRatings?.[track] ?? 0;
+        const current = this.document.system.damage?.[track] ?? 0;
+        await this.document.update({
+            [`system.damage.${track}`]: Math.min(max, Math.max(0, current + delta)),
+        });
+    }
+
+    static async _onClearVehicleDamageAction() {
+        await this.document.update({
+            'system.damage.stun': 0,
+            'system.damage.wound': 0,
+            'system.damage.mortal': 0,
+            'system.isConkedOut': false,
+        });
     }
 }
 

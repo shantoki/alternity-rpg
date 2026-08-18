@@ -102,9 +102,12 @@ Hooks.once('init', async () => {
             bar: ['durability.stun', 'durability.wound', 'durability.mortal', 'durability.fatigue'],
             value: ['woundLevel'],
         },
+        // Three tracks, not four: Table P42 prints stun/wound/mortal and a vehicle has
+        // no fatigue rating. These used to read `hullIntegrity`, `shields` and
+        // `techPoints`, none of which were Alternity stats.
         vehicle: {
-            bar: ['hullIntegrity', 'shields', 'techPoints'],
-            value: [],
+            bar: ['durability.stun', 'durability.wound', 'durability.mortal'],
+            value: ['status', 'controlPenalty'],
         },
         warship: {
             bar: ['damage.stun', 'damage.wound', 'damage.mortal', 'damage.critical'],

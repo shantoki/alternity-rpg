@@ -1,0 +1,84 @@
+{
+  "_id": "ahQ3OnabCCc7vc7q",
+  "_key": "!actors!ahQ3OnabCCc7vc7q",
+  "name": "Skycar",
+  "type": "vehicle",
+  "img": "icons/svg/wing.svg",
+  "system": {
+    "operationSkill": "Air vehicle",
+    "scale": "Air",
+    "progressLevel": 6,
+    "drvModifier": -1,
+    "acceleration": "200",
+    "cruiseSpeed": "1000",
+    "maxSpeed": "3000",
+    "speedBand": "Cruising",
+    "toughness": "Good",
+    "durabilityRatings": {
+      "stun": 11,
+      "wound": 11,
+      "mortal": 5
+    },
+    "damage": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "hull": {
+      "size": 0,
+      "compartments": 0
+    },
+    "isConkedOut": false,
+    "armor": {
+      "type": "",
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": ""
+    },
+    "crew": {
+      "capacity": 0,
+      "current": 0
+    },
+    "weapons": [],
+    "availability": "Common",
+    "cost": "50K",
+    "notes": "<p>Introduced late in PL 6 after gravity induction. A sport coupe is a two-seater with higher speed and better handling; a luxury sedan seats six but tops out at 2,000 kph with no Drv bonus.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Alternity Player's Handbook, Table P42: Vehicles (Ch.12, p.194)</dd><dt>Progress Level</dt><dd>6 - PL 6: Fusion Age</dd><dt>Skill</dt><dd>Air vehicle</dd><dt>Drv</dt><dd>-1</dd><dt>Acceleration</dt><dd>200</dd><dt>Cruising speed</dt><dd>1000</dd><dt>Maximum speed</dt><dd>3000</dd><dt>Toughness</dt><dd>Good</dd><dt>Durability</dt><dd>11/11/5</dd><dt>Availability</dt><dd>Common</dd><dt>Cost</dt><dd>50K</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "RP2ciKiZweyIILhd",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Skycar",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/wing.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Alternity Player's Handbook",
+        "folder": "PL 6: Fusion Age",
+        "table": "Table P42: Vehicles (Ch.12, p.194)",
+        "progressLevel": 6,
+        "printed": {
+          "skill": "Air",
+          "drv": "-1",
+          "acc": "200",
+          "cruise": "1000",
+          "max": "3000",
+          "type": "G",
+          "dur": "11/11/5",
+          "avail": "Com",
+          "cost": "50K"
+        }
+      }
+    }
+  }
+}

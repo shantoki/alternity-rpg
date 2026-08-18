@@ -1,0 +1,84 @@
+{
+  "_id": "7i8slbyhgMOcptbH",
+  "_key": "!actors!7i8slbyhgMOcptbH",
+  "name": "Raft",
+  "type": "vehicle",
+  "img": "icons/svg/water.svg",
+  "system": {
+    "operationSkill": "Water vehicle",
+    "scale": "Surface",
+    "progressLevel": 3,
+    "drvModifier": 2,
+    "acceleration": "2",
+    "cruiseSpeed": "8",
+    "maxSpeed": "16",
+    "speedBand": "Cruising",
+    "toughness": "Ordinary",
+    "durabilityRatings": {
+      "stun": 3,
+      "wound": 3,
+      "mortal": 2
+    },
+    "damage": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "hull": {
+      "size": 0,
+      "compartments": 0
+    },
+    "isConkedOut": false,
+    "armor": {
+      "type": "",
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": ""
+    },
+    "crew": {
+      "capacity": 0,
+      "current": 0
+    },
+    "weapons": [],
+    "availability": "Any",
+    "cost": "50",
+    "notes": "<p>A flat flotation device, usually logs tied together or pontoons on either side of a flat surface. On a shallow river the operator can pole it along.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Alternity Player's Handbook, Table P42: Vehicles (Ch.12, p.194)</dd><dt>Progress Level</dt><dd>3 - PL 0-3: Stone Age through Age of Reason</dd><dt>Skill</dt><dd>Water vehicle</dd><dt>Drv</dt><dd>+2</dd><dt>Acceleration</dt><dd>2</dd><dt>Cruising speed</dt><dd>8</dd><dt>Maximum speed</dt><dd>16</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Durability</dt><dd>3/3/2</dd><dt>Availability</dt><dd>Any</dd><dt>Cost</dt><dd>50</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "325qXx1FPRRkALD0",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Raft",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/water.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Alternity Player's Handbook",
+        "folder": "PL 0-3: Stone Age through Age of Reason",
+        "table": "Table P42: Vehicles (Ch.12, p.194)",
+        "progressLevel": 3,
+        "printed": {
+          "skill": "Water",
+          "drv": "+2",
+          "acc": "2",
+          "cruise": "8",
+          "max": "16",
+          "type": "O",
+          "dur": "3/3/2",
+          "avail": "Any",
+          "cost": "50"
+        }
+      }
+    }
+  }
+}

@@ -226,6 +226,21 @@ function buildGridProgramRow(item) {
     };
 }
 
+/**
+ * A vehicle mounts personal-scale weapons, so the row is the NPC/creature attack
+ * shape plus the firepower grade the vehicle sheet shows. `score` stays at the row
+ * default for the same reason it does everywhere else: the score is the gunner's,
+ * not the weapon's.
+ */
+function buildVehicleWeaponRow(item) {
+    const system = item.system ?? {};
+    return {
+        ...attackCore(item),
+        damageType: oneOf(system.damageType, PERSONAL_DAMAGE_FORMS, 'HI'),
+        firepower:  oneOf(system.firepower, FIREPOWER_CLASSES, 'Ordinary'),
+    };
+}
+
 function buildSpaceshipWeaponRow(item) {
     const system = item.system ?? {};
     return {
@@ -273,10 +288,10 @@ function buildWarshipWeaponRow(item) {
 /**
  * Which array each item type lands in, per actor type, and how the row is built.
  *
- * An actor type absent from this map (`vehicle`) accepts nothing: `VehicleData`
- * holds no arrays at all, because a vehicle is driven by a character's own Vehicle
- * Operation check and has no attacks or gear of its own. An item type absent from
- * an actor's entry is refused out loud rather than silently swallowed.
+ * An actor type absent from this map accepts nothing, and an item type absent from
+ * an actor's entry is refused out loud rather than silently swallowed. A `vehicle`
+ * takes weapons only: it is *driven*, so it has no skills of its own to drop into —
+ * the Vehicle Operation score belongs to whoever is at the controls.
  */
 export const STATBLOCK_DROP_TARGETS = Object.freeze({
     npc: {
@@ -296,6 +311,9 @@ export const STATBLOCK_DROP_TARGETS = Object.freeze({
         armor:   { array: 'physicalForm', build: buildAiArmorRow },
         program: { array: 'gridPrograms', build: buildGridProgramRow },
         skill:   { array: 'skills',       build: buildMemorySkillRow },
+    },
+    vehicle: {
+        weapon: { array: 'weapons', build: buildVehicleWeaponRow },
     },
     spaceship: {
         weapon: { array: 'weapons', build: buildSpaceshipWeaponRow },

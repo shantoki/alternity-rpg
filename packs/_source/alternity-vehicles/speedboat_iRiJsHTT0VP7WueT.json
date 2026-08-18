@@ -1,0 +1,84 @@
+{
+  "_id": "iRiJsHTT0VP7WueT",
+  "_key": "!actors!iRiJsHTT0VP7WueT",
+  "name": "Speedboat",
+  "type": "vehicle",
+  "img": "icons/svg/water.svg",
+  "system": {
+    "operationSkill": "Water vehicle",
+    "scale": "Surface",
+    "progressLevel": 4,
+    "drvModifier": 0,
+    "acceleration": "20",
+    "cruiseSpeed": "60",
+    "maxSpeed": "80",
+    "speedBand": "Cruising",
+    "toughness": "Good",
+    "durabilityRatings": {
+      "stun": 6,
+      "wound": 6,
+      "mortal": 3
+    },
+    "damage": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "hull": {
+      "size": 0,
+      "compartments": 0
+    },
+    "isConkedOut": false,
+    "armor": {
+      "type": "",
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": ""
+    },
+    "crew": {
+      "capacity": 0,
+      "current": 0
+    },
+    "weapons": [],
+    "availability": "Any",
+    "cost": "12K",
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Alternity Player's Handbook, Table P42: Vehicles (Ch.12, p.194)</dd><dt>Progress Level</dt><dd>4 - PL 4: Industrial Age</dd><dt>Skill</dt><dd>Water vehicle</dd><dt>Drv</dt><dd>None</dd><dt>Acceleration</dt><dd>20</dd><dt>Cruising speed</dt><dd>60</dd><dt>Maximum speed</dt><dd>80</dd><dt>Toughness</dt><dd>Good</dd><dt>Durability</dt><dd>6/6/3</dd><dt>Availability</dt><dd>Any</dd><dt>Cost</dt><dd>12K</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "VVGL711zXHCiD3ly",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Speedboat",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/water.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Alternity Player's Handbook",
+        "folder": "PL 4: Industrial Age",
+        "table": "Table P42: Vehicles (Ch.12, p.194)",
+        "progressLevel": 4,
+        "printed": {
+          "skill": "Water",
+          "drv": "-",
+          "acc": "20",
+          "cruise": "60",
+          "max": "80",
+          "type": "G",
+          "dur": "6/6/3",
+          "avail": "Any",
+          "cost": "12K"
+        }
+      }
+    }
+  }
+}

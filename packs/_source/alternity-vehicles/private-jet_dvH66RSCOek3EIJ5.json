@@ -1,0 +1,84 @@
+{
+  "_id": "dvH66RSCOek3EIJ5",
+  "_key": "!actors!dvH66RSCOek3EIJ5",
+  "name": "Private jet",
+  "type": "vehicle",
+  "img": "icons/svg/wing.svg",
+  "system": {
+    "operationSkill": "Air vehicle",
+    "scale": "Air",
+    "progressLevel": 5,
+    "drvModifier": 0,
+    "acceleration": "50",
+    "cruiseSpeed": "500",
+    "maxSpeed": "1000",
+    "speedBand": "Cruising",
+    "toughness": "Good",
+    "durabilityRatings": {
+      "stun": 10,
+      "wound": 10,
+      "mortal": 5
+    },
+    "damage": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "hull": {
+      "size": 0,
+      "compartments": 0
+    },
+    "isConkedOut": false,
+    "armor": {
+      "type": "",
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": ""
+    },
+    "crew": {
+      "capacity": 0,
+      "current": 0
+    },
+    "weapons": [],
+    "availability": "Controlled",
+    "cost": "150K",
+    "notes": "<p>A small jet aircraft, usually with room for a pilot and three to eight passengers.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Alternity Player's Handbook, Table P42: Vehicles (Ch.12, p.194)</dd><dt>Progress Level</dt><dd>5 - PL 5: Information Age</dd><dt>Skill</dt><dd>Air vehicle</dd><dt>Drv</dt><dd>None</dd><dt>Acceleration</dt><dd>50</dd><dt>Cruising speed</dt><dd>500</dd><dt>Maximum speed</dt><dd>1000</dd><dt>Toughness</dt><dd>Good</dd><dt>Durability</dt><dd>10/10/5</dd><dt>Availability</dt><dd>Controlled</dd><dt>Cost</dt><dd>150K</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "KQXdrYjbZbL2cAlJ",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Private jet",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/wing.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Alternity Player's Handbook",
+        "folder": "PL 5: Information Age",
+        "table": "Table P42: Vehicles (Ch.12, p.194)",
+        "progressLevel": 5,
+        "printed": {
+          "skill": "Air",
+          "drv": "-",
+          "acc": "50",
+          "cruise": "500",
+          "max": "1000",
+          "type": "G",
+          "dur": "10/10/5",
+          "avail": "Con",
+          "cost": "150K"
+        }
+      }
+    }
+  }
+}

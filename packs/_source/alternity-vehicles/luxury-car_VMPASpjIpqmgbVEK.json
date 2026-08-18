@@ -1,0 +1,84 @@
+{
+  "_id": "VMPASpjIpqmgbVEK",
+  "_key": "!actors!VMPASpjIpqmgbVEK",
+  "name": "Luxury car",
+  "type": "vehicle",
+  "img": "icons/svg/cart.svg",
+  "system": {
+    "operationSkill": "Land vehicle",
+    "scale": "Surface",
+    "progressLevel": 5,
+    "drvModifier": 1,
+    "acceleration": "50",
+    "cruiseSpeed": "100",
+    "maxSpeed": "200",
+    "speedBand": "Cruising",
+    "toughness": "Good",
+    "durabilityRatings": {
+      "stun": 11,
+      "wound": 11,
+      "mortal": 5
+    },
+    "damage": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "hull": {
+      "size": 0,
+      "compartments": 0
+    },
+    "isConkedOut": false,
+    "armor": {
+      "type": "",
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": ""
+    },
+    "crew": {
+      "capacity": 0,
+      "current": 0
+    },
+    "weapons": [],
+    "availability": "Common",
+    "cost": "45K",
+    "notes": "<p>Any large, expensive automobile with plenty of accessories.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Alternity Player's Handbook, Table P42: Vehicles (Ch.12, p.194)</dd><dt>Progress Level</dt><dd>5 - PL 5: Information Age</dd><dt>Skill</dt><dd>Land vehicle</dd><dt>Drv</dt><dd>+1</dd><dt>Acceleration</dt><dd>50</dd><dt>Cruising speed</dt><dd>100</dd><dt>Maximum speed</dt><dd>200</dd><dt>Toughness</dt><dd>Good</dd><dt>Durability</dt><dd>11/11/5</dd><dt>Availability</dt><dd>Common</dd><dt>Cost</dt><dd>45K</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "KQXdrYjbZbL2cAlJ",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Luxury car",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/cart.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Alternity Player's Handbook",
+        "folder": "PL 5: Information Age",
+        "table": "Table P42: Vehicles (Ch.12, p.194)",
+        "progressLevel": 5,
+        "printed": {
+          "skill": "Land",
+          "drv": "+1",
+          "acc": "50",
+          "cruise": "100",
+          "max": "200",
+          "type": "G",
+          "dur": "11/11/5",
+          "avail": "Com",
+          "cost": "45K"
+        }
+      }
+    }
+  }
+}

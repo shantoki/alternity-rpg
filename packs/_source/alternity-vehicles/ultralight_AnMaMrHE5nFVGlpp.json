@@ -1,0 +1,84 @@
+{
+  "_id": "AnMaMrHE5nFVGlpp",
+  "_key": "!actors!AnMaMrHE5nFVGlpp",
+  "name": "Ultralight",
+  "type": "vehicle",
+  "img": "icons/svg/upgrade.svg",
+  "system": {
+    "operationSkill": "Daredevil",
+    "scale": "Personal",
+    "progressLevel": 5,
+    "drvModifier": 0,
+    "acceleration": "10",
+    "cruiseSpeed": "60",
+    "maxSpeed": "100",
+    "speedBand": "Cruising",
+    "toughness": "Ordinary",
+    "durabilityRatings": {
+      "stun": 3,
+      "wound": 3,
+      "mortal": 2
+    },
+    "damage": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "hull": {
+      "size": 0,
+      "compartments": 0
+    },
+    "isConkedOut": false,
+    "armor": {
+      "type": "",
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": ""
+    },
+    "crew": {
+      "capacity": 0,
+      "current": 0
+    },
+    "weapons": [],
+    "availability": "Any",
+    "cost": "3000",
+    "notes": "<p>A hang glider with a tiny engine. It weighs 50 kg, stows in a large backpack-style case, and has a range of 200 kilometres.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Alternity Player's Handbook, Table P42: Vehicles (Ch.12, p.194)</dd><dt>Progress Level</dt><dd>5 - PL 5: Information Age</dd><dt>Skill</dt><dd>Daredevil</dd><dt>Drv</dt><dd>None</dd><dt>Acceleration</dt><dd>10</dd><dt>Cruising speed</dt><dd>60</dd><dt>Maximum speed</dt><dd>100</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Durability</dt><dd>3/3/2</dd><dt>Availability</dt><dd>Any</dd><dt>Cost</dt><dd>3000</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "KQXdrYjbZbL2cAlJ",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Ultralight",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/upgrade.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Alternity Player's Handbook",
+        "folder": "PL 5: Information Age",
+        "table": "Table P42: Vehicles (Ch.12, p.194)",
+        "progressLevel": 5,
+        "printed": {
+          "skill": "Daredevil",
+          "drv": "-",
+          "acc": "10",
+          "cruise": "60",
+          "max": "100",
+          "type": "O",
+          "dur": "3/3/2",
+          "avail": "Any",
+          "cost": "3000"
+        }
+      }
+    }
+  }
+}

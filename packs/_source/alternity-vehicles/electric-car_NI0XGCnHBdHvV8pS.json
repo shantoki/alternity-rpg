@@ -1,0 +1,84 @@
+{
+  "_id": "NI0XGCnHBdHvV8pS",
+  "_key": "!actors!NI0XGCnHBdHvV8pS",
+  "name": "Electric car",
+  "type": "vehicle",
+  "img": "icons/svg/cart.svg",
+  "system": {
+    "operationSkill": "Land vehicle",
+    "scale": "Surface",
+    "progressLevel": 6,
+    "drvModifier": -1,
+    "acceleration": "30",
+    "cruiseSpeed": "100",
+    "maxSpeed": "180",
+    "speedBand": "Cruising",
+    "toughness": "Good",
+    "durabilityRatings": {
+      "stun": 10,
+      "wound": 10,
+      "mortal": 5
+    },
+    "damage": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "hull": {
+      "size": 0,
+      "compartments": 0
+    },
+    "isConkedOut": false,
+    "armor": {
+      "type": "",
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": ""
+    },
+    "crew": {
+      "capacity": 0,
+      "current": 0
+    },
+    "weapons": [],
+    "availability": "Common",
+    "cost": "15K",
+    "notes": "<p>Silent and easy to handle; runs 24 hours before an hour-long recharge. A turbo-capacitor (25K) raises acceleration to 60, at the cost of recharging every 12 hours.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Alternity Player's Handbook, Table P42: Vehicles (Ch.12, p.194)</dd><dt>Progress Level</dt><dd>6 - PL 6: Fusion Age</dd><dt>Skill</dt><dd>Land vehicle</dd><dt>Drv</dt><dd>-1</dd><dt>Acceleration</dt><dd>30</dd><dt>Cruising speed</dt><dd>100</dd><dt>Maximum speed</dt><dd>180</dd><dt>Toughness</dt><dd>Good</dd><dt>Durability</dt><dd>10/10/5</dd><dt>Availability</dt><dd>Common</dd><dt>Cost</dt><dd>15K</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "RP2ciKiZweyIILhd",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Electric car",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/cart.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Alternity Player's Handbook",
+        "folder": "PL 6: Fusion Age",
+        "table": "Table P42: Vehicles (Ch.12, p.194)",
+        "progressLevel": 6,
+        "printed": {
+          "skill": "Land",
+          "drv": "-1",
+          "acc": "30",
+          "cruise": "100",
+          "max": "180",
+          "type": "G",
+          "dur": "10/10/5",
+          "avail": "Com",
+          "cost": "15K"
+        }
+      }
+    }
+  }
+}

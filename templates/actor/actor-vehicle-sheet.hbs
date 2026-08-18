@@ -1,5 +1,20 @@
-<form class="{{cssClass}} {{alt}}-sheet {{alt}}-vehicle-sheet" autocomplete="off">
-    {{!-- Vehicle Sheet Header --}}
+{{!--
+    Vehicle record sheet.
+
+    Laid out in Table P42's own column order — Skill, Drv, Acc/Cruise/Max, Type
+    (toughness), Dur, Avail, Cost — because that is the row a Gamemaster is copying in
+    from the book. Below the table row: the three damage tracks (there is no fourth,
+    vehicles do not fatigue), armour, and any mounted weapons.
+
+    Nothing here is a combatant. There are no ability scores and no action check: a
+    vehicle is driven, so the check that matters is the *operator's* Vehicle Operation
+    check, and all this sheet contributes to it is a step penalty.
+
+    Root is a plain <div>: the ApplicationV2 root is already a <form>.
+--}}
+<div class="{{cssClass}} {{alt}}-sheet {{alt}}-vehicle-sheet">
+
+    {{!-- ═══ Header ════════════════════════════════════════════════════════ --}}
     <header class="{{alt}}-sheet-header">
         <div class="{{alt}}-sheet-portrait">
             <img src="{{actor.img}}" data-edit="img" alt="{{actor.name}}" />
@@ -10,106 +25,264 @@
             </h1>
             <div class="{{alt}}-sheet-meta">
                 <div class="{{alt}}-meta-field">
-                    <label>{{localize 'ALTERNITY.Type'}}</label>
-                    <select name="system.vehicleType">
-                        {{#each vehicleTypeChoices as |choice|}}
-                        <option value="{{choice}}" {{#if (eq ../system.vehicleType choice)}}selected{{/if}}>{{choice}}</option>
+                    <label title="{{localize 'ALTERNITY.Vehicle.OperationSkillHint'}}">{{localize 'ALTERNITY.Vehicle.OperationSkill'}}</label>
+                    <select name="system.operationSkill">
+                        {{#each operationSkillChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq ../system.operationSkill choice)}}selected{{/if}}>{{choice}}</option>
                         {{/each}}
                     </select>
                 </div>
                 <div class="{{alt}}-meta-field">
-                    <label>{{localize 'ALTERNITY.Size'}}</label>
-                    <select name="system.size">
-                        {{#each sizeChoices as |choice|}}
-                        <option value="{{choice}}" {{#if (eq ../system.size choice)}}selected{{/if}}>{{choice}}</option>
+                    <label title="{{localize 'ALTERNITY.Vehicle.ScaleHint'}}">{{localize 'ALTERNITY.Vehicle.Scale'}}</label>
+                    <select name="system.scale">
+                        {{#each scaleChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq ../system.scale choice)}}selected{{/if}}>{{choice}}</option>
                         {{/each}}
                     </select>
                 </div>
-                {{#if system.isDisabled}}<span class="{{alt}}-incap-warning">⚠ {{localize 'ALTERNITY.Disabled'}}</span>{{/if}}
+                <div class="{{alt}}-meta-field">
+                    <label>{{localize 'ALTERNITY.ProgressLevel'}}</label>
+                    <input type="number" name="system.progressLevel" value="{{system.progressLevel}}" min="0" max="9" />
+                </div>
+                <span class="{{alt}}-ship-status-badge {{alt}}-vehicle-status--{{system.status}}"
+                      title="{{localize (concat 'ALTERNITY.Vehicle.Status.' system.status 'Hint')}}">
+                    {{localize (concat 'ALTERNITY.Vehicle.Status.' system.status)}}
+                </span>
             </div>
         </div>
     </header>
 
-    {{!-- Vehicle Resources --}}
-    <section class="{{alt}}-resources">
-        {{!-- Hull Integrity --}}
-        <div class="{{alt}}-resource-bar bar--hull" data-resource="hullIntegrity">
-            <div class="{{alt}}-bar-label">
-                <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.HullIntegrity'}}</span>
-                <span class="{{alt}}-bar-values">
-                    <input type="number" name="system.hullIntegrity.value" value="{{system.hullIntegrity.value}}" min="0" max="{{system.hullIntegrity.max}}" />
-                    <span class="{{alt}}-bar-sep">/</span>
-                    <input type="number" name="system.hullIntegrity.max" value="{{system.hullIntegrity.max}}" min="0" />
-                </span>
-            </div>
-            <div class="{{alt}}-bar-track">
-                <div class="{{alt}}-bar-fill" style="width: {{system.hullPercent}}%"></div>
-            </div>
-        </div>
+    <main class="{{alt}}-sheet-body">
 
-        {{!-- Shields --}}
-        <div class="{{alt}}-resource-bar bar--shields" data-resource="shields">
-            <div class="{{alt}}-bar-label">
-                <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.Shields'}}</span>
-                <span class="{{alt}}-bar-values">
-                    <input type="number" name="system.shields.value" value="{{system.shields.value}}" min="0" max="{{system.shields.max}}" />
-                    <span class="{{alt}}-bar-sep">/</span>
-                    <input type="number" name="system.shields.max" value="{{system.shields.max}}" min="0" />
-                </span>
+        {{!-- ═══ The printed table row ═════════════════════════════════════ --}}
+        <section class="{{alt}}-stats-grid">
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Vehicle.DrvHint'}}">{{localize 'ALTERNITY.Vehicle.Drv'}}</label>
+                <input type="number" name="system.drvModifier" value="{{system.drvModifier}}" min="-5" max="5" />
             </div>
-            <div class="{{alt}}-bar-track">
-                <div class="{{alt}}-bar-fill" style="width: {{system.shieldPercent}}%"></div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Vehicle.SpeedUnitHint'}}">{{localize 'ALTERNITY.Vehicle.Acceleration'}}</label>
+                <input type="text" name="system.acceleration" value="{{system.acceleration}}" placeholder="—" />
             </div>
-        </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Vehicle.CruiseHint'}}">{{localize 'ALTERNITY.Vehicle.Cruise'}}</label>
+                <input type="text" name="system.cruiseSpeed" value="{{system.cruiseSpeed}}" placeholder="—" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Vehicle.MaxHint'}}">{{localize 'ALTERNITY.Vehicle.Max'}}</label>
+                <input type="text" name="system.maxSpeed" value="{{system.maxSpeed}}" placeholder="—" />
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Vehicle.ToughnessHint'}}">{{localize 'ALTERNITY.Armor.Toughness'}}</label>
+                <select name="system.toughness">
+                    {{#each toughnessChoices as |choice|}}
+                    <option value="{{choice}}" {{#if (eq ../system.toughness choice)}}selected{{/if}}>{{choice}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label title="{{localize 'ALTERNITY.Vehicle.DurabilityHint'}}">{{localize 'ALTERNITY.Vehicle.Durability'}}</label>
+                <strong>{{system.durabilityRun}}</strong>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Availability'}}</label>
+                <select name="system.availability">
+                    {{#each availabilityChoices as |choice|}}
+                    <option value="{{choice}}" {{#if (eq ../system.availability choice)}}selected{{/if}}>{{choice}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="{{alt}}-stat-box">
+                <label>{{localize 'ALTERNITY.Cost'}}</label>
+                <input type="text" name="system.cost" value="{{system.cost}}" placeholder="15K" />
+            </div>
+        </section>
 
-        {{!-- Tech Points --}}
-        <div class="{{alt}}-resource-bar bar--tp" data-resource="techPoints">
-            <div class="{{alt}}-bar-label">
-                <span class="{{alt}}-bar-name">{{localize 'ALTERNITY.TechPoints'}}</span>
-                <span class="{{alt}}-bar-values">
-                    <input type="number" name="system.techPoints.value" value="{{system.techPoints.value}}" min="0" max="{{system.techPoints.max}}" />
-                    <span class="{{alt}}-bar-sep">/</span>
-                    <input type="number" name="system.techPoints.max" value="{{system.techPoints.max}}" min="0" />
-                </span>
-            </div>
-            <div class="{{alt}}-bar-track">
-                <div class="{{alt}}-bar-fill" style="width: {{pct system.techPoints.value system.techPoints.max}}"></div>
-            </div>
-        </div>
-    </section>
-
-    {{!-- Vehicle Stats Grid --}}
-    <section class="{{alt}}-sheet-body">
-        <div class="{{alt}}-stats-grid">
-            <div class="{{alt}}-stat-box">
-                <label>{{localize 'ALTERNITY.Defense'}}</label>
-                <input type="number" name="system.defense" value="{{system.defense}}" />
-            </div>
-            <div class="{{alt}}-stat-box">
-                <label>{{localize 'ALTERNITY.Speed'}}</label>
-                <input type="number" name="system.speed" value="{{system.speed}}" />
-            </div>
-            <div class="{{alt}}-stat-box">
-                <label>{{localize 'ALTERNITY.Maneuver'}}</label>
-                <input type="number" name="system.maneuver" value="{{system.maneuver}}" />
-            </div>
-            <div class="{{alt}}-stat-box">
-                <label>{{localize 'ALTERNITY.Crew'}}</label>
-                <div class="{{alt}}-crew-fields">
-                    <input type="number" name="system.currentCrew" value="{{system.currentCrew}}" min="0" />
-                    <span>/</span>
-                    <input type="number" name="system.crewCapacity" value="{{system.crewCapacity}}" min="1" />
+        {{!-- ═══ How hard it is being pushed ═══════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3 title="{{localize 'ALTERNITY.Vehicle.ControlHint'}}">
+                {{localize 'ALTERNITY.Vehicle.Control'}}
+                <span class="{{alt}}-robot-hardware-note">{{localize 'ALTERNITY.Vehicle.ControlTotal'}} {{controlPenalty}}</span>
+            </h3>
+            <div class="{{alt}}-stats-grid">
+                <div class="{{alt}}-stat-box">
+                    <label title="{{localize 'ALTERNITY.Vehicle.SpeedBandHint'}}">{{localize 'ALTERNITY.Vehicle.SpeedBand'}}</label>
+                    <select name="system.speedBand">
+                        {{#each speedBandChoices as |band|}}
+                        <option value="{{band.key}}" {{#if (eq ../system.speedBand band.key)}}selected{{/if}}>{{band.label}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <div class="{{alt}}-stat-box">
+                    <label title="{{localize 'ALTERNITY.Vehicle.CrewHint'}}">{{localize 'ALTERNITY.Crew'}}</label>
+                    <div class="{{alt}}-npc-inline-pair">
+                        <input type="number" name="system.crew.current" value="{{system.crew.current}}" min="0" />
+                        <span>/</span>
+                        <input type="number" name="system.crew.capacity" value="{{system.crew.capacity}}" min="0" />
+                    </div>
+                </div>
+                <div class="{{alt}}-stat-box">
+                    <label title="{{localize 'ALTERNITY.Vehicle.ConkedOutHint'}}">{{localize 'ALTERNITY.Vehicle.ConkedOut'}}</label>
+                    <label class="{{alt}}-ship-inline-toggle">
+                        <input type="checkbox" name="system.isConkedOut" data-dtype="Boolean" {{#if system.isConkedOut}}checked{{/if}} />
+                        <span>{{localize 'ALTERNITY.Vehicle.Stopped'}}</span>
+                    </label>
                 </div>
             </div>
-        </div>
+            {{#if controlModifiers.length}}
+            <ul class="{{alt}}-vehicle-modifier-list">
+                {{#each controlModifiers as |mod|}}
+                <li><span class="{{../alt}}-vehicle-modifier-value">{{mod.display}}</span> {{mod.reason}}</li>
+                {{/each}}
+            </ul>
+            {{else}}
+            <p class="{{alt}}-empty-state">{{localize 'ALTERNITY.Vehicle.NoControlModifiers'}}</p>
+            {{/if}}
+        </section>
 
-        <div class="{{alt}}-vehicle-description">
-            <label>{{localize 'ALTERNITY.Description'}}</label>
+        {{!-- ═══ Damage ════════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3 title="{{localize 'ALTERNITY.Vehicle.DamageHint'}}">
+                {{localize 'ALTERNITY.Vehicle.Damage'}}
+                <button type="button" data-action="clearVehicleDamage" title="{{localize 'ALTERNITY.Vehicle.ClearDamage'}}">⟲</button>
+            </h3>
+            {{#if system.isHullRated}}
+            <p class="{{alt}}-npc-tier-hint">{{localize 'ALTERNITY.Vehicle.HullRatedNote'}}</p>
+            <div class="{{alt}}-stats-grid">
+                <div class="{{alt}}-stat-box">
+                    <label>{{localize 'ALTERNITY.Spaceship.HullSize'}}</label>
+                    <input type="number" name="system.hull.size" value="{{system.hull.size}}" min="0" />
+                </div>
+                <div class="{{alt}}-stat-box">
+                    <label>{{localize 'ALTERNITY.Vehicle.Compartments'}}</label>
+                    <input type="number" name="system.hull.compartments" value="{{system.hull.compartments}}" min="0" />
+                </div>
+            </div>
+            {{else}}
+            <div class="{{alt}}-resources">
+                {{#each tracks as |t|}}
+                <div class="{{../alt}}-resource-bar bar--{{t.key}}">
+                    <div class="{{../alt}}-bar-label">
+                        <span class="{{../alt}}-compartment-track-name">{{t.label}}</span>
+                        <span class="{{../alt}}-bar-values">
+                            {{t.value}} / <input type="number" name="system.durabilityRatings.{{t.key}}" value="{{t.max}}" min="0" />
+                        </span>
+                        <span class="{{../alt}}-damage-quick">
+                            <button type="button" data-action="setVehicleDamage" data-track="{{t.key}}" data-delta="-1">−</button>
+                            <button type="button" data-action="setVehicleDamage" data-track="{{t.key}}" data-delta="1">+</button>
+                        </span>
+                    </div>
+                    <div class="{{../alt}}-bar-track"><div class="{{../alt}}-bar-fill" style="width: {{t.pct}}"></div></div>
+                </div>
+                {{/each}}
+            </div>
+            {{/if}}
+            {{#if system.isStunStrained}}
+            <p class="{{alt}}-ship-warning">{{localize 'ALTERNITY.Vehicle.StunStrainedWarning'}}</p>
+            {{/if}}
+            {{#if system.isWoundStrained}}
+            <p class="{{alt}}-ship-warning">{{localize 'ALTERNITY.Vehicle.WoundStrainedWarning'}}</p>
+            {{/if}}
+        </section>
+
+        {{!-- ═══ Armour ════════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3 title="{{localize 'ALTERNITY.Vehicle.ArmorHint'}}">{{localize 'ALTERNITY.Armor.Label'}}</h3>
+            <div class="{{alt}}-stats-grid">
+                <div class="{{alt}}-stat-box">
+                    <label>{{localize 'ALTERNITY.Vehicle.ArmorType'}}</label>
+                    <input type="text" name="system.armor.type" value="{{system.armor.type}}" placeholder="{{localize 'ALTERNITY.Vehicle.None'}}" />
+                </div>
+                {{#each armorSlots as |slot|}}
+                <div class="{{../alt}}-stat-box">
+                    <label>{{slot.label}}</label>
+                    <input type="text" name="system.armor.{{slot.key}}" value="{{slot.value}}" placeholder="d6+1" />
+                </div>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Mounted weapons ═══════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>
+                {{localize 'ALTERNITY.Vehicle.Weapons'}}
+                <span class="{{alt}}-section-tools">
+                    <span class="{{alt}}-robot-hardware-note">{{localize 'ALTERNITY.Vehicle.WeaponScoreNote'}}</span>
+                    <button type="button" data-action="addVehicleRow" data-array="weapons">+</button>
+                </span>
+            </h3>
+            <div class="{{alt}}-ship-table">
+                {{#each attackRows as |row|}}
+                <div class="{{../alt}}-ship-table-row">
+                    <input type="text" name="system.weapons.{{row.index}}.name" value="{{row.name}}" placeholder="{{localize 'ALTERNITY.Name'}}" />
+                    <input type="number" name="system.weapons.{{row.index}}.score" value="{{row.score}}" min="0" title="{{localize 'ALTERNITY.Vehicle.WeaponScoreHint'}}" />
+                    <span class="{{../alt}}-robot-resolved">{{row.scoreRun}}</span>
+                    <input type="text" name="system.weapons.{{row.index}}.damageOrdinary" value="{{row.damageOrdinary}}" placeholder="d4+1w" title="{{localize 'ALTERNITY.DegreeOrdinary'}}" />
+                    <input type="text" name="system.weapons.{{row.index}}.damageGood" value="{{row.damageGood}}" placeholder="d6w" title="{{localize 'ALTERNITY.DegreeGood'}}" />
+                    <input type="text" name="system.weapons.{{row.index}}.damageAmazing" value="{{row.damageAmazing}}" placeholder="d4m" title="{{localize 'ALTERNITY.DegreeAmazing'}}" />
+                    <select name="system.weapons.{{row.index}}.damageType">
+                        {{#each ../damageTypeChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.damageType choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                    <select name="system.weapons.{{row.index}}.firepower" title="{{localize 'ALTERNITY.Vehicle.FirepowerHint'}}">
+                        {{#each ../firepowerChoices as |choice|}}
+                        <option value="{{choice}}" {{#if (eq row.firepower choice)}}selected{{/if}}>{{choice}}</option>
+                        {{/each}}
+                    </select>
+                    <button type="button" class="{{../alt}}-roll-btn" data-action="rollAttack" data-index="{{row.index}}"
+                            title="{{localize 'ALTERNITY.Roll.AttackHint'}}">⚔</button>
+                    <button type="button" data-action="deleteVehicleRow" data-array="weapons" data-index="{{row.index}}">✕</button>
+                </div>
+                {{else}}
+                <p class="{{alt}}-empty-state">{{localize 'ALTERNITY.Vehicle.NoWeapons'}}</p>
+                {{/each}}
+            </div>
+        </section>
+
+        {{!-- ═══ Notes ═════════════════════════════════════════════════════ --}}
+        <section class="{{alt}}-ship-table-section">
+            <h3>{{localize 'ALTERNITY.Notes'}}</h3>
+            {{#if systemFields.notes}}
+                {{formInput systemFields.notes value=system.notes name="system.notes"}}
+            {{else}}
+                <textarea name="system.notes" rows="3">{{system.notes}}</textarea>
+            {{/if}}
+            <h3>{{localize 'ALTERNITY.Description'}}</h3>
             {{#if systemFields.description}}
                 {{formInput systemFields.description value=system.description name="system.description"}}
             {{else}}
                 <textarea name="system.description" rows="3">{{system.description}}</textarea>
             {{/if}}
+        </section>
+
+    </main>
+
+    {{!-- The roll tray. The control check is the operator's, not the vehicle's, which
+          is why its button names the driver rather than this actor; the durability
+          checks are the only rolls a vehicle makes on its own behalf. --}}
+    <footer class="{{alt}}-roll-tray">
+        <div class="{{alt}}-roll-mount" hidden></div>
+        <div class="{{alt}}-quick-roll-bar">
+            {{#if isSteered}}
+            <button type="button" class="{{alt}}-quick-btn is-primary" data-action="rollControl"
+                    title="{{localize 'ALTERNITY.Vehicle.ControlCheckHint'}}">
+                🎯 {{localize 'ALTERNITY.Vehicle.ControlCheck'}}
+                <span class="{{alt}}-quick-btn-score">{{controlPenalty}}</span>
+            </button>
+            {{/if}}
+            {{#unless system.isHullRated}}
+            <button type="button" class="{{alt}}-quick-btn" data-action="rollDurability" data-track="stun"
+                    title="{{localize 'ALTERNITY.Vehicle.DurabilityStunHint'}}">
+                ⬡ {{localize 'ALTERNITY.Vehicle.DurabilityStun'}}
+                <span class="{{alt}}-quick-btn-score">{{system.durabilityChecks.stun.label}}</span>
+            </button>
+            <button type="button" class="{{alt}}-quick-btn" data-action="rollDurability" data-track="wound"
+                    title="{{localize 'ALTERNITY.Vehicle.DurabilityWoundHint'}}">
+                ⬡ {{localize 'ALTERNITY.Vehicle.DurabilityWound'}}
+                <span class="{{alt}}-quick-btn-score">{{system.durabilityChecks.wound.label}}</span>
+            </button>
+            {{/unless}}
         </div>
-    </section>
-</form>
+    </footer>
+</div>

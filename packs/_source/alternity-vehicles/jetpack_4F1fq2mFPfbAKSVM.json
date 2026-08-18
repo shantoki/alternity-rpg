@@ -1,0 +1,84 @@
+{
+  "_id": "4F1fq2mFPfbAKSVM",
+  "_key": "!actors!4F1fq2mFPfbAKSVM",
+  "name": "Jetpack",
+  "type": "vehicle",
+  "img": "icons/svg/upgrade.svg",
+  "system": {
+    "operationSkill": "Daredevil",
+    "scale": "Personal",
+    "progressLevel": 6,
+    "drvModifier": 1,
+    "acceleration": "30",
+    "cruiseSpeed": "120",
+    "maxSpeed": "300",
+    "speedBand": "Cruising",
+    "toughness": "Ordinary",
+    "durabilityRatings": {
+      "stun": 4,
+      "wound": 4,
+      "mortal": 2
+    },
+    "damage": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "hull": {
+      "size": 0,
+      "compartments": 0
+    },
+    "isConkedOut": false,
+    "armor": {
+      "type": "",
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": ""
+    },
+    "crew": {
+      "capacity": 1,
+      "current": 0
+    },
+    "weapons": [],
+    "availability": "Common",
+    "cost": "15K",
+    "notes": "<p>Low-heat, high-thrust engines give flight at up to 300 kph with a range of about 500 kilometres. It weighs 25 kg and is worn on a harness. The space-capable version is called a thruster: its practical maximum is 1,000 kph, which spends exactly half the fuel - the other half stops it again at the far end.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Alternity Player's Handbook, Table P42: Vehicles (Ch.12, p.194)</dd><dt>Progress Level</dt><dd>6 - PL 6: Fusion Age</dd><dt>Skill</dt><dd>Daredevil</dd><dt>Drv</dt><dd>+1</dd><dt>Acceleration</dt><dd>30</dd><dt>Cruising speed</dt><dd>120</dd><dt>Maximum speed</dt><dd>300</dd><dt>Toughness</dt><dd>Ordinary</dd><dt>Durability</dt><dd>4/4/2</dd><dt>Availability</dt><dd>Common</dd><dt>Cost</dt><dd>15K</dd><dt>Crew</dt><dd>1</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "RP2ciKiZweyIILhd",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Jetpack",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/upgrade.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Alternity Player's Handbook",
+        "folder": "PL 6: Fusion Age",
+        "table": "Table P42: Vehicles (Ch.12, p.194)",
+        "progressLevel": 6,
+        "printed": {
+          "skill": "Daredevil",
+          "drv": "+1",
+          "acc": "30",
+          "cruise": "120",
+          "max": "300",
+          "type": "O",
+          "dur": "4/4/2",
+          "avail": "Com",
+          "cost": "15K"
+        }
+      }
+    }
+  }
+}

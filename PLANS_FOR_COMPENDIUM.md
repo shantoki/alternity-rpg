@@ -6,9 +6,9 @@ the next pass has to pick up. Check here before assuming a gap is an oversight.
 
 ## What exists
 
-Eleven packs. Nine are built from the Alternity character generator's data set; the two ship
-packs are built from the books, because the generator data set has no starships in it (see
-Phase 6). The pipeline is two steps and the middle is committed:
+Twelve packs. Nine are built from the Alternity character generator's data set; the two ship
+packs and the vehicle pack are built from the books, because the generator data set has
+neither starships nor vehicles in it (see Phase 6 and Phase 7). The pipeline is two steps and the middle is committed:
 
 ```
 external/json/**            npm run convert:source     packs/_source/**       npm run build:packs     packs/**
@@ -41,11 +41,14 @@ release.yml` on a `v*` tag. Nobody installing the system runs npm.
 | `alternity-templates` | 54 | `character` Actors |
 | `alternity-spaceships` | 18 | `spaceship` Actors |
 | `alternity-warships` | 44 | `warship` Actors |
+| `alternity-vehicles` | 42 | `vehicle` Actors |
 
 Each pack folders its contents by source book, except `alternity-achievements`, which
 folders by profession because every achievement comes from the same book, and
 `alternity-warships`, which folders by what a record *is* (military hulls, civilian hulls,
-stations and bases, sample ships) because it all comes from one book too.
+stations and bases, sample ships) because it all comes from one book too, and
+`alternity-vehicles`, which folders by Progress Level because that is how Table P42 itself
+groups its rows.
 
 Two rules the tooling depends on:
 
@@ -375,14 +378,86 @@ Two differences between the books are transcribed rather than smoothed over:
       command crew, and no published statblock names its officers with skill scores. The
       *Stingray* and the Blade-class scout state crew *numbers*, which are in their notes.
 
+## Phase 7: vehicles from the book - done
+
+`alternity-vehicles`, 42 `vehicle` Actors, from the Player's Handbook's **Table P42:
+Vehicles** (Ch.12, p.194-195) and the descriptive paragraphs beside it. Foldered by
+Progress Level, the way the table groups its own rows.
+
+Like the two ship packs, the converter has no input file: the character generator's data
+set has no vehicles in it. Unlike them, it could not be transcribed from
+`../alternity-md/` either - the OCR collapsed the whole ten-column grid into one mangled
+cell (search the Player's Handbook markdown for `Bicycle Cabin cruiser Motorcar` and the
+damage is obvious). The rows were read off the page scan instead.
+
+Two independent checks say the reading is right, and both are asserted in
+`tests/test-pack-source.test.js`:
+
+- The PHB's own worked example says "a mid-sized car with 10 stun points needs a 10 or
+  less"; the transcribed row is `10/10/5`.
+- The STG shuttle's prose statblock says "Hull size 16, 4 compartments"; the transcribed
+  row is `Hull 16/4`.
+
+The printed cells are also kept verbatim on `provenance.printed`, so every parsed field
+can be round-tripped against the cell it came from without going back to the image. And
+stun equals wound on all 32 damage-rated rows, exactly, which catches a single-digit slip
+in either column.
+
+### What the columns mean
+
+| Column | Field | Note |
+| --- | --- | --- |
+| Skill | `operationSkill` | Land / Water / Air / Space vehicle. Three rows print `Daredevil`, which is *Acrobatics*-daredevil, not a Vehicle Operation specialty. Two print nothing: they are not steered. |
+| Drv | `drvModifier` | A step modifier, house sign convention - positive is a penalty. The book confirms the reading by calling the skycar's negative number a "Drv bonus". |
+| Acc / Cruise / Max | `acceleration`, `cruiseSpeed`, `maxSpeed` | Kept as printed strings: the column mixes kph, Megameters per phase per phase and AU per hour, and no rule computes with them. What the rules use is the comparison - +1 step past cruise, +3 at maximum. |
+| Type | `toughness` | A toughness grade, not a classification. Most vehicles are Good or Amazing, which is why personal weapons bounce off them. |
+| Dur | `durabilityRatings` or `hull` | Stun/wound/mortal - **three tracks, vehicles do not fatigue**. Ten rows print `Hull <size>/<compartments>` instead, being resolved by the spaceship rules. |
+| Avail / Cost | `availability`, `cost` | The same acquisition columns the gear tables print. |
+
+### What Phase 7 left for later
+
+- [ ] **No weapon rows.** Four descriptions name a mounted gun, but every one of those
+      damage codes is OCR-damaged past the point of honesty - `(244w/3d4w/ 2d4m, HIG)`
+      and `(48+1w/d8m/d12+2m, HV/A)` - and the chain gun's sentence is orphaned at a page
+      break, so even its attribution to a row is uncertain. The printed text is carried
+      verbatim into the description and `system.weapons` is left empty for someone with
+      the book open. The sheet supports the rows and accepts a dropped weapon Item; only
+      the compendium data is missing.
+- [ ] **`scale` is inferred, not transcribed.** Table P45 (Vehicle Scales) is an image in
+      the scan and did not survive at all, so the four scales are known from the prose
+      ("Personal vs Surface", "Air vs Space") but their per-vehicle assignment is not.
+      The converter derives it mechanically from the printed Skill column and a test
+      pins that it stays a pure function of it. Two rows print no skill and are called
+      Space, being spacecraft.
+- [ ] **Two damage runs sit outside the halving pattern.** Mortal is otherwise half the
+      wound rating, rounded either way. `Fighter jet 13/13/5` is not, and `Semi 20/20/11`
+      is a point over. Both are transcribed as read; the fighter jet is pinned by name in
+      the test so that correcting it later is a deliberate act rather than a silent one.
+      Worth a second look at the page before the prose pass.
+- [ ] **Crew capacity is only filled where a sentence states one.** Table P42 has no crew
+      column. Eleven rows have a capacity because their description gives a number; the
+      rows that give a range instead ("three to eight passengers", "a two-seater ... can
+      seat six") are left at 0, which means *not stated* rather than *nobody*.
+- [ ] **Armour comes from prose, so only three rows have it.** The tank, the skytank and
+      the STG shuttle print a die range per damage form. Table P42 has no armour column
+      at all.
+- [ ] **Ten rows overlap the ship packs by name.** Cutter, Launch, Escape Pod and the
+      other hull-rated craft appear here because Table P42 prints them, and at full
+      statblock length in `alternity-spaceships` / `alternity-warships`. Their notes say
+      where the fuller version lives. Table P42's `Launch 8/2` agrees with the *Warships*
+      civilian hull table's 8 hull points, which is a third corroboration of the reading.
+- [ ] **The vehicle-combat modifier table is lost.** The four prevailing conditions
+      (clear / normal / crowded / hazardous) are named on p.201 but their step modifiers,
+      and the manoeuvre table beside them, are images in every scan. They go through the
+      Gamemaster's circumstance picker on the roll panel like any other unsourced call.
+
 ## Sources not yet mined
 
 - `external/json/Reports/*.json` are the generator's XSL report stylesheets, not data.
   They are worth keeping as a decoder ring - `walter_weapons.xsl` is where the numeric
   availability codes were confirmed - but there is nothing in them to convert.
-- Vehicles and creatures have actor types and sheets in this system but no records in the
-  character generator data set. Vehicles are in the Player's Handbook Ch.12 table, whose
-  scan is destroyed; creatures are in the Gamemaster Guide. Starships are done - see
-  Phase 6.
+- Creatures have an actor type and a sheet in this system but no records in the character
+  generator data set; they are in the Gamemaster Guide. Starships are done - see Phase 6,
+  and vehicles - see Phase 7.
 - `PerkFlawData`, `ProgramData` and `MutationData` have no source records either. Perks
   and flaws are in the Player's Handbook, programs in Dataware, mutations in Gamma World.

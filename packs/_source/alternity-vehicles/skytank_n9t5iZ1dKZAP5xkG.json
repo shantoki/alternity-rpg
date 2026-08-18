@@ -1,0 +1,84 @@
+{
+  "_id": "n9t5iZ1dKZAP5xkG",
+  "_key": "!actors!n9t5iZ1dKZAP5xkG",
+  "name": "Skytank",
+  "type": "vehicle",
+  "img": "icons/svg/wing.svg",
+  "system": {
+    "operationSkill": "Air vehicle",
+    "scale": "Air",
+    "progressLevel": 6,
+    "drvModifier": 0,
+    "acceleration": "100",
+    "cruiseSpeed": "500",
+    "maxSpeed": "2000",
+    "speedBand": "Cruising",
+    "toughness": "Amazing",
+    "durabilityRatings": {
+      "stun": 25,
+      "wound": 25,
+      "mortal": 12
+    },
+    "damage": {
+      "stun": 0,
+      "wound": 0,
+      "mortal": 0
+    },
+    "hull": {
+      "size": 0,
+      "compartments": 0
+    },
+    "isConkedOut": false,
+    "armor": {
+      "type": "Cerametal plate",
+      "lowImpact": "d8",
+      "highImpact": "d8",
+      "energy": "d8"
+    },
+    "crew": {
+      "capacity": 0,
+      "current": 0
+    },
+    "weapons": [],
+    "availability": "Military",
+    "cost": "400K",
+    "notes": "<p>Performs the functions of helicopters and jets, and serves as the backbone of ground assaults.</p><p>A 120mm rail cannon (48+1w/d8m/d12+2m, HV/A) is standard. [Damage code as it survives in the scan; verify against the book before use.]</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Alternity Player's Handbook, Table P42: Vehicles (Ch.12, p.194)</dd><dt>Progress Level</dt><dd>6 - PL 6: Fusion Age</dd><dt>Skill</dt><dd>Air vehicle</dd><dt>Drv</dt><dd>None</dd><dt>Acceleration</dt><dd>100</dd><dt>Cruising speed</dt><dd>500</dd><dt>Maximum speed</dt><dd>2000</dd><dt>Toughness</dt><dd>Amazing</dd><dt>Durability</dt><dd>25/25/12</dd><dt>Availability</dt><dd>Military</dd><dt>Cost</dt><dd>400K</dd><dt>Armor</dt><dd>d8 (LI), d8 (HI), d8 (En)</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "RP2ciKiZweyIILhd",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Skytank",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/wing.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Alternity Player's Handbook",
+        "folder": "PL 6: Fusion Age",
+        "table": "Table P42: Vehicles (Ch.12, p.194)",
+        "progressLevel": 6,
+        "printed": {
+          "skill": "Air",
+          "drv": "-",
+          "acc": "100",
+          "cruise": "500",
+          "max": "2000",
+          "type": "A",
+          "dur": "25/25/12",
+          "avail": "Mil",
+          "cost": "400K"
+        }
+      }
+    }
+  }
+}
