@@ -21,5 +21,8 @@
     "@foundryvtt/foundryvtt-cli": "^3.0.4",
     "@types/jest": "^29.5.10",
     "jest": "^29.7.0"
+  },
+  "allowScripts": {
+    "classic-level@3.0.0": true
   }
 }
