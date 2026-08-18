@@ -1631,6 +1631,14 @@
    As above: set a height and framing, but do NOT set `display`. Foundry wraps an
    activated editor in `.menu-container` and `.editor-container`, both of which take
    their height from the host being a flex container. */
+/* Set by `applySheetEditableState` on a sheet whose document cannot be written — a
+   locked compendium entry, or one the user has no update permission for. The controls are
+   `disabled` as well; this just says so at a glance. */
+.alt-sheet-app.alt-sheet-readonly :disabled {
+    opacity: 0.75;
+    cursor: default;
+}
+
 .alt-sheet-app prose-mirror {
     display: flex;
     flex-direction: column;

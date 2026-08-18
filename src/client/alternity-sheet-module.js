@@ -144,6 +144,30 @@ function safeFloat(val, fallback = 0) {
 }
 
 /**
+ * Disable a sheet's controls when its document cannot be written.
+ *
+ * `DocumentSheetV2` does this itself in `_onRender`, but **no sheet in this system calls
+ * `super._onRender`** — that is deliberate, and is what keeps core's `DragDrop` from
+ * double-creating every dropped item (see `alternity-drag-drop.js`) — so the read-only
+ * pass has to be done by hand. Without it a locked compendium sheet accepts edits that
+ * then throw on write, and its add/delete-row buttons throw the same way.
+ *
+ * **Only ever sets `disabled`, never clears it.** Several templates disable a control on
+ * their own terms (an AI's barred programs, a robot's unloaded ones), and the rendered
+ * part is rebuilt from scratch each render, so the template's own attributes are reapplied
+ * for free. Clearing here would quietly re-enable buttons the template meant to bar.
+ *
+ * @param {DocumentSheetV2} sheet
+ */
+function applySheetEditableState(sheet) {
+    if (sheet.isEditable) return;
+    sheet.element.classList.add(`${NS}-sheet-readonly`);
+    for (const control of sheet.element.querySelectorAll('input, select, textarea, button, prose-mirror')) {
+        control.disabled = true;
+    }
+}
+
+/**
  * Write one changed form field back onto a document.
  *
  * The subtlety is array rows. A binding like `system.weapons.2.arc` expands to
@@ -156,14 +180,24 @@ function safeFloat(val, fallback = 0) {
  * events instead, so they need the array path rewritten into a read-modify-write
  * over a clone of the full array.
  *
- * @param {Document} document  - The document to update.
+ * @param {DocumentSheetV2} sheet - The sheet whose form changed.
  * @param {HTMLElement} input  - The element that changed; must carry a `name`.
  * @param {object} arrayFields - Map whose keys are the document's array-valued
  *                               schema fields (the row-defaults table works).
  * @returns {Promise<Document>|undefined}
  */
-function applySheetFieldChange(document, input, arrayFields = {}) {
+function applySheetFieldChange(sheet, input, arrayFields = {}) {
     if (!input?.name) return undefined;
+
+    // Refuse rather than throw when the document cannot be written — a locked
+    // compendium, or a user without update permission. This is not only about typed
+    // edits: a `<prose-mirror>` editor calls `save()` from its own
+    // `disconnectedCallback`, so *closing* a compendium sheet dispatches a change
+    // event, and without this guard that alone raised "You may not update documents
+    // in the locked compendium".
+    if (!sheet.isEditable) return undefined;
+
+    const document = sheet.document;
 
     // Only `type="number"` inputs are coerced. String-typed schema fields are
     // always bound to `type="text"`, so this can't turn a dice code into a number.
@@ -964,6 +998,13 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
     }
 
     async _onSheetChange(e) {
+        // Nothing here can be written on a locked compendium document, or by a user
+        // without update permission — and every branch below ends in either
+        // `saveAlternityState` or `actor.update`. The hero sheet keeps its inputs live
+        // rather than taking the statblock sheets' blanket `applySheetEditableState`
+        // pass: it has no <prose-mirror>, so nothing here writes unless a human edits.
+        if (!this.isEditable) return;
+
         const input  = e.target;
         const action = input.dataset.action;
         if (action === 'editResource') {
@@ -1668,11 +1709,14 @@ class AlternityNpcSheet extends foundry.applications.api.HandlebarsApplicationMi
         // one write per render the sheet has been through.
         bindOnce(this.element, 'sheetChange', () => {
             this.element.addEventListener('change', (e) => {
-                applySheetFieldChange(this.document, e.target, NPC_ARRAY_FIELDS);
+                applySheetFieldChange(this, e.target, NPC_ARRAY_FIELDS);
             });
         });
         bindRollMount(this);
         bindStatblockDragDrop(this, this.element, NPC_ARRAY_FIELDS);
+        // Read-only when the document cannot be written (a locked compendium, or no
+        // update permission). Runs every render, because the rendered part is replaced.
+        applySheetEditableState(this);
     }
 
     static async _onSetWoundAction(event, target) {
@@ -1767,7 +1811,9 @@ class AlternityVehicleSheet extends foundry.applications.api.HandlebarsApplicati
         bindOnce(this.element, 'sheetChange', () => {
             this.element.addEventListener('change', (e) => {
                 const input = e.target;
-                if (input.name) {
+                // Same editability guard the shared `applySheetFieldChange` applies; this
+                // sheet writes inline because it has no array fields to read-modify-write.
+                if (input.name && this.isEditable) {
                     const val = input.type === 'checkbox' ? input.checked : input.value;
                     this.document.update({ [input.name]: val });
                 }
@@ -1777,6 +1823,9 @@ class AlternityVehicleSheet extends foundry.applications.api.HandlebarsApplicati
         // character's own Vehicle Operation check. Bound anyway so a drop is
         // refused out loud instead of appearing to have worked.
         bindStatblockDragDrop(this, this.element, {});
+        // Read-only when the document cannot be written (a locked compendium, or no
+        // update permission). Runs every render, because the rendered part is replaced.
+        applySheetEditableState(this);
     }
 }
 
@@ -1834,11 +1883,14 @@ class AlternityWarshipSheet extends foundry.applications.api.HandlebarsApplicati
     _onRender(context, options) {
         bindOnce(this.element, 'sheetChange', () => {
             this.element.addEventListener('change', (e) => {
-                applySheetFieldChange(this.document, e.target, WARSHIP_ARRAY_FIELDS);
+                applySheetFieldChange(this, e.target, WARSHIP_ARRAY_FIELDS);
             });
         });
         bindRollMount(this);
         bindStatblockDragDrop(this, this.element, WARSHIP_ARRAY_FIELDS);
+        // Read-only when the document cannot be written (a locked compendium, or no
+        // update permission). Runs every render, because the rendered part is replaced.
+        applySheetEditableState(this);
     }
 
     static async _onAddArrayRowAction(event, target) {
@@ -2033,11 +2085,14 @@ class AlternitySpaceshipSheet extends foundry.applications.api.HandlebarsApplica
     _onRender(context, options) {
         bindOnce(this.element, 'sheetChange', () => {
             this.element.addEventListener('change', (e) => {
-                applySheetFieldChange(this.document, e.target, SPACESHIP_ARRAY_FIELDS);
+                applySheetFieldChange(this, e.target, SPACESHIP_ARRAY_FIELDS);
             });
         });
         bindRollMount(this);
         bindStatblockDragDrop(this, this.element, SPACESHIP_ARRAY_FIELDS);
+        // Read-only when the document cannot be written (a locked compendium, or no
+        // update permission). Runs every render, because the rendered part is replaced.
+        applySheetEditableState(this);
     }
 
     // -----------------------------------------------------------------------
@@ -2489,11 +2544,14 @@ class AlternityRobotSheet extends foundry.applications.api.HandlebarsApplication
     _onRender(context, options) {
         bindOnce(this.element, 'sheetChange', () => {
             this.element.addEventListener('change', (e) => {
-                applySheetFieldChange(this.document, e.target, ROBOT_ARRAY_FIELDS);
+                applySheetFieldChange(this, e.target, ROBOT_ARRAY_FIELDS);
             });
         });
         bindRollMount(this);
         bindStatblockDragDrop(this, this.element, ROBOT_ARRAY_FIELDS);
+        // Read-only when the document cannot be written (a locked compendium, or no
+        // update permission). Runs every render, because the rendered part is replaced.
+        applySheetEditableState(this);
     }
 
     // -----------------------------------------------------------------------
@@ -2755,11 +2813,14 @@ class AlternityAISheet extends foundry.applications.api.HandlebarsApplicationMix
     _onRender(context, options) {
         bindOnce(this.element, 'sheetChange', () => {
             this.element.addEventListener('change', (e) => {
-                applySheetFieldChange(this.document, e.target, AI_ARRAY_FIELDS);
+                applySheetFieldChange(this, e.target, AI_ARRAY_FIELDS);
             });
         });
         bindRollMount(this);
         bindStatblockDragDrop(this, this.element, AI_ARRAY_FIELDS);
+        // Read-only when the document cannot be written (a locked compendium, or no
+        // update permission). Runs every render, because the rendered part is replaced.
+        applySheetEditableState(this);
     }
 
     // -----------------------------------------------------------------------
@@ -3020,11 +3081,14 @@ class AlternityCreatureSheet extends foundry.applications.api.HandlebarsApplicat
     _onRender(context, options) {
         bindOnce(this.element, 'sheetChange', () => {
             this.element.addEventListener('change', (e) => {
-                applySheetFieldChange(this.document, e.target, CREATURE_ARRAY_FIELDS);
+                applySheetFieldChange(this, e.target, CREATURE_ARRAY_FIELDS);
             });
         });
         bindRollMount(this);
         bindStatblockDragDrop(this, this.element, CREATURE_ARRAY_FIELDS);
+        // Read-only when the document cannot be written (a locked compendium, or no
+        // update permission). Runs every render, because the rendered part is replaced.
+        applySheetEditableState(this);
     }
 
     // -----------------------------------------------------------------------
