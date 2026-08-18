@@ -295,7 +295,7 @@ export class NpcData extends foundry.abstract.TypeDataModel {
         // "the same number of stun, wound, fatigue, and mortal points as a hero
         // with the same Constitution score."
         const ratings = AlternityMathService.calculateDurabilityRatings(con, {
-            isWeren: this.isSuperiorDurability,
+            durabilityMultiplier: this.isSuperiorDurability ? 1.5 : 1,
         });
         for (const track of ['stun', 'wound', 'mortal', 'fatigue']) {
             this.durability[track].max = ratings[track];

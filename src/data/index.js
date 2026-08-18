@@ -19,3 +19,4 @@ export * from './ProgramData.js';
 export * from './FXData.js';
 export * from './MutationData.js';
 export * from './AchievementBenefitData.js';
+export * from './SpeciesData.js';

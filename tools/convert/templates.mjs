@@ -17,10 +17,11 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { makeActor, statBlock, escapeHtml, slugify } from '../lib/fvtt.mjs';
-import { SOURCE_ROOT, readSource, asArray, attr, int, str } from '../lib/source-data.mjs';
+import { makeActor, stableId, statBlock, escapeHtml, slugify } from '../lib/fvtt.mjs';
+import { SOURCE_ROOT, readSource, asArray, attr, int, str, bookLabel } from '../lib/source-data.mjs';
 import { AlternityCharacterState, SKILL_DEFINITIONS } from '../../src/data/alternity-actor-data.js';
 import { loadSourceSkills, resolveSkillId, qualifiedName, STAT_ID_TO_ABILITY } from '../lib/skill-map.mjs';
+import { speciesSystem, speciesNotes, SPECIES_IMG } from './species.mjs';
 
 export const PACK = 'alternity-templates';
 
@@ -53,6 +54,41 @@ export function convert() {
 
         const speciesName = str(hero.Species?.Name) || 'Human';
         const profession = professionName(hero);
+
+        // Each template file repeats the whole Species record inline, so the template
+        // gets a real `species` Item rather than only the name - which is the one thing
+        // that makes the durability multiplier, the psionic multiplier and the ability
+        // buy ranges readable once the actor is imported. All 54 are Human today; the
+        // record is read rather than assumed so a non-human template would work.
+        const speciesRecord = hero.Species ?? {};
+        // Embedded documents are their own LevelDB rows, keyed by the sublevel and the
+        // parent id joined to the child's - the same rule journal pages follow. Without
+        // `_key` the batch write fails on an undefined key rather than dropping the item.
+        // `makeActor` derives the same id from the same parts, so the two agree.
+        const actorId = stableId(PACK, 'character', name);
+        const speciesItemId = stableId(PACK, 'species', name);
+        const speciesItem = {
+            _id: speciesItemId,
+            _key: `!actors.items!${actorId}.${speciesItemId}`,
+            name: speciesName,
+            type: 'species',
+            img: SPECIES_IMG,
+            system: speciesSystem(speciesRecord, allSkills, bookLabel(speciesRecord.Source, '')),
+            effects: [],
+            folder: null,
+            sort: 0,
+            ownership: { default: 0 },
+            flags: {
+                'alternity-v2': {
+                    provenance: {
+                        book: bookLabel(speciesRecord.Source, ''),
+                        sourceFile: path.posix.join('Templates', file),
+                        sourceSpeciesId: int(attr(speciesRecord, 'ID'), 0),
+                        specialNotes: speciesNotes(speciesRecord),
+                    },
+                },
+            },
+        };
 
         const abilityScores = Object.fromEntries(ABILITIES.map(ability => [
             ability, int(attr(hero.Abilities?.[ability] ?? {}, 'Score'), 10),
@@ -138,6 +174,7 @@ export function convert() {
             name,
             type: 'character',
             sort: index * 100,
+            items: [speciesItem],
             system: {
                 abilities: Object.fromEntries(
                     ABILITIES.map(ability => [ability.toLowerCase(), abilityScores[ability]]),
@@ -176,6 +213,11 @@ export function convert() {
             woundLevel: 'Healthy',
         });
 
+        // Same call the `createItem` hook makes when a species is dropped on a hero, so
+        // the state a template ships with is the state it would have had if a Gamemaster
+        // had dragged the species on themselves.
+        state.applySpecies(speciesName, speciesItem.system);
+
         actor.flags['alternity-v2'] = {
             characterState: state.serialize(),
             provenance: {
@@ -189,9 +231,9 @@ export function convert() {
             },
         };
 
-        // The durability maxes are derived by the state constructor (CON, with the
-        // Weren multiplier); mirror them onto `system` the way `_syncSystemFromState`
-        // does, so token bars are right before the sheet is ever opened.
+        // The durability maxes are derived by the state (CON, through the species'
+        // multiplier); mirror them onto `system` the way `_syncSystemFromState` does,
+        // so token bars are right before the sheet is ever opened.
         actor.system.durability = {
             stun: { value: 0, max: state.durability.stunMax },
             wound: { value: 0, max: state.durability.woundMax },

@@ -1,0 +1,74 @@
+{
+  "_id": "WsxqxBJIAssmxTnG",
+  "_key": "!items!WsxqxBJIAssmxTnG",
+  "name": "Fraal",
+  "type": "species",
+  "img": "icons/svg/mystery-man.svg",
+  "system": {
+    "abilityRanges": {
+      "STR": {
+        "min": 4,
+        "max": 11
+      },
+      "DEX": {
+        "min": 4,
+        "max": 11
+      },
+      "CON": {
+        "min": 4,
+        "max": 10
+      },
+      "INT": {
+        "min": 9,
+        "max": 15
+      },
+      "WIL": {
+        "min": 9,
+        "max": 16
+      },
+      "PER": {
+        "min": 4,
+        "max": 15
+      }
+    },
+    "bonusSkillPoints": 0,
+    "bonusBroadSkills": 0,
+    "durabilityMultiplier": 1,
+    "psionicMultiplier": 1.5,
+    "actionCheckStep": 0,
+    "isPsionic": true,
+    "canGlide": false,
+    "canFly": false,
+    "naturalArmor": {
+      "li": "",
+      "hi": "",
+      "en": ""
+    },
+    "freeSkills": [
+      "Vehicle Operation",
+      "Knowledge",
+      "Awareness",
+      "Resolve",
+      "Interaction",
+      "Telepathy"
+    ],
+    "specialAbilities": [],
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Core Rulebook</dd></dl><h2>Ability Ranges</h2><table><thead><tr><th>Ability</th><th>Minimum</th><th>Maximum</th></tr></thead><tbody><tr><th>STR</th><td>4</td><td>11</td></tr><tr><th>DEX</th><td>4</td><td>11</td></tr><tr><th>CON</th><td>4</td><td>10</td></tr><tr><th>INT</th><td>9</td><td>15</td></tr><tr><th>WIL</th><td>9</td><td>16</td></tr><tr><th>PER</th><td>4</td><td>15</td></tr></tbody></table><h2>Species Traits</h2><ul><li>Psionic energy is WIL x 1.5</li><li>Psionically active</li></ul><h2>Free Skills</h2><ul><li>Vehicle Operation</li><li>Knowledge</li><li>Awareness</li><li>Resolve</li><li>Interaction</li><li>Telepathy</li></ul>"
+  },
+  "effects": [],
+  "folder": "TgY9cvkaCBBPjCVW",
+  "sort": 100,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/species.json",
+        "sourceSpeciesId": 1,
+        "specialNotes": []
+      }
+    }
+  }
+}

@@ -148,7 +148,7 @@
                             <div class="{{@root.alt}}-ability-main">
                                 <label class="{{@root.alt}}-ability-label">{{label}}</label>
                                 <input type="number" class="{{@root.alt}}-ability-value"
-                                       value="{{ability.score}}" min="4" max="14"
+                                       value="{{ability.score}}" min="{{ability.min}}" max="{{ability.max}}"
                                        data-action="editAbility" data-ability="{{label}}"
                                        aria-label="{{label}} modifier" />
                             </div>
@@ -199,6 +199,33 @@
                 </div>
 
                 <div class="{{@root.alt}}-summary-grid">
+                    {{!-- Species is an Item, not a text field: it carries the multiplier
+                          Constitution goes through for the durability tracks, the one
+                          Willpower goes through for psionic energy, and the range each
+                          ability may be bought within. Drag one out of the Species
+                          compendium; dropping a second replaces the first. --}}
+                    <div class="{{@root.alt}}-form-group">
+                        <label>{{localize 'ALTERNITY.Species.Label'}}</label>
+                        {{#if species.item}}
+                        <div class="{{@root.alt}}-item-card" data-item-id="{{species.item.id}}">
+                            <img src="{{species.item.img}}" data-action="editItem" data-item-id="{{species.item.id}}" title="{{localize 'ALTERNITY.Species.Edit'}}" />
+                            <div class="{{@root.alt}}-item-info">
+                                <span class="{{@root.alt}}-item-name">{{species.item.name}}</span>
+                                <span class="{{@root.alt}}-item-stats">
+                                    {{#each species.traits as |trait|}}<span class="skill-type-tag">{{trait}}</span>{{/each}}
+                                </span>
+                            </div>
+                            <div class="{{@root.alt}}-item-actions">
+                                <button type="button" class="{{@root.alt}}-delete-btn" data-action="deleteItem" data-item-id="{{species.item.id}}" title="{{localize 'ALTERNITY.Species.Remove'}}">✕</button>
+                            </div>
+                        </div>
+                        {{else}}
+                        <p class="{{@root.alt}}-empty-state">
+                            {{#if species.name}}{{species.name}} — {{/if}}{{localize 'ALTERNITY.Species.Empty'}}
+                        </p>
+                        {{/if}}
+                    </div>
+
                     <div class="{{@root.alt}}-form-group">
                         <label>Career Path</label>
                         <input type="text" value="{{career}}" 

@@ -91,6 +91,7 @@ const SORT_DENSITY = 100000;
  */
 export const ITEM_TYPE_TABS = Object.freeze({
     achievementBenefit: 'character',
+    species:            'character',
     weapon:             'combat',
     armor:              'combat',
     perkFlaw:           'combat',

@@ -1,0 +1,92 @@
+{
+  "_id": "yWlRCNU5rZPGbIzB",
+  "_key": "!items!yWlRCNU5rZPGbIzB",
+  "name": "Mechalus",
+  "type": "species",
+  "img": "icons/svg/mystery-man.svg",
+  "system": {
+    "abilityRanges": {
+      "STR": {
+        "min": 8,
+        "max": 14
+      },
+      "DEX": {
+        "min": 4,
+        "max": 14
+      },
+      "CON": {
+        "min": 6,
+        "max": 14
+      },
+      "INT": {
+        "min": 7,
+        "max": 15
+      },
+      "WIL": {
+        "min": 6,
+        "max": 12
+      },
+      "PER": {
+        "min": 4,
+        "max": 12
+      }
+    },
+    "bonusSkillPoints": 0,
+    "bonusBroadSkills": 0,
+    "durabilityMultiplier": 1,
+    "psionicMultiplier": 1,
+    "actionCheckStep": 0,
+    "isPsionic": false,
+    "canGlide": false,
+    "canFly": false,
+    "naturalArmor": {
+      "li": "",
+      "hi": "",
+      "en": ""
+    },
+    "freeSkills": [
+      "Athletics",
+      "Vehicle Operation",
+      "Stamina",
+      "Computer Science",
+      "Knowledge",
+      "Awareness"
+    ],
+    "specialAbilities": [
+      {
+        "name": "Mechalus Computer Operation Skill Bonus",
+        "description": "Mechalus Computer Operation Skill Bonus: -1 step when using Knowledge-Computer Operations and Computer Science-Hacking when merged",
+        "effectTarget": "None",
+        "effectValue": 0,
+        "attackKind": "Any"
+      },
+      {
+        "name": "Mechalus Cybernetic Enhancement",
+        "description": "",
+        "effectTarget": "None",
+        "effectValue": 0,
+        "attackKind": "Any"
+      }
+    ],
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Core Rulebook</dd></dl><h2>Ability Ranges</h2><table><thead><tr><th>Ability</th><th>Minimum</th><th>Maximum</th></tr></thead><tbody><tr><th>STR</th><td>8</td><td>14</td></tr><tr><th>DEX</th><td>4</td><td>14</td></tr><tr><th>CON</th><td>6</td><td>14</td></tr><tr><th>INT</th><td>7</td><td>15</td></tr><tr><th>WIL</th><td>6</td><td>12</td></tr><tr><th>PER</th><td>4</td><td>12</td></tr></tbody></table><h2>Free Skills</h2><ul><li>Athletics</li><li>Vehicle Operation</li><li>Stamina</li><li>Computer Science</li><li>Knowledge</li><li>Awareness</li></ul><h2>Special Abilities</h2><ul><li>Mechalus Computer Operation Skill Bonus: -1 step when using Knowledge-Computer Operations and Computer Science-Hacking when merged</li><li>Mechalus Cybernetic Enhancement</li></ul>"
+  },
+  "effects": [],
+  "folder": "TgY9cvkaCBBPjCVW",
+  "sort": 200,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/species.json",
+        "sourceSpeciesId": 2,
+        "specialNotes": [
+          "Mechalus Computer Operation Skill Bonus: -1 step when using Knowledge-Computer Operations and Computer Science-Hacking when merged",
+          "Mechalus Cybernetic Enhancement"
+        ]
+      }
+    }
+  }
+}

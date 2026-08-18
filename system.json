@@ -48,7 +48,8 @@
       "program": {},
       "fx": {},
       "mutation": {},
-      "achievementBenefit": {}
+      "achievementBenefit": {},
+      "species": {}
     }
   },
   "packs": [
@@ -133,7 +134,7 @@
       "name": "alternity-species",
       "label": "Alternity: Species",
       "path": "packs/alternity-species",
-      "type": "JournalEntry",
+      "type": "Item",
       "system": "alternity-v2",
       "ownership": {
         "PLAYER": "OBSERVER",

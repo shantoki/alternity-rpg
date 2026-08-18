@@ -305,6 +305,70 @@ export class AlternityActor extends Actor {
     }
 
     // -----------------------------------------------------------------------
+    // Species
+    // -----------------------------------------------------------------------
+
+    /** The `species` Item this actor holds, or null. At most one is ever kept. */
+    get speciesItem() {
+        return this.items.find(item => item.type === 'species') ?? null;
+    }
+
+    /**
+     * Delete every `species` Item except one.
+     *
+     * A hero is one species. Nothing in Foundry stops a second one being dropped on
+     * them, and two would mean two durability multipliers and two ability-range
+     * tables with no rule for which wins — so the newest replaces the old rather than
+     * joining it.
+     *
+     * @param {string} keepId - The id of the species Item to keep.
+     * @returns {Promise<number>} How many were removed.
+     */
+    async removeOtherSpecies(keepId) {
+        const extras = this.items
+            .filter(item => item.type === 'species' && item.id !== keepId)
+            .map(item => item.id);
+        if (!extras.length) return 0;
+        await this.deleteEmbeddedDocuments('Item', extras);
+        return extras.length;
+    }
+
+    /**
+     * Bring the character state into line with whichever `species` Item is held.
+     *
+     * This is the whole of the species integration: dropping the Item is the event,
+     * and everything the species changes — the durability multiplier, the psionic
+     * multiplier, the ability buy ranges — is copied onto the state here, which then
+     * recomputes the maxima and mirrors them into `system` through `saveAltState`.
+     *
+     * Heroes only. Supporting cast keep an AlternityCharacterState too, but NpcData
+     * already owns the one species rule they need as its own `isSuperiorDurability`
+     * flag, and two sources for the same multiplier is how they end up disagreeing.
+     *
+     * @returns {Promise<boolean>} True if the state was updated.
+     */
+    async syncSpeciesFromItems() {
+        if (this.type !== 'character') return false;
+
+        const state = await this.getAltState();
+        if (!state) return false;
+
+        const species = this.speciesItem;
+        if (species) state.applySpecies(species.name, species.system);
+        else state.clearSpecies();
+
+        await this.saveAltState(state);
+
+        // `system.details.species` is what the sheet header prints, and it is a
+        // plain string — keep it saying the same thing the Item does.
+        const name = species?.name ?? '';
+        if (species && this.system?.details?.species !== name) {
+            await this.update({ 'system.details.species': name });
+        }
+        return true;
+    }
+
+    // -----------------------------------------------------------------------
     // Roll API
     // -----------------------------------------------------------------------
 

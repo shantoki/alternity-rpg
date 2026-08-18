@@ -1692,6 +1692,152 @@
                 </div>
             {{/if}}
 
+            {{#if (eq document.type 'species')}}
+                {{!-- Ability ranges. `abilityRanges` is a SchemaField, so iterating it
+                      yields the six abilities in the order the schema declares them,
+                      which is the order the books print. --}}
+                <div class="alt-item-array-section">
+                    <h3>{{localize 'ALTERNITY.Species.AbilityRanges'}}</h3>
+                    <p class="alt-item-hint">{{localize 'ALTERNITY.Species.AbilityRangesHint'}}</p>
+                    <div class="alt-item-array-table">
+                        {{#each system.abilityRanges as |range ability|}}
+                        <div class="alt-item-array-row">
+                            <span class="alt-species-ability">{{ability}}</span>
+                            <input type="number" name="system.abilityRanges.{{ability}}.min" value="{{range.min}}"
+                                   data-dtype="Number" min="1" max="20" title="{{localize 'ALTERNITY.Species.Minimum'}}"/>
+                            <input type="number" name="system.abilityRanges.{{ability}}.max" value="{{range.max}}"
+                                   data-dtype="Number" min="1" max="20" title="{{localize 'ALTERNITY.Species.Maximum'}}"/>
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.Species.Creation'}}</h3>
+                <div class="grid grid-2col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Species.BonusSkillPoints'}}</label>
+                        <input type="number" name="system.bonusSkillPoints" value="{{system.bonusSkillPoints}}" data-dtype="Number" min="0"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Species.BonusBroadSkills'}}</label>
+                        <input type="number" name="system.bonusBroadSkills" value="{{system.bonusBroadSkills}}" data-dtype="Number" min="0"/>
+                    </div>
+                </div>
+
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.Species.Derivation'}}</h3>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Species.DurabilityMultiplier'}}</label>
+                        <input type="number" name="system.durabilityMultiplier" value="{{system.durabilityMultiplier}}"
+                               data-dtype="Number" min="0.25" max="4" step="0.25"
+                               data-tooltip="{{localize 'ALTERNITY.Species.DurabilityMultiplierHint'}}"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Species.PsionicMultiplier'}}</label>
+                        <input type="number" name="system.psionicMultiplier" value="{{system.psionicMultiplier}}"
+                               data-dtype="Number" min="0.25" max="4" step="0.25"
+                               data-tooltip="{{localize 'ALTERNITY.Species.PsionicMultiplierHint'}}"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.Species.ActionCheckStep'}}</label>
+                        <input type="number" name="system.actionCheckStep" value="{{system.actionCheckStep}}"
+                               data-dtype="Number" min="-4" max="4"
+                               data-tooltip="{{localize 'ALTERNITY.Species.ActionCheckStepHint'}}"/>
+                    </div>
+                </div>
+
+                <h3 class="alt-item-subhead">{{localize 'ALTERNITY.Species.Traits'}}</h3>
+                <div class="alt-checkbox-row">
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.isPsionic" data-dtype="Boolean" {{#if system.isPsionic}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.Species.IsPsionic'}}
+                    </label>
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.canGlide" data-dtype="Boolean" {{#if system.canGlide}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.Species.CanGlide'}}
+                    </label>
+                    <label class="alt-checkbox-inline">
+                        <input type="checkbox" name="system.canFly" data-dtype="Boolean" {{#if system.canFly}}checked{{/if}}/>
+                        {{localize 'ALTERNITY.Species.CanFly'}}
+                    </label>
+                </div>
+
+                {{!-- Free text per damage form, like CreatureData's: "d4+1" is not a
+                      die expression Foundry could roll unaided. --}}
+                <h3 class="alt-item-subhead" data-tooltip="{{localize 'ALTERNITY.Species.NaturalArmorHint'}}">{{localize 'ALTERNITY.Species.NaturalArmor'}}</h3>
+                <div class="grid grid-3col">
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.DamageTypeAbbr.lowImpact'}}</label>
+                        <input type="text" name="system.naturalArmor.li" value="{{system.naturalArmor.li}}" data-dtype="String" placeholder="d4+1"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.DamageTypeAbbr.highImpact'}}</label>
+                        <input type="text" name="system.naturalArmor.hi" value="{{system.naturalArmor.hi}}" data-dtype="String" placeholder="d4"/>
+                    </div>
+                    <div class="form-group">
+                        <label>{{localize 'ALTERNITY.DamageTypeAbbr.energy'}}</label>
+                        <input type="text" name="system.naturalArmor.en" value="{{system.naturalArmor.en}}" data-dtype="String" placeholder="d4-1"/>
+                    </div>
+                </div>
+
+                <div class="alt-item-array-section">
+                    <h3>
+                        {{localize 'ALTERNITY.Species.FreeSkills'}}
+                        <a class="alt-item-array-add" data-action="addArrayRow" data-array="freeSkills" data-tooltip="{{localize 'ALTERNITY.AddRow'}}"><i class="fas fa-plus"></i></a>
+                    </h3>
+                    <p class="alt-item-hint">{{localize 'ALTERNITY.Species.FreeSkillsHint'}}</p>
+                    <div class="alt-item-array-table">
+                        {{#each system.freeSkills as |skill idx|}}
+                        <div class="alt-item-array-row">
+                            <input type="text" name="system.freeSkills.{{idx}}" value="{{skill}}" data-dtype="String"/>
+                            <a class="alt-item-array-delete" data-action="deleteArrayRow" data-array="freeSkills" data-index="{{idx}}" data-tooltip="{{localize 'ALTERNITY.DeleteRow'}}"><i class="fas fa-times"></i></a>
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+
+                {{!-- The selects below use inline <option> markup rather than
+                      {{selectOptions ../config.…}}, for the reason documented in
+                      alternity-item-sheet.js: an undefined config key makes
+                      selectOptions throw, which aborts the render of this shared
+                      sheet for every item type, not just this one. --}}
+                <div class="alt-item-array-section">
+                    <h3>
+                        {{localize 'ALTERNITY.Species.SpecialAbilities'}}
+                        <a class="alt-item-array-add" data-action="addArrayRow" data-array="specialAbilities" data-tooltip="{{localize 'ALTERNITY.AddRow'}}"><i class="fas fa-plus"></i></a>
+                    </h3>
+                    <div class="alt-item-array-table">
+                        {{#each system.specialAbilities as |row idx|}}
+                        <div class="alt-item-array-row alt-item-array-row-wrap">
+                            <input type="text" name="system.specialAbilities.{{idx}}.name" value="{{row.name}}"
+                                   data-dtype="String" placeholder="{{localize 'ALTERNITY.Species.AbilityName'}}"/>
+                            <textarea name="system.specialAbilities.{{idx}}.description" rows="1"
+                                      placeholder="{{localize 'ALTERNITY.Species.AbilityDescription'}}">{{row.description}}</textarea>
+                            <select name="system.specialAbilities.{{idx}}.effectTarget" title="{{localize 'ALTERNITY.Species.EffectTarget'}}">
+                                <option value="None" {{#if (eq row.effectTarget 'None')}}selected{{/if}}>{{localize 'ALTERNITY.Species.EffectTargetNone'}}</option>
+                                <option value="AttacksAgainstMe" {{#if (eq row.effectTarget 'AttacksAgainstMe')}}selected{{/if}}>{{localize 'ALTERNITY.Species.EffectTargetAttacksAgainstMe'}}</option>
+                            </select>
+                            <input type="number" class="alt-item-array-narrow" name="system.specialAbilities.{{idx}}.effectValue"
+                                   value="{{row.effectValue}}" data-dtype="Number"
+                                   data-tooltip="{{localize 'ALTERNITY.Species.EffectValueHint'}}"/>
+                            <select name="system.specialAbilities.{{idx}}.attackKind" title="{{localize 'ALTERNITY.Species.AttackKind'}}">
+                                <option value="Any" {{#if (eq row.attackKind 'Any')}}selected{{/if}}>{{localize 'ALTERNITY.Species.AttackKindAny'}}</option>
+                                <option value="Melee" {{#if (eq row.attackKind 'Melee')}}selected{{/if}}>{{localize 'ALTERNITY.Species.AttackKindMelee'}}</option>
+                                <option value="Ranged" {{#if (eq row.attackKind 'Ranged')}}selected{{/if}}>{{localize 'ALTERNITY.Species.AttackKindRanged'}}</option>
+                            </select>
+                            <a class="alt-item-array-delete" data-action="deleteArrayRow" data-array="specialAbilities" data-index="{{idx}}" data-tooltip="{{localize 'ALTERNITY.DeleteRow'}}"><i class="fas fa-times"></i></a>
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+
+                <div class="alt-item-summary">
+                    {{#each system.traits as |trait|}}
+                    <span class="alt-item-summary-entry">{{trait}}</span>
+                    {{/each}}
+                </div>
+            {{/if}}
+
             {{!-- Shared inventory fields, only for the types whose schema defines them --}}
             {{#if (or (eq document.type 'computer') (eq document.type 'personalEquipment'))}}
             <div class="form-group">

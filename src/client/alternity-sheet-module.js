@@ -680,12 +680,15 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
         this._altState = await getAlternityState(this.document) || new AlternityCharacterState({ actorId: this.document.id });
         const state    = this._altState;
 
-        // Build rich abilities object
+        // Build rich abilities object. The buy range comes off the state rather than
+        // being fixed at 4-14 in the template: it is the hero's *species'* range, and
+        // several print scores outside the human span in both directions.
         const abilities = {};
         for (const ab of ABILITIES) {
             abilities[ab] = {
                 label:     ab,
                 score:     state.abilityScores[ab],
+                ...state.abilityRange(ab),
                 ...state.getAbilityData(ab)
             };
         }
@@ -779,6 +782,17 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
             fxPowers: ownedItems('fx'),
             mutations: ownedItems('mutation'),
             achievementBenefits: ownedItems('achievementBenefit')
+        };
+
+        // A hero holds at most one species — `AlternityActor.removeOtherSpecies`
+        // enforces that on drop — so this is a single item rather than a list. The
+        // name falls back to the state's string for a hero who predates the Item type
+        // or whose Gamemaster never dropped one.
+        const speciesItem = this.document.items.find(item => item.type === 'species') ?? null;
+        context.species = {
+            item:   speciesItem,
+            name:   speciesItem?.name || state.species || '',
+            traits: speciesItem?.system?.traits ?? [],
         };
 
         // Active memory is derived from the owned computers' capacity and the

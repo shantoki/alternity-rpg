@@ -32,6 +32,7 @@ import {
     FXData,
     MutationData,
     AchievementBenefitData,
+    SpeciesData,
 } from './data/index.js';
 
 // ── Logic / hooks ───────────────────────────────────────────────────────────
@@ -79,6 +80,7 @@ Hooks.once('init', async () => {
     CONFIG.Item.dataModels.fx        = FXData;
     CONFIG.Item.dataModels.mutation  = MutationData;
     CONFIG.Item.dataModels.achievementBenefit = AchievementBenefitData;
+    CONFIG.Item.dataModels.species = SpeciesData;
 
     // ── 3. Initiative formula ───────────────────────────────────────────────
     // The actual roll logic is in AlternityActor.rollInitiative.
@@ -167,6 +169,41 @@ Hooks.once('ready', () => {
 // ---------------------------------------------------------------------------
 // Lifecycle hooks
 // ---------------------------------------------------------------------------
+
+/**
+ * A `species` Item is the only Item in this system whose numbers reach outside
+ * itself: it sets the multiplier Constitution goes through on the way to the
+ * durability tracks, the one Willpower goes through on the way to psionic energy,
+ * and the range each ability score may be bought within. So dropping one, or
+ * removing it, has to run the derivation again.
+ *
+ * Guarded on ownership because these hooks fire on every connected client, and a
+ * player who cannot update the actor would only produce a permission error.
+ */
+async function syncSpecies(item, { created = false } = {}) {
+    const actor = item?.parent;
+    if (item?.type !== 'species' || !actor?.isOwner || actor.documentName !== 'Actor') return;
+    try {
+        // On a create, the new one wins — any species already on the actor is
+        // removed first, and its own delete hook then finds this one still in place
+        // and re-syncs to it rather than clearing.
+        if (created) await actor.removeOtherSpecies(item.id);
+        await actor.syncSpeciesFromItems();
+    } catch (err) {
+        console.error(`[Alternity] species sync failed for actor ${actor?.id}:`, err);
+    }
+}
+
+Hooks.on('createItem', (item) => syncSpecies(item, { created: true }));
+Hooks.on('deleteItem', (item) => syncSpecies(item));
+
+// An edit to the species itself — a Gamemaster raising a homebrew species'
+// durability multiplier — has to reach the heroes already carrying it.
+Hooks.on('updateItem', (item, changes) => {
+    if (item?.type !== 'species') return;
+    if (!changes?.system && changes?.name === undefined) return;
+    return syncSpecies(item);
+});
 
 Hooks.on('createActor', async (actor) => {
     if (!['character', 'npc'].includes(actor.type)) return;

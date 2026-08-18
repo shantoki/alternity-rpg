@@ -443,25 +443,88 @@ describe('character templates', () => {
     });
 });
 
-describe('species journal entries', () => {
-    const species = ALL.filter(entry => entry.doc._key?.startsWith('!journal!'));
+describe('species items', () => {
+    const species = itemsOfType('species');
+    const ABILITIES = ['CON', 'DEX', 'INT', 'PER', 'STR', 'WIL'];
 
     test('the pack is populated', () => expect(species.length).toBeGreaterThan(15));
 
-    test('each entry has one text page and the structured record behind it', () => {
-        expectEach(species, (_system, doc) => {
-            expect(doc.pages).toHaveLength(1);
-            expect(doc.pages[0].type).toBe('text');
-            expect(doc.pages[0].text.content.length).toBeGreaterThan(0);
+    test('the pack holds nothing but species', () => {
+        const strays = ALL
+            .filter(entry => entry.pack === 'alternity-species' && entry.doc._key?.startsWith('!items!'))
+            .filter(entry => entry.doc.type !== 'species');
+        expect(strays.map(entry => `${entry.doc.name} (${entry.doc.type})`)).toEqual([]);
+    });
 
-            // The promotion to a real `species` Item subtype reads this flag rather
-            // than re-running the conversion, so it has to survive every rebuild.
-            const provenance = doc.flags['alternity-v2'].provenance;
-            expect(Object.keys(provenance.abilityRanges).sort())
-                .toEqual(['CON', 'DEX', 'INT', 'PER', 'STR', 'WIL']);
-            for (const range of Object.values(provenance.abilityRanges)) {
+    test('every ability carries a range, and the maximum is not below the minimum', () => {
+        expectEach(species, (system) => {
+            expect(Object.keys(system.abilityRanges).sort()).toEqual(ABILITIES);
+            for (const range of Object.values(system.abilityRanges)) {
+                expect(Number.isInteger(range.min)).toBe(true);
+                expect(Number.isInteger(range.max)).toBe(true);
+                expect(range.min).toBeGreaterThanOrEqual(1);
+                expect(range.max).toBeLessThanOrEqual(20);
                 expect(range.max).toBeGreaterThanOrEqual(range.min);
             }
+        });
+    });
+
+    test('the multipliers are inside the schema bounds', () => {
+        expectEach(species, (system) => {
+            for (const key of ['durabilityMultiplier', 'psionicMultiplier']) {
+                expect(system[key]).toBeGreaterThanOrEqual(0.25);
+                expect(system[key]).toBeLessThanOrEqual(4);
+            }
+            expect(Number.isInteger(system.actionCheckStep)).toBe(true);
+            expect(Math.abs(system.actionCheckStep)).toBeLessThanOrEqual(4);
+        });
+    });
+
+    test('special abilities validate against the schema choice lists', () => {
+        expectEach(species, (system) => {
+            for (const ability of system.specialAbilities) {
+                expect(ability.name.length).toBeGreaterThan(0);
+                expect(['None', 'AttacksAgainstMe']).toContain(ability.effectTarget);
+                expect(['Any', 'Melee', 'Ranged']).toContain(ability.attackKind);
+                expect(Number.isInteger(ability.effectValue)).toBe(true);
+                // A row that claims no target must not carry a step with it, or the
+                // sheet would print a modifier nothing applies.
+                if (ability.effectTarget === 'None') expect(ability.effectValue).toBe(0);
+            }
+        });
+    });
+
+    /**
+     * The two species the retired name-sniff got wrong, pinned as data rather than as
+     * prose: it fired on the Weren by name and silently missed the Sasquatch, which
+     * carries exactly the same multiplier.
+     */
+    test('both CON x1.5 species carry the multiplier, not just the one named Weren', () => {
+        const tough = species.filter(entry => entry.doc.system.durabilityMultiplier === 1.5);
+        expect(tough.map(entry => entry.doc.name).sort()).toEqual(['Sasquatch', 'Weren']);
+    });
+
+    test('the Weren camouflage note became a real step modifier', () => {
+        const weren = species.find(entry => entry.doc.name === 'Weren');
+        expect(weren).toBeDefined();
+        const camouflage = weren.doc.system.specialAbilities
+            .find(ability => ability.effectTarget === 'AttacksAgainstMe');
+        expect(camouflage).toMatchObject({ effectValue: 1, attackKind: 'Ranged' });
+    });
+
+    test("the T'sa natural armour survived as three printed die expressions", () => {
+        const tsa = species.find(entry => entry.doc.name === "T'sa");
+        expect(tsa).toBeDefined();
+        expect(tsa.doc.system.naturalArmor).toEqual({ li: 'd4+1', hi: 'd4', en: 'd4-1' });
+        // Everyone else prints a dash, which is a blank here rather than a rating of 0.
+        const armoured = species.filter(entry => entry.doc.system.naturalArmor.li !== '');
+        expect(armoured).toHaveLength(1);
+    });
+
+    test('the printed notes are kept alongside the parsed abilities', () => {
+        expectEach(species, (system, doc) => {
+            const notes = doc.flags['alternity-v2'].provenance.specialNotes;
+            expect(notes).toHaveLength(system.specialAbilities.length);
         });
     });
 });

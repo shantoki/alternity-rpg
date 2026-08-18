@@ -1,0 +1,74 @@
+{
+  "_id": "FIP27A2kKbMvSqLb",
+  "_key": "!items!FIP27A2kKbMvSqLb",
+  "name": "Mothman",
+  "type": "species",
+  "img": "icons/svg/mystery-man.svg",
+  "system": {
+    "abilityRanges": {
+      "STR": {
+        "min": 6,
+        "max": 12
+      },
+      "DEX": {
+        "min": 6,
+        "max": 14
+      },
+      "CON": {
+        "min": 5,
+        "max": 11
+      },
+      "INT": {
+        "min": 4,
+        "max": 11
+      },
+      "WIL": {
+        "min": 9,
+        "max": 15
+      },
+      "PER": {
+        "min": 4,
+        "max": 11
+      }
+    },
+    "bonusSkillPoints": 0,
+    "bonusBroadSkills": 0,
+    "durabilityMultiplier": 1,
+    "psionicMultiplier": 1,
+    "actionCheckStep": 0,
+    "isPsionic": false,
+    "canGlide": true,
+    "canFly": true,
+    "naturalArmor": {
+      "li": "",
+      "hi": "",
+      "en": ""
+    },
+    "freeSkills": [
+      "Athletics",
+      "Acrobatics",
+      "Stamina",
+      "Knowledge",
+      "Awareness",
+      "Interaction"
+    ],
+    "specialAbilities": [],
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Dark*Matter</dd></dl><h2>Ability Ranges</h2><table><thead><tr><th>Ability</th><th>Minimum</th><th>Maximum</th></tr></thead><tbody><tr><th>STR</th><td>6</td><td>12</td></tr><tr><th>DEX</th><td>6</td><td>14</td></tr><tr><th>CON</th><td>5</td><td>11</td></tr><tr><th>INT</th><td>4</td><td>11</td></tr><tr><th>WIL</th><td>9</td><td>15</td></tr><tr><th>PER</th><td>4</td><td>11</td></tr></tbody></table><h2>Species Traits</h2><ul><li>Can fly</li></ul><h2>Free Skills</h2><ul><li>Athletics</li><li>Acrobatics</li><li>Stamina</li><li>Knowledge</li><li>Awareness</li><li>Interaction</li></ul>"
+  },
+  "effects": [],
+  "folder": "FekaNJ2S2z5UVObb",
+  "sort": 1400,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Dark*Matter",
+        "sourceFile": "data/species.json",
+        "sourceSpeciesId": 202,
+        "specialNotes": []
+      }
+    }
+  }
+}

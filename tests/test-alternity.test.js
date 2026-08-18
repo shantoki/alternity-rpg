@@ -504,12 +504,31 @@ describe('Alternity System Unit Tests', () => {
             }
         });
 
-        it('should give weren CON x1.5 before halving (Superior Durability)', () => {
+        it('should multiply CON before halving (Superior Durability)', () => {
             // CON 16 -> base 24 -> 24/24/12/12. Halving the *inflated* score is the
             // point: halving first would give 8, not 12.
-            const r = AlternityMathService.calculateDurabilityRatings(16, { isWeren: true });
+            const r = AlternityMathService.calculateDurabilityRatings(16, { durabilityMultiplier: 1.5 });
             expect([r.stun, r.wound, r.mortal, r.fatigue]).toEqual([24, 24, 12, 12]);
-            expect(r.modifierTrace.some(m => m.source === 'Weren')).toBe(true);
+            expect(r.modifierTrace.some(m => m.source === 'Species')).toBe(true);
+        });
+
+        it('should treat isWeren as an alias for a multiplier of 1.5', () => {
+            // The flag survives for supporting cast, who state this as
+            // `NpcData.isSuperiorDurability` rather than as a number.
+            const flagged = AlternityMathService.calculateDurabilityRatings(16, { isWeren: true });
+            const numeric = AlternityMathService.calculateDurabilityRatings(16, { durabilityMultiplier: 1.5 });
+            expect([flagged.stun, flagged.wound, flagged.mortal, flagged.fatigue])
+                .toEqual([numeric.stun, numeric.wound, numeric.mortal, numeric.fatigue]);
+        });
+
+        it('should leave an unmultiplied species with no species entry in the trace', () => {
+            const r = AlternityMathService.calculateDurabilityRatings(12, { durabilityMultiplier: 1 });
+            expect(r.modifierTrace.some(m => m.source === 'Species')).toBe(false);
+        });
+
+        it('should reject a durability multiplier of zero or less', () => {
+            expect(() => AlternityMathService.calculateDurabilityRatings(12, { durabilityMultiplier: 0 })).toThrow();
+            expect(() => AlternityMathService.calculateDurabilityRatings(12, { durabilityMultiplier: -1 })).toThrow();
         });
 
         it('should reject invalid Constitution scores', () => {
@@ -1507,7 +1526,7 @@ describe('Alternity System Unit Tests', () => {
 
             // The weren rule genuinely is the other one: "use the character's
             // Constitution score x 1.5". Both are followed as written.
-            const weren = AlternityMathService.calculateDurabilityRatings(14, { isWeren: true });
+            const weren = AlternityMathService.calculateDurabilityRatings(14, { durabilityMultiplier: 1.5 });
             expect(weren.mortal).toBe(11);
         });
 

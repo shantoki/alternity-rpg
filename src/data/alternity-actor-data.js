@@ -334,6 +334,43 @@ class SpecialRuleComponent {
  * Top-level state wrapper for Alternity actors.
  * Stores raw Ability Scores (4-14) and calculates Triple Skill Scores (Ordinary/Good/Amazing).
  */
+/** A species' ability buy range, defaulting to the human 4-14 span. */
+const DEFAULT_ABILITY_RANGE = Object.freeze({ min: 4, max: 14 });
+
+/**
+ * Normalise whatever a `species` Item handed us into a full six-ability table.
+ *
+ * Absent or partial input falls back to the human span per ability rather than to
+ * nothing, so a hand-made species with two ranges filled in still clamps the other
+ * four sensibly.
+ */
+function normaliseAbilityRanges(ranges) {
+    return Object.fromEntries(ABILITIES.map((ability) => {
+        const range = ranges?.[ability] ?? {};
+        const min = Number.isFinite(Number(range.min)) ? Math.round(Number(range.min)) : DEFAULT_ABILITY_RANGE.min;
+        const max = Number.isFinite(Number(range.max)) ? Math.round(Number(range.max)) : DEFAULT_ABILITY_RANGE.max;
+        return [ability, { min: Math.min(min, max), max: Math.max(min, max) }];
+    }));
+}
+
+/**
+ * The durability multiplier a state written before the `species` Item type existed
+ * implies from its species *name*.
+ *
+ * This is the whole of what used to be the live derivation: the Weren multiplier had
+ * nowhere else to live, so `calculateDurabilityRatings` was asked on every recompute
+ * whether the name contained "weren". That test was wrong in both directions - it
+ * missed the Sasquatch, which carries the same CON x1.5, and it fired on any hero
+ * whose species name merely mentioned one.
+ *
+ * It survives here, once, as a migration bridge: a state with no stored multiplier
+ * gets one guessed for it, and the guess is written out by the next `serialize()`.
+ * Nothing recomputes from the name after that.
+ */
+function legacyDurabilityMultiplier(species) {
+    return /weren/i.test(String(species ?? '')) ? 1.5 : 1;
+}
+
 class AlternityCharacterState {
     constructor({
         actorId,
@@ -342,6 +379,14 @@ class AlternityCharacterState {
         durability    = {},
         lastResort    = {},
         species       = '',
+        // Mirrored off the actor's `species` Item by `applySpecies`, because the
+        // derivations below need numbers and an Item is not reachable from here.
+        // `null` means "no stored value", which is a different statement from 1 -
+        // it is what states saved before the species Item type existed look like,
+        // and it is the only case that falls back to guessing from the name.
+        durabilityMultiplier = null,
+        psionicMultiplier    = null,
+        abilityRanges        = null,
         abilityScores = {},
         skills        = {},
         customSkills  = [],
@@ -382,9 +427,13 @@ class AlternityCharacterState {
         this.profession = String(profession);
         this.career     = String(career);
         this.background = String(background);
-        // Kept on the state (not just actor.system.details) because the durability
-        // derivation reads it — Weren get CON x1.5.
+        // Kept on the state (not just actor.system.details) because it labels the
+        // hero. The numbers a species contributes are the three fields below it,
+        // which come off the actor's `species` Item rather than off this string.
         this.species    = String(species);
+        this.durabilityMultiplier = Number(durabilityMultiplier ?? legacyDurabilityMultiplier(this.species));
+        this.psionicMultiplier    = Number(psionicMultiplier ?? 1);
+        this.abilityRanges        = normaliseAbilityRanges(abilityRanges);
         this.actionsPerRound = Number(actionsPerRound);
         this.armor      = { ...armor };
 
@@ -394,9 +443,11 @@ class AlternityCharacterState {
             this.abilityScores[ab] = Number(abilityScores[ab] ?? 10);
         }
 
-        // Automate psionic energy max if not set
+        // Automate psionic energy max if not set. The Fraal and the Grey buy energy
+        // at WIL x1.5, which is the second thing a species multiplies and the second
+        // thing that had nowhere to live before the `species` Item type.
         if (this.psionics.energy.max === 0) {
-            this.psionics.energy.max = this.abilityScores.WIL;
+            this.psionics.energy.max = this._psionicEnergyMax();
         }
 
         // Durability tracks (Authentic Fastplay)
@@ -405,7 +456,7 @@ class AlternityCharacterState {
         // the CON -> stun/wound/mortal/fatigue derivation is game math, and the
         // Weren "Superior Durability" case has to land before the halving.
         const ratings = AlternityMathService.calculateDurabilityRatings(con, {
-            isWeren: String(species ?? '').toLowerCase().includes('weren'),
+            durabilityMultiplier: this.durabilityMultiplier,
         });
 
         this.durability = {
@@ -581,26 +632,80 @@ class AlternityCharacterState {
         return this;
     }
 
+    /** The buy range for one ability, as this hero's species prints it. */
+    abilityRange(ability) {
+        return this.abilityRanges?.[ability] ?? { ...DEFAULT_ABILITY_RANGE };
+    }
+
+    /** Psionic energy points: Willpower, times whatever the species multiplies it by. */
+    _psionicEnergyMax() {
+        return Math.floor(this.abilityScores.WIL * this.psionicMultiplier);
+    }
+
+    /**
+     * Recompute every maximum that a species or an ability score feeds.
+     *
+     * Routed through the math service so the four durability ratings can never drift
+     * from the constructor's derivation, and kept in one method so a species change
+     * and an ability edit cannot disagree about which maxima they refresh.
+     */
+    _refreshDerivedMaxima() {
+        const ratings = AlternityMathService.calculateDurabilityRatings(this.abilityScores.CON, {
+            durabilityMultiplier: this.durabilityMultiplier,
+        });
+        this.durability.stunMax    = ratings.stun;
+        this.durability.woundMax   = ratings.wound;
+        this.durability.mortalMax  = ratings.mortal;
+        this.durability.fatigueMax = ratings.fatigue;
+        this.psionics.energy.max   = this._psionicEnergyMax();
+        return this;
+    }
+
+    /**
+     * Adopt the numbers carried by a `species` Item.
+     *
+     * Called when one is dropped on the actor (see the `createItem` hook in
+     * `src/index.js`), which is the only path by which these three values change.
+     * Existing ability scores are re-clamped first, because the new species' range
+     * may not admit them - a Weren rebuilt as a Fraal cannot keep Strength 16.
+     *
+     * @param {string} name    The species Item's name, which is the species' name.
+     * @param {object} system  The species Item's `system` data (see SpeciesData).
+     */
+    applySpecies(name, system = {}) {
+        this.species = String(name ?? '');
+        this.durabilityMultiplier = Number(system.durabilityMultiplier ?? 1);
+        this.psionicMultiplier    = Number(system.psionicMultiplier ?? 1);
+        this.abilityRanges        = normaliseAbilityRanges(system.abilityRanges);
+
+        for (const ability of ABILITIES) {
+            const { min, max } = this.abilityRange(ability);
+            this.abilityScores[ability] = Math.min(max, Math.max(min, this.abilityScores[ability]));
+        }
+        return this._refreshDerivedMaxima();
+    }
+
+    /**
+     * Drop back to the unspecified-species defaults, for when the species Item is
+     * removed from the actor. The name is kept: it is what the hero's sheet says they
+     * are, and deleting the item is not a claim that they stopped being it.
+     */
+    clearSpecies() {
+        this.durabilityMultiplier = 1;
+        this.psionicMultiplier    = 1;
+        this.abilityRanges        = normaliseAbilityRanges(null);
+        return this._refreshDerivedMaxima();
+    }
+
     setAbilityScore(ability, value) {
         if (!ABILITIES.includes(ability)) throw new Error(`[AlternityCharacterState] Unknown ability "${ability}".`);
-        this.abilityScores[ability] = Math.min(14, Math.max(4, Math.round(Number(value))));
-        
-        // Update durability maximums. Routed through the math service so the
-        // four ratings can never drift from the constructor's derivation.
-        if (ability === 'CON') {
-            const ratings = AlternityMathService.calculateDurabilityRatings(this.abilityScores.CON, {
-                isWeren: String(this.species ?? '').toLowerCase().includes('weren'),
-            });
-            this.durability.stunMax    = ratings.stun;
-            this.durability.woundMax   = ratings.wound;
-            this.durability.mortalMax  = ratings.mortal;
-            this.durability.fatigueMax = ratings.fatigue;
-        }
+        // Clamped to the *species'* range, not to a flat 4-14. That constant put the
+        // Weren's printed Strength maximum of 16 and the Sandman's Willpower minimum
+        // of 2 out of reach, and rewrote them silently on the way in.
+        const { min, max } = this.abilityRange(ability);
+        this.abilityScores[ability] = Math.min(max, Math.max(min, Math.round(Number(value))));
 
-        // Update psionic energy max
-        if (ability === 'WIL') {
-            this.psionics.energy.max = this.abilityScores.WIL;
-        }
+        if (ability === 'CON' || ability === 'WIL') this._refreshDerivedMaxima();
 
         return this;
     }
@@ -700,6 +805,13 @@ class AlternityCharacterState {
             durability:    { ...this.durability },
             lastResort:    { ...this.lastResort },
             species:       this.species,
+            // Written out even when they are the defaults, so the name-sniffing
+            // fallback in the constructor only ever fires once per saved actor.
+            durabilityMultiplier: this.durabilityMultiplier,
+            psionicMultiplier:    this.psionicMultiplier,
+            abilityRanges: Object.fromEntries(
+                Object.entries(this.abilityRanges).map(([ability, range]) => [ability, { ...range }])
+            ),
             abilityScores: { ...this.abilityScores },
             skills:        Object.fromEntries(Object.entries(this.skills).map(([id, s]) => [id, { rank: s.rank }])),
             customSkills:  this.customSkills.map(s => ({ ...s })),

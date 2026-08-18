@@ -36,7 +36,7 @@ release.yml` on a `v*` tag. Nobody installing the system runs npm.
 | `alternity-fx` | 228 | `fx` |
 | `alternity-cybertech` | 57 | `cybertech` |
 | `alternity-achievements` | 185 | `achievementBenefit` |
-| `alternity-species` | 18 | `JournalEntry` |
+| `alternity-species` | 18 | `species` |
 | `alternity-templates` | 54 | `character` Actors |
 
 Each pack folders its contents by source book, except `alternity-achievements`, which
@@ -168,48 +168,72 @@ Correctly left at their defaults, and not to be "fixed": catalogue skills at ran
 every suit of armour. The achievement `effectValue` of 1 was checked against the source
 data's own `SpecialItems` encoding and agrees with it, ability mappings included.
 
-## Phase 4: species as a real Item subtype - not started
+## Phase 4: species as a real Item subtype - done
 
-**This is the tracked follow-up for the species pack.** The 18 species are JournalEntries
-today because there is no `species` Item type, but each entry already carries its full
-structured record on `flags['alternity-v2'].provenance`:
+The 18 species are `species` Items, and a hero's species is the Item they carry rather
+than a string on their sheet. That matters because a species is the only thing in this
+system whose numbers reach outside itself:
 
-```jsonc
-{
-  "abilityRanges": { "STR": { "min": 9, "max": 16 }, /* ...all six... */ },
-  "bonusSkillPoints": 0,
-  "bonusBroadSkills": 0,
-  "durabilityMultiplier": 1.5,     // Weren: CON x 1.5 for durability scores
-  "psionicMultiplier": 1,
-  "isPsionic": false,
-  "canGlide": false,
-  "canFly": false,
-  "actionCheckStep": 0,
-  "freeSkills": ["Athletics", "Unarmed Attack", "Stamina", /* ... */],
-  "specialAbilities": ["Weren Superior Durability: CON x 1.5 for durability scores", /* ... */]
-}
-```
+| What it sets | Where it lands |
+| --- | --- |
+| `durabilityMultiplier` | Constitution, before the stun/wound/mortal/fatigue run is figured |
+| `psionicMultiplier` | Willpower, on the way to psionic energy points |
+| `abilityRanges` | The span each score may be bought within |
+| `actionCheckStep` | The action check die (T'sa: -1) |
+| `specialAbilities[].effectTarget` | `collectTargetModifiers`, for the ones that state a step |
 
-So the promotion reads that flag rather than re-running the conversion against
-`external/`, and the compendium entries can be updated in place.
+- [x] **`SpeciesData` holds all of it**, plus `bonusSkillPoints`, `bonusBroadSkills`,
+      the psionic/glide/fly flags, `naturalArmor` as printed die expressions, and the
+      free skills by name. `specialAbilities` is `{name, description, effectTarget,
+      effectValue, attackKind}` — the description is always the whole printed note, and
+      the mechanical fields are filled only where the note states something the system
+      can apply on its own.
+- [x] **The `isWeren` name test is retired.** Durability used to ask whether
+      `state.species` contained the string "weren", which was wrong twice over: it
+      missed the **Sasquatch**, which carries exactly the same CON x1.5, and it would
+      have fired on any hero whose species name merely mentioned one.
+      `calculateDurabilityRatings` now takes `durabilityMultiplier`; `isWeren` survives
+      as a documented alias for 1.5, because supporting cast state it as a flag
+      (`NpcData.isSuperiorDurability`) rather than as a number.
+      `legacyDurabilityMultiplier` runs the old guess exactly once, for a state saved
+      before the Item type existed, and the guess is written out by the next save.
+- [x] **Ability scores clamp to the species' range, not to a flat 4-14.** That constant
+      put the Weren's printed Strength maximum of 16 and the Sandman's Willpower minimum
+      of 2 out of reach and rewrote them silently on the way in. The hero sheet's number
+      inputs read the same range.
+- [x] **The mechanical notes are parsed where they are mechanical.** One is, in the whole
+      data set: "Weren Camouflage: +1 step to ranged attacks vs. weren", which
+      `AlternityRollService.collectTargetModifiers` now applies beside the target's
+      resistance modifier. The T'sa's natural armour is lifted out of its note into
+      `naturalArmor`. The pattern is deliberately narrow — a looser one would turn a
+      sentence that merely mentions steps into a modifier applied behind the player's
+      back.
+- [x] **The item sheet has a species tab**, and the hero sheet shows the carried species
+      with its trait summary on the Hero tab. Dropping one runs
+      `AlternityActor.syncSpeciesFromItems`; dropping a second replaces the first
+      (`removeOtherSpecies`), because two would mean two multipliers with no rule for
+      which wins.
+- [x] **Each of the 54 career templates carries its species Item.** Every one is Human,
+      and each template file repeats the whole `Species` record inline, so they are built
+      from the record rather than from an assumption.
 
-- [ ] Add a `species` Item type to `system.json`'s `documentTypes` and a `SpeciesData`
-      TypeDataModel: ability minimum/maximum per ability, bonus skill points, bonus broad
-      skills, durability and psionic multipliers, action check step, flight/glide flags,
-      free skill ids, and special abilities as an array of `{name, description}`.
-- [ ] **Retire the `isWeren` special case.** `AlternityCharacterState` currently derives
-      durability by asking `AlternityMathService.calculateDurabilityRatings` whether the
-      species name contains "weren", because that multiplier had nowhere else to live. A
-      `durabilityMultiplier` on a real species item is where it belongs, and every other
-      species in the data set carries the same field.
-- [ ] Parse `specialAbilities` into something mechanical where the note is mechanical.
-      Several are step modifiers stated in prose ("Weren Camouflage: +1 step to ranged
-      attacks vs. weren"), which `collectTargetModifiers` could read.
-- [ ] Add a species row to the item sheet, and make the character sheet accept a dropped
-      species - the drag-and-drop path already exists (`alternity-drag-drop.js`).
-- [ ] Convert the pack to `species` items and keep the ids stable, so a world that
-      already references the journal entries is not orphaned. The pack changes document
-      type, so this is a migration, not a rebuild.
+**The document ids changed, and no id would have prevented that.** A compendium UUID
+names the document type, so `Compendium.alternity-v2.alternity-species.JournalEntry.<id>`
+cannot resolve to an Item whatever id it is given. The pack's ids are hashed from
+`(pack, 'species', name)` like every other item and are stable from here on.
+
+What is still prose and not mechanics, in the four Core species that carry notes at all
+(the Star\*Drive, Dark\*Matter and Traveller species carry none):
+
+- [ ] The T'sa's natural armour is stored but not yet applied — the state's `armor`
+      block is filled from worn gear, and a species' rating should stack into it.
+- [ ] "Sesheyan Light Sensitivity: +1/+2/+3 step penalty for ordinary/good/amazing
+      illumination" is a circumstance modifier keyed to a condition the system does not
+      model.
+- [ ] "Weren Primitive Culture: +2 step penalty when using any items of PL4 or higher"
+      could be read off the item's `progressLevel`, which every gear item now carries.
+- [ ] "Weren Natural Weapon: claws do d4w/d4+2w/d4m (LI/O)" is a weapon, and could be
+      embedded as one rather than described.
 
 ## Phase 5: career templates - partly done
 

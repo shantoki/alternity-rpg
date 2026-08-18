@@ -11,11 +11,16 @@ const NS = 'alt';
 // (mirrors the generic add/delete-row pattern used by AlternityWarshipSheet).
 // Keyed by schema field name rather than by item type, so the names must stay
 // unique across types — `effects`/`requiredChecks` belong to `effect`,
-// `rankBenefits` to `fx`.
+// `rankBenefits` to `fx`, `freeSkills`/`specialAbilities` to `species`.
+//
+// A default may be a scalar: `species.freeSkills` is an ArrayField of plain
+// strings, not of schemas, so its new row is `''` rather than an object.
 const ARRAY_ROW_DEFAULTS = Object.freeze({
     effects:        { effectType: 'Modifier', value: 0, damageType: null, stat: '', duration: 'instant', notes: '' },
     requiredChecks: { checkType: 'resource', params: {}, failMessage: '' },
     rankBenefits:   { rank: 3, name: '', description: '' },
+    freeSkills:     '',
+    specialAbilities: { name: '', description: '', effectTarget: 'None', effectValue: 0, attackKind: 'Any' },
 });
 
 export class AlternityItemSheet extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.sheets.ItemSheetV2) {
@@ -61,9 +66,13 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
     static async _onAddArrayRowAction(event, target) {
         const arrayKey = target.dataset.array;
         const defaults = ARRAY_ROW_DEFAULTS[arrayKey];
-        if (!defaults) return;
+        // `undefined`, not falsy: a scalar default of `''` is a legitimate new row
+        // (species free skills are an array of plain strings), and testing for
+        // truthiness would have made that field's add button silently do nothing.
+        if (defaults === undefined) return;
+        const row = (defaults !== null && typeof defaults === 'object') ? { ...defaults } : defaults;
         const current = foundry.utils.getProperty(this.item.system, arrayKey) ?? [];
-        await this.item.update({ [`system.${arrayKey}`]: [...current, { ...defaults }] });
+        await this.item.update({ [`system.${arrayKey}`]: [...current, row] });
     }
 
     static async _onDeleteArrayRowAction(event, target) {

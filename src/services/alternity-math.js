@@ -1478,10 +1478,19 @@ const AlternityMathService = {
      * subsequent actions (the "Dazed" rule), which is why it is tracked here
      * rather than folded into stun.
      *
+     * **A species multiplies the Constitution, not the ratings.** The Weren's
+     * "Superior Durability" reads CON x1.5 rounded down, and the Sasquatch carries
+     * the same multiplier — so it has to land before the mortal/fatigue halving
+     * rather than on each of the four results. At CON 9 that is 13/13/7/7, not
+     * 13/13/8/8.
+     *
      * @param {number} constitutionScore
      * @param {object}  [options]
-     * @param {boolean} [options.isWeren] - Weren "Superior Durability": CON x1.5,
-     *        rounded down (PHB Ch.2). Applied before the halving.
+     * @param {number}  [options.durabilityMultiplier=1] - The owner's species
+     *        multiplier on Constitution, read off their `species` Item.
+     * @param {boolean} [options.isWeren] - Back-compatible alias for a multiplier of
+     *        1.5. Kept because supporting cast state this as a flag
+     *        (`NpcData.isSuperiorDurability`) rather than as a number.
      * @returns {{
      *   stun: number, wound: number, mortal: number, fatigue: number,
      *   base: number, modifierTrace: object[]
@@ -1494,20 +1503,22 @@ const AlternityMathService = {
             );
         }
 
-        const isWeren = !!options.isWeren;
-        // Weren durability is figured from an inflated Constitution, so the
-        // multiplier has to land before the mortal/fatigue halving rather than
-        // being applied to each of the four results.
-        const base = isWeren
-            ? Math.floor(Math.floor(constitutionScore) * 1.5)
-            : Math.floor(constitutionScore);
+        const multiplier = Number(options.durabilityMultiplier ?? (options.isWeren ? 1.5 : 1));
+        if (!isFinite(multiplier) || multiplier <= 0) {
+            throw new Error(
+                '[AlternityMathService.calculateDurabilityRatings] durabilityMultiplier must be a finite number > 0.'
+            );
+        }
+
+        const constitution = Math.floor(constitutionScore);
+        const base = Math.floor(constitution * multiplier);
 
         const modifierTrace = [
-            this.buildModifier('Constitution', Math.floor(constitutionScore), 'Base durability'),
+            this.buildModifier('Constitution', constitution, 'Base durability'),
         ];
-        if (isWeren) {
+        if (multiplier !== 1) {
             modifierTrace.push(
-                this.buildModifier('Weren', base - Math.floor(constitutionScore), 'Superior Durability (CON x1.5)')
+                this.buildModifier('Species', base - constitution, `Durability from CON x${multiplier}`)
             );
         }
 

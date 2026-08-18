@@ -1,0 +1,74 @@
+{
+  "_id": "UoSGxfkSWyqA5W7W",
+  "_key": "!items!UoSGxfkSWyqA5W7W",
+  "name": "Edanweir",
+  "type": "species",
+  "img": "icons/svg/mystery-man.svg",
+  "system": {
+    "abilityRanges": {
+      "STR": {
+        "min": 4,
+        "max": 13
+      },
+      "DEX": {
+        "min": 6,
+        "max": 15
+      },
+      "CON": {
+        "min": 4,
+        "max": 13
+      },
+      "INT": {
+        "min": 4,
+        "max": 14
+      },
+      "WIL": {
+        "min": 8,
+        "max": 14
+      },
+      "PER": {
+        "min": 4,
+        "max": 12
+      }
+    },
+    "bonusSkillPoints": 0,
+    "bonusBroadSkills": 0,
+    "durabilityMultiplier": 1,
+    "psionicMultiplier": 1,
+    "actionCheckStep": 0,
+    "isPsionic": true,
+    "canGlide": false,
+    "canFly": false,
+    "naturalArmor": {
+      "li": "",
+      "hi": "",
+      "en": ""
+    },
+    "freeSkills": [
+      "Athletics",
+      "Movement",
+      "Knowledge",
+      "Awareness",
+      "Resolve",
+      "Interaction"
+    ],
+    "specialAbilities": [],
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Star*Drive</dd></dl><h2>Ability Ranges</h2><table><thead><tr><th>Ability</th><th>Minimum</th><th>Maximum</th></tr></thead><tbody><tr><th>STR</th><td>4</td><td>13</td></tr><tr><th>DEX</th><td>6</td><td>15</td></tr><tr><th>CON</th><td>4</td><td>13</td></tr><tr><th>INT</th><td>4</td><td>14</td></tr><tr><th>WIL</th><td>8</td><td>14</td></tr><tr><th>PER</th><td>4</td><td>12</td></tr></tbody></table><h2>Species Traits</h2><ul><li>Psionically active</li></ul><h2>Free Skills</h2><ul><li>Athletics</li><li>Movement</li><li>Knowledge</li><li>Awareness</li><li>Resolve</li><li>Interaction</li></ul>"
+  },
+  "effects": [],
+  "folder": "93xEtKfSGHjtSroo",
+  "sort": 900,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Star*Drive",
+        "sourceFile": "data/species.json",
+        "sourceSpeciesId": 101,
+        "specialNotes": []
+      }
+    }
+  }
+}

@@ -1697,6 +1697,14 @@
     min-width: 0;
     resize: vertical;
 }
+/* The ability label in a species' range rows: fixed, so the six min/max pairs
+   line up into columns instead of each row sizing to its own label. */
+.alt-item-sheet .alt-species-ability {
+    flex: 0 0 44px;
+    font-weight: 600;
+    color: var(--alt-color-primary);
+}
+
 /* A rank/level column that shouldn't share the row's equal-flex sizing. */
 .alt-item-sheet .alt-item-array-row input.alt-item-array-narrow {
     flex: 0 0 48px;

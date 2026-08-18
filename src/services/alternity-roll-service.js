@@ -29,6 +29,7 @@ import {
     getAlternityState,
     ABILITY_TYPES,
 } from '../data/alternity-actor-data.js';
+import { speciesDefenseModifiers } from '../data/SpeciesData.js';
 import { Roll, ChatMessage, Hooks, game, renderTemplate } from '../module-info.js';
 
 const NAMESPACE = 'alternity-v2';
@@ -1013,6 +1014,25 @@ export const AlternityRollService = {
                 resistance,
                 game.i18n.format('ALTERNITY.Modifier.ResistanceReason', { target: target.name }),
             ));
+        }
+
+        // A species can make its owner harder to hit: the Weren's camouflage reads
+        // "+1 step to ranged attacks vs. weren". This belongs beside the resistance
+        // modifier because it is the same kind of thing - Alternity has no armour
+        // class, so every "harder to hit" is a step penalty on the attacker's check.
+        // Only abilities whose printed note states a step land here; the rest of a
+        // species' abilities are prose a Gamemaster adjudicates.
+        for (const item of Array.from(target.items ?? [])) {
+            if (item.type !== 'species') continue;
+            for (const ability of speciesDefenseModifiers(item.system, attackKind)) {
+                modifiers.push(AlternityMathService.buildModifier(
+                    ability.name,
+                    ability.value,
+                    game.i18n.format('ALTERNITY.Modifier.SpeciesReason', {
+                        target: target.name, species: item.name,
+                    }),
+                ));
+            }
         }
 
         modifiers.push(...await this.readPendingDodge(target));

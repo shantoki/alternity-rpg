@@ -1,0 +1,100 @@
+{
+  "_id": "Mrw4yEgTqKqS3i94",
+  "_key": "!items!Mrw4yEgTqKqS3i94",
+  "name": "T'sa",
+  "type": "species",
+  "img": "icons/svg/mystery-man.svg",
+  "system": {
+    "abilityRanges": {
+      "STR": {
+        "min": 4,
+        "max": 11
+      },
+      "DEX": {
+        "min": 9,
+        "max": 16
+      },
+      "CON": {
+        "min": 4,
+        "max": 10
+      },
+      "INT": {
+        "min": 8,
+        "max": 14
+      },
+      "WIL": {
+        "min": 4,
+        "max": 12
+      },
+      "PER": {
+        "min": 4,
+        "max": 13
+      }
+    },
+    "bonusSkillPoints": 0,
+    "bonusBroadSkills": 0,
+    "durabilityMultiplier": 1,
+    "psionicMultiplier": 1,
+    "actionCheckStep": -1,
+    "isPsionic": false,
+    "canGlide": false,
+    "canFly": false,
+    "naturalArmor": {
+      "li": "d4+1",
+      "hi": "d4",
+      "en": "d4-1"
+    },
+    "freeSkills": [
+      "Athletics",
+      "Manipulation",
+      "Stamina",
+      "Knowledge",
+      "Awareness",
+      "Interaction"
+    ],
+    "specialAbilities": [
+      {
+        "name": "T'sa Action Check bonus",
+        "description": "T'sa Action Check bonus: base die is -d4",
+        "effectTarget": "None",
+        "effectValue": 0,
+        "attackKind": "Any"
+      },
+      {
+        "name": "T'sa Body Armor",
+        "description": "T'sa Body Armor: natural armor of d4+1 (LI), d4 (HI), d4-1 (En)",
+        "effectTarget": "None",
+        "effectValue": 0,
+        "attackKind": "Any"
+      },
+      {
+        "name": "T'sa Juryrig Bonus",
+        "description": "T'sa Juryrig Bonus: -1 step to Technical Science-Juryrig skill check",
+        "effectTarget": "None",
+        "effectValue": 0,
+        "attackKind": "Any"
+      }
+    ],
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Core Rulebook</dd><dt>Natural armour</dt><dd>d4+1 (LI), d4 (HI), d4-1 (En)</dd></dl><h2>Ability Ranges</h2><table><thead><tr><th>Ability</th><th>Minimum</th><th>Maximum</th></tr></thead><tbody><tr><th>STR</th><td>4</td><td>11</td></tr><tr><th>DEX</th><td>9</td><td>16</td></tr><tr><th>CON</th><td>4</td><td>10</td></tr><tr><th>INT</th><td>8</td><td>14</td></tr><tr><th>WIL</th><td>4</td><td>12</td></tr><tr><th>PER</th><td>4</td><td>13</td></tr></tbody></table><h2>Species Traits</h2><ul><li>Action check step -1</li></ul><h2>Free Skills</h2><ul><li>Athletics</li><li>Manipulation</li><li>Stamina</li><li>Knowledge</li><li>Awareness</li><li>Interaction</li></ul><h2>Special Abilities</h2><ul><li>T'sa Action Check bonus: base die is -d4</li><li>T'sa Body Armor: natural armor of d4+1 (LI), d4 (HI), d4-1 (En)</li><li>T'sa Juryrig Bonus: -1 step to Technical Science-Juryrig skill check</li></ul>"
+  },
+  "effects": [],
+  "folder": "TgY9cvkaCBBPjCVW",
+  "sort": 400,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {
+    "alternity-v2": {
+      "provenance": {
+        "book": "Core Rulebook",
+        "sourceFile": "data/species.json",
+        "sourceSpeciesId": 4,
+        "specialNotes": [
+          "T'sa Action Check bonus: base die is -d4",
+          "T'sa Body Armor: natural armor of d4+1 (LI), d4 (HI), d4-1 (En)",
+          "T'sa Juryrig Bonus: -1 step to Technical Science-Juryrig skill check"
+        ]
+      }
+    }
+  }
+}

@@ -65,7 +65,100 @@
       "powers": []
     }
   },
-  "items": [],
+  "items": [
+    {
+      "_id": "7HH4XAUjrla2G9IK",
+      "_key": "!actors.items!NeWA40LaUQgKQlEr.7HH4XAUjrla2G9IK",
+      "name": "Human",
+      "type": "species",
+      "img": "icons/svg/mystery-man.svg",
+      "system": {
+        "abilityRanges": {
+          "STR": {
+            "min": 4,
+            "max": 14
+          },
+          "DEX": {
+            "min": 4,
+            "max": 14
+          },
+          "CON": {
+            "min": 4,
+            "max": 14
+          },
+          "INT": {
+            "min": 4,
+            "max": 14
+          },
+          "WIL": {
+            "min": 4,
+            "max": 14
+          },
+          "PER": {
+            "min": 4,
+            "max": 14
+          }
+        },
+        "bonusSkillPoints": 5,
+        "bonusBroadSkills": 1,
+        "durabilityMultiplier": 1,
+        "psionicMultiplier": 1,
+        "actionCheckStep": 0,
+        "isPsionic": false,
+        "canGlide": false,
+        "canFly": false,
+        "naturalArmor": {
+          "li": "",
+          "hi": "",
+          "en": ""
+        },
+        "freeSkills": [
+          "Athletics",
+          "Vehicle Operation",
+          "Stamina",
+          "Knowledge",
+          "Awareness",
+          "Interaction"
+        ],
+        "specialAbilities": [
+          {
+            "name": "Human 5 point skill bonus",
+            "description": "",
+            "effectTarget": "None",
+            "effectValue": 0,
+            "attackKind": "Any"
+          },
+          {
+            "name": "Human 1 extra broad skill bonus",
+            "description": "",
+            "effectTarget": "None",
+            "effectValue": 0,
+            "attackKind": "Any"
+          }
+        ],
+        "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Core Rulebook</dd></dl><h2>Ability Ranges</h2><table><thead><tr><th>Ability</th><th>Minimum</th><th>Maximum</th></tr></thead><tbody><tr><th>STR</th><td>4</td><td>14</td></tr><tr><th>DEX</th><td>4</td><td>14</td></tr><tr><th>CON</th><td>4</td><td>14</td></tr><tr><th>INT</th><td>4</td><td>14</td></tr><tr><th>WIL</th><td>4</td><td>14</td></tr><tr><th>PER</th><td>4</td><td>14</td></tr></tbody></table><h2>Species Traits</h2><ul><li>5 bonus skill points</li><li>1 extra broad skill</li></ul><h2>Free Skills</h2><ul><li>Athletics</li><li>Vehicle Operation</li><li>Stamina</li><li>Knowledge</li><li>Awareness</li><li>Interaction</li></ul><h2>Special Abilities</h2><ul><li>Human 5 point skill bonus</li><li>Human 1 extra broad skill bonus</li></ul>"
+      },
+      "effects": [],
+      "folder": null,
+      "sort": 0,
+      "ownership": {
+        "default": 0
+      },
+      "flags": {
+        "alternity-v2": {
+          "provenance": {
+            "book": "Core Rulebook",
+            "sourceFile": "Templates/Scientist (Core).json",
+            "sourceSpeciesId": 0,
+            "specialNotes": [
+              "Human 5 point skill bonus",
+              "Human 1 extra broad skill bonus"
+            ]
+          }
+        }
+      }
+    }
+  ],
   "effects": [],
   "folder": "raPfB7E5xf1KnsQQ",
   "sort": 4300,
@@ -131,6 +224,34 @@
           "cost": 3
         },
         "species": "Human",
+        "durabilityMultiplier": 1,
+        "psionicMultiplier": 1,
+        "abilityRanges": {
+          "STR": {
+            "min": 4,
+            "max": 14
+          },
+          "DEX": {
+            "min": 4,
+            "max": 14
+          },
+          "CON": {
+            "min": 4,
+            "max": 14
+          },
+          "INT": {
+            "min": 4,
+            "max": 14
+          },
+          "WIL": {
+            "min": 4,
+            "max": 14
+          },
+          "PER": {
+            "min": 4,
+            "max": 14
+          }
+        },
         "abilityScores": {
           "STR": 10,
           "DEX": 10,
