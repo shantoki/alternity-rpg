@@ -1,0 +1,173 @@
+{
+  "_id": "AEJ4lOeeKjvPyoyJ",
+  "_key": "!actors!AEJ4lOeeKjvPyoyJ",
+  "name": "Liner",
+  "type": "warship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Liner",
+    "hullCategory": "Civilian",
+    "toughness": "Medium",
+    "targetModifier": "-1 step",
+    "maneuverClass": 1,
+    "hullPoints": {
+      "base": 840,
+      "bonus": 252
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 53
+      },
+      "wound": {
+        "value": 0,
+        "max": 53
+      },
+      "mortal": {
+        "value": 0,
+        "max": 27
+      },
+      "critical": {
+        "value": 0,
+        "max": 14
+      }
+    },
+    "armor": {
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": "",
+      "armorType": ""
+    },
+    "power": {
+      "generated": 0,
+      "consumed": 0
+    },
+    "edge": 0,
+    "acceleration": 0,
+    "crew": {
+      "estimate": 840,
+      "current": 0
+    },
+    "cost": "$150 M",
+    "systems": [],
+    "weapons": [],
+    "defenses": [],
+    "sensors": [],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 137,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FC (Forward center)",
+        "hullPointLimit": 137,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FP (Forward port side)",
+        "hullPointLimit": 137,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FS (Forward starboard side)",
+        "hullPointLimit": 137,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "P (Midships port)",
+        "hullPointLimit": 137,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "CF (Center forward)",
+        "hullPointLimit": 137,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "S (Midships starboard)",
+        "hullPointLimit": 137,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AP (Aft port)",
+        "hullPointLimit": 137,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "CA (Center aft)",
+        "hullPointLimit": 137,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AS (Aft starboard)",
+        "hullPointLimit": 137,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AC (Aft center)",
+        "hullPointLimit": 137,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 137,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Tables 5-1b / 5-18</dd><dt>Class</dt><dd>Civilian hull</dd><dt>Hull points</dt><dd>840 (+252)</dd><dt>Toughness</dt><dd>Medium (printed &quot;Md&quot;)</dd><dt>Target modifier</dt><dd>-1 step</dd><dt>Manoeuvre class</dt><dd>1</dd><dt>Damage track (s/w/m/c)</dt><dd>53/53/27/14</dd><dt>Hit zones</dt><dd>12, up to 137 hull points each</dd><dt>5% of hull</dt><dd>42</dd><dt>10% of hull</dt><dd>84</dd><dt>Typical crew</dt><dd>840</dd><dt>Cost</dt><dd>$150 M</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "zPTaUSsNEFtaEyLW",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Liner",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Civilian Hulls",
+        "table": "Tables 5-1b / 5-18",
+        "hullPointsFivePercent": 42,
+        "hullPointsTenPercent": 84,
+        "printedToughness": "Md",
+        "zoneLimitTable": "Table 5-18"
+      }
+    }
+  }
+}

@@ -1,0 +1,211 @@
+{
+  "_id": "lwHjK3p6LHfvUrGE",
+  "_key": "!actors!lwHjK3p6LHfvUrGE",
+  "name": "System Liner",
+  "type": "spaceship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "System liner",
+    "hullCategory": "Civilian",
+    "hullSize": 32,
+    "compartmentLimit": 8,
+    "progressLevel": 6,
+    "cost": "",
+    "maneuverRating": 0,
+    "acceleration": 0,
+    "cruisingSpeed": 0,
+    "engineType": "Fusion torch",
+    "movementPoints": 0,
+    "ftl": {
+      "driveType": "Stardrive",
+      "drivespace": 5
+    },
+    "power": {
+      "generated": 0,
+      "allocated": 0,
+      "plantText": "Fusion generator"
+    },
+    "berthing": 0,
+    "crewAboard": 0,
+    "armor": {
+      "grade": "Light",
+      "material": "alloy",
+      "lowImpact": "d6-1",
+      "highImpact": "d6-1",
+      "energy": "d4-1"
+    },
+    "computer": {
+      "coreQuality": "Marginal",
+      "dedicatedText": ""
+    },
+    "compartments": [
+      {
+        "label": "Command",
+        "kind": "Command",
+        "durability": 5,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 1,
+        "hitHigh": 1,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Engineering",
+        "kind": "Engineering",
+        "durability": 7,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 2,
+        "hitHigh": 2,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Engineering 2",
+        "kind": "Engineering",
+        "durability": 6,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 3,
+        "hitHigh": 4,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Auxiliary",
+        "kind": "Auxiliary",
+        "durability": 5,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 5,
+        "hitHigh": 6,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Cargo",
+        "kind": "Cargo",
+        "durability": 2,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 7,
+        "hitHigh": 9,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Cargo",
+        "kind": "Cargo",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 10,
+        "hitHigh": 12,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Cargo",
+        "kind": "Cargo",
+        "durability": 2,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 13,
+        "hitHigh": 16,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Cargo",
+        "kind": "Cargo",
+        "durability": 2,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 17,
+        "hitHigh": 20,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      }
+    ],
+    "weapons": [
+      {
+        "name": "CHE missile rack",
+        "compartment": 0,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "The compartment table does not say which space it is mounted in.",
+        "arc": "Fore",
+        "range": "",
+        "damageOrdinary": "d8s",
+        "damageGood": "d6+1w",
+        "damageAmazing": "d4m",
+        "damageType": "lowImpact",
+        "firepower": "Amazing",
+        "actionsPerRound": 1
+      }
+    ],
+    "defenses": [],
+    "systems": [],
+    "stations": [],
+    "notes": "<p>Cannot enter atmosphere; meets shuttles in orbit and carries cargo or passengers to other places in the star system. Drivespace fitting is a PL 7 refit costing $1,000,000.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Player's Handbook, Ch.12 &quot;Vehicles&quot;, PL 6</dd><dt>Hull</dt><dd>System liner (Civilian), hull size 32</dd><dt>Progress Level</dt><dd>6</dd><dt>Compartments</dt><dd>8</dd><dt>Toughness</dt><dd>Amazing - as every spaceship is (GM Guide Ch.11)</dd><dt>Manoeuvre rating</dt><dd>0</dd><dt>Engine</dt><dd>Fusion torch</dd><dt>Power plant</dt><dd>Fusion generator</dd><dt>FTL</dt><dd>Stardrive, 5 light-years per starfall</dd><dt>Armor</dt><dd>Light alloy: d6-1 (LI), d6-1 (HI), d4-1 (En)</dd><dt>Computer</dt><dd>undefined core</dd><dt>Compartment durability assigned</dt><dd>32 of 32</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "npefu74U1eEu5NCk",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "System Liner",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Player's Handbook",
+        "reference": "Ch.12 \"Vehicles\", PL 6",
+        "folder": "Player's Handbook"
+      }
+    }
+  }
+}

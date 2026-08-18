@@ -50,9 +50,23 @@ const SUCCESS_DEGREES = Object.freeze({
 });
 
 /**
- * Ship toughness/firepower classes, ordered small → large (Warships Ch.1).
+ * Ship toughness classes, ordered weakest → toughest (Warships Ch.1).
+ *
+ * 'Good' is the bottom rung and belongs to hulls only: Table 5-1b prints `(Gd)` for the
+ * launch, courier and trader, and that table's own note reads "some ships have Good
+ * toughness, one step less than Small Craft". No weapon has Good firepower, which is why
+ * SHIP_FIREPOWER_CLASSES drops it — but the *ranking* has to run over one shared ladder,
+ * because `calculateFirepowerShift` reads a firepower class and a toughness class off the
+ * same scale and only the difference between them means anything.
  */
-const SHIP_TOUGHNESS_CLASSES = Object.freeze(['SmallCraft', 'Light', 'Medium', 'Heavy', 'SuperHeavy']);
+const SHIP_TOUGHNESS_CLASSES = Object.freeze(['Good', 'SmallCraft', 'Light', 'Medium', 'Heavy', 'SuperHeavy']);
+
+/**
+ * Firepower classes a *weapon* can carry (Warships Tables 5-8 through 5-13: the
+ * `S`/`L`/`M`/`H`/`SH` half of a code like `En/H`). The toughness ladder without its
+ * hull-only bottom rung.
+ */
+const SHIP_FIREPOWER_CLASSES = Object.freeze(SHIP_TOUGHNESS_CLASSES.slice(1));
 
 /**
  * Ship damage grades, ordered least → most severe (Warships Ch.1).
@@ -3464,6 +3478,7 @@ export {
     DODGE_STEP_ADJUSTMENTS,
     COMPLEX_CHECK_SUCCESS_VALUES,
     SHIP_TOUGHNESS_CLASSES,
+    SHIP_FIREPOWER_CLASSES,
     SHIP_DAMAGE_GRADES,
     FIREPOWER_CLASSES,
     COMPARTMENT_DAMAGE_GRADES,

@@ -1,0 +1,103 @@
+{
+  "_id": "mfEt00Nlv5cieNxh",
+  "_key": "!actors!mfEt00Nlv5cieNxh",
+  "name": "Launch",
+  "type": "warship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Launch",
+    "hullCategory": "Civilian",
+    "toughness": "Good",
+    "targetModifier": "+3 steps",
+    "maneuverClass": 4,
+    "hullPoints": {
+      "base": 8,
+      "bonus": 0
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 4
+      },
+      "wound": {
+        "value": 0,
+        "max": 4
+      },
+      "mortal": {
+        "value": 0,
+        "max": 2
+      },
+      "critical": {
+        "value": 0,
+        "max": 1
+      }
+    },
+    "armor": {
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": "",
+      "armorType": ""
+    },
+    "power": {
+      "generated": 0,
+      "consumed": 0
+    },
+    "edge": 0,
+    "acceleration": 0,
+    "crew": {
+      "estimate": 2,
+      "current": 0
+    },
+    "cost": "$300 K",
+    "systems": [],
+    "weapons": [],
+    "defenses": [],
+    "sensors": [],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 5,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 5,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Tables 5-1b / 5-18</dd><dt>Class</dt><dd>Civilian hull</dd><dt>Hull points</dt><dd>8</dd><dt>Toughness</dt><dd>Good (printed &quot;(Gd)&quot;)</dd><dt>Target modifier</dt><dd>+3 steps</dd><dt>Manoeuvre class</dt><dd>4</dd><dt>Damage track (s/w/m/c)</dt><dd>4/4/2/1</dd><dt>Hit zones</dt><dd>2, up to 5 hull points each</dd><dt>5% of hull</dt><dd>0.5</dd><dt>10% of hull</dt><dd>1</dd><dt>Typical crew</dt><dd>2</dd><dt>Cost</dt><dd>$300 K</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "zPTaUSsNEFtaEyLW",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Launch",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Civilian Hulls",
+        "table": "Tables 5-1b / 5-18",
+        "hullPointsFivePercent": 0.5,
+        "hullPointsTenPercent": 1,
+        "printedToughness": "(Gd)",
+        "zoneLimitTable": "Table 5-18"
+      }
+    }
+  }
+}

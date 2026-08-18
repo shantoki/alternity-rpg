@@ -1,0 +1,340 @@
+{
+  "_id": "TzEEofrF2U9QNNcp",
+  "_key": "!actors!TzEEofrF2U9QNNcp",
+  "name": "Concord Blade-class Scout",
+  "type": "spaceship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Scout",
+    "hullCategory": "Military",
+    "hullSize": 30,
+    "compartmentLimit": 6,
+    "progressLevel": 7,
+    "cost": "",
+    "maneuverRating": -1,
+    "acceleration": 3,
+    "cruisingSpeed": 2,
+    "engineType": "Induction engine",
+    "movementPoints": 0,
+    "ftl": {
+      "driveType": "Stardrive",
+      "drivespace": 5
+    },
+    "power": {
+      "generated": 15,
+      "allocated": 0,
+      "plantText": "2 mass reactors rated for a total of 15 power factors"
+    },
+    "berthing": 12,
+    "crewAboard": 0,
+    "armor": {
+      "grade": "Moderate",
+      "material": "neutronite",
+      "lowImpact": "d6+1",
+      "highImpact": "d6+1",
+      "energy": "d6"
+    },
+    "computer": {
+      "coreQuality": "Good",
+      "dedicatedText": "Good navigation and sensors dedicated computers"
+    },
+    "compartments": [
+      {
+        "label": "Command",
+        "kind": "Command",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 1,
+        "hitHigh": 2,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Engineering",
+        "kind": "Engineering",
+        "durability": 9,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 3,
+        "hitHigh": 4,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Auxiliary",
+        "kind": "Auxiliary",
+        "durability": 4,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 5,
+        "hitHigh": 7,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Auxiliary 2",
+        "kind": "Auxiliary",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 8,
+        "hitHigh": 10,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Weapons",
+        "kind": "Weapons",
+        "durability": 4,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 11,
+        "hitHigh": 14,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Crew",
+        "kind": "Crew",
+        "durability": 2,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 15,
+        "hitHigh": 20,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      }
+    ],
+    "weapons": [
+      {
+        "name": "Mass cannon",
+        "compartment": 5,
+        "durabilityCost": 2,
+        "powerReq": 3,
+        "isOffline": false,
+        "notes": "",
+        "arc": "Fore",
+        "range": "5/10/15 Mm",
+        "damageOrdinary": "d6+2s",
+        "damageGood": "d6+1w",
+        "damageAmazing": "d6+3w",
+        "damageType": "lowImpact",
+        "firepower": "Amazing",
+        "actionsPerRound": 1
+      },
+      {
+        "name": "Mass cannon",
+        "compartment": 5,
+        "durabilityCost": 2,
+        "powerReq": 3,
+        "isOffline": false,
+        "notes": "",
+        "arc": "Fore",
+        "range": "5/10/15 Mm",
+        "damageOrdinary": "d6+2s",
+        "damageGood": "d6+1w",
+        "damageAmazing": "d6+3w",
+        "damageType": "lowImpact",
+        "firepower": "Amazing",
+        "actionsPerRound": 1
+      }
+    ],
+    "defenses": [
+      {
+        "name": "Point-defense gun",
+        "compartment": 1,
+        "durabilityCost": 1,
+        "powerReq": 1,
+        "isOffline": false,
+        "notes": "",
+        "isActive": false,
+        "effectText": "Destroys an incoming missile before it can detonate."
+      }
+    ],
+    "systems": [
+      {
+        "name": "Good computer core",
+        "compartment": 1,
+        "durabilityCost": 2,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Computer",
+        "range": ""
+      },
+      {
+        "name": "Multiband radar",
+        "compartment": 1,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Sensors",
+        "range": ""
+      },
+      {
+        "name": "EM detector",
+        "compartment": 1,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Sensors",
+        "range": ""
+      },
+      {
+        "name": "Radio transceiver",
+        "compartment": 1,
+        "durabilityCost": 0,
+        "powerReq": 1,
+        "isOffline": false,
+        "notes": "",
+        "category": "Communications",
+        "range": ""
+      },
+      {
+        "name": "Reentry capsule",
+        "compartment": 1,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Misc",
+        "range": ""
+      },
+      {
+        "name": "Induction engine",
+        "compartment": 2,
+        "durabilityCost": 6,
+        "powerReq": 6,
+        "isOffline": false,
+        "notes": "",
+        "category": "Engine",
+        "range": ""
+      },
+      {
+        "name": "Stardrive",
+        "compartment": 2,
+        "durabilityCost": 3,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "FTL Drive",
+        "range": ""
+      },
+      {
+        "name": "Airlock",
+        "compartment": 2,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Misc",
+        "range": ""
+      },
+      {
+        "name": "Mass reactor",
+        "compartment": 3,
+        "durabilityCost": 4,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Power Plant",
+        "range": ""
+      },
+      {
+        "name": "Autosupport",
+        "compartment": 3,
+        "durabilityCost": 0,
+        "powerReq": 2,
+        "isOffline": false,
+        "notes": "",
+        "category": "Life Support",
+        "range": ""
+      },
+      {
+        "name": "Mass reactor",
+        "compartment": 4,
+        "durabilityCost": 2,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Power Plant",
+        "range": ""
+      },
+      {
+        "name": "Airlock",
+        "compartment": 4,
+        "durabilityCost": 1,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Misc",
+        "range": ""
+      },
+      {
+        "name": "Crew quarters",
+        "compartment": 6,
+        "durabilityCost": 2,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Crew",
+        "range": ""
+      }
+    ],
+    "stations": [],
+    "notes": "<p>45.5 metres, 1,120 metric tons, 12 enlisted and 3 officers. The Concord's standard scout: a Good computer core with dedicated navigation and sensor computers, a stardrive, and two mass cannons for when looking is not enough.</p><p>The source table's durability column is unreadable. Each compartment here holds exactly the durability its printed systems cost, which leaves 2 points of the hull unassigned - the sheet will say so.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>StarDrive Campaign Setting, Oberon system</dd><dt>Hull</dt><dd>Scout (Military), hull size 30</dd><dt>Progress Level</dt><dd>7</dd><dt>Compartments</dt><dd>6</dd><dt>Toughness</dt><dd>Amazing - as every spaceship is (GM Guide Ch.11)</dd><dt>Manoeuvre rating</dt><dd>-1</dd><dt>Acceleration</dt><dd>3 Mm per phase</dd><dt>Cruising speed</dt><dd>2 AU per hour</dd><dt>Engine</dt><dd>Induction engine</dd><dt>Power plant</dt><dd>2 mass reactors rated for a total of 15 power factors</dd><dt>FTL</dt><dd>Stardrive, 5 light-years per starfall</dd><dt>Armor</dt><dd>Moderate neutronite: d6+1 (LI), d6+1 (HI), d6 (En)</dd><dt>Computer</dt><dd>Good core; Good navigation and sensors dedicated computers</dd><dt>Berthing</dt><dd>12</dd><dt>Compartment durability assigned</dt><dd>25 of 30</dd><dt>Scan damage</dt><dd>The durability column was lost entirely. Compartment ratings are the sums of the printed system costs, not the printed ratings.</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "x9iqN1j6DUo8KCrX",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Concord Blade-class Scout",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "StarDrive Campaign Setting",
+        "reference": "Oberon system",
+        "folder": "Ships of the Verge",
+        "scanDamage": "The durability column was lost entirely. Compartment ratings are the sums of the printed system costs, not the printed ratings."
+      }
+    }
+  }
+}

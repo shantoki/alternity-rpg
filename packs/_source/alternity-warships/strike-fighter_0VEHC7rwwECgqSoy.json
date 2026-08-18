@@ -1,0 +1,103 @@
+{
+  "_id": "0VEHC7rwwECgqSoy",
+  "_key": "!actors!0VEHC7rwwECgqSoy",
+  "name": "Strike fighter",
+  "type": "warship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Strike fighter",
+    "hullCategory": "Military",
+    "toughness": "SmallCraft",
+    "targetModifier": "+3 steps",
+    "maneuverClass": 4,
+    "hullPoints": {
+      "base": 15,
+      "bonus": 0
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 8
+      },
+      "wound": {
+        "value": 0,
+        "max": 8
+      },
+      "mortal": {
+        "value": 0,
+        "max": 4
+      },
+      "critical": {
+        "value": 0,
+        "max": 2
+      }
+    },
+    "armor": {
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": "",
+      "armorType": ""
+    },
+    "power": {
+      "generated": 0,
+      "consumed": 0
+    },
+    "edge": 0,
+    "acceleration": 0,
+    "crew": {
+      "estimate": 2,
+      "current": 0
+    },
+    "cost": "$500 K",
+    "systems": [],
+    "weapons": [],
+    "defenses": [],
+    "sensors": [],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 10,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 10,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Tables 5-1a / 5-18</dd><dt>Class</dt><dd>Military hull</dd><dt>Hull points</dt><dd>15</dd><dt>Toughness</dt><dd>SmallCraft (printed &quot;Sm&quot;)</dd><dt>Target modifier</dt><dd>+3 steps</dd><dt>Manoeuvre class</dt><dd>4</dd><dt>Damage track (s/w/m/c)</dt><dd>8/8/4/2</dd><dt>Hit zones</dt><dd>2, up to 10 hull points each</dd><dt>5% of hull</dt><dd>1</dd><dt>10% of hull</dt><dd>1.5</dd><dt>Typical crew</dt><dd>2</dd><dt>Cost</dt><dd>$500 K</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "NaBQROMUzthU7gcO",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Strike fighter",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Military Hulls",
+        "table": "Tables 5-1a / 5-18",
+        "hullPointsFivePercent": 1,
+        "hullPointsTenPercent": 1.5,
+        "printedToughness": "Sm",
+        "zoneLimitTable": "Table 5-18"
+      }
+    }
+  }
+}

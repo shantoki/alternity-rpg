@@ -1,0 +1,145 @@
+{
+  "_id": "ShA8ywqEQar5XJdl",
+  "_key": "!actors!ShA8ywqEQar5XJdl",
+  "name": "Hab Complex",
+  "type": "warship",
+  "img": "icons/svg/shield.svg",
+  "system": {
+    "hullType": "Hab Complex",
+    "hullCategory": "Installation",
+    "toughness": "Light",
+    "targetModifier": "-1 step",
+    "maneuverClass": 0,
+    "hullPoints": {
+      "base": 300,
+      "bonus": 60
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 38
+      },
+      "wound": {
+        "value": 0,
+        "max": 38
+      },
+      "mortal": {
+        "value": 0,
+        "max": 19
+      },
+      "critical": {
+        "value": 0,
+        "max": 10
+      }
+    },
+    "armor": {
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": "",
+      "armorType": ""
+    },
+    "power": {
+      "generated": 0,
+      "consumed": 0
+    },
+    "edge": 0,
+    "acceleration": 0,
+    "crew": {
+      "estimate": 150,
+      "current": 0
+    },
+    "cost": "$30 M",
+    "systems": [],
+    "weapons": [],
+    "defenses": [],
+    "sensors": [],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 72,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FP (Forward port side)",
+        "hullPointLimit": 72,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FC (Forward center)",
+        "hullPointLimit": 72,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FS (Forward starboard side)",
+        "hullPointLimit": 72,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AP (Aft port side)",
+        "hullPointLimit": 72,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AC (Aft center)",
+        "hullPointLimit": 72,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AS (Aft starboard side)",
+        "hullPointLimit": 72,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 72,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Table 6-1</dd><dt>Class</dt><dd>Station or base</dd><dt>Hull points</dt><dd>300 (+60)</dd><dt>Toughness</dt><dd>Light (printed &quot;Light&quot;)</dd><dt>Target modifier</dt><dd>-1 step</dd><dt>Manoeuvre class</dt><dd>None - installations do not move</dd><dt>Damage track (s/w/m/c)</dt><dd>38/38/19/10</dd><dt>Hit zones</dt><dd>8, up to 72 hull points each</dd><dt>5% of hull</dt><dd>15</dd><dt>10% of hull</dt><dd>30</dd><dt>Typical crew</dt><dd>150</dd><dt>Cost</dt><dd>$30 M</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "njDZPzjcxPxDTVBR",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Hab Complex",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/shield.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Stations & Bases",
+        "table": "Table 6-1",
+        "hullPointsFivePercent": 15,
+        "hullPointsTenPercent": 30,
+        "printedToughness": "Light",
+        "zoneLimitTable": "Table 6-1"
+      }
+    }
+  }
+}

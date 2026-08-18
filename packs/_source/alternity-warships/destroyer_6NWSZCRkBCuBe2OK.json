@@ -1,0 +1,131 @@
+{
+  "_id": "6NWSZCRkBCuBe2OK",
+  "_key": "!actors!6NWSZCRkBCuBe2OK",
+  "name": "Destroyer",
+  "type": "warship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Destroyer",
+    "hullCategory": "Military",
+    "toughness": "Light",
+    "targetModifier": "+1 step",
+    "maneuverClass": 3,
+    "hullPoints": {
+      "base": 160,
+      "bonus": 16
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 40
+      },
+      "wound": {
+        "value": 0,
+        "max": 40
+      },
+      "mortal": {
+        "value": 0,
+        "max": 20
+      },
+      "critical": {
+        "value": 0,
+        "max": 10
+      }
+    },
+    "armor": {
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": "",
+      "armorType": ""
+    },
+    "power": {
+      "generated": 0,
+      "consumed": 0
+    },
+    "edge": 0,
+    "acceleration": 0,
+    "crew": {
+      "estimate": 80,
+      "current": 0
+    },
+    "cost": "$30 M",
+    "systems": [],
+    "weapons": [],
+    "defenses": [],
+    "sensors": [],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 44,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FC (Forward center)",
+        "hullPointLimit": 44,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "P (Port side)",
+        "hullPointLimit": 44,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "S (Starboard side)",
+        "hullPointLimit": 44,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AC (Aft center)",
+        "hullPointLimit": 44,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 44,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Tables 5-1a / 5-18</dd><dt>Class</dt><dd>Military hull</dd><dt>Hull points</dt><dd>160 (+16)</dd><dt>Toughness</dt><dd>Light (printed &quot;Lt&quot;)</dd><dt>Target modifier</dt><dd>+1 step</dd><dt>Manoeuvre class</dt><dd>3</dd><dt>Damage track (s/w/m/c)</dt><dd>40/40/20/10</dd><dt>Hit zones</dt><dd>6, up to 44 hull points each</dd><dt>5% of hull</dt><dd>8</dd><dt>10% of hull</dt><dd>16</dd><dt>Typical crew</dt><dd>80</dd><dt>Cost</dt><dd>$30 M</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "NaBQROMUzthU7gcO",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Destroyer",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Military Hulls",
+        "table": "Tables 5-1a / 5-18",
+        "hullPointsFivePercent": 8,
+        "hullPointsTenPercent": 16,
+        "printedToughness": "Lt",
+        "zoneLimitTable": "Table 5-18"
+      }
+    }
+  }
+}

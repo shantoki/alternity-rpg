@@ -1,0 +1,131 @@
+{
+  "_id": "knsxKBeWaEn5FJPz",
+  "_key": "!actors!knsxKBeWaEn5FJPz",
+  "name": "Hauler",
+  "type": "warship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Hauler",
+    "hullCategory": "Civilian",
+    "toughness": "SmallCraft",
+    "targetModifier": "+1 step",
+    "maneuverClass": 3,
+    "hullPoints": {
+      "base": 72,
+      "bonus": 7
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 18
+      },
+      "wound": {
+        "value": 0,
+        "max": 18
+      },
+      "mortal": {
+        "value": 0,
+        "max": 9
+      },
+      "critical": {
+        "value": 0,
+        "max": 5
+      }
+    },
+    "armor": {
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": "",
+      "armorType": ""
+    },
+    "power": {
+      "generated": 0,
+      "consumed": 0
+    },
+    "edge": 0,
+    "acceleration": 0,
+    "crew": {
+      "estimate": 18,
+      "current": 0
+    },
+    "cost": "$1 M",
+    "systems": [],
+    "weapons": [],
+    "defenses": [],
+    "sensors": [],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 20,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FC (Forward center)",
+        "hullPointLimit": 20,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "P (Port side)",
+        "hullPointLimit": 20,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "S (Starboard side)",
+        "hullPointLimit": 20,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AC (Aft center)",
+        "hullPointLimit": 20,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 20,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Tables 5-1b / 5-18</dd><dt>Class</dt><dd>Civilian hull</dd><dt>Hull points</dt><dd>72 (+7)</dd><dt>Toughness</dt><dd>SmallCraft (printed &quot;Sm&quot;)</dd><dt>Target modifier</dt><dd>+1 step</dd><dt>Manoeuvre class</dt><dd>3</dd><dt>Damage track (s/w/m/c)</dt><dd>18/18/9/5</dd><dt>Hit zones</dt><dd>6, up to 20 hull points each</dd><dt>5% of hull</dt><dd>3</dd><dt>10% of hull</dt><dd>7</dd><dt>Typical crew</dt><dd>18</dd><dt>Cost</dt><dd>$1 M</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "zPTaUSsNEFtaEyLW",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Hauler",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Civilian Hulls",
+        "table": "Tables 5-1b / 5-18",
+        "hullPointsFivePercent": 3,
+        "hullPointsTenPercent": 7,
+        "printedToughness": "Sm",
+        "zoneLimitTable": "Table 5-18"
+      }
+    }
+  }
+}

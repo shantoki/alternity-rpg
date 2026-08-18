@@ -1,0 +1,421 @@
+{
+  "_id": "d6VvgyLAoMwoLUhR",
+  "_key": "!actors!d6VvgyLAoMwoLUhR",
+  "name": "Endurance",
+  "type": "warship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Heavy cruiser",
+    "hullCategory": "Military",
+    "toughness": "Medium",
+    "targetModifier": "0",
+    "maneuverClass": 2,
+    "hullPoints": {
+      "base": 400,
+      "bonus": 80
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 45
+      },
+      "wound": {
+        "value": 0,
+        "max": 45
+      },
+      "mortal": {
+        "value": 0,
+        "max": 23
+      },
+      "critical": {
+        "value": 0,
+        "max": 12
+      }
+    },
+    "armor": {
+      "lowImpact": "d6+1",
+      "highImpact": "d6+1",
+      "energy": "d6",
+      "armorType": "Medium neutronite"
+    },
+    "power": {
+      "generated": 294,
+      "consumed": 294
+    },
+    "edge": 0,
+    "acceleration": 3,
+    "crew": {
+      "estimate": 300,
+      "current": 300
+    },
+    "cost": "$372 M",
+    "systems": [
+      {
+        "category": "Hull",
+        "name": "Heavy cruiser hull",
+        "hullPoints": 0,
+        "powerReq": 0,
+        "cost": "$100 M"
+      },
+      {
+        "category": "Armor",
+        "name": "Medium neutronite armor",
+        "hullPoints": 20,
+        "powerReq": 0,
+        "cost": "$10 M"
+      },
+      {
+        "category": "Power",
+        "name": "4x 21-pt mass reactor (generates +294)",
+        "hullPoints": 84,
+        "powerReq": 0,
+        "cost": "$29 M"
+      },
+      {
+        "category": "Engine",
+        "name": "2x 30-pt induction drive",
+        "hullPoints": 60,
+        "powerReq": 60,
+        "cost": "$32 M"
+      },
+      {
+        "category": "FTL",
+        "name": "Stardrive (60 power to make a starfall)",
+        "hullPoints": 20,
+        "powerReq": 0,
+        "cost": "$22 M"
+      },
+      {
+        "category": "Support",
+        "name": "10x autosupport",
+        "hullPoints": 10,
+        "powerReq": 10,
+        "cost": "$2 M"
+      },
+      {
+        "category": "Support",
+        "name": "12x crew bunkroom",
+        "hullPoints": 36,
+        "powerReq": 0,
+        "cost": "$0.48 M"
+      },
+      {
+        "category": "Support",
+        "name": "8x crew quarters",
+        "hullPoints": 16,
+        "powerReq": 0,
+        "cost": "$0.16 M"
+      },
+      {
+        "category": "Support",
+        "name": "6x staterooms",
+        "hullPoints": 12,
+        "powerReq": 0,
+        "cost": "$0.3 M"
+      },
+      {
+        "category": "Support",
+        "name": "15x recyclers",
+        "hullPoints": 15,
+        "powerReq": 15,
+        "cost": "$4.5 M"
+      },
+      {
+        "category": "Command",
+        "name": "Command deck",
+        "hullPoints": 6,
+        "powerReq": 0,
+        "cost": "$1.8 M"
+      },
+      {
+        "category": "Command",
+        "name": "2x mass transceivers",
+        "hullPoints": 2,
+        "powerReq": 2,
+        "cost": "$0.2 M"
+      },
+      {
+        "category": "Command",
+        "name": "4x radio transceivers",
+        "hullPoints": 2,
+        "powerReq": 4,
+        "cost": "$0.1 M"
+      },
+      {
+        "category": "Command",
+        "name": "Computer core, Good",
+        "hullPoints": 2,
+        "powerReq": 2,
+        "cost": "$2 M"
+      },
+      {
+        "category": "Command",
+        "name": "3x Fire control, Good",
+        "hullPoints": 3,
+        "powerReq": 0,
+        "cost": "$38.7 M"
+      },
+      {
+        "category": "Command",
+        "name": "Tactical control, Good",
+        "hullPoints": 1,
+        "powerReq": 0,
+        "cost": "$0.2 M"
+      },
+      {
+        "category": "Command",
+        "name": "Nav control, Good",
+        "hullPoints": 1,
+        "powerReq": 0,
+        "cost": "$0.75 M"
+      },
+      {
+        "category": "Command",
+        "name": "3x Sensor control, Good",
+        "hullPoints": 3,
+        "powerReq": 0,
+        "cost": "$3.3 M"
+      },
+      {
+        "category": "Hangar",
+        "name": "Hangar (2 launches)",
+        "hullPoints": 16,
+        "powerReq": 0,
+        "cost": "$0.5 M"
+      },
+      {
+        "category": "Misc",
+        "name": "Evacuation system (300 crew)",
+        "hullPoints": 17,
+        "powerReq": 0,
+        "cost": "$0.9 M"
+      },
+      {
+        "category": "Misc",
+        "name": "Brig",
+        "hullPoints": 2,
+        "powerReq": 0,
+        "cost": "$0.02 M"
+      },
+      {
+        "category": "Misc",
+        "name": "Lab section",
+        "hullPoints": 2,
+        "powerReq": 0,
+        "cost": "$0.1 M"
+      },
+      {
+        "category": "Misc",
+        "name": "Sick bay",
+        "hullPoints": 2,
+        "powerReq": 0,
+        "cost": "$0.15 M"
+      },
+      {
+        "category": "Misc",
+        "name": "Fabrication facility",
+        "hullPoints": 4,
+        "powerReq": 2,
+        "cost": "$0.2 M"
+      },
+      {
+        "category": "Misc",
+        "name": "Cargo hold",
+        "hullPoints": 3,
+        "powerReq": 0,
+        "cost": "$0.05 M"
+      },
+      {
+        "category": "Misc",
+        "name": "Security suite (covers 40 hull points)",
+        "hullPoints": 1,
+        "powerReq": 1,
+        "cost": "$0.2 M"
+      }
+    ],
+    "weapons": [
+      {
+        "name": "2x3 matter beam turret (2d6+1w/2d8+1w/2d8m)",
+        "hullPoints": 56,
+        "powerReq": 66,
+        "cost": "$100 M",
+        "fireMode": "Battery",
+        "arc": "Turret",
+        "firepowerClass": "Medium",
+        "damageFormula": "2d6+1",
+        "damageType": "energy",
+        "damageGrade": "wound"
+      },
+      {
+        "name": "1 fixed plasma torpedo (3d6s/3d6w/d8+3m)",
+        "hullPoints": 8,
+        "powerReq": 15,
+        "cost": "$7.5 M",
+        "fireMode": "Single",
+        "arc": "Fixed",
+        "firepowerClass": "Heavy",
+        "damageFormula": "3d6",
+        "damageType": "energy",
+        "damageGrade": "stun"
+      },
+      {
+        "name": "6x3 mass cannon turret (d6+2s/d6+1w/d6+3w)",
+        "hullPoints": 36,
+        "powerReq": 54,
+        "cost": "$4.5 M",
+        "fireMode": "Battery",
+        "arc": "Turret",
+        "firepowerClass": "SmallCraft",
+        "damageFormula": "d6+2",
+        "damageType": "lowImpact",
+        "damageGrade": "stun"
+      }
+    ],
+    "defenses": [
+      {
+        "name": "20x deflection inducers",
+        "hullPoints": 20,
+        "powerReq": 40,
+        "cost": "$10 M",
+        "effectText": "+2 step penalty to attacks against the ship. A whole-ship installation: knocking out any one inducer fails the whole system."
+      },
+      {
+        "name": "4x jammer",
+        "hullPoints": 4,
+        "powerReq": 4,
+        "cost": "$0.4 M",
+        "effectText": "+2 steps to enemy missile and sensor checks."
+      }
+    ],
+    "sensors": [
+      {
+        "name": "Multiband radar #1",
+        "hullPoints": 4,
+        "powerReq": 8,
+        "cost": "$0.4 M",
+        "trackingCapacity": 200
+      },
+      {
+        "name": "Multiband radar #2",
+        "hullPoints": 3,
+        "powerReq": 6,
+        "cost": "$0.3 M",
+        "trackingCapacity": 120
+      },
+      {
+        "name": "Mass detector",
+        "hullPoints": 4,
+        "powerReq": 4,
+        "cost": "$0.4 M",
+        "trackingCapacity": 120
+      },
+      {
+        "name": "EM detector",
+        "hullPoints": 2,
+        "powerReq": 0,
+        "cost": "$0.08 M",
+        "trackingCapacity": 120
+      },
+      {
+        "name": "Hi-res video",
+        "hullPoints": 2,
+        "powerReq": 0,
+        "cost": "$0.04 M",
+        "trackingCapacity": 0
+      },
+      {
+        "name": "Spectroanalyzer",
+        "hullPoints": 1,
+        "powerReq": 1,
+        "cost": "$0.1 M",
+        "trackingCapacity": 0
+      }
+    ],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 96,
+        "hullPointsUsed": 0,
+        "systemsText": "Plasma torpedo, hi-res video, mass transceiver, cargo hold, evac system (4 pods), bunkroom, bunkroom, crew quarters, lab section, recycler (6 pts), autosupport (4 pts), power plant #1",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FP (Forward port side)",
+        "hullPointLimit": 96,
+        "hullPointsUsed": 0,
+        "systemsText": "Mass cannon turret #2, mass cannon turret #4, radio transceiver, evac system (4 pods), bunkroom, bunkroom, crew quarters, stateroom, stateroom, recycler (3 pts)",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FC (Forward center)",
+        "hullPointLimit": 96,
+        "hullPointsUsed": 0,
+        "systemsText": "Matter beam turret A, jammer, multiband radar #1, mass detector, spectroanalyzer, evac system (main - 4 pods), crew quarters, recycler (3 pts), power plant #2, stardrive",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FS (Forward starboard side)",
+        "hullPointLimit": 96,
+        "hullPointsUsed": 0,
+        "systemsText": "Mass cannon turret #1, mass cannon turret #3, radio transceiver, evac system (4 pods), bunkroom, bunkroom, crew quarters, stateroom, stateroom, recycler (3 pts)",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AP (Aft port side)",
+        "hullPointLimit": 96,
+        "hullPointsUsed": 0,
+        "systemsText": "Mass cannon turret #6, radio transceiver, evac system (4 pods), bunkroom, bunkroom, crew quarters, stateroom, autosupport (3 pts), induction engine #2",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AC (Aft center)",
+        "hullPointLimit": 96,
+        "hullPointsUsed": 0,
+        "systemsText": "Matter beam turret X, deflection inducer, multiband radar #2, EM detector, evac system (4 pods), sick bay, power plant #3, command deck, security suite, computer core and control computers",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AS (Aft starboard side)",
+        "hullPointLimit": 96,
+        "hullPointsUsed": 0,
+        "systemsText": "Mass cannon turret #5, radio transceiver, evac system (4 pods), bunkroom, bunkroom, crew quarters, stateroom, autosupport (3 pts), induction engine #1",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 96,
+        "hullPointsUsed": 0,
+        "systemsText": "Mass transceiver, hangar, evac system (2 pods), bunkroom, bunkroom, crew quarters, crew quarters, brig, fabrication facility, power plant #4",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "<p>A PL 7 survey cruiser: fast, fully life-supported and provisioned for nearly three years, with combat as a secondary role. The printed hull point column sums to exactly 480, so nothing can be added without taking something out.</p><p>Zone fill as designed: FC holds 91 of its 96 hull points and AC 95 of 96. The other six zones are not totalled in the book.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Ch.5 &quot;An Example of Ship Construction&quot; (p.106)</dd><dt>Hull</dt><dd>Heavy cruiser, 400 (+80) hull points, Medium toughness</dd><dt>Progress Level</dt><dd>7 - no matter coding, teleportation or energy transformation</dd><dt>Target modifier</dt><dd>0</dd><dt>Manoeuvre class</dt><dd>2, acceleration 3</dd><dt>Damage track (s/w/m/c)</dt><dd>45/45/23/12</dd><dt>Armor</dt><dd>Medium neutronite: d6+1 (LI), d6+1 (HI), d6 (En)</dd><dt>Power</dt><dd>294 generated, 294 drawn - the stardrive’s 60 points are not simultaneous</dd><dt>FTL</dt><dd>Stardrive: 20 light-years per starfall on 60 power, up to 39 if the whole plant is fed to it</dd><dt>Crew</dt><dd>300 recommended, berthing for 306</dd><dt>Hit zones</dt><dd>8, up to 96 hull points each; FC is filled to 91 and AC to 95</dd><dt>Cost</dt><dd>$372 M</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "nKfLc9lYuDTpVpEY",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Endurance",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Sample Ships",
+        "table": "Ch.5, p.106",
+        "progressLevel": 7,
+        "ftl": "Stardrive, 20 ly per starfall (39 ly at full power)"
+      }
+    }
+  }
+}

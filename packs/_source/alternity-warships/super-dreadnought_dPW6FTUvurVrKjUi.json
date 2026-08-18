@@ -1,0 +1,229 @@
+{
+  "_id": "dPW6FTUvurVrKjUi",
+  "_key": "!actors!dPW6FTUvurVrKjUi",
+  "name": "Super-dreadnought",
+  "type": "warship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Super-dreadnought",
+    "hullCategory": "Military",
+    "toughness": "SuperHeavy",
+    "targetModifier": "-5 steps",
+    "maneuverClass": 1,
+    "hullPoints": {
+      "base": 6400,
+      "bonus": 3200
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 200
+      },
+      "wound": {
+        "value": 0,
+        "max": 200
+      },
+      "mortal": {
+        "value": 0,
+        "max": 100
+      },
+      "critical": {
+        "value": 0,
+        "max": 50
+      }
+    },
+    "armor": {
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": "",
+      "armorType": ""
+    },
+    "power": {
+      "generated": 0,
+      "consumed": 0
+    },
+    "edge": 0,
+    "acceleration": 0,
+    "crew": {
+      "estimate": 6400,
+      "current": 0
+    },
+    "cost": "$10000 M",
+    "systems": [],
+    "weapons": [],
+    "defenses": [],
+    "sensors": [],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FFP (Forward-forward port)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FFC (Forward-forward center)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FFS (Forward-forward starboard)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FP (Forward port)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FC (Forward center)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FS (Forward starboard)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "P (Midships port)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "PC (Port center)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "CF (Center forward)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "SC (Starboard center)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "S (Midships starboard)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AP (Aft port)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "CA (Center aft)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AS (Aft starboard)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AAP (After-after port)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AC (Aft center)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AAS (After-after starboard)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AAC (After-after center)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 960,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Tables 5-1a / 5-18</dd><dt>Class</dt><dd>Military hull</dd><dt>Hull points</dt><dd>6400 (+3200)</dd><dt>Toughness</dt><dd>SuperHeavy (printed &quot;SHv&quot;)</dd><dt>Target modifier</dt><dd>-5 steps</dd><dt>Manoeuvre class</dt><dd>1</dd><dt>Damage track (s/w/m/c)</dt><dd>200/200/100/50</dd><dt>Hit zones</dt><dd>20, up to 960 hull points each</dd><dt>5% of hull</dt><dd>320</dd><dt>10% of hull</dt><dd>640</dd><dt>Typical crew</dt><dd>6400</dd><dt>Cost</dt><dd>$10000 M</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "NaBQROMUzthU7gcO",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Super-dreadnought",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Military Hulls",
+        "table": "Tables 5-1a / 5-18",
+        "hullPointsFivePercent": 320,
+        "hullPointsTenPercent": 640,
+        "printedToughness": "SHv",
+        "zoneLimitTable": "Table 5-18"
+      }
+    }
+  }
+}

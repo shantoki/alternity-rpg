@@ -1,0 +1,145 @@
+{
+  "_id": "IU3tNlCAjUNBAsG3",
+  "_key": "!actors!IU3tNlCAjUNBAsG3",
+  "name": "Clipper",
+  "type": "warship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Clipper",
+    "hullCategory": "Civilian",
+    "toughness": "Light",
+    "targetModifier": "0",
+    "maneuverClass": 2,
+    "hullPoints": {
+      "base": 360,
+      "bonus": 72
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 45
+      },
+      "wound": {
+        "value": 0,
+        "max": 45
+      },
+      "mortal": {
+        "value": 0,
+        "max": 23
+      },
+      "critical": {
+        "value": 0,
+        "max": 12
+      }
+    },
+    "armor": {
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": "",
+      "armorType": ""
+    },
+    "power": {
+      "generated": 0,
+      "consumed": 0
+    },
+    "edge": 0,
+    "acceleration": 0,
+    "crew": {
+      "estimate": 360,
+      "current": 0
+    },
+    "cost": "$40 M",
+    "systems": [],
+    "weapons": [],
+    "defenses": [],
+    "sensors": [],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 87,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FP (Forward port side)",
+        "hullPointLimit": 87,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FC (Forward center)",
+        "hullPointLimit": 87,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FS (Forward starboard side)",
+        "hullPointLimit": 87,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AP (Aft port side)",
+        "hullPointLimit": 87,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AC (Aft center)",
+        "hullPointLimit": 87,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AS (Aft starboard side)",
+        "hullPointLimit": 87,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 87,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Tables 5-1b / 5-18</dd><dt>Class</dt><dd>Civilian hull</dd><dt>Hull points</dt><dd>360 (+72)</dd><dt>Toughness</dt><dd>Light (printed &quot;Lt&quot;)</dd><dt>Target modifier</dt><dd>0</dd><dt>Manoeuvre class</dt><dd>2</dd><dt>Damage track (s/w/m/c)</dt><dd>45/45/23/12</dd><dt>Hit zones</dt><dd>8, up to 87 hull points each</dd><dt>5% of hull</dt><dd>18</dd><dt>10% of hull</dt><dd>36</dd><dt>Typical crew</dt><dd>360</dd><dt>Cost</dt><dd>$40 M</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "zPTaUSsNEFtaEyLW",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Clipper",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Civilian Hulls",
+        "table": "Tables 5-1b / 5-18",
+        "hullPointsFivePercent": 18,
+        "hullPointsTenPercent": 36,
+        "printedToughness": "Lt",
+        "zoneLimitTable": "Table 5-18"
+      }
+    }
+  }
+}

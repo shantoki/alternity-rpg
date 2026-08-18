@@ -1,0 +1,145 @@
+{
+  "_id": "oLpEgwgLfvZSwdwv",
+  "_key": "!actors!oLpEgwgLfvZSwdwv",
+  "name": "Light cruiser",
+  "type": "warship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Light cruiser",
+    "hullCategory": "Military",
+    "toughness": "Medium",
+    "targetModifier": "0",
+    "maneuverClass": 2,
+    "hullPoints": {
+      "base": 320,
+      "bonus": 64
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 40
+      },
+      "wound": {
+        "value": 0,
+        "max": 40
+      },
+      "mortal": {
+        "value": 0,
+        "max": 20
+      },
+      "critical": {
+        "value": 0,
+        "max": 10
+      }
+    },
+    "armor": {
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": "",
+      "armorType": ""
+    },
+    "power": {
+      "generated": 0,
+      "consumed": 0
+    },
+    "edge": 0,
+    "acceleration": 0,
+    "crew": {
+      "estimate": 240,
+      "current": 0
+    },
+    "cost": "$50 M",
+    "systems": [],
+    "weapons": [],
+    "defenses": [],
+    "sensors": [],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 75,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FP (Forward port side)",
+        "hullPointLimit": 75,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FC (Forward center)",
+        "hullPointLimit": 75,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FS (Forward starboard side)",
+        "hullPointLimit": 75,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AP (Aft port side)",
+        "hullPointLimit": 75,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AC (Aft center)",
+        "hullPointLimit": 75,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AS (Aft starboard side)",
+        "hullPointLimit": 75,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 75,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Tables 5-1a / 5-18</dd><dt>Class</dt><dd>Military hull</dd><dt>Hull points</dt><dd>320 (+64)</dd><dt>Toughness</dt><dd>Medium (printed &quot;Md&quot;)</dd><dt>Target modifier</dt><dd>0</dd><dt>Manoeuvre class</dt><dd>2</dd><dt>Damage track (s/w/m/c)</dt><dd>40/40/20/10</dd><dt>Hit zones</dt><dd>8, up to 75 hull points each</dd><dt>5% of hull</dt><dd>16</dd><dt>10% of hull</dt><dd>32</dd><dt>Typical crew</dt><dd>240</dd><dt>Cost</dt><dd>$50 M</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "NaBQROMUzthU7gcO",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Light cruiser",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Military Hulls",
+        "table": "Tables 5-1a / 5-18",
+        "hullPointsFivePercent": 16,
+        "hullPointsTenPercent": 32,
+        "printedToughness": "Md",
+        "zoneLimitTable": "Table 5-18"
+      }
+    }
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "_id": "zt0bF5E8H6DM3LL1",
+  "_key": "!actors!zt0bF5E8H6DM3LL1",
+  "name": "Frigate",
+  "type": "warship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Frigate",
+    "hullCategory": "Military",
+    "toughness": "Light",
+    "targetModifier": "+1 step",
+    "maneuverClass": 3,
+    "hullPoints": {
+      "base": 120,
+      "bonus": 12
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 30
+      },
+      "wound": {
+        "value": 0,
+        "max": 30
+      },
+      "mortal": {
+        "value": 0,
+        "max": 15
+      },
+      "critical": {
+        "value": 0,
+        "max": 8
+      }
+    },
+    "armor": {
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": "",
+      "armorType": ""
+    },
+    "power": {
+      "generated": 0,
+      "consumed": 0
+    },
+    "edge": 0,
+    "acceleration": 0,
+    "crew": {
+      "estimate": 60,
+      "current": 0
+    },
+    "cost": "$15 M",
+    "systems": [],
+    "weapons": [],
+    "defenses": [],
+    "sensors": [],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 33,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FC (Forward center)",
+        "hullPointLimit": 33,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "P (Port side)",
+        "hullPointLimit": 33,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "S (Starboard side)",
+        "hullPointLimit": 33,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AC (Aft center)",
+        "hullPointLimit": 33,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 33,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Tables 5-1a / 5-18</dd><dt>Class</dt><dd>Military hull</dd><dt>Hull points</dt><dd>120 (+12)</dd><dt>Toughness</dt><dd>Light (printed &quot;Lt&quot;)</dd><dt>Target modifier</dt><dd>+1 step</dd><dt>Manoeuvre class</dt><dd>3</dd><dt>Damage track (s/w/m/c)</dt><dd>30/30/15/8</dd><dt>Hit zones</dt><dd>6, up to 33 hull points each</dd><dt>5% of hull</dt><dd>6</dd><dt>10% of hull</dt><dd>12</dd><dt>Typical crew</dt><dd>60</dd><dt>Cost</dt><dd>$15 M</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "NaBQROMUzthU7gcO",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Frigate",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Military Hulls",
+        "table": "Tables 5-1a / 5-18",
+        "hullPointsFivePercent": 6,
+        "hullPointsTenPercent": 12,
+        "printedToughness": "Lt",
+        "zoneLimitTable": "Table 5-18"
+      }
+    }
+  }
+}

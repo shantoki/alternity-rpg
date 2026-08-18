@@ -13,8 +13,9 @@
                     <label>{{localize 'ALTERNITY.Warship.HullType'}}</label>
                     <input type="text" name="system.hullType" value="{{system.hullType}}" list="alt-hull-type-list" />
                     <datalist id="alt-hull-type-list">
-                        {{#each hullTypeChoices.Military as |choice|}}<option value="{{choice}}">{{/each}}
-                        {{#each hullTypeChoices.Civilian as |choice|}}<option value="{{choice}}">{{/each}}
+                        {{!-- Iterated by group rather than named one at a time, so a new
+                              category (Table 6-1's installations) shows up without an edit here. --}}
+                        {{#each hullTypeChoices as |group|}}{{#each group as |choice|}}<option value="{{choice}}">{{/each}}{{/each}}
                     </datalist>
                 </div>
                 <div class="{{alt}}-meta-field">

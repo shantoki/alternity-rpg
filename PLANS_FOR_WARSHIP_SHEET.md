@@ -40,6 +40,33 @@ defenses/sensors lists, hit-location zones) — modeled after the book's own wor
 - [x] `lang/en.json` localization keys, additive CSS in `src/client/css/alternity-sheet.css`.
 - [x] Unit tests for `calculateShipDamageMitigation` / `calculateFirepowerShift` in
       `tests/test-alternity.test.js`, hand-verified against every row of Tables 1-3/1-4.
+- [x] **Two enums widened when the hulls were actually transcribed** (see
+      `PLANS_FOR_COMPENDIUM.md` Phase 6). `SHIP_TOUGHNESS_CLASSES` was missing the `Good`
+      rung Table 5-1b prints as `(Gd)` for the launch, courier and trader — inserted at the
+      bottom of the ladder, which leaves `calculateFirepowerShift` correct because only rank
+      *differences* matter, and paired with a `SHIP_FIREPOWER_CLASSES` that drops it because
+      no weapon has Good firepower. `hullCategory` gained `Installation` for Table 6-1's
+      stations and bases. `WarshipData` now imports the ladder from the math service instead
+      of keeping a second copy, and the sheet reads the category list from `WarshipData`
+      instead of restating it.
+
+### The compendium ships this sheet's content
+
+`alternity-warships` holds 44 `warship` Actors: the 33 bare hulls of Tables 5-1a/5-1b joined
+with Table 5-18, the 10 stations and bases of Table 6-1, and the *Endurance* itself with all
+its system rows and its 8-zone damage diagram. So the sheet now has real content to open, and
+the *Endurance* — the ship this sheet was modelled on — is a fixture as well as an example.
+
+One thing that surfaced while transcribing it, and which is a **schema gap, not a conversion
+decision**: a `WarshipData.weapons` row holds a single `damageFormula` plus `damageGrade`,
+but Warships weapons print the usual three-grade run with a track letter on each grade — the
+matter beam is `2d6+1w/2d8+1w/2d8m`, the plasma torpedo `3d6s/3d6w/d8+3m`. The compendium
+rows carry the Ordinary code in the schema fields and the whole run in the row's name, so
+nothing printed is lost, but a GM rolling the *Endurance*'s main battery gets Ordinary damage
+whatever degree they rolled. `SpaceshipData.weapons` already models this correctly with
+`damageOrdinary`/`damageGood`/`damageAmazing`; giving the warship array the same shape means
+touching the schema, the sheet's weapon-roll action, `alternity-statblock-drops.js` (whose
+comment about "the warship's single-formula row" is about exactly this) and their tests.
 
 ### Deliberate Phase 1 scope calls (revisit at Phase 2 kickoff)
 
@@ -53,6 +80,11 @@ defenses/sensors lists, hit-location zones) — modeled after the book's own wor
   5-18) are GM-entered, not derived from a hull-type lookup; per-system-to-zone assignment is
   free text, matching how the book itself presents the "damage diagram." Structured
   zone/system relationships belong to Phase 2.
+  *Since then:* the 44 compendium hulls arrive with their zone lists already filled in, because
+  Table 5-18's count and limit plus Ch.5 Step A's names for each of the six layouts
+  (2/4/6/8/12/20 zones) are a pure function of the hull. That is the hull-type lookup, stored as
+  data rather than added to the runtime — a hull dragged out of the compendium needs no zone
+  set-up, and a hand-built ship still needs it entered.
 - **`cost` fields are display strings**, not numbers — source costs span `$300K`–`$50000M` and
   Phase 1 does no arithmetic over cost (that's a budget-validation concern for Phase 2).
 

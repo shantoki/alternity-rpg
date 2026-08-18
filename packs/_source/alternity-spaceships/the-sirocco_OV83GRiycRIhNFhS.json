@@ -1,0 +1,269 @@
+{
+  "_id": "OV83GRiycRIhNFhS",
+  "_key": "!actors!OV83GRiycRIhNFhS",
+  "name": "The Sirocco",
+  "type": "spaceship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Trader",
+    "hullCategory": "Civilian",
+    "hullSize": 24,
+    "compartmentLimit": 5,
+    "progressLevel": 7,
+    "cost": "",
+    "maneuverRating": -1,
+    "acceleration": 3,
+    "cruisingSpeed": 2,
+    "engineType": "Induction engine",
+    "movementPoints": 0,
+    "ftl": {
+      "driveType": "None",
+      "drivespace": 0
+    },
+    "power": {
+      "generated": 15,
+      "allocated": 0,
+      "plantText": "Mass reactor rated at 15 power factors"
+    },
+    "berthing": 6,
+    "crewAboard": 0,
+    "armor": {
+      "grade": "Moderate",
+      "material": "neutronite",
+      "lowImpact": "d6+1",
+      "highImpact": "d6+1",
+      "energy": "d6"
+    },
+    "computer": {
+      "coreQuality": "Marginal",
+      "dedicatedText": ""
+    },
+    "compartments": [
+      {
+        "label": "Command",
+        "kind": "Command",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 1,
+        "hitHigh": 3,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Electronics",
+        "kind": "Electronics",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 4,
+        "hitHigh": 6,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Auxiliary",
+        "kind": "Auxiliary",
+        "durability": 6,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 7,
+        "hitHigh": 9,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Engineering",
+        "kind": "Engineering",
+        "durability": 6,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 10,
+        "hitHigh": 14,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Weapons",
+        "kind": "Weapons",
+        "durability": 4,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 15,
+        "hitHigh": 20,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      }
+    ],
+    "weapons": [
+      {
+        "name": "2x mass cannon",
+        "compartment": 5,
+        "durabilityCost": 4,
+        "powerReq": 6,
+        "isOffline": false,
+        "notes": "",
+        "arc": "Fore",
+        "range": "5/10/15 Mm",
+        "damageOrdinary": "d6+2s",
+        "damageGood": "d6+1w",
+        "damageAmazing": "d6+3w",
+        "damageType": "lowImpact",
+        "firepower": "Amazing",
+        "actionsPerRound": 1
+      }
+    ],
+    "defenses": [
+      {
+        "name": "Jammer",
+        "compartment": 0,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "Named in the statblock header; the compartment table does not itemise it.",
+        "isActive": false,
+        "effectText": "+2 steps to enemy missile and sensor checks."
+      },
+      {
+        "name": "Point-defense gun",
+        "compartment": 0,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "Named in the statblock header; the compartment table does not itemise it.",
+        "isActive": false,
+        "effectText": "Destroys an incoming missile before it can detonate."
+      }
+    ],
+    "systems": [
+      {
+        "name": "Sick bay",
+        "compartment": 1,
+        "durabilityCost": 2,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Misc",
+        "range": ""
+      },
+      {
+        "name": "Crew quarters",
+        "compartment": 1,
+        "durabilityCost": 1,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Crew",
+        "range": ""
+      },
+      {
+        "name": "EM detector",
+        "compartment": 2,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Sensors",
+        "range": ""
+      },
+      {
+        "name": "Radio transceiver",
+        "compartment": 2,
+        "durabilityCost": 0,
+        "powerReq": 1,
+        "isOffline": false,
+        "notes": "",
+        "category": "Communications",
+        "range": ""
+      },
+      {
+        "name": "Computer core",
+        "compartment": 2,
+        "durabilityCost": 1,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Computer",
+        "range": ""
+      },
+      {
+        "name": "Mass reactor",
+        "compartment": 3,
+        "durabilityCost": 6,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Power Plant",
+        "range": ""
+      },
+      {
+        "name": "Autosupport",
+        "compartment": 3,
+        "durabilityCost": 0,
+        "powerReq": 1,
+        "isOffline": false,
+        "notes": "",
+        "category": "Life Support",
+        "range": ""
+      },
+      {
+        "name": "3x Induction engine",
+        "compartment": 4,
+        "durabilityCost": 6,
+        "powerReq": 6,
+        "isOffline": false,
+        "notes": "",
+        "category": "Engine",
+        "range": ""
+      }
+    ],
+    "stations": [],
+    "notes": "<p>A refitted Buckley-class trader: two mass cannons, a jammer and a point-defence gun on a hull built for cargo. No stardrive.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>StarDrive Campaign Setting, Lucullus system</dd><dt>Hull</dt><dd>Trader (Civilian), hull size 24</dd><dt>Progress Level</dt><dd>7</dd><dt>Compartments</dt><dd>5</dd><dt>Toughness</dt><dd>Amazing - as every spaceship is (GM Guide Ch.11)</dd><dt>Manoeuvre rating</dt><dd>-1</dd><dt>Acceleration</dt><dd>3 Mm per phase</dd><dt>Cruising speed</dt><dd>2 AU per hour</dd><dt>Engine</dt><dd>Induction engine</dd><dt>Power plant</dt><dd>Mass reactor rated at 15 power factors</dd><dt>FTL</dt><dd>None</dd><dt>Armor</dt><dd>Moderate neutronite: d6+1 (LI), d6+1 (HI), d6 (En)</dd><dt>Computer</dt><dd>undefined core</dd><dt>Berthing</dt><dd>6</dd><dt>Compartment durability assigned</dt><dd>22 of 24</dd><dt>Scan damage</dt><dd>The compartment table lost its band labels and the command compartment's rating. The bands and ratings are recovered from the hull-size sum, and the split of systems between the command and electronics spaces is confirmed by the installed power draw coming to 14 of the plant's 15 factors.</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "x9iqN1j6DUo8KCrX",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "The Sirocco",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "StarDrive Campaign Setting",
+        "reference": "Lucullus system",
+        "folder": "Ships of the Verge",
+        "scanDamage": "The compartment table lost its band labels and the command compartment's rating. The bands and ratings are recovered from the hull-size sum, and the split of systems between the command and electronics spaces is confirmed by the installed power draw coming to 14 of the plant's 15 factors."
+      }
+    }
+  }
+}

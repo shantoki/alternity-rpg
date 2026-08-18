@@ -1,0 +1,162 @@
+{
+  "_id": "o8GKLqokM88h5EdN",
+  "_key": "!actors!o8GKLqokM88h5EdN",
+  "name": "Cutter",
+  "type": "spaceship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Cutter",
+    "hullCategory": "Military",
+    "hullSize": 20,
+    "compartmentLimit": 4,
+    "progressLevel": 7,
+    "cost": "",
+    "maneuverRating": 0,
+    "acceleration": 0,
+    "cruisingSpeed": 0,
+    "engineType": "Induction engine",
+    "movementPoints": 0,
+    "ftl": {
+      "driveType": "Stardrive",
+      "drivespace": 10
+    },
+    "power": {
+      "generated": 0,
+      "allocated": 0,
+      "plantText": "Mass reactor"
+    },
+    "berthing": 0,
+    "crewAboard": 0,
+    "armor": {
+      "grade": "Moderate",
+      "material": "neutronite",
+      "lowImpact": "d6+1",
+      "highImpact": "d6+1",
+      "energy": "d6"
+    },
+    "computer": {
+      "coreQuality": "Marginal",
+      "dedicatedText": ""
+    },
+    "compartments": [
+      {
+        "label": "Command",
+        "kind": "Command",
+        "durability": 4,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 1,
+        "hitHigh": 2,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Engineering",
+        "kind": "Engineering",
+        "durability": 10,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 3,
+        "hitHigh": 5,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Weapon",
+        "kind": "Weapons",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 6,
+        "hitHigh": 12,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Auxiliary",
+        "kind": "Auxiliary",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 13,
+        "hitHigh": 20,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      }
+    ],
+    "weapons": [
+      {
+        "name": "Plasma cannon",
+        "compartment": 3,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "arc": "Fore",
+        "range": "",
+        "damageOrdinary": "d6+2w",
+        "damageGood": "d8+2w",
+        "damageAmazing": "d6+1m",
+        "damageType": "energy",
+        "firepower": "Amazing",
+        "actionsPerRound": 1
+      }
+    ],
+    "defenses": [
+      {
+        "name": "Deflection inducer",
+        "compartment": 0,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "Named in the statblock header; the compartment table does not itemise it.",
+        "isActive": false,
+        "effectText": "+2 step penalty to any attack against the ship."
+      }
+    ],
+    "systems": [],
+    "stations": [],
+    "notes": "<p>A small warship built for high speed and long endurance. A stabilizer gives the helmsman a -1 step bonus on Vehicle Operation-space vehicle checks. Stardrive-capable cutters (\"drive cutters\") cost $500,000 more.</p><p><em>Budget note:</em> the compartments assign 2 durability points more than the GM Guide leaves after Moderate armour is mounted. The Player's Handbook statblocks print an armour rating without charging durability for it, so this is the source as printed, not a transcription error.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Player's Handbook, Ch.12 &quot;Vehicles&quot;, PL 7</dd><dt>Hull</dt><dd>Cutter (Military), hull size 20</dd><dt>Progress Level</dt><dd>7</dd><dt>Compartments</dt><dd>4</dd><dt>Toughness</dt><dd>Amazing - as every spaceship is (GM Guide Ch.11)</dd><dt>Manoeuvre rating</dt><dd>0</dd><dt>Engine</dt><dd>Induction engine</dd><dt>Power plant</dt><dd>Mass reactor</dd><dt>FTL</dt><dd>Stardrive, 10 light-years per starfall</dd><dt>Armor</dt><dd>Moderate neutronite: d6+1 (LI), d6+1 (HI), d6 (En)</dd><dt>Computer</dt><dd>undefined core</dd><dt>Compartment durability assigned</dt><dd>20 of 20</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "npefu74U1eEu5NCk",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Cutter",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Player's Handbook",
+        "reference": "Ch.12 \"Vehicles\", PL 7",
+        "folder": "Player's Handbook"
+      }
+    }
+  }
+}

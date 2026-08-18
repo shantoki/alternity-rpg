@@ -1,0 +1,319 @@
+{
+  "_id": "izr3RpMGgcnZkDiQ",
+  "_key": "!actors!izr3RpMGgcnZkDiQ",
+  "name": "The Blackguard",
+  "type": "spaceship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Vashon-class raider",
+    "hullCategory": "Military",
+    "hullSize": 32,
+    "compartmentLimit": 8,
+    "progressLevel": 7,
+    "cost": "",
+    "maneuverRating": 0,
+    "acceleration": 2,
+    "cruisingSpeed": 1.5,
+    "engineType": "Induction engine",
+    "movementPoints": 0,
+    "ftl": {
+      "driveType": "Stardrive",
+      "drivespace": 0
+    },
+    "power": {
+      "generated": 0,
+      "allocated": 0,
+      "plantText": "Mass reactor"
+    },
+    "berthing": 18,
+    "crewAboard": 0,
+    "armor": {
+      "grade": "None",
+      "material": "",
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": ""
+    },
+    "computer": {
+      "coreQuality": "Marginal",
+      "dedicatedText": ""
+    },
+    "compartments": [
+      {
+        "label": "Command",
+        "kind": "Command",
+        "durability": 4,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 0,
+        "hitHigh": 0,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Engineering 1",
+        "kind": "Engineering",
+        "durability": 6,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 1,
+        "hitHigh": 2,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Engineering 2",
+        "kind": "Engineering",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 3,
+        "hitHigh": 4,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Auxiliary",
+        "kind": "Auxiliary",
+        "durability": 6,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 5,
+        "hitHigh": 6,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Crew",
+        "kind": "Crew",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 7,
+        "hitHigh": 9,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Weapons 1",
+        "kind": "Weapons",
+        "durability": 4,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 10,
+        "hitHigh": 12,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Weapons 2",
+        "kind": "Weapons",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 13,
+        "hitHigh": 16,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Cargo",
+        "kind": "Cargo",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 17,
+        "hitHigh": 20,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      }
+    ],
+    "weapons": [
+      {
+        "name": "Launch tube",
+        "compartment": 6,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "Fifteen MBB missiles. Damage is the missile's, not the tube's. The statblock prints no durability or power cost for the tube.",
+        "arc": "Fore",
+        "range": "",
+        "damageOrdinary": "",
+        "damageGood": "",
+        "damageAmazing": "",
+        "damageType": "lowImpact",
+        "firepower": "Amazing",
+        "actionsPerRound": 1
+      },
+      {
+        "name": "Mass cannon in turret",
+        "compartment": 7,
+        "durabilityCost": 3,
+        "powerReq": 3,
+        "isOffline": false,
+        "notes": "",
+        "arc": "Turret",
+        "range": "5/10/15 Mm",
+        "damageOrdinary": "d6+2s",
+        "damageGood": "d6+1w",
+        "damageAmazing": "d6+3w",
+        "damageType": "lowImpact",
+        "firepower": "Amazing",
+        "actionsPerRound": 1
+      }
+    ],
+    "defenses": [],
+    "systems": [
+      {
+        "name": "Mass detector",
+        "compartment": 1,
+        "durabilityCost": 1,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Sensors",
+        "range": ""
+      },
+      {
+        "name": "Multiband radar",
+        "compartment": 1,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Sensors",
+        "range": ""
+      },
+      {
+        "name": "Crew quarters",
+        "compartment": 1,
+        "durabilityCost": 2,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Crew",
+        "range": ""
+      },
+      {
+        "name": "3x Induction engine",
+        "compartment": 2,
+        "durabilityCost": 6,
+        "powerReq": 6,
+        "isOffline": false,
+        "notes": "",
+        "category": "Engine",
+        "range": ""
+      },
+      {
+        "name": "Stardrive",
+        "compartment": 3,
+        "durabilityCost": 3,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "FTL Drive",
+        "range": ""
+      },
+      {
+        "name": "Mass reactor",
+        "compartment": 4,
+        "durabilityCost": 6,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Power Plant",
+        "range": ""
+      },
+      {
+        "name": "Airlock",
+        "compartment": 5,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Misc",
+        "range": ""
+      },
+      {
+        "name": "Boarding pod",
+        "compartment": 5,
+        "durabilityCost": 2,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Misc",
+        "range": ""
+      },
+      {
+        "name": "Cargo hold",
+        "compartment": 8,
+        "durabilityCost": 3,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Cargo",
+        "range": ""
+      }
+    ],
+    "stations": [],
+    "notes": "<p>The personal ship of Devriele Shanassin, corsair lord of the Lucullus system, flown out of the hidden mobile base Icewalk. A boarding pod and a fifteen-missile launch tube say what it is for.</p><p>The statblock prints no armour, no defences and no power rating, so the ship shows an unpowered plant on the sheet - that is the source, not a conversion loss. Its compartments sum to the full 32 durability points, which agrees with carrying no armour.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>StarDrive Campaign Setting, Lucullus system</dd><dt>Hull</dt><dd>Vashon-class raider (Military), hull size 32</dd><dt>Progress Level</dt><dd>7</dd><dt>Compartments</dt><dd>8</dd><dt>Toughness</dt><dd>Amazing - as every spaceship is (GM Guide Ch.11)</dd><dt>Manoeuvre rating</dt><dd>0</dd><dt>Acceleration</dt><dd>2 Mm per phase</dd><dt>Cruising speed</dt><dd>1.5 AU per hour</dd><dt>Engine</dt><dd>Induction engine</dd><dt>Power plant</dt><dd>Mass reactor</dd><dt>FTL</dt><dd>Stardrive, 0 light-years per starfall</dd><dt>Armor</dt><dd>None</dd><dt>Computer</dt><dd>undefined core</dd><dt>Berthing</dt><dd>18</dd><dt>Compartment durability assigned</dt><dd>32 of 32</dd><dt>Scan damage</dt><dd>The engineering-2 compartment printed as &quot;8/6/3&quot;, which is not a legal 2n/2n/n triple; read as 6/6/3, which the hull-size sum confirms.</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "x9iqN1j6DUo8KCrX",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "The Blackguard",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "StarDrive Campaign Setting",
+        "reference": "Lucullus system",
+        "folder": "Ships of the Verge",
+        "scanDamage": "The engineering-2 compartment printed as \"8/6/3\", which is not a legal 2n/2n/n triple; read as 6/6/3, which the hull-size sum confirms."
+      }
+    }
+  }
+}

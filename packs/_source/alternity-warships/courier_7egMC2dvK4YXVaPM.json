@@ -1,0 +1,103 @@
+{
+  "_id": "7egMC2dvK4YXVaPM",
+  "_key": "!actors!7egMC2dvK4YXVaPM",
+  "name": "Courier",
+  "type": "warship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Courier",
+    "hullCategory": "Civilian",
+    "toughness": "Good",
+    "targetModifier": "+2 steps",
+    "maneuverClass": 4,
+    "hullPoints": {
+      "base": 16,
+      "bonus": 0
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 8
+      },
+      "wound": {
+        "value": 0,
+        "max": 8
+      },
+      "mortal": {
+        "value": 0,
+        "max": 4
+      },
+      "critical": {
+        "value": 0,
+        "max": 2
+      }
+    },
+    "armor": {
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": "",
+      "armorType": ""
+    },
+    "power": {
+      "generated": 0,
+      "consumed": 0
+    },
+    "edge": 0,
+    "acceleration": 0,
+    "crew": {
+      "estimate": 4,
+      "current": 0
+    },
+    "cost": "$400 K",
+    "systems": [],
+    "weapons": [],
+    "defenses": [],
+    "sensors": [],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 10,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 10,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Tables 5-1b / 5-18</dd><dt>Class</dt><dd>Civilian hull</dd><dt>Hull points</dt><dd>16</dd><dt>Toughness</dt><dd>Good (printed &quot;(Gd)&quot;)</dd><dt>Target modifier</dt><dd>+2 steps</dd><dt>Manoeuvre class</dt><dd>4</dd><dt>Damage track (s/w/m/c)</dt><dd>8/8/4/2</dd><dt>Hit zones</dt><dd>2, up to 10 hull points each</dd><dt>5% of hull</dt><dd>1</dd><dt>10% of hull</dt><dd>1.5</dd><dt>Typical crew</dt><dd>4</dd><dt>Cost</dt><dd>$400 K</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "zPTaUSsNEFtaEyLW",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Courier",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Civilian Hulls",
+        "table": "Tables 5-1b / 5-18",
+        "hullPointsFivePercent": 1,
+        "hullPointsTenPercent": 1.5,
+        "printedToughness": "(Gd)",
+        "zoneLimitTable": "Table 5-18"
+      }
+    }
+  }
+}

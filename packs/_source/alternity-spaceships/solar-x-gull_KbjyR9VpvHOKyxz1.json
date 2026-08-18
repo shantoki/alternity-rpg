@@ -1,0 +1,175 @@
+{
+  "_id": "KbjyR9VpvHOKyxz1",
+  "_key": "!actors!KbjyR9VpvHOKyxz1",
+  "name": "Solar X Gull",
+  "type": "spaceship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Launch",
+    "hullCategory": "Civilian",
+    "hullSize": 8,
+    "compartmentLimit": 2,
+    "progressLevel": 7,
+    "cost": "$1,425,000",
+    "maneuverRating": -1,
+    "acceleration": 3,
+    "cruisingSpeed": 2,
+    "engineType": "Induction engine",
+    "movementPoints": 0,
+    "ftl": {
+      "driveType": "None",
+      "drivespace": 0
+    },
+    "power": {
+      "generated": 5,
+      "allocated": 0,
+      "plantText": "Mass reactor rated at 5 power factors"
+    },
+    "berthing": 0,
+    "crewAboard": 0,
+    "armor": {
+      "grade": "Moderate",
+      "material": "cerametal",
+      "lowImpact": "d4+1",
+      "highImpact": "d4+1",
+      "energy": "d4+1"
+    },
+    "computer": {
+      "coreQuality": "Marginal",
+      "dedicatedText": ""
+    },
+    "compartments": [
+      {
+        "label": "Command",
+        "kind": "Command",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 1,
+        "hitHigh": 6,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Engineering",
+        "kind": "Engineering",
+        "durability": 4,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 7,
+        "hitHigh": 20,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      }
+    ],
+    "weapons": [
+      {
+        "name": "Mass cannon",
+        "compartment": 1,
+        "durabilityCost": 2,
+        "powerReq": 3,
+        "isOffline": false,
+        "notes": "",
+        "arc": "Fore",
+        "range": "5/10/15 Mm",
+        "damageOrdinary": "d6+2s",
+        "damageGood": "d6+1w",
+        "damageAmazing": "d6+3w",
+        "damageType": "lowImpact",
+        "firepower": "Amazing",
+        "actionsPerRound": 1
+      }
+    ],
+    "defenses": [
+      {
+        "name": "Jammer",
+        "compartment": 1,
+        "durabilityCost": 0,
+        "powerReq": 1,
+        "isOffline": false,
+        "notes": "",
+        "isActive": false,
+        "effectText": "+2 steps to enemy missile and sensor checks."
+      }
+    ],
+    "systems": [
+      {
+        "name": "Multiband radar",
+        "compartment": 1,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Sensors",
+        "range": ""
+      },
+      {
+        "name": "Configurable section",
+        "compartment": 1,
+        "durabilityCost": 1,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "One point of crew quarters (6 hands), passenger section (4 passengers) or cargo hold (~30 cubic metres). Four hours to re-partition.",
+        "category": "Crew",
+        "range": ""
+      },
+      {
+        "name": "Induction engine",
+        "compartment": 2,
+        "durabilityCost": 2,
+        "powerReq": 2,
+        "isOffline": false,
+        "notes": "",
+        "category": "Engine",
+        "range": ""
+      },
+      {
+        "name": "Autosupport",
+        "compartment": 2,
+        "durabilityCost": 0,
+        "powerReq": 1,
+        "isOffline": false,
+        "notes": "",
+        "category": "Life Support",
+        "range": ""
+      }
+    ],
+    "stations": [],
+    "notes": "<p>One of the smallest interplanetary craft built anywhere, usually carried as a ship's boat. Quick and responsive, and capable of supporting its crew for weeks, but notoriously underpowered - its installed systems draw 7 power factors against a plant rated for 5, so the crew cannot run everything at once.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>StarDrive Arms &amp; Equipment Guide, Solar X Shipyards</dd><dt>Hull</dt><dd>Launch (Civilian), hull size 8</dd><dt>Progress Level</dt><dd>7</dd><dt>Compartments</dt><dd>2</dd><dt>Toughness</dt><dd>Amazing - as every spaceship is (GM Guide Ch.11)</dd><dt>Manoeuvre rating</dt><dd>-1</dd><dt>Acceleration</dt><dd>3 Mm per phase</dd><dt>Cruising speed</dt><dd>2 AU per hour</dd><dt>Engine</dt><dd>Induction engine</dd><dt>Power plant</dt><dd>Mass reactor rated at 5 power factors</dd><dt>FTL</dt><dd>None</dd><dt>Armor</dt><dd>Moderate cerametal: d4+1 (LI), d4+1 (HI), d4+1 (En)</dd><dt>Computer</dt><dd>Marginal core</dd><dt>Cost</dt><dd>$1,425,000</dd><dt>Compartment durability assigned</dt><dd>7 of 8</dd><dt>Scan damage</dt><dd>The second hit band printed as &quot;7-12&quot;, which leaves faces 13-20 hitting nothing; read as 7-20 so the d20 table is complete. The engineering compartment's rating is recovered from the hull-size sum.</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "CCFNk5renkAJDSfX",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Solar X Gull",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "StarDrive Arms & Equipment Guide",
+        "reference": "Solar X Shipyards",
+        "folder": "Solar X Shipyards",
+        "scanDamage": "The second hit band printed as \"7-12\", which leaves faces 13-20 hitting nothing; read as 7-20 so the d20 table is complete. The engineering compartment's rating is recovered from the hull-size sum.",
+        "printedArmorDurabilityCost": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "_id": "FDndXePWTlBBOClc",
+  "_key": "!actors!FDndXePWTlBBOClc",
+  "name": "Escape Pod",
+  "type": "spaceship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Escape pod",
+    "hullCategory": "Civilian",
+    "hullSize": 2,
+    "compartmentLimit": 1,
+    "progressLevel": 7,
+    "cost": "",
+    "maneuverRating": 0,
+    "acceleration": 0,
+    "cruisingSpeed": 0,
+    "engineType": "",
+    "movementPoints": 0,
+    "ftl": {
+      "driveType": "None",
+      "drivespace": 0
+    },
+    "power": {
+      "generated": 0,
+      "allocated": 0,
+      "plantText": ""
+    },
+    "berthing": 8,
+    "crewAboard": 0,
+    "armor": {
+      "grade": "Light",
+      "material": "polymeric",
+      "lowImpact": "d4-1",
+      "highImpact": "d4-1",
+      "energy": "d4-2"
+    },
+    "computer": {
+      "coreQuality": "Marginal",
+      "dedicatedText": ""
+    },
+    "compartments": [
+      {
+        "label": "Command",
+        "kind": "Command",
+        "durability": 2,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 1,
+        "hitHigh": 20,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      }
+    ],
+    "weapons": [],
+    "defenses": [],
+    "systems": [],
+    "stations": [],
+    "notes": "<p>A small sphere for up to eight people, with four weeks of food, water and environment supplies. No engine, but a continuous-broadcast beacon that can be traced.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Player's Handbook, Ch.12 &quot;Vehicles&quot;, PL 7</dd><dt>Hull</dt><dd>Escape pod (Civilian), hull size 2</dd><dt>Progress Level</dt><dd>7</dd><dt>Compartments</dt><dd>1</dd><dt>Toughness</dt><dd>Amazing - as every spaceship is (GM Guide Ch.11)</dd><dt>Manoeuvre rating</dt><dd>0</dd><dt>FTL</dt><dd>None</dd><dt>Armor</dt><dd>Light polymeric: d4-1 (LI), d4-1 (HI), d4-2 (En)</dd><dt>Computer</dt><dd>undefined core</dd><dt>Berthing</dt><dd>8</dd><dt>Compartment durability assigned</dt><dd>2 of 2</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "npefu74U1eEu5NCk",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Escape Pod",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Player's Handbook",
+        "reference": "Ch.12 \"Vehicles\", PL 7",
+        "folder": "Player's Handbook"
+      }
+    }
+  }
+}

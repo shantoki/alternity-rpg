@@ -1,0 +1,145 @@
+{
+  "_id": "SPSHf6fgsPbh08Tl",
+  "_key": "!actors!SPSHf6fgsPbh08Tl",
+  "name": "Medium freighter",
+  "type": "warship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Medium freighter",
+    "hullCategory": "Civilian",
+    "toughness": "Light",
+    "targetModifier": "0",
+    "maneuverClass": 2,
+    "hullPoints": {
+      "base": 240,
+      "bonus": 48
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 30
+      },
+      "wound": {
+        "value": 0,
+        "max": 30
+      },
+      "mortal": {
+        "value": 0,
+        "max": 15
+      },
+      "critical": {
+        "value": 0,
+        "max": 8
+      }
+    },
+    "armor": {
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": "",
+      "armorType": ""
+    },
+    "power": {
+      "generated": 0,
+      "consumed": 0
+    },
+    "edge": 0,
+    "acceleration": 0,
+    "crew": {
+      "estimate": 30,
+      "current": 0
+    },
+    "cost": "$20 M",
+    "systems": [],
+    "weapons": [],
+    "defenses": [],
+    "sensors": [],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 58,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FP (Forward port side)",
+        "hullPointLimit": 58,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FC (Forward center)",
+        "hullPointLimit": 58,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FS (Forward starboard side)",
+        "hullPointLimit": 58,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AP (Aft port side)",
+        "hullPointLimit": 58,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AC (Aft center)",
+        "hullPointLimit": 58,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AS (Aft starboard side)",
+        "hullPointLimit": 58,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 58,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Tables 5-1b / 5-18</dd><dt>Class</dt><dd>Civilian hull</dd><dt>Hull points</dt><dd>240 (+48)</dd><dt>Toughness</dt><dd>Light (printed &quot;Lt&quot;)</dd><dt>Target modifier</dt><dd>0</dd><dt>Manoeuvre class</dt><dd>2</dd><dt>Damage track (s/w/m/c)</dt><dd>30/30/15/8</dd><dt>Hit zones</dt><dd>8, up to 58 hull points each</dd><dt>5% of hull</dt><dd>12</dd><dt>10% of hull</dt><dd>24</dd><dt>Typical crew</dt><dd>30</dd><dt>Cost</dt><dd>$20 M</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "zPTaUSsNEFtaEyLW",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Medium freighter",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Civilian Hulls",
+        "table": "Tables 5-1b / 5-18",
+        "hullPointsFivePercent": 12,
+        "hullPointsTenPercent": 24,
+        "printedToughness": "Lt",
+        "zoneLimitTable": "Table 5-18"
+      }
+    }
+  }
+}

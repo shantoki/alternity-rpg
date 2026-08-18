@@ -1,0 +1,412 @@
+{
+  "_id": "rVQ9KGXHt4dx96YI",
+  "_key": "!actors!rVQ9KGXHt4dx96YI",
+  "name": "Nike-class Gunboat",
+  "type": "spaceship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Gunboat",
+    "hullCategory": "Military",
+    "hullSize": 40,
+    "compartmentLimit": 8,
+    "progressLevel": 7,
+    "cost": "$10,435,000",
+    "maneuverRating": 0,
+    "acceleration": 2,
+    "cruisingSpeed": 1.5,
+    "engineType": "Induction engine",
+    "movementPoints": 0,
+    "ftl": {
+      "driveType": "None",
+      "drivespace": 0
+    },
+    "power": {
+      "generated": 25,
+      "allocated": 0,
+      "plantText": "3 mass reactors rated at 25 power factors"
+    },
+    "berthing": 12,
+    "crewAboard": 0,
+    "armor": {
+      "grade": "Moderate",
+      "material": "neutronite",
+      "lowImpact": "d6+1",
+      "highImpact": "d6+1",
+      "energy": "d6"
+    },
+    "computer": {
+      "coreQuality": "Good",
+      "dedicatedText": "Good battle and sensor; Ordinary engineering and navigation"
+    },
+    "compartments": [
+      {
+        "label": "Command",
+        "kind": "Command",
+        "durability": 4,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 0,
+        "hitHigh": 0,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Engineering 1",
+        "kind": "Engineering",
+        "durability": 8,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 1,
+        "hitHigh": 2,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Auxiliary",
+        "kind": "Auxiliary",
+        "durability": 4,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 3,
+        "hitHigh": 4,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Weapons 1",
+        "kind": "Weapons",
+        "durability": 5,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 5,
+        "hitHigh": 6,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Electronics",
+        "kind": "Electronics",
+        "durability": 4,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 7,
+        "hitHigh": 9,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Auxiliary 2",
+        "kind": "Auxiliary",
+        "durability": 4,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 10,
+        "hitHigh": 12,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Weapons 2",
+        "kind": "Weapons",
+        "durability": 5,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 13,
+        "hitHigh": 16,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Cargo",
+        "kind": "Cargo",
+        "durability": 2,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 17,
+        "hitHigh": 20,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      }
+    ],
+    "weapons": [
+      {
+        "name": "Mass cannon",
+        "compartment": 4,
+        "durabilityCost": 2,
+        "powerReq": 3,
+        "isOffline": false,
+        "notes": "",
+        "arc": "Fore",
+        "range": "5/10/15 Mm",
+        "damageOrdinary": "d6+2s",
+        "damageGood": "d6+1w",
+        "damageAmazing": "d6+3w",
+        "damageType": "lowImpact",
+        "firepower": "Amazing",
+        "actionsPerRound": 1
+      },
+      {
+        "name": "Mass cannon",
+        "compartment": 7,
+        "durabilityCost": 2,
+        "powerReq": 3,
+        "isOffline": false,
+        "notes": "",
+        "arc": "Fore",
+        "range": "5/10/15 Mm",
+        "damageOrdinary": "d6+2s",
+        "damageGood": "d6+1w",
+        "damageAmazing": "d6+3w",
+        "damageType": "lowImpact",
+        "firepower": "Amazing",
+        "actionsPerRound": 1
+      },
+      {
+        "name": "Launch tube",
+        "compartment": 3,
+        "durabilityCost": 3,
+        "powerReq": 1,
+        "isOffline": false,
+        "notes": "Ten of the ship's twenty missiles (8 CHE, 8 ARN, 4 SMP across both tubes). Damage is the missile's, not the tube's.",
+        "arc": "Fore",
+        "range": "",
+        "damageOrdinary": "",
+        "damageGood": "",
+        "damageAmazing": "",
+        "damageType": "lowImpact",
+        "firepower": "Amazing",
+        "actionsPerRound": 1
+      },
+      {
+        "name": "Launch tube",
+        "compartment": 7,
+        "durabilityCost": 3,
+        "powerReq": 1,
+        "isOffline": false,
+        "notes": "The other ten missiles. Damage is the missile's, not the tube's.",
+        "arc": "Fore",
+        "range": "",
+        "damageOrdinary": "",
+        "damageGood": "",
+        "damageAmazing": "",
+        "damageType": "lowImpact",
+        "firepower": "Amazing",
+        "actionsPerRound": 1
+      }
+    ],
+    "defenses": [
+      {
+        "name": "Deflection inducer",
+        "compartment": 4,
+        "durabilityCost": 2,
+        "powerReq": 4,
+        "isOffline": false,
+        "notes": "",
+        "isActive": false,
+        "effectText": "+2 step penalty to any attack against the ship."
+      },
+      {
+        "name": "Jammer",
+        "compartment": 5,
+        "durabilityCost": 0,
+        "powerReq": 1,
+        "isOffline": false,
+        "notes": "",
+        "isActive": false,
+        "effectText": "+2 steps to enemy missile and sensor checks."
+      }
+    ],
+    "systems": [
+      {
+        "name": "Multiband radar",
+        "compartment": 1,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Sensors",
+        "range": ""
+      },
+      {
+        "name": "Airlock",
+        "compartment": 1,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Misc",
+        "range": ""
+      },
+      {
+        "name": "Good computer core",
+        "compartment": 1,
+        "durabilityCost": 2,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Computer",
+        "range": ""
+      },
+      {
+        "name": "Crew quarters",
+        "compartment": 1,
+        "durabilityCost": 2,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Crew",
+        "range": ""
+      },
+      {
+        "name": "Reentry capsule",
+        "compartment": 1,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Misc",
+        "range": ""
+      },
+      {
+        "name": "Induction engine",
+        "compartment": 2,
+        "durabilityCost": 4,
+        "powerReq": 4,
+        "isOffline": false,
+        "notes": "",
+        "category": "Engine",
+        "range": ""
+      },
+      {
+        "name": "Mass reactor",
+        "compartment": 2,
+        "durabilityCost": 4,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Power Plant",
+        "range": ""
+      },
+      {
+        "name": "Autosupport",
+        "compartment": 3,
+        "durabilityCost": 0,
+        "powerReq": 2,
+        "isOffline": false,
+        "notes": "",
+        "category": "Life Support",
+        "range": ""
+      },
+      {
+        "name": "EM detector",
+        "compartment": 5,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Sensors",
+        "range": ""
+      },
+      {
+        "name": "Mass reactor",
+        "compartment": 5,
+        "durabilityCost": 2,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Power Plant",
+        "range": ""
+      },
+      {
+        "name": "Mass transceiver",
+        "compartment": 5,
+        "durabilityCost": 1,
+        "powerReq": 1,
+        "isOffline": false,
+        "notes": "",
+        "category": "Communications",
+        "range": ""
+      },
+      {
+        "name": "Mass reactor",
+        "compartment": 6,
+        "durabilityCost": 4,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Power Plant",
+        "range": ""
+      },
+      {
+        "name": "Cargo space",
+        "compartment": 8,
+        "durabilityCost": 2,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Cargo",
+        "range": ""
+      }
+    ],
+    "stations": [],
+    "notes": "<p>The largest and most powerful patrol craft built by a private shipyard outside the Tendril system, and a common sight defending corporate outposts in lawless systems. With twenty missiles and two mass cannons the Nike can outslug almost any noncapital ship, but it is not fast and it is short-ranged. No stardrive: this is a system defence ship.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>StarDrive Arms &amp; Equipment Guide, Solar X Shipyards</dd><dt>Hull</dt><dd>Gunboat (Military), hull size 40</dd><dt>Progress Level</dt><dd>7</dd><dt>Compartments</dt><dd>8</dd><dt>Toughness</dt><dd>Amazing - as every spaceship is (GM Guide Ch.11)</dd><dt>Manoeuvre rating</dt><dd>0</dd><dt>Acceleration</dt><dd>2 Mm per phase</dd><dt>Cruising speed</dt><dd>1.5 AU per hour</dd><dt>Engine</dt><dd>Induction engine</dd><dt>Power plant</dt><dd>3 mass reactors rated at 25 power factors</dd><dt>FTL</dt><dd>None</dd><dt>Armor</dt><dd>Moderate neutronite: d6+1 (LI), d6+1 (HI), d6 (En)</dd><dt>Computer</dt><dd>Good core; Good battle and sensor; Ordinary engineering and navigation</dd><dt>Berthing</dt><dd>12</dd><dt>Cost</dt><dd>$10,435,000</dd><dt>Compartment durability assigned</dt><dd>36 of 40</dd><dt>Scan damage</dt><dd>The compartment table was scrambled, losing one compartment's name and band and detaching several system rows. Band 10-12 and the durability values are recovered from the hull-size sum; the systems are placed in the only compartments large enough to hold them.</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "CCFNk5renkAJDSfX",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Nike-class Gunboat",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "StarDrive Arms & Equipment Guide",
+        "reference": "Solar X Shipyards",
+        "folder": "Solar X Shipyards",
+        "scanDamage": "The compartment table was scrambled, losing one compartment's name and band and detaching several system rows. Band 10-12 and the durability values are recovered from the hull-size sum; the systems are placed in the only compartments large enough to hold them."
+      }
+    }
+  }
+}

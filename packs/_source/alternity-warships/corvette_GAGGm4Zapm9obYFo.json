@@ -1,0 +1,131 @@
+{
+  "_id": "GAGGm4Zapm9obYFo",
+  "_key": "!actors!GAGGm4Zapm9obYFo",
+  "name": "Corvette",
+  "type": "warship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Corvette",
+    "hullCategory": "Military",
+    "toughness": "Light",
+    "targetModifier": "+1 step",
+    "maneuverClass": 3,
+    "hullPoints": {
+      "base": 80,
+      "bonus": 8
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 20
+      },
+      "wound": {
+        "value": 0,
+        "max": 20
+      },
+      "mortal": {
+        "value": 0,
+        "max": 10
+      },
+      "critical": {
+        "value": 0,
+        "max": 5
+      }
+    },
+    "armor": {
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": "",
+      "armorType": ""
+    },
+    "power": {
+      "generated": 0,
+      "consumed": 0
+    },
+    "edge": 0,
+    "acceleration": 0,
+    "crew": {
+      "estimate": 20,
+      "current": 0
+    },
+    "cost": "$5 M",
+    "systems": [],
+    "weapons": [],
+    "defenses": [],
+    "sensors": [],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 22,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FC (Forward center)",
+        "hullPointLimit": 22,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "P (Port side)",
+        "hullPointLimit": 22,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "S (Starboard side)",
+        "hullPointLimit": 22,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AC (Aft center)",
+        "hullPointLimit": 22,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 22,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Tables 5-1a / 5-18</dd><dt>Class</dt><dd>Military hull</dd><dt>Hull points</dt><dd>80 (+8)</dd><dt>Toughness</dt><dd>Light (printed &quot;Lt&quot;)</dd><dt>Target modifier</dt><dd>+1 step</dd><dt>Manoeuvre class</dt><dd>3</dd><dt>Damage track (s/w/m/c)</dt><dd>20/20/10/5</dd><dt>Hit zones</dt><dd>6, up to 22 hull points each</dd><dt>5% of hull</dt><dd>4</dd><dt>10% of hull</dt><dd>8</dd><dt>Typical crew</dt><dd>20</dd><dt>Cost</dt><dd>$5 M</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "NaBQROMUzthU7gcO",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Corvette",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Military Hulls",
+        "table": "Tables 5-1a / 5-18",
+        "hullPointsFivePercent": 4,
+        "hullPointsTenPercent": 8,
+        "printedToughness": "Lt",
+        "zoneLimitTable": "Table 5-18"
+      }
+    }
+  }
+}

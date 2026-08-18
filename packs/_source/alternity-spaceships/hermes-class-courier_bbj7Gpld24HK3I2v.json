@@ -1,0 +1,273 @@
+{
+  "_id": "bbj7Gpld24HK3I2v",
+  "_key": "!actors!bbj7Gpld24HK3I2v",
+  "name": "Hermes-class Courier",
+  "type": "spaceship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Courier",
+    "hullCategory": "Civilian",
+    "hullSize": 16,
+    "compartmentLimit": 4,
+    "progressLevel": 7,
+    "cost": "$2,395,000",
+    "maneuverRating": 1,
+    "acceleration": 3,
+    "cruisingSpeed": 2,
+    "engineType": "Induction engine",
+    "movementPoints": 0,
+    "ftl": {
+      "driveType": "None",
+      "drivespace": 0
+    },
+    "power": {
+      "generated": 25,
+      "allocated": 0,
+      "plantText": "Mass reactor rated at 25 power factors"
+    },
+    "berthing": 14,
+    "crewAboard": 0,
+    "armor": {
+      "grade": "Light",
+      "material": "cerametal",
+      "lowImpact": "d6-1",
+      "highImpact": "d6-1",
+      "energy": "d6-1"
+    },
+    "computer": {
+      "coreQuality": "Ordinary",
+      "dedicatedText": "Ordinary navigation dedicated computer"
+    },
+    "compartments": [
+      {
+        "label": "Command",
+        "kind": "Command",
+        "durability": 5,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 1,
+        "hitHigh": 4,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Engineering",
+        "kind": "Engineering",
+        "durability": 4,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 5,
+        "hitHigh": 7,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Auxiliary",
+        "kind": "Auxiliary",
+        "durability": 4,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 8,
+        "hitHigh": 12,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Crew",
+        "kind": "Crew",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 13,
+        "hitHigh": 20,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      }
+    ],
+    "weapons": [
+      {
+        "name": "Plasma cannon",
+        "compartment": 1,
+        "durabilityCost": 3,
+        "powerReq": 3,
+        "isOffline": false,
+        "notes": "",
+        "arc": "Fore",
+        "range": "4/8/16 Mm",
+        "damageOrdinary": "d6+2w",
+        "damageGood": "d8+2w",
+        "damageAmazing": "d6+1m",
+        "damageType": "energy",
+        "firepower": "Amazing",
+        "actionsPerRound": 1
+      }
+    ],
+    "defenses": [
+      {
+        "name": "Chaff",
+        "compartment": 1,
+        "durabilityCost": 1,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "isActive": true,
+        "effectText": "+1 step to enemy missile and sensor checks."
+      },
+      {
+        "name": "Jammer",
+        "compartment": 0,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "Named in the statblock header; the compartment table does not itemise it.",
+        "isActive": false,
+        "effectText": "+2 steps to enemy missile and sensor checks."
+      }
+    ],
+    "systems": [
+      {
+        "name": "Laser transceiver",
+        "compartment": 1,
+        "durabilityCost": 0,
+        "powerReq": 1,
+        "isOffline": false,
+        "notes": "",
+        "category": "Communications",
+        "range": ""
+      },
+      {
+        "name": "Radio transceiver",
+        "compartment": 1,
+        "durabilityCost": 0,
+        "powerReq": 1,
+        "isOffline": false,
+        "notes": "",
+        "category": "Communications",
+        "range": ""
+      },
+      {
+        "name": "Airlock",
+        "compartment": 1,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Misc",
+        "range": ""
+      },
+      {
+        "name": "Ordinary computer core",
+        "compartment": 1,
+        "durabilityCost": 1,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Computer",
+        "range": ""
+      },
+      {
+        "name": "Induction engine",
+        "compartment": 2,
+        "durabilityCost": 4,
+        "powerReq": 4,
+        "isOffline": false,
+        "notes": "",
+        "category": "Engine",
+        "range": ""
+      },
+      {
+        "name": "Autosupport",
+        "compartment": 2,
+        "durabilityCost": 0,
+        "powerReq": 1,
+        "isOffline": false,
+        "notes": "",
+        "category": "Life Support",
+        "range": ""
+      },
+      {
+        "name": "Reentry capsule",
+        "compartment": 2,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Misc",
+        "range": ""
+      },
+      {
+        "name": "Mass reactor",
+        "compartment": 3,
+        "durabilityCost": 4,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Power Plant",
+        "range": ""
+      },
+      {
+        "name": "Crew quarters",
+        "compartment": 4,
+        "durabilityCost": 1,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "Six hands.",
+        "category": "Crew",
+        "range": ""
+      },
+      {
+        "name": "Passenger suite",
+        "compartment": 4,
+        "durabilityCost": 2,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "Staterooms for two passengers.",
+        "category": "Crew",
+        "range": ""
+      }
+    ],
+    "stations": [],
+    "notes": "<p>Small and fast, built for high-speed interplanetary passenger and mail runs, and carried by larger warships as a captain's gig or crew shuttle. Too small to carry an interstellar drive, but small enough to hitch a ride with any driveship. A new hull takes 6d4 weeks to build and outfit.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>StarDrive Arms &amp; Equipment Guide, Solar X Shipyards</dd><dt>Hull</dt><dd>Courier (Civilian), hull size 16</dd><dt>Progress Level</dt><dd>7</dd><dt>Compartments</dt><dd>4</dd><dt>Toughness</dt><dd>Amazing - as every spaceship is (GM Guide Ch.11)</dd><dt>Manoeuvre rating</dt><dd>1</dd><dt>Acceleration</dt><dd>3 Mm per phase</dd><dt>Cruising speed</dt><dd>2 AU per hour</dd><dt>Engine</dt><dd>Induction engine</dd><dt>Power plant</dt><dd>Mass reactor rated at 25 power factors</dd><dt>FTL</dt><dd>None</dd><dt>Armor</dt><dd>Light cerametal: d6-1 (LI), d6-1 (HI), d6-1 (En)</dd><dt>Computer</dt><dd>Ordinary core; Ordinary navigation dedicated computer</dd><dt>Berthing</dt><dd>14</dd><dt>Cost</dt><dd>$2,395,000</dd><dt>Compartment durability assigned</dt><dd>16 of 16</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "CCFNk5renkAJDSfX",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Hermes-class Courier",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "StarDrive Arms & Equipment Guide",
+        "reference": "Solar X Shipyards",
+        "folder": "Solar X Shipyards"
+      }
+    }
+  }
+}

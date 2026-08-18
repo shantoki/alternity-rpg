@@ -1,0 +1,134 @@
+{
+  "_id": "KFRPz0YBCgU7lHDZ",
+  "_key": "!actors!KFRPz0YBCgU7lHDZ",
+  "name": "STG Shuttle",
+  "type": "spaceship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "STG shuttle",
+    "hullCategory": "Civilian",
+    "hullSize": 16,
+    "compartmentLimit": 4,
+    "progressLevel": 6,
+    "cost": "",
+    "maneuverRating": 0,
+    "acceleration": 0,
+    "cruisingSpeed": 0,
+    "engineType": "Planetary thruster",
+    "movementPoints": 0,
+    "ftl": {
+      "driveType": "None",
+      "drivespace": 0
+    },
+    "power": {
+      "generated": 0,
+      "allocated": 0,
+      "plantText": "Fusion generator"
+    },
+    "berthing": 0,
+    "crewAboard": 0,
+    "armor": {
+      "grade": "Light",
+      "material": "polymeric",
+      "lowImpact": "d4-1",
+      "highImpact": "d4-1",
+      "energy": "d4-2"
+    },
+    "computer": {
+      "coreQuality": "Marginal",
+      "dedicatedText": ""
+    },
+    "compartments": [
+      {
+        "label": "Command",
+        "kind": "Command",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 1,
+        "hitHigh": 2,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Engineering",
+        "kind": "Engineering",
+        "durability": 8,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 3,
+        "hitHigh": 5,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Cargo",
+        "kind": "Cargo",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 6,
+        "hitHigh": 12,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Passenger hold",
+        "kind": "Crew",
+        "durability": 2,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 13,
+        "hitHigh": 20,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      }
+    ],
+    "weapons": [],
+    "defenses": [],
+    "systems": [],
+    "stations": [],
+    "notes": "<p>Space-to-ground only: fast and cheap for moving people and cargo between a planet and orbit, and incapable of deep space travel. It needs no separate rockets to make orbit, working much like an airplane.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Player's Handbook, Ch.12 &quot;Vehicles&quot;, PL 6</dd><dt>Hull</dt><dd>STG shuttle (Civilian), hull size 16</dd><dt>Progress Level</dt><dd>6</dd><dt>Compartments</dt><dd>4</dd><dt>Toughness</dt><dd>Amazing - as every spaceship is (GM Guide Ch.11)</dd><dt>Manoeuvre rating</dt><dd>0</dd><dt>Engine</dt><dd>Planetary thruster</dd><dt>Power plant</dt><dd>Fusion generator</dd><dt>FTL</dt><dd>None</dd><dt>Armor</dt><dd>Light polymeric: d4-1 (LI), d4-1 (HI), d4-2 (En)</dd><dt>Computer</dt><dd>undefined core</dd><dt>Compartment durability assigned</dt><dd>16 of 16</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "npefu74U1eEu5NCk",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "STG Shuttle",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Player's Handbook",
+        "reference": "Ch.12 \"Vehicles\", PL 6",
+        "folder": "Player's Handbook"
+      }
+    }
+  }
+}

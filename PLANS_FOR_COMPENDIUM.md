@@ -6,8 +6,9 @@ the next pass has to pick up. Check here before assuming a gap is an oversight.
 
 ## What exists
 
-Nine packs, built from the Alternity character generator's data set. The pipeline is two
-steps and the middle is committed:
+Eleven packs. Nine are built from the Alternity character generator's data set; the two ship
+packs are built from the books, because the generator data set has no starships in it (see
+Phase 6). The pipeline is two steps and the middle is committed:
 
 ```
 external/json/**            npm run convert:source     packs/_source/**       npm run build:packs     packs/**
@@ -38,9 +39,13 @@ release.yml` on a `v*` tag. Nobody installing the system runs npm.
 | `alternity-achievements` | 185 | `achievementBenefit` |
 | `alternity-species` | 18 | `species` |
 | `alternity-templates` | 54 | `character` Actors |
+| `alternity-spaceships` | 18 | `spaceship` Actors |
+| `alternity-warships` | 44 | `warship` Actors |
 
 Each pack folders its contents by source book, except `alternity-achievements`, which
-folders by profession because every achievement comes from the same book.
+folders by profession because every achievement comes from the same book, and
+`alternity-warships`, which folders by what a record *is* (military hulls, civilian hulls,
+stations and bases, sample ships) because it all comes from one book too.
 
 Two rules the tooling depends on:
 
@@ -254,14 +259,130 @@ what the character generator shipped, not something the conversion lost.
       that are enabled but do nothing. Several are mechanical ("Free Agent Action Check
       Increase: action check score increased by 2") and could be real modifiers.
 
+## Phase 6: starships from the books - done
+
+Two packs of Actors, and the first content in the compendium that does not come from the
+character generator data set at all. The generator has no ships in it; the ship rules only
+ever existed in the books, so `tools/convert/warships.mjs` and `tools/convert/spaceships.mjs`
+carry their tables inline as literal data and export `NEEDS_SOURCE_DATA = false`. The driver
+checks that flag per converter, so a clone with no `external/` can still rebuild the ships.
+
+They are two packs because they are two rules systems. `spaceship` is the core rules -
+compartments, each with its own stun/wound/mortal track, and a d20 hit table that picks which
+one eats a hit. `warship` is the supplement - one whole-ship hull point pool, a ship-level
+stun/wound/mortal/critical track, a per-ship toughness class, and hit *zones*. Every published
+statblock is printed in one form or the other, never both.
+
+### `alternity-warships` - 44 records
+
+- [x] **33 bare hulls**, Tables 5-1a and 5-1b joined with Table 5-18: hull points and their
+      economy-of-scale bonus, toughness class, target modifier, manoeuvre class, the s/w/m/c
+      damage track, typical crew, cost, and the zone count with its per-zone hull point limit.
+      The systems/weapons/defenses/sensors tables stay empty - a hull is where a design starts.
+- [x] **10 stations and bases**, Table 6-1, in the same shape. Ch.6 was never finished before
+      the line was cancelled; that table is the whole of what exists, and the book publishes it
+      as "a good starting point".
+- [x] **The *Endurance***, the survey cruiser Ch.5 builds step by step and prints on p.106 -
+      all 26 system rows, 3 weapon batteries, 2 defences, 6 sensors and the 8-zone damage
+      diagram. Its own arithmetic is the proof the transcription is complete: the hull point
+      column sums to exactly 480 (400 plus the 80 bonus, nothing left over) and the continuous
+      power draw to exactly 294, which is what the four mass reactors generate. Both are
+      asserted in `tests/test-pack-source.test.js`.
+- [x] **Zone lists are pre-filled**, because zone count and limit are a pure function of the
+      hull (Table 5-18) and Ch.5 Step A names every zone for each of the six layouts
+      (2/4/6/8/12/20). `PLANS_FOR_WARSHIP_SHEET.md` deferred a hull-type lookup to Phase 2;
+      this is that lookup as data rather than as code, which needs no runtime table.
+
+Two schema gaps had to be closed first, both from the books rather than from convenience:
+
+- [x] **`SHIP_TOUGHNESS_CLASSES` was missing `Good`.** Table 5-1b prints `(Gd)` for the launch,
+      courier and trader, and its own note says "some ships have Good toughness, one step less
+      than Small Craft". Mapping those three onto `SmallCraft` would have been a play-affecting
+      error, since toughness is what the firepower-versus-toughness ladder measures against.
+      `Good` is inserted at the bottom of the ladder, which leaves `calculateFirepowerShift`
+      correct because only the *difference* between two ranks means anything. Weapons list one
+      rung fewer - nothing shoots with Good firepower - so `SHIP_FIREPOWER_CLASSES` is the
+      ladder minus its bottom rung, and that is what a weapon row's `firepowerClass` admits.
+- [x] **`hullCategory` admitted only `Military | Civilian`.** Table 6-1's installations are
+      neither, so `Installation` is a third value, `SHIP_HULL_TYPES` gained the group, and the
+      list is now exported from `WarshipData` instead of being restated in the sheet.
+      `WarshipData` also stopped keeping its own copy of the toughness ladder and imports the
+      math service's.
+
+### `alternity-spaceships` - 18 records
+
+- [x] **9 Player's Handbook Ch.12 stock hulls** (STG shuttle, system liner, cutter, escape pod,
+      launch, trader, transport, yacht, space fighter) with compartments, d20 hit bands, armour,
+      the weapon's full three-grade damage run and the drivespace rating.
+- [x] **3 Solar X Shipyards ships** from the Arms & Equipment Guide (Hermes-class courier,
+      Nike-class gunboat, Solar X Gull), fully itemised down to the durability and power cost of
+      every airlock, and with printed prices.
+- [x] **6 named ships of the Verge** from the Campaign Setting (*Blackguard*, *Sirocco*,
+      Blade-class scout, Lucre-class escort, CSS *Stingray*, klick attack ship), likewise
+      itemised, with each system assigned to the compartment it sits in.
+
+**The statblocks were reconstructed, not just typed.** The scans render `4/4/2` as `4/8/2`,
+`13-16` as `18-16` and `C6` as `CE`, so two invariants were used to pin every number down:
+
+1. **A printed triple is one number.** "A compartment's mortal rating is the same as its number
+   of durability points, and its stun and wound ratings are twice that number" - so `8/8/4` is
+   durability 4 and any triple that is not 2n/2n/n is corrupt. That is how the *Blackguard*'s
+   "8/6/3" resolved to 6/6/3.
+2. **The compartments account for the hull.** Every StarDrive statblock prints its armour's
+   durability cost, and its compartments sum to exactly `Dur` minus that cost. That identity
+   supplied the *Stingray*'s missing engineering compartment (9 points - exactly its induction
+   engine plus its stardrive, the engine row having been lost with it), the yacht's missing
+   command compartment, the *Sirocco*'s command compartment and the split of its systems, and
+   both unreadable compartments on the *Lucre*-class escort.
+
+Both invariants, plus the d20 bands tiling 1-20 exactly once and no compartment holding more
+systems than it has durability for, are asserted for all 18 ships in
+`tests/test-pack-source.test.js`. Eight ships needed reconstruction and each names what was
+reconstructed on `provenance.scanDamage`; the *Blade*-class scout, whose durability column was
+destroyed outright, carries the sums of its printed system costs rather than a guess, and says
+so on the sheet.
+
+Two differences between the books are transcribed rather than smoothed over:
+
+- **The Player's Handbook does not charge durability for armour.** Its five Moderate-armoured
+  ships assign exactly the armour's cost more than the GM Guide's budget allows, so their sheets
+  read as over-budget. Each says why in its own description, and the test pins the list of five
+  closed so a real transcription error cannot hide behind it.
+- **Ships whose statblock prints no power rating show a deficit.** The *Blackguard* is the
+  clearest case. That is the source, not a conversion loss, and the ship says so.
+
+### What Phase 6 left for later
+
+- [ ] **A warship weapon row holds one damage code, not three.** Warships weapons print the
+      usual Ordinary/Good/Amazing run with a track letter on each grade (the matter beam is
+      `2d6+1w/2d8+1w/2d8m`), but `WarshipData.weapons` has a single `damageFormula` plus
+      `damageGrade`. The *Endurance*'s rows carry the Ordinary code and the full run in the row
+      name, so nothing printed is lost - but a GM rolling its matter beam gets the Ordinary
+      damage whatever degree they achieved. Giving that array the three-grade run
+      `SpaceshipData.weapons` already has is a schema change and its own piece of work; see
+      `PLANS_FOR_WARSHIP_SHEET.md`.
+- [ ] **No prose.** Like every other pack, a ship's description is its stat block. The books
+      carry a paragraph for every hull and a page for several of the named ships, and that text
+      belongs to the Phase 2 pass along with everything else - the OCR damage that made the
+      numbers checkable makes the prose exactly as unreliable as it is for the 1,300 items.
+- [ ] **The GM Guide's own hull table (G34) is unrecoverable.** Its durability and cost columns
+      are destroyed in the scan; only six compartment counts survive. So there are no bare
+      *spaceship* hulls to match the 33 bare warship hulls - the named ships are all the
+      core-rules ship data that exists. Every published design uses its hull's full compartment
+      allowance, so `compartmentLimit` is set from each ship's own compartment count, which
+      agrees with all six readable values.
+- [ ] **Crew stations are empty.** `SpaceshipData.stations` models the Ship Status Record Form's
+      command crew, and no published statblock names its officers with skill scores. The
+      *Stingray* and the Blade-class scout state crew *numbers*, which are in their notes.
+
 ## Sources not yet mined
 
 - `external/json/Reports/*.json` are the generator's XSL report stylesheets, not data.
   They are worth keeping as a decoder ring - `walter_weapons.xsl` is where the numeric
   availability codes were confirmed - but there is nothing in them to convert.
-- Vehicles, starships and creatures have actor types and sheets in this system but no
-  records in the character generator data set. Those come from the Warships, Star Drive
-  Campaign Setting and Gamemaster Guide Markdown, and would be a Phase 2-style pass with
-  no stats to anchor against.
+- Vehicles and creatures have actor types and sheets in this system but no records in the
+  character generator data set. Vehicles are in the Player's Handbook Ch.12 table, whose
+  scan is destroyed; creatures are in the Gamemaster Guide. Starships are done - see
+  Phase 6.
 - `PerkFlawData`, `ProgramData` and `MutationData` have no source records either. Perks
   and flaws are in the Player's Handbook, programs in Dataware, mutations in Gamma World.

@@ -1,0 +1,426 @@
+{
+  "_id": "hYVbC0MXqZsswGfz",
+  "_key": "!actors!hYVbC0MXqZsswGfz",
+  "name": "Alaundril Lucre-class Escort",
+  "type": "spaceship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Escort",
+    "hullCategory": "Military",
+    "hullSize": 50,
+    "compartmentLimit": 10,
+    "progressLevel": 7,
+    "cost": "$11.3 M",
+    "maneuverRating": 1,
+    "acceleration": 1,
+    "cruisingSpeed": 1,
+    "engineType": "Induction engine",
+    "movementPoints": 0,
+    "ftl": {
+      "driveType": "Stardrive",
+      "drivespace": 5
+    },
+    "power": {
+      "generated": 20,
+      "allocated": 0,
+      "plantText": "2 mass reactors rated for 20 power factors total"
+    },
+    "berthing": 36,
+    "crewAboard": 0,
+    "armor": {
+      "grade": "Moderate",
+      "material": "neutronite",
+      "lowImpact": "d6+1",
+      "highImpact": "d6+1",
+      "energy": "d6"
+    },
+    "computer": {
+      "coreQuality": "Ordinary",
+      "dedicatedText": "Ordinary engineering and battle dedicated computers"
+    },
+    "compartments": [
+      {
+        "label": "Command",
+        "kind": "Command",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 0,
+        "hitHigh": 0,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Engineering 1",
+        "kind": "Engineering",
+        "durability": 6,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 0,
+        "hitHigh": 0,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Engineering 2",
+        "kind": "Engineering",
+        "durability": 5,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 1,
+        "hitHigh": 1,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Auxiliary",
+        "kind": "Auxiliary",
+        "durability": 6,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 2,
+        "hitHigh": 3,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Weapons 1",
+        "kind": "Weapons",
+        "durability": 4,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 4,
+        "hitHigh": 5,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Weapons 2",
+        "kind": "Weapons",
+        "durability": 5,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 6,
+        "hitHigh": 7,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Electronics",
+        "kind": "Electronics",
+        "durability": 5,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 8,
+        "hitHigh": 10,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Crew 1",
+        "kind": "Crew",
+        "durability": 4,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 11,
+        "hitHigh": 13,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Crew 2",
+        "kind": "Crew",
+        "durability": 4,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 14,
+        "hitHigh": 16,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Cargo",
+        "kind": "Cargo",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 17,
+        "hitHigh": 20,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      }
+    ],
+    "weapons": [
+      {
+        "name": "Turret: mass cannon",
+        "compartment": 1,
+        "durabilityCost": 3,
+        "powerReq": 3,
+        "isOffline": false,
+        "notes": "The header lists two mass cannons; the compartment table itemises one mount.",
+        "arc": "Turret",
+        "range": "5/10/15 Mm",
+        "damageOrdinary": "d6+2s",
+        "damageGood": "d6+1w",
+        "damageAmazing": "d6+3w",
+        "damageType": "lowImpact",
+        "firepower": "Amazing",
+        "actionsPerRound": 1
+      },
+      {
+        "name": "Launch rack",
+        "compartment": 5,
+        "durabilityCost": 2,
+        "powerReq": 1,
+        "isOffline": false,
+        "notes": "Half of the ship's 16 missiles (6 ARN, 8 CHE, 2 MAB across both racks). Damage is the missile's, not the rack's.",
+        "arc": "Fore",
+        "range": "",
+        "damageOrdinary": "",
+        "damageGood": "",
+        "damageAmazing": "",
+        "damageType": "lowImpact",
+        "firepower": "Amazing",
+        "actionsPerRound": 1
+      },
+      {
+        "name": "Launch rack",
+        "compartment": 6,
+        "durabilityCost": 2,
+        "powerReq": 1,
+        "isOffline": false,
+        "notes": "The other half of the missile load.",
+        "arc": "Fore",
+        "range": "",
+        "damageOrdinary": "",
+        "damageGood": "",
+        "damageAmazing": "",
+        "damageType": "lowImpact",
+        "firepower": "Amazing",
+        "actionsPerRound": 1
+      }
+    ],
+    "defenses": [
+      {
+        "name": "Deflection inducer",
+        "compartment": 0,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "Named in the statblock header; the compartment table does not itemise it.",
+        "isActive": false,
+        "effectText": "+2 step penalty to any attack against the ship."
+      },
+      {
+        "name": "Jammer",
+        "compartment": 0,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "Named in the statblock header; the compartment table does not itemise it.",
+        "isActive": false,
+        "effectText": "+2 steps to enemy missile and sensor checks."
+      },
+      {
+        "name": "Chaff",
+        "compartment": 0,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "Named in the statblock header; the compartment table does not itemise it.",
+        "isActive": true,
+        "effectText": "+1 step to enemy missile and sensor checks."
+      }
+    ],
+    "systems": [
+      {
+        "name": "Multiband radar",
+        "compartment": 1,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Sensors",
+        "range": ""
+      },
+      {
+        "name": "Induction engine",
+        "compartment": 2,
+        "durabilityCost": 6,
+        "powerReq": 6,
+        "isOffline": false,
+        "notes": "",
+        "category": "Engine",
+        "range": ""
+      },
+      {
+        "name": "Airlock",
+        "compartment": 2,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Misc",
+        "range": ""
+      },
+      {
+        "name": "Mass reactor",
+        "compartment": 3,
+        "durabilityCost": 2,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Power Plant",
+        "range": ""
+      },
+      {
+        "name": "Stardrive",
+        "compartment": 3,
+        "durabilityCost": 3,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "FTL Drive",
+        "range": ""
+      },
+      {
+        "name": "Mass reactor",
+        "compartment": 4,
+        "durabilityCost": 6,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Power Plant",
+        "range": ""
+      },
+      {
+        "name": "Tractor beam",
+        "compartment": 5,
+        "durabilityCost": 2,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Misc",
+        "range": ""
+      },
+      {
+        "name": "Laser transceiver",
+        "compartment": 7,
+        "durabilityCost": 0,
+        "powerReq": 1,
+        "isOffline": false,
+        "notes": "",
+        "category": "Communications",
+        "range": ""
+      },
+      {
+        "name": "EM detector",
+        "compartment": 7,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Sensors",
+        "range": ""
+      },
+      {
+        "name": "Crew quarters",
+        "compartment": 8,
+        "durabilityCost": 4,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Crew",
+        "range": ""
+      },
+      {
+        "name": "Crew quarters",
+        "compartment": 9,
+        "durabilityCost": 2,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "category": "Crew",
+        "range": ""
+      },
+      {
+        "name": "Autocargo",
+        "compartment": 10,
+        "durabilityCost": 3,
+        "powerReq": 3,
+        "isOffline": false,
+        "notes": "",
+        "category": "Cargo",
+        "range": ""
+      }
+    ],
+    "stations": [],
+    "notes": "<p>The mainstay of Alaundril's defensive force, and for many years the only warship for sale to any system in the Verge. Forty-six have been built at the Ion Production shipyards at an average of $11.3 million each, with seven more on order. A few have fallen into pirate hands.</p><p>The command and first engineering spaces have no random-damage band, so a d20 can never single them out.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>StarDrive Campaign Setting, Tendril system</dd><dt>Hull</dt><dd>Escort (Military), hull size 50</dd><dt>Progress Level</dt><dd>7</dd><dt>Compartments</dt><dd>10</dd><dt>Toughness</dt><dd>Amazing - as every spaceship is (GM Guide Ch.11)</dd><dt>Manoeuvre rating</dt><dd>1</dd><dt>Acceleration</dt><dd>1 Mm per phase</dd><dt>Cruising speed</dt><dd>1 AU per hour</dd><dt>Engine</dt><dd>Induction engine</dd><dt>Power plant</dt><dd>2 mass reactors rated for 20 power factors total</dd><dt>FTL</dt><dd>Stardrive, 5 light-years per starfall</dd><dt>Armor</dt><dd>Moderate neutronite: d6+1 (LI), d6+1 (HI), d6 (En)</dd><dt>Computer</dt><dd>Ordinary core; Ordinary engineering and battle dedicated computers</dd><dt>Berthing</dt><dd>36</dd><dt>Cost</dt><dd>$11.3 M</dd><dt>Compartment durability assigned</dt><dd>45 of 50</dd><dt>Scan damage</dt><dd>Two compartments lost their durability ratings; both are forced to 5 by the hull-size sum. Several system rows drifted between compartments and are placed in the spaces large enough to hold them.</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "x9iqN1j6DUo8KCrX",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Alaundril Lucre-class Escort",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "StarDrive Campaign Setting",
+        "reference": "Tendril system",
+        "folder": "Ships of the Verge",
+        "scanDamage": "Two compartments lost their durability ratings; both are forced to 5 by the hull-size sum. Several system rows drifted between compartments and are placed in the spaces large enough to hold them."
+      }
+    }
+  }
+}

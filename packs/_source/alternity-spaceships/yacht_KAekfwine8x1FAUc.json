@@ -1,0 +1,182 @@
+{
+  "_id": "KAekfwine8x1FAUc",
+  "_key": "!actors!KAekfwine8x1FAUc",
+  "name": "Yacht",
+  "type": "spaceship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Yacht",
+    "hullCategory": "Civilian",
+    "hullSize": 24,
+    "compartmentLimit": 6,
+    "progressLevel": 7,
+    "cost": "",
+    "maneuverRating": 0,
+    "acceleration": 0,
+    "cruisingSpeed": 0,
+    "engineType": "Induction engine",
+    "movementPoints": 0,
+    "ftl": {
+      "driveType": "Stardrive",
+      "drivespace": 10
+    },
+    "power": {
+      "generated": 0,
+      "allocated": 0,
+      "plantText": "Grav-fusion cell"
+    },
+    "berthing": 12,
+    "crewAboard": 0,
+    "armor": {
+      "grade": "Moderate",
+      "material": "cerametal",
+      "lowImpact": "d4+1",
+      "highImpact": "d4+1",
+      "energy": "d4+1"
+    },
+    "computer": {
+      "coreQuality": "Marginal",
+      "dedicatedText": ""
+    },
+    "compartments": [
+      {
+        "label": "Command",
+        "kind": "Command",
+        "durability": 5,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 1,
+        "hitHigh": 2,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Engineering",
+        "kind": "Engineering",
+        "durability": 5,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 3,
+        "hitHigh": 4,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Auxiliary",
+        "kind": "Auxiliary",
+        "durability": 5,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 5,
+        "hitHigh": 7,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Passenger quarters",
+        "kind": "Crew",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 8,
+        "hitHigh": 10,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Passenger quarters",
+        "kind": "Crew",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 11,
+        "hitHigh": 15,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Cargo",
+        "kind": "Cargo",
+        "durability": 3,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 16,
+        "hitHigh": 20,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      }
+    ],
+    "weapons": [
+      {
+        "name": "X-ray laser",
+        "compartment": 0,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "The compartment table does not say which space it is mounted in.",
+        "arc": "Fore",
+        "range": "",
+        "damageOrdinary": "d6+1s",
+        "damageGood": "d4+2w",
+        "damageAmazing": "d4m",
+        "damageType": "energy",
+        "firepower": "Amazing",
+        "actionsPerRound": 1
+      }
+    ],
+    "defenses": [],
+    "systems": [],
+    "stations": [],
+    "notes": "<p>A small spacefaring palace: minimally armed, often fitted with the finest engines available, with quarters for a small crew of space hands, cooks and valets and four to eight passengers in private cabins. A drive yacht costs $750,000 more.</p><p><em>Budget note:</em> the compartments assign 2 durability points more than the GM Guide leaves after Moderate armour is mounted. The Player's Handbook statblocks print an armour rating without charging durability for it, so this is the source as printed, not a transcription error.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Player's Handbook, Ch.12 &quot;Vehicles&quot;, PL 7</dd><dt>Hull</dt><dd>Yacht (Civilian), hull size 24</dd><dt>Progress Level</dt><dd>7</dd><dt>Compartments</dt><dd>6</dd><dt>Toughness</dt><dd>Amazing - as every spaceship is (GM Guide Ch.11)</dd><dt>Manoeuvre rating</dt><dd>0</dd><dt>Engine</dt><dd>Induction engine</dd><dt>Power plant</dt><dd>Grav-fusion cell</dd><dt>FTL</dt><dd>Stardrive, 10 light-years per starfall</dd><dt>Armor</dt><dd>Moderate cerametal: d4+1 (LI), d4+1 (HI), d4+1 (En)</dd><dt>Computer</dt><dd>undefined core</dd><dt>Berthing</dt><dd>12</dd><dt>Compartment durability assigned</dt><dd>24 of 24</dd><dt>Scan damage</dt><dd>The command compartment's durability rating was unreadable and is recovered from the hull-size sum.</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "npefu74U1eEu5NCk",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Yacht",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Player's Handbook",
+        "reference": "Ch.12 \"Vehicles\", PL 7",
+        "folder": "Player's Handbook",
+        "scanDamage": "The command compartment's durability rating was unreadable and is recovered from the hull-size sum."
+      }
+    }
+  }
+}

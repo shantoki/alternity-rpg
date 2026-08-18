@@ -1,0 +1,117 @@
+{
+  "_id": "F3vMepFzCsxk4yDX",
+  "_key": "!actors!F3vMepFzCsxk4yDX",
+  "name": "Trader",
+  "type": "warship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Trader",
+    "hullCategory": "Civilian",
+    "toughness": "Good",
+    "targetModifier": "+2 steps",
+    "maneuverClass": 4,
+    "hullPoints": {
+      "base": 24,
+      "bonus": 0
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 12
+      },
+      "wound": {
+        "value": 0,
+        "max": 12
+      },
+      "mortal": {
+        "value": 0,
+        "max": 6
+      },
+      "critical": {
+        "value": 0,
+        "max": 3
+      }
+    },
+    "armor": {
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": "",
+      "armorType": ""
+    },
+    "power": {
+      "generated": 0,
+      "consumed": 0
+    },
+    "edge": 0,
+    "acceleration": 0,
+    "crew": {
+      "estimate": 6,
+      "current": 0
+    },
+    "cost": "$500 K",
+    "systems": [],
+    "weapons": [],
+    "defenses": [],
+    "sensors": [],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 8,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FC (Forward center)",
+        "hullPointLimit": 8,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AC (Aft center)",
+        "hullPointLimit": 8,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 8,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Tables 5-1b / 5-18</dd><dt>Class</dt><dd>Civilian hull</dd><dt>Hull points</dt><dd>24</dd><dt>Toughness</dt><dd>Good (printed &quot;(Gd)&quot;)</dd><dt>Target modifier</dt><dd>+2 steps</dd><dt>Manoeuvre class</dt><dd>4</dd><dt>Damage track (s/w/m/c)</dt><dd>12/12/6/3</dd><dt>Hit zones</dt><dd>4, up to 8 hull points each</dd><dt>5% of hull</dt><dd>1</dd><dt>10% of hull</dt><dd>2</dd><dt>Typical crew</dt><dd>6</dd><dt>Cost</dt><dd>$500 K</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "zPTaUSsNEFtaEyLW",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Trader",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Civilian Hulls",
+        "table": "Tables 5-1b / 5-18",
+        "hullPointsFivePercent": 1,
+        "hullPointsTenPercent": 2,
+        "printedToughness": "(Gd)",
+        "zoneLimitTable": "Table 5-18"
+      }
+    }
+  }
+}

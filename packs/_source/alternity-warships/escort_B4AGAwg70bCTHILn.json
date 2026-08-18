@@ -1,0 +1,117 @@
+{
+  "_id": "B4AGAwg70bCTHILn",
+  "_key": "!actors!B4AGAwg70bCTHILn",
+  "name": "Escort",
+  "type": "warship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Escort",
+    "hullCategory": "Military",
+    "toughness": "SmallCraft",
+    "targetModifier": "+2 steps",
+    "maneuverClass": 4,
+    "hullPoints": {
+      "base": 40,
+      "bonus": 0
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 20
+      },
+      "wound": {
+        "value": 0,
+        "max": 20
+      },
+      "mortal": {
+        "value": 0,
+        "max": 10
+      },
+      "critical": {
+        "value": 0,
+        "max": 5
+      }
+    },
+    "armor": {
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": "",
+      "armorType": ""
+    },
+    "power": {
+      "generated": 0,
+      "consumed": 0
+    },
+    "edge": 0,
+    "acceleration": 0,
+    "crew": {
+      "estimate": 10,
+      "current": 0
+    },
+    "cost": "$1 M",
+    "systems": [],
+    "weapons": [],
+    "defenses": [],
+    "sensors": [],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 14,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FC (Forward center)",
+        "hullPointLimit": 14,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AC (Aft center)",
+        "hullPointLimit": 14,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 14,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Tables 5-1a / 5-18</dd><dt>Class</dt><dd>Military hull</dd><dt>Hull points</dt><dd>40</dd><dt>Toughness</dt><dd>SmallCraft (printed &quot;Sm&quot;)</dd><dt>Target modifier</dt><dd>+2 steps</dd><dt>Manoeuvre class</dt><dd>4</dd><dt>Damage track (s/w/m/c)</dt><dd>20/20/10/5</dd><dt>Hit zones</dt><dd>4, up to 14 hull points each</dd><dt>5% of hull</dt><dd>2</dd><dt>10% of hull</dt><dd>4</dd><dt>Typical crew</dt><dd>10</dd><dt>Cost</dt><dd>$1 M</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "NaBQROMUzthU7gcO",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Escort",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Military Hulls",
+        "table": "Tables 5-1a / 5-18",
+        "hullPointsFivePercent": 2,
+        "hullPointsTenPercent": 4,
+        "printedToughness": "Sm",
+        "zoneLimitTable": "Table 5-18"
+      }
+    }
+  }
+}

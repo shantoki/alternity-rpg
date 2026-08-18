@@ -1,0 +1,117 @@
+{
+  "_id": "Hs5jtrw1Hpjstvxu",
+  "_key": "!actors!Hs5jtrw1Hpjstvxu",
+  "name": "Fast freighter",
+  "type": "warship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Fast freighter",
+    "hullCategory": "Civilian",
+    "toughness": "SmallCraft",
+    "targetModifier": "+2 steps",
+    "maneuverClass": 4,
+    "hullPoints": {
+      "base": 32,
+      "bonus": 0
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 16
+      },
+      "wound": {
+        "value": 0,
+        "max": 16
+      },
+      "mortal": {
+        "value": 0,
+        "max": 8
+      },
+      "critical": {
+        "value": 0,
+        "max": 4
+      }
+    },
+    "armor": {
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": "",
+      "armorType": ""
+    },
+    "power": {
+      "generated": 0,
+      "consumed": 0
+    },
+    "edge": 0,
+    "acceleration": 0,
+    "crew": {
+      "estimate": 8,
+      "current": 0
+    },
+    "cost": "$600 K",
+    "systems": [],
+    "weapons": [],
+    "defenses": [],
+    "sensors": [],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 11,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FC (Forward center)",
+        "hullPointLimit": 11,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AC (Aft center)",
+        "hullPointLimit": 11,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 11,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Tables 5-1b / 5-18</dd><dt>Class</dt><dd>Civilian hull</dd><dt>Hull points</dt><dd>32</dd><dt>Toughness</dt><dd>SmallCraft (printed &quot;Sm&quot;)</dd><dt>Target modifier</dt><dd>+2 steps</dd><dt>Manoeuvre class</dt><dd>4</dd><dt>Damage track (s/w/m/c)</dt><dd>16/16/8/4</dd><dt>Hit zones</dt><dd>4, up to 11 hull points each</dd><dt>5% of hull</dt><dd>1.5</dd><dt>10% of hull</dt><dd>3</dd><dt>Typical crew</dt><dd>8</dd><dt>Cost</dt><dd>$600 K</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "zPTaUSsNEFtaEyLW",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Fast freighter",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Civilian Hulls",
+        "table": "Tables 5-1b / 5-18",
+        "hullPointsFivePercent": 1.5,
+        "hullPointsTenPercent": 3,
+        "printedToughness": "Sm",
+        "zoneLimitTable": "Table 5-18"
+      }
+    }
+  }
+}

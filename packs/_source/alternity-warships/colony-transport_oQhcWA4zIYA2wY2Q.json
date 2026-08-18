@@ -1,0 +1,229 @@
+{
+  "_id": "oQhcWA4zIYA2wY2Q",
+  "_key": "!actors!oQhcWA4zIYA2wY2Q",
+  "name": "Colony transport",
+  "type": "warship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Colony transport",
+    "hullCategory": "Civilian",
+    "toughness": "Heavy",
+    "targetModifier": "-4 steps",
+    "maneuverClass": 0,
+    "hullPoints": {
+      "base": 3600,
+      "bonus": 1800
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 113
+      },
+      "wound": {
+        "value": 0,
+        "max": 113
+      },
+      "mortal": {
+        "value": 0,
+        "max": 57
+      },
+      "critical": {
+        "value": 0,
+        "max": 29
+      }
+    },
+    "armor": {
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": "",
+      "armorType": ""
+    },
+    "power": {
+      "generated": 0,
+      "consumed": 0
+    },
+    "edge": 0,
+    "acceleration": 0,
+    "crew": {
+      "estimate": 3600,
+      "current": 0
+    },
+    "cost": "$1000 M",
+    "systems": [],
+    "weapons": [],
+    "defenses": [],
+    "sensors": [],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FFP (Forward-forward port)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FFC (Forward-forward center)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FFS (Forward-forward starboard)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FP (Forward port)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FC (Forward center)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FS (Forward starboard)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "P (Midships port)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "PC (Port center)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "CF (Center forward)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "SC (Starboard center)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "S (Midships starboard)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AP (Aft port)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "CA (Center aft)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AS (Aft starboard)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AAP (After-after port)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AC (Aft center)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AAS (After-after starboard)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AAC (After-after center)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 540,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Tables 5-1b / 5-18</dd><dt>Class</dt><dd>Civilian hull</dd><dt>Hull points</dt><dd>3600 (+1800)</dd><dt>Toughness</dt><dd>Heavy (printed &quot;Hv&quot;)</dd><dt>Target modifier</dt><dd>-4 steps</dd><dt>Manoeuvre class</dt><dd>0</dd><dt>Damage track (s/w/m/c)</dt><dd>113/113/57/29</dd><dt>Hit zones</dt><dd>20, up to 540 hull points each</dd><dt>5% of hull</dt><dd>180</dd><dt>10% of hull</dt><dd>360</dd><dt>Typical crew</dt><dd>3600</dd><dt>Cost</dt><dd>$1000 M</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "zPTaUSsNEFtaEyLW",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Colony transport",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Civilian Hulls",
+        "table": "Tables 5-1b / 5-18",
+        "hullPointsFivePercent": 180,
+        "hullPointsTenPercent": 360,
+        "printedToughness": "Hv",
+        "zoneLimitTable": "Table 5-18"
+      }
+    }
+  }
+}

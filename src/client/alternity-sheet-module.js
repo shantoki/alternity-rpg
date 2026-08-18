@@ -25,7 +25,13 @@ import { AlternityRollService } from '../services/alternity-roll-service.js';
 import { bindActorSheetDragDrop, claimDropHandling, tabForItemType } from './alternity-drag-drop.js';
 import { bindStatblockDragDrop } from './alternity-statblock-drops.js';
 import { bindOnce } from './alternity-sheet-binding.js';
-import { SHIP_TOUGHNESS_CLASSES, SHIP_HULL_TYPES, SHIP_STATUS_EFFECTS } from '../data/WarshipData.js';
+import {
+    SHIP_TOUGHNESS_CLASSES,
+    SHIP_FIREPOWER_CLASSES,
+    SHIP_HULL_CATEGORIES,
+    SHIP_HULL_TYPES,
+    SHIP_STATUS_EFFECTS,
+} from '../data/WarshipData.js';
 import {
     SPACESHIP_HULL_TYPES,
     SPACESHIP_ARMOR_GRADES,
@@ -1802,10 +1808,11 @@ class AlternityWarshipSheet extends foundry.applications.api.HandlebarsApplicati
         context.actor = this.document;
         context.system = this.document.system;
         context.alt = NS;
-        context.hullCategoryChoices = ['Military', 'Civilian'];
+        context.hullCategoryChoices = SHIP_HULL_CATEGORIES;
         context.hullTypeChoices = SHIP_HULL_TYPES;
         context.toughnessChoices = SHIP_TOUGHNESS_CLASSES;
-        context.firepowerClassChoices = SHIP_TOUGHNESS_CLASSES;
+        // Weapons list one rung fewer than hulls do — nothing shoots with Good firepower.
+        context.firepowerClassChoices = SHIP_FIREPOWER_CLASSES;
         context.fireModeChoices = ['Single', 'Burst', 'Auto', 'Battery'];
         context.arcChoices = ['Fore', 'Aft', 'Port', 'Starboard', 'Turret', 'Fixed'];
         context.damageTypeChoices = ['lowImpact', 'highImpact', 'energy'];

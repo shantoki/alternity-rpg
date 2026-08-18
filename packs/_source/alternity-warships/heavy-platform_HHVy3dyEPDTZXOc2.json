@@ -1,0 +1,173 @@
+{
+  "_id": "HHVy3dyEPDTZXOc2",
+  "_key": "!actors!HHVy3dyEPDTZXOc2",
+  "name": "Heavy Platform",
+  "type": "warship",
+  "img": "icons/svg/shield.svg",
+  "system": {
+    "hullType": "Heavy Platform",
+    "hullCategory": "Installation",
+    "toughness": "Heavy",
+    "targetModifier": "-3 steps",
+    "maneuverClass": 0,
+    "hullPoints": {
+      "base": 1000,
+      "bonus": 300
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 63
+      },
+      "wound": {
+        "value": 0,
+        "max": 63
+      },
+      "mortal": {
+        "value": 0,
+        "max": 32
+      },
+      "critical": {
+        "value": 0,
+        "max": 16
+      }
+    },
+    "armor": {
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": "",
+      "armorType": ""
+    },
+    "power": {
+      "generated": 0,
+      "consumed": 0
+    },
+    "edge": 0,
+    "acceleration": 0,
+    "crew": {
+      "estimate": 500,
+      "current": 0
+    },
+    "cost": "$250 M",
+    "systems": [],
+    "weapons": [],
+    "defenses": [],
+    "sensors": [],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 163,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FC (Forward center)",
+        "hullPointLimit": 163,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FP (Forward port side)",
+        "hullPointLimit": 163,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "FS (Forward starboard side)",
+        "hullPointLimit": 163,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "P (Midships port)",
+        "hullPointLimit": 163,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "CF (Center forward)",
+        "hullPointLimit": 163,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "S (Midships starboard)",
+        "hullPointLimit": 163,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AP (Aft port)",
+        "hullPointLimit": 163,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "CA (Center aft)",
+        "hullPointLimit": 163,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AS (Aft starboard)",
+        "hullPointLimit": 163,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "AC (Aft center)",
+        "hullPointLimit": 163,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 163,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Table 6-1</dd><dt>Class</dt><dd>Station or base</dd><dt>Hull points</dt><dd>1000 (+300)</dd><dt>Toughness</dt><dd>Heavy (printed &quot;Hvy&quot;)</dd><dt>Target modifier</dt><dd>-3 steps</dd><dt>Manoeuvre class</dt><dd>None - installations do not move</dd><dt>Damage track (s/w/m/c)</dt><dd>63/63/32/16</dd><dt>Hit zones</dt><dd>12, up to 163 hull points each</dd><dt>5% of hull</dt><dd>50</dd><dt>10% of hull</dt><dd>100</dd><dt>Typical crew</dt><dd>500</dd><dt>Cost</dt><dd>$250 M</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "njDZPzjcxPxDTVBR",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Heavy Platform",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/shield.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Stations & Bases",
+        "table": "Table 6-1",
+        "hullPointsFivePercent": 50,
+        "hullPointsTenPercent": 100,
+        "printedToughness": "Hvy",
+        "zoneLimitTable": "Table 6-1"
+      }
+    }
+  }
+}

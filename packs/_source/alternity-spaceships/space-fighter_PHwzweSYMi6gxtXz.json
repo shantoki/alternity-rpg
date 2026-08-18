@@ -1,0 +1,132 @@
+{
+  "_id": "PHwzweSYMi6gxtXz",
+  "_key": "!actors!PHwzweSYMi6gxtXz",
+  "name": "Space Fighter",
+  "type": "spaceship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Space fighter",
+    "hullCategory": "Military",
+    "hullSize": 10,
+    "compartmentLimit": 2,
+    "progressLevel": 8,
+    "cost": "",
+    "maneuverRating": 0,
+    "acceleration": 0,
+    "cruisingSpeed": 0,
+    "engineType": "Anomaly inducer",
+    "movementPoints": 0,
+    "ftl": {
+      "driveType": "Drivewave",
+      "drivespace": 25
+    },
+    "power": {
+      "generated": 0,
+      "allocated": 0,
+      "plantText": "Matter converter"
+    },
+    "berthing": 2,
+    "crewAboard": 0,
+    "armor": {
+      "grade": "Moderate",
+      "material": "nanofluidic",
+      "lowImpact": "2d4",
+      "highImpact": "2d4",
+      "energy": "2d4"
+    },
+    "computer": {
+      "coreQuality": "Marginal",
+      "dedicatedText": ""
+    },
+    "compartments": [
+      {
+        "label": "Command",
+        "kind": "Command",
+        "durability": 4,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 1,
+        "hitHigh": 7,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      },
+      {
+        "label": "Engineering",
+        "kind": "Engineering",
+        "durability": 6,
+        "damage": {
+          "stun": 0,
+          "wound": 0,
+          "mortal": 0
+        },
+        "hitLow": 8,
+        "hitHigh": 20,
+        "hasLifeSupport": true,
+        "damageControl": "None",
+        "systemsText": ""
+      }
+    ],
+    "weapons": [
+      {
+        "name": "Kinetic lance",
+        "compartment": 1,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "",
+        "arc": "Fore",
+        "range": "",
+        "damageOrdinary": "d4+1w",
+        "damageGood": "2d4w",
+        "damageAmazing": "d4+3m",
+        "damageType": "highImpact",
+        "firepower": "Amazing",
+        "actionsPerRound": 1
+      }
+    ],
+    "defenses": [
+      {
+        "name": "Displacer",
+        "compartment": 0,
+        "durabilityCost": 0,
+        "powerReq": 0,
+        "isOffline": false,
+        "notes": "Named in the statblock header; the compartment table does not itemise it.",
+        "isActive": false,
+        "effectText": "+3 step penalty to any attack against the ship."
+      }
+    ],
+    "systems": [],
+    "stations": [],
+    "notes": "<p>A one- or two-seat fighter. Drivewave units and anomaly inducers let a craft this small both cross the stars and fight. The drive version costs $1,000,000 more.</p><p><em>Budget note:</em> the compartments assign 1 durability point more than the GM Guide leaves after Moderate armour is mounted. The Player's Handbook statblocks print an armour rating without charging durability for it, so this is the source as printed, not a transcription error.</p>",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Player's Handbook, Ch.12 &quot;Vehicles&quot;, PL 8</dd><dt>Hull</dt><dd>Space fighter (Military), hull size 10</dd><dt>Progress Level</dt><dd>8</dd><dt>Compartments</dt><dd>2</dd><dt>Toughness</dt><dd>Amazing - as every spaceship is (GM Guide Ch.11)</dd><dt>Manoeuvre rating</dt><dd>0</dd><dt>Engine</dt><dd>Anomaly inducer</dd><dt>Power plant</dt><dd>Matter converter</dd><dt>FTL</dt><dd>Drivewave, 25 light-years per starfall</dd><dt>Armor</dt><dd>Moderate nanofluidic: 2d4 (LI), 2d4 (HI), 2d4 (En)</dd><dt>Computer</dt><dd>undefined core</dd><dt>Berthing</dt><dd>2</dd><dt>Compartment durability assigned</dt><dd>10 of 10</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "npefu74U1eEu5NCk",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Space Fighter",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Player's Handbook",
+        "reference": "Ch.12 \"Vehicles\", PL 8",
+        "folder": "Player's Handbook"
+      }
+    }
+  }
+}

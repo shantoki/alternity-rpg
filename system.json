@@ -2,7 +2,7 @@
   "id": "alternity",
   "title": "Alternity",
   "description": "The Alternity science fiction roleplaying game for Foundry VTT.",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "compatibility": {
     "minimum": "12",
     "verified": "14"
@@ -151,6 +151,28 @@
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
       }
+    },
+    {
+      "name": "alternity-spaceships",
+      "label": "Alternity: Spaceships",
+      "path": "packs/alternity-spaceships",
+      "type": "Actor",
+      "system": "alternity",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "alternity-warships",
+      "label": "Alternity: Warships & Hulls",
+      "path": "packs/alternity-warships",
+      "type": "Actor",
+      "system": "alternity",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
     }
   ],
   "packFolders": [
@@ -175,6 +197,15 @@
         "alternity-achievements",
         "alternity-species",
         "alternity-templates"
+      ]
+    },
+    {
+      "name": "Alternity Ships",
+      "sorting": "m",
+      "color": "#4a8c6f",
+      "packs": [
+        "alternity-spaceships",
+        "alternity-warships"
       ]
     }
   ]

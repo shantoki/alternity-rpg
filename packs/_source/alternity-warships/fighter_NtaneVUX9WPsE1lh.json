@@ -1,0 +1,103 @@
+{
+  "_id": "NtaneVUX9WPsE1lh",
+  "_key": "!actors!NtaneVUX9WPsE1lh",
+  "name": "Fighter",
+  "type": "warship",
+  "img": "icons/svg/target.svg",
+  "system": {
+    "hullType": "Fighter",
+    "hullCategory": "Military",
+    "toughness": "SmallCraft",
+    "targetModifier": "+3 steps",
+    "maneuverClass": 4,
+    "hullPoints": {
+      "base": 10,
+      "bonus": 0
+    },
+    "damage": {
+      "stun": {
+        "value": 0,
+        "max": 5
+      },
+      "wound": {
+        "value": 0,
+        "max": 5
+      },
+      "mortal": {
+        "value": 0,
+        "max": 3
+      },
+      "critical": {
+        "value": 0,
+        "max": 2
+      }
+    },
+    "armor": {
+      "lowImpact": "",
+      "highImpact": "",
+      "energy": "",
+      "armorType": ""
+    },
+    "power": {
+      "generated": 0,
+      "consumed": 0
+    },
+    "edge": 0,
+    "acceleration": 0,
+    "crew": {
+      "estimate": 1,
+      "current": 0
+    },
+    "cost": "$350 K",
+    "systems": [],
+    "weapons": [],
+    "defenses": [],
+    "sensors": [],
+    "zones": [
+      {
+        "label": "F (Fore)",
+        "hullPointLimit": 7,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      },
+      {
+        "label": "A (Aft)",
+        "hullPointLimit": 7,
+        "hullPointsUsed": 0,
+        "systemsText": "",
+        "isKnockedOut": false
+      }
+    ],
+    "notes": "",
+    "description": "<dl class=\"alternity-source-stats\"><dt>Source</dt><dd>Warships, Tables 5-1a / 5-18</dd><dt>Class</dt><dd>Military hull</dd><dt>Hull points</dt><dd>10</dd><dt>Toughness</dt><dd>SmallCraft (printed &quot;Sm&quot;)</dd><dt>Target modifier</dt><dd>+3 steps</dd><dt>Manoeuvre class</dt><dd>4</dd><dt>Damage track (s/w/m/c)</dt><dd>5/5/3/2</dd><dt>Hit zones</dt><dd>2, up to 7 hull points each</dd><dt>5% of hull</dt><dd>0.5</dd><dt>10% of hull</dt><dd>1</dd><dt>Typical crew</dt><dd>1</dd><dt>Cost</dt><dd>$350 K</dd></dl>"
+  },
+  "items": [],
+  "effects": [],
+  "folder": "NaBQROMUzthU7gcO",
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "prototypeToken": {
+    "name": "Fighter",
+    "actorLink": false,
+    "disposition": 0,
+    "texture": {
+      "src": "icons/svg/target.svg"
+    }
+  },
+  "flags": {
+    "alternity": {
+      "provenance": {
+        "book": "Warships",
+        "folder": "Military Hulls",
+        "table": "Tables 5-1a / 5-18",
+        "hullPointsFivePercent": 0.5,
+        "hullPointsTenPercent": 1,
+        "printedToughness": "Sm",
+        "zoneLimitTable": "Table 5-18"
+      }
+    }
+  }
+}

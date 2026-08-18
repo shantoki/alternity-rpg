@@ -17,10 +17,23 @@
 
 const { fields } = foundry.data;
 
-/** Ship toughness/firepower classes, ordered small -> large (Warships Ch.1). */
-export const SHIP_TOUGHNESS_CLASSES = ['SmallCraft', 'Light', 'Medium', 'Heavy', 'SuperHeavy'];
+import {
+    SHIP_TOUGHNESS_CLASSES,
+    SHIP_FIREPOWER_CLASSES,
+} from '../services/alternity-math.js';
 
-/** Named hull types, grouped by category (Warships Tables 5-1a/5-1b). */
+// Re-exported rather than restated: the ladder is what `calculateFirepowerShift` ranks
+// against, and a second copy here is a second thing to keep in step with Tables 1-3/1-4.
+export { SHIP_TOUGHNESS_CLASSES, SHIP_FIREPOWER_CLASSES };
+
+/**
+ * What a hull *is*, which is also how the book groups its tables: Tables 5-1a and 5-1b
+ * are the military and civilian hulls, and Table 6-1 is stations and bases — a station
+ * being, in the book's words, "a ship without engines".
+ */
+export const SHIP_HULL_CATEGORIES = Object.freeze(['Military', 'Civilian', 'Installation']);
+
+/** Named hull types, grouped by category (Warships Tables 5-1a/5-1b, Table 6-1). */
 export const SHIP_HULL_TYPES = {
     Military: [
         'Fighter', 'Strike fighter', 'Cutter', 'Scout', 'Escort',
@@ -35,6 +48,12 @@ export const SHIP_HULL_TYPES = {
         'Medium freighter', 'Clipper', 'Medium transport',
         'Tanker', 'Liner', 'Heavy transport',
         'Super-freighter', 'Colony transport',
+    ],
+    Installation: [
+        'Habitat Dome', 'Light Platform', 'Light Post',
+        'Hab Complex', 'Medium Platform', 'Medium Bunker',
+        'Heavy Platform', 'Heavy Bunker',
+        'Super Platform', 'Fortress',
     ],
 };
 
@@ -123,7 +142,7 @@ export class WarshipData extends foundry.abstract.TypeDataModel {
                 required: true,
                 nullable: false,
                 initial:  'Military',
-                choices:  ['Military', 'Civilian'],
+                choices:  SHIP_HULL_CATEGORIES,
             }),
 
             toughness: new fields.StringField({
@@ -215,7 +234,8 @@ export class WarshipData extends foundry.abstract.TypeDataModel {
                     required: true,
                     nullable: false,
                     initial:  'Medium',
-                    choices:  SHIP_TOUGHNESS_CLASSES,
+                    // A weapon's half of the ladder: 'Good' is a hull toughness only.
+                    choices:  SHIP_FIREPOWER_CLASSES,
                 }),
                 damageFormula: new fields.StringField({ required: false, initial: '1d6' }),
                 damageType: new fields.StringField({
