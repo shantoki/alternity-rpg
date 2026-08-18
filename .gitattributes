@@ -8,8 +8,5 @@
 # never be touched.
 * text=auto eol=lf
 
-# Compiled compendium packs are a LevelDB store, not source.
-packs/*/*.ldb      binary
-packs/*/*.log      binary
-packs/*/CURRENT    binary
-packs/*/MANIFEST-* binary
+# The compiled compendium packs are gitignored build artefacts rather than source, so
+# there is nothing to declare for them here — see the note in .gitignore.

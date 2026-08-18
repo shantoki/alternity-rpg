@@ -12,7 +12,16 @@ steps and the middle is committed:
 ```
 external/json/**            npm run convert:source     packs/_source/**       npm run build:packs     packs/**
 (gitignored source data) ------------------------->  (JSON, one file/doc)  ------------------------> (LevelDB)
+                                                       ^ committed                                     ^ gitignored
 ```
+
+**`npm run build:packs` is a setup step.** Only `packs/_source` is committed, so a fresh
+clone has no loadable compendia until it is run — and it needs running again after any
+pull that touched `packs/_source`. The compiled packs are excluded because a LevelDB is a
+live database: Foundry rewrites `CURRENT` and spawns a new `MANIFEST-*` every time it
+opens one, so a committed pack collides with the local Foundry on every pull. Ignoring
+just the churn does not work, because `CURRENT` and `MANIFEST-*` are what make the store
+readable.
 
 | Pack | Documents | Item / Document types |
 | --- | --- | --- |
