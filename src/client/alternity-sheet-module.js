@@ -1,6 +1,6 @@
 /**
  * @file alternity-sheet-module.js
- * @description Phase 3 – Client UI: Character, NPC, and Vehicle sheets for Alternity Fastplay.
+ * @description Phase 3 – Client UI: Character, NPC, and Vehicle sheets for Alternity.
  */
 
 import {
@@ -486,7 +486,7 @@ class AlternityRollComponent {
             context: this.context,
         });
 
-        const html = await renderTemplate("systems/alternity-v2/templates/roll/roll-panel.hbs", {
+        const html = await renderTemplate("systems/alternity/templates/roll/roll-panel.hbs", {
             alt: NS,
             context: this.context,
             check: {
@@ -654,7 +654,7 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
     /** @override */
     static PARTS = {
         sheet: {
-            template: "systems/alternity-v2/templates/actor/actor-sheet.hbs"
+            template: "systems/alternity/templates/actor/actor-sheet.hbs"
         }
     };
 
@@ -877,7 +877,7 @@ class AlternityCharacterSheet extends foundry.applications.api.HandlebarsApplica
         context.ACTION_ICON      = ABILITY_TYPE_ICONS[ABILITY_TYPES.ACTION];
         context.ABILITY_TYPE_ICONS = ABILITY_TYPE_ICONS;
         context.fmtMod           = fmtMod;
-        context.abilityCardTemplate = "systems/alternity-v2/templates/actor/ability-card.hbs";
+        context.abilityCardTemplate = "systems/alternity/templates/actor/ability-card.hbs";
 
         return context;
     }
@@ -1580,7 +1580,7 @@ class AlternityNpcSheet extends foundry.applications.api.HandlebarsApplicationMi
         }
     });
     static PARTS = {
-        sheet: { template: "systems/alternity-v2/templates/actor/actor-npc-sheet.hbs" }
+        sheet: { template: "systems/alternity/templates/actor/actor-npc-sheet.hbs" }
     };
 
     async _prepareContext(options) {
@@ -1740,7 +1740,7 @@ class AlternityVehicleSheet extends foundry.applications.api.HandlebarsApplicati
         window: { resizable: true, width: 560, height: 600 }
     });
     static PARTS = {
-        sheet: { template: "systems/alternity-v2/templates/actor/actor-vehicle-sheet.hbs" }
+        sheet: { template: "systems/alternity/templates/actor/actor-vehicle-sheet.hbs" }
     };
     async _prepareContext(options) {
         const context = await super._prepareContext(options);
@@ -1794,7 +1794,7 @@ class AlternityWarshipSheet extends foundry.applications.api.HandlebarsApplicati
     });
 
     static PARTS = {
-        sheet: { template: "systems/alternity-v2/templates/actor/actor-warship-sheet.hbs" }
+        sheet: { template: "systems/alternity/templates/actor/actor-warship-sheet.hbs" }
     };
 
     async _prepareContext(options) {
@@ -1941,7 +1941,7 @@ class AlternitySpaceshipSheet extends foundry.applications.api.HandlebarsApplica
     });
 
     static PARTS = {
-        sheet: { template: "systems/alternity-v2/templates/actor/actor-spaceship-sheet.hbs" }
+        sheet: { template: "systems/alternity/templates/actor/actor-spaceship-sheet.hbs" }
     };
 
     async _prepareContext(options) {
@@ -2349,7 +2349,7 @@ class AlternityRobotSheet extends foundry.applications.api.HandlebarsApplication
     });
 
     static PARTS = {
-        sheet: { template: "systems/alternity-v2/templates/actor/actor-robot-sheet.hbs" }
+        sheet: { template: "systems/alternity/templates/actor/actor-robot-sheet.hbs" }
     };
 
     async _prepareContext(options) {
@@ -2619,7 +2619,7 @@ class AlternityAISheet extends foundry.applications.api.HandlebarsApplicationMix
     });
 
     static PARTS = {
-        sheet: { template: "systems/alternity-v2/templates/actor/actor-ai-sheet.hbs" }
+        sheet: { template: "systems/alternity/templates/actor/actor-ai-sheet.hbs" }
     };
 
     async _prepareContext(options) {
@@ -2911,7 +2911,7 @@ class AlternityCreatureSheet extends foundry.applications.api.HandlebarsApplicat
     });
 
     static PARTS = {
-        sheet: { template: "systems/alternity-v2/templates/actor/actor-creature-sheet.hbs" }
+        sheet: { template: "systems/alternity/templates/actor/actor-creature-sheet.hbs" }
     };
 
     async _prepareContext(options) {
@@ -3107,19 +3107,19 @@ async function registerAlternitySheet() {
     Handlebars.registerHelper('lower', (str) => String(str ?? '').toLowerCase().replace(/\s+/g, '-'));
 
     await foundry.applications.handlebars.loadTemplates([
-        "systems/alternity-v2/templates/actor/ability-card.hbs",
+        "systems/alternity/templates/actor/ability-card.hbs",
         // Preloaded so a roll never waits on a template fetch mid-click.
-        "systems/alternity-v2/templates/roll/roll-panel.hbs",
-        "systems/alternity-v2/templates/roll/roll-card.hbs",
-        "systems/alternity-v2/templates/roll/damage-card.hbs",
-        "systems/alternity-v2/templates/roll/armor-card.hbs",
-        "systems/alternity-v2/templates/roll/action-check-card.hbs",
+        "systems/alternity/templates/roll/roll-panel.hbs",
+        "systems/alternity/templates/roll/roll-card.hbs",
+        "systems/alternity/templates/roll/damage-card.hbs",
+        "systems/alternity/templates/roll/armor-card.hbs",
+        "systems/alternity/templates/roll/action-check-card.hbs",
     ]);
 
     const ItemsCollection = foundry.documents.collections.Items ?? Items;
     if (typeof ItemsCollection !== 'undefined') {
         const { AlternityItemSheet } = await import('./alternity-item-sheet.js');
-        ItemsCollection.registerSheet('alternity-v2', AlternityItemSheet, { makeDefault: true, label: 'Alternity Item Sheet' });
+        ItemsCollection.registerSheet('alternity', AlternityItemSheet, { makeDefault: true, label: 'Alternity Item Sheet' });
     }
 
     const ActorsCollection = foundry.documents.collections.Actors ?? Actors;
@@ -3134,14 +3134,14 @@ async function registerAlternitySheet() {
         AlternitySpaceshipSheet, AlternityRobotSheet, AlternityAISheet, AlternityCreatureSheet,
     ]) claimDropHandling(SheetClass);
 
-    ActorsCollection.registerSheet('alternity-v2', AlternityCharacterSheet, { types: ['character'], makeDefault: true, label: 'Alternity Character Sheet' });
-    ActorsCollection.registerSheet('alternity-v2', AlternityNpcSheet, { types: ['npc'], makeDefault: true, label: 'Alternity NPC Sheet' });
-    ActorsCollection.registerSheet('alternity-v2', AlternityVehicleSheet, { types: ['vehicle'], makeDefault: true, label: 'Alternity Vehicle Sheet' });
-    ActorsCollection.registerSheet('alternity-v2', AlternityWarshipSheet, { types: ['warship'], makeDefault: true, label: 'Alternity Warship Sheet' });
-    ActorsCollection.registerSheet('alternity-v2', AlternitySpaceshipSheet, { types: ['spaceship'], makeDefault: true, label: 'Alternity Spaceship Sheet' });
-    ActorsCollection.registerSheet('alternity-v2', AlternityRobotSheet, { types: ['robot'], makeDefault: true, label: 'Alternity Robot Sheet' });
-    ActorsCollection.registerSheet('alternity-v2', AlternityAISheet, { types: ['ai'], makeDefault: true, label: 'Alternity AI Sheet' });
-    ActorsCollection.registerSheet('alternity-v2', AlternityCreatureSheet, { types: ['creature'], makeDefault: true, label: 'Alternity Creature Sheet' });
+    ActorsCollection.registerSheet('alternity', AlternityCharacterSheet, { types: ['character'], makeDefault: true, label: 'Alternity Character Sheet' });
+    ActorsCollection.registerSheet('alternity', AlternityNpcSheet, { types: ['npc'], makeDefault: true, label: 'Alternity NPC Sheet' });
+    ActorsCollection.registerSheet('alternity', AlternityVehicleSheet, { types: ['vehicle'], makeDefault: true, label: 'Alternity Vehicle Sheet' });
+    ActorsCollection.registerSheet('alternity', AlternityWarshipSheet, { types: ['warship'], makeDefault: true, label: 'Alternity Warship Sheet' });
+    ActorsCollection.registerSheet('alternity', AlternitySpaceshipSheet, { types: ['spaceship'], makeDefault: true, label: 'Alternity Spaceship Sheet' });
+    ActorsCollection.registerSheet('alternity', AlternityRobotSheet, { types: ['robot'], makeDefault: true, label: 'Alternity Robot Sheet' });
+    ActorsCollection.registerSheet('alternity', AlternityAISheet, { types: ['ai'], makeDefault: true, label: 'Alternity AI Sheet' });
+    ActorsCollection.registerSheet('alternity', AlternityCreatureSheet, { types: ['creature'], makeDefault: true, label: 'Alternity Creature Sheet' });
 }
 
 export {

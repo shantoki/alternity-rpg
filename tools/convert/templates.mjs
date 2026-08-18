@@ -79,7 +79,7 @@ export function convert() {
             sort: 0,
             ownership: { default: 0 },
             flags: {
-                'alternity-v2': {
+                'alternity': {
                     provenance: {
                         book: bookLabel(speciesRecord.Source, ''),
                         sourceFile: path.posix.join('Templates', file),
@@ -218,7 +218,7 @@ export function convert() {
         // had dragged the species on themselves.
         state.applySpecies(speciesName, speciesItem.system);
 
-        actor.flags['alternity-v2'] = {
+        actor.flags['alternity'] = {
             characterState: state.serialize(),
             provenance: {
                 book: setting || 'Core',

@@ -27,7 +27,7 @@
     "default": 0
   },
   "flags": {
-    "alternity-v2": {
+    "alternity": {
       "provenance": {
         "book": "Core Rulebook",
         "sourceFile": "data/achieve.json",

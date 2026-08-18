@@ -31,7 +31,7 @@
     "default": 0
   },
   "flags": {
-    "alternity-v2": {
+    "alternity": {
       "provenance": {
         "book": "Gamma World",
         "sourceFile": "data/armor_Gamma World.json",

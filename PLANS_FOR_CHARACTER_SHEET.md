@@ -1,4 +1,4 @@
-# Alternity Fastplay Character Sheet Roadmap
+# Alternity Character Sheet Roadmap
 
 This document outlines the missing features and planned improvements for the Alternity Fastplay character sheet, based on the `Alternity_-_Fastplay_-_Core_-_Player_Rules.pdf`.
 

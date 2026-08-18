@@ -145,7 +145,7 @@
         "default": 0
       },
       "flags": {
-        "alternity-v2": {
+        "alternity": {
           "provenance": {
             "book": "Core Rulebook",
             "sourceFile": "Templates/Law Enforcer (Core).json",
@@ -174,7 +174,7 @@
     }
   },
   "flags": {
-    "alternity-v2": {
+    "alternity": {
       "characterState": {
         "actorId": "WElGBZdIue3h0t6e",
         "abilitySets": [],

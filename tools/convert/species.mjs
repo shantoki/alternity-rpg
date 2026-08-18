@@ -9,7 +9,7 @@
  * them back. `SpeciesData` is that place, so they are droppable items now.
  *
  * **The document ids changed with the type, and that is unavoidable.** A compendium UUID
- * names the document type (`Compendium.alternity-v2.alternity-species.JournalEntry.<id>`),
+ * names the document type (`Compendium.alternity.alternity-species.JournalEntry.<id>`),
  * so a link into the old pack breaks whatever id the new document is given. Hashing
  * `(pack, 'species', name)` like every other item keeps them stable from here on.
  */

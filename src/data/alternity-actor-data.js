@@ -1,6 +1,6 @@
 /**
  * @file alternity-actor-data.js
- * @description Phase 1 – Data Layer: Character state persistence for the Alternity Fastplay system.
+ * @description Phase 1 – Data Layer: Character state persistence for the Alternity system.
  *
  * Extends the native Foundry Actor document with custom Alternity-specific state.
  * All state must be serializable/deserializable — no Functions, Dates, or RegExps stored.
@@ -905,10 +905,10 @@ async function getAlternityState(actor) {
     if (!actor || !actor.id) return null;
     return _withLock(actor.id, async () => {
         try {
-            const raw = actor.getFlag('alternity-v2', 'characterState');
+            const raw = actor.getFlag('alternity', 'characterState');
             if (raw) return AlternityCharacterState.deserialize(raw);
             const defaultState = new AlternityCharacterState({ actorId: actor.id });
-            await actor.setFlag('alternity-v2', 'characterState', defaultState.serialize());
+            await actor.setFlag('alternity', 'characterState', defaultState.serialize());
             return defaultState;
         } catch (err) { return null; }
     });
@@ -926,7 +926,7 @@ async function saveAlternityState(actor, state) {
             
             // Sync key fields back to actor.system for standard Foundry features
             const updates = {
-                'flags.alternity-v2.characterState': data,
+                'flags.alternity.characterState': data,
                 'system.actionsPerRound': state.actionsPerRound
             };
 

@@ -123,7 +123,7 @@ describe('the acquisition columns every gear table prints', () => {
 
         test(`${type}: cost agrees with the price the source data carried`, () => {
             expectEach(gear, (system, doc) => {
-                const printed = doc.flags['alternity-v2'].provenance.cost;
+                const printed = doc.flags['alternity'].provenance.cost;
                 if (printed !== undefined) expect(system.cost).toBe(printed);
             });
         });
@@ -252,7 +252,7 @@ describe('skill items', () => {
         expectEach(skills, (system, doc) => {
             expect(system.baseCost).toBeGreaterThanOrEqual(0);
             expect(system.baseCost).toBeLessThanOrEqual(15);
-            expect(system.baseCost).toBe(doc.flags['alternity-v2'].provenance.basePrice);
+            expect(system.baseCost).toBe(doc.flags['alternity'].provenance.basePrice);
         });
         expect(skills.filter(entry => entry.doc.system.baseCost > 0).length).toBeGreaterThan(150);
     });
@@ -405,7 +405,7 @@ describe('character templates', () => {
 
     test('each template carries a character state keyed to its own id', () => {
         expectEach(templates, (_system, doc) => {
-            const state = doc.flags['alternity-v2'].characterState;
+            const state = doc.flags['alternity'].characterState;
             expect(state.actorId).toBe(doc._id);
             expect(Object.keys(state.abilityScores).sort())
                 .toEqual(['CON', 'DEX', 'INT', 'PER', 'STR', 'WIL']);
@@ -414,7 +414,7 @@ describe('character templates', () => {
 
     test('every skill in a package is either a known slug or an explicit custom skill', () => {
         expectEach(templates, (_system, doc) => {
-            const state = doc.flags['alternity-v2'].characterState;
+            const state = doc.flags['alternity'].characterState;
             for (const id of Object.keys(state.skills)) expect(known.has(id)).toBe(true);
             for (const custom of state.customSkills) {
                 expect(custom.id).toMatch(/^src-\d+$/);
@@ -425,7 +425,7 @@ describe('character templates', () => {
 
     test('the system mirror agrees with the state it was derived from', () => {
         expectEach(templates, (system, doc) => {
-            const state = doc.flags['alternity-v2'].characterState;
+            const state = doc.flags['alternity'].characterState;
             expect(system.durability.stun.max).toBe(state.durability.stunMax);
             expect(system.durability.wound.max).toBe(state.durability.woundMax);
             expect(system.durability.mortal.max).toBe(state.durability.mortalMax);
@@ -437,7 +437,7 @@ describe('character templates', () => {
 
     test('special rules have unique ids within a template', () => {
         expectEach(templates, (_system, doc) => {
-            const ids = doc.flags['alternity-v2'].characterState.specialRules.map(rule => rule.id);
+            const ids = doc.flags['alternity'].characterState.specialRules.map(rule => rule.id);
             expect(new Set(ids).size).toBe(ids.length);
         });
     });
@@ -523,7 +523,7 @@ describe('species items', () => {
 
     test('the printed notes are kept alongside the parsed abilities', () => {
         expectEach(species, (system, doc) => {
-            const notes = doc.flags['alternity-v2'].provenance.specialNotes;
+            const notes = doc.flags['alternity'].provenance.specialNotes;
             expect(notes).toHaveLength(system.specialAbilities.length);
         });
     });

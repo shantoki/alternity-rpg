@@ -145,7 +145,7 @@
         "default": 0
       },
       "flags": {
-        "alternity-v2": {
+        "alternity": {
           "provenance": {
             "book": "Core Rulebook",
             "sourceFile": "Templates/Martial Artist (Star Drive).json",
@@ -174,7 +174,7 @@
     }
   },
   "flags": {
-    "alternity-v2": {
+    "alternity": {
       "characterState": {
         "actorId": "Qil6JGDFLXLycicx",
         "abilitySets": [],

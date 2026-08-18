@@ -53,18 +53,7 @@ CLAUDE.md
 # an option either — CURRENT and MANIFEST-* are what make the store readable at all.
 #
 # So packs/_source is the committed form and the LevelDB is a build artefact:
-# run 
-> alternity-v2@1.0.0 build:packs
-> node tools/build-packs.mjs
-
-alternity-achievements    190 documents -> packs/alternity-achievements
-alternity-armor            94 documents -> packs/alternity-armor
-alternity-cybertech        58 documents -> packs/alternity-cybertech
-alternity-equipment       226 documents -> packs/alternity-equipment
-alternity-fx              234 documents -> packs/alternity-fx
-alternity-skills          214 documents -> packs/alternity-skills
-alternity-species          22 documents -> packs/alternity-species
-alternity-templates        59 documents -> packs/alternity-templates
-alternity-weapons         258 documents -> packs/alternity-weapons after cloning, and after any pull that touched packs/_source.
+# run "npm run build:packs" after cloning, and after any pull that touched
+# packs/_source.
 packs/*
 !packs/_source

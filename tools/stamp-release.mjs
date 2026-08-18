@@ -40,7 +40,7 @@ system.url = `https://github.com/${repository}`;
 // installed copy checks for updates against whatever is newest rather than pinning
 // itself to the version it was installed from.
 system.manifest = `https://github.com/${repository}/releases/latest/download/system.json`;
-system.download = `https://github.com/${repository}/releases/download/${tag}/alternity-v2.zip`;
+system.download = `https://github.com/${repository}/releases/download/${tag}/alternity.zip`;
 
 fs.writeFileSync(file, `${JSON.stringify(system, null, 2)}\n`, 'utf8');
 

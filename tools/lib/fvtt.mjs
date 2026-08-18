@@ -88,7 +88,7 @@ export function makeItem({ pack, name, type, system, folder = null, img, sort = 
         folder,
         sort,
         ownership: { default: 0 },
-        flags: { 'alternity-v2': { provenance } },
+        flags: { 'alternity': { provenance } },
     };
 }
 
@@ -121,7 +121,7 @@ export function makeJournalEntry({ pack, name, html, folder = null, sort = 0, pr
         folder,
         sort,
         ownership: { default: 0 },
-        flags: { 'alternity-v2': { provenance } },
+        flags: { 'alternity': { provenance } },
     };
 }
 

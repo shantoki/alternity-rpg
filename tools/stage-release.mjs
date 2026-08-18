@@ -2,7 +2,7 @@
  * @file tools/stage-release.mjs
  * @description Copy the files a player's Foundry needs into a staging directory.
  *
- *     node tools/stage-release.mjs dist/alternity-v2
+ *     node tools/stage-release.mjs dist/alternity
  *
  * The set is defined by exclusion in `.releaseignore`: everything not listed is shipped,
  * so a new runtime directory is included by default rather than silently left out of the
@@ -66,7 +66,7 @@ function copyTree(ignored, relative, destinationRoot) {
     return copied;
 }
 
-const destination = path.resolve(process.argv[2] ?? path.join(REPO_ROOT, 'dist', 'alternity-v2'));
+const destination = path.resolve(process.argv[2] ?? path.join(REPO_ROOT, 'dist', 'alternity'));
 const ignored = readIgnoreList();
 
 // A packed system that carries no compendia is the failure this whole release path

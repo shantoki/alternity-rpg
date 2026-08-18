@@ -170,7 +170,7 @@ class AlternityEffect {
  * The top-level item template for Alternity System_Effect items.
  *
  * Stored in Foundry as an Item document with `type: 'System_Effect'`.
- * Serialised to `item.getFlag('alternity-v2', 'effectTemplate')`.
+ * Serialised to `item.getFlag('alternity', 'effectTemplate')`.
  *
  * @property {string}            id             - Foundry Item id.
  * @property {string}            name           - Effect name.
@@ -296,7 +296,7 @@ class SystemEffectItem {
 function getEffectTemplate(item) {
     if (!item) return null;
     try {
-        const raw = item.getFlag('alternity-v2', 'effectTemplate');
+        const raw = item.getFlag('alternity', 'effectTemplate');
         return raw ? SystemEffectItem.deserialize(raw) : null;
     } catch (err) {
         console.error(`[Alternity] getEffectTemplate() failed for item ${item?.id}:`, err);
@@ -313,7 +313,7 @@ function getEffectTemplate(item) {
 async function saveEffectTemplate(item, template) {
     if (!item || !(template instanceof SystemEffectItem)) return false;
     try {
-        await item.setFlag('alternity-v2', 'effectTemplate', template.serialize());
+        await item.setFlag('alternity', 'effectTemplate', template.serialize());
         return true;
     } catch (err) {
         console.error(`[Alternity] saveEffectTemplate() failed for item ${item?.id}:`, err);

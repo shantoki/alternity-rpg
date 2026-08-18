@@ -32,7 +32,7 @@ import {
 import { speciesDefenseModifiers } from '../data/SpeciesData.js';
 import { Roll, ChatMessage, Hooks, game, renderTemplate } from '../module-info.js';
 
-const NAMESPACE = 'alternity-v2';
+const NAMESPACE = 'alternity';
 
 const CHECK_CARD  = `systems/${NAMESPACE}/templates/roll/roll-card.hbs`;
 const DAMAGE_CARD = `systems/${NAMESPACE}/templates/roll/damage-card.hbs`;
@@ -664,7 +664,7 @@ export const AlternityRollService = {
      * selected while shooting someone else, and applying damage to themselves
      * would be the one outcome nobody wants.
      *
-     * @param {object} damageData - The `flags['alternity-v2'].damage` payload.
+     * @param {object} damageData - The `flags['alternity'].damage` payload.
      * @returns {Promise<number>} How many actors were damaged.
      */
     async applyDamageToTargets(damageData) {

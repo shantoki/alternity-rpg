@@ -1,8 +1,8 @@
 {
-  "name": "alternity-v2",
+  "name": "alternity",
   "version": "1.0.0",
   "type": "module",
-  "description": "Alternity Fastplay Core RPG System for Foundry VTT.",
+  "description": "The Alternity science fiction roleplaying game for Foundry VTT.",
   "main": "src/index.js",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./jest.config.js",

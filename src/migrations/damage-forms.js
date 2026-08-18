@@ -32,7 +32,7 @@
 import { DAMAGE_TYPES, LEGACY_DAMAGE_TYPE_MAP } from '../services/alternity-math.js';
 import { game, Hooks } from '../module-info.js';
 
-const NAMESPACE = 'alternity-v2';
+const NAMESPACE = 'alternity';
 
 /** Damage form -> the `protection` sub-field it is rated in. */
 const FORM_KEYS = Object.freeze({ LI: 'li', HI: 'hi', En: 'en' });

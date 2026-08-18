@@ -1,6 +1,6 @@
 /**
  * @file alternity-item-sheet.js
- * @description Shared item sheet for every Alternity Fastplay item type.
+ * @description Shared item sheet for every Alternity item type.
  */
 
 import { DAMAGE_TYPE_LABELS } from '../services/alternity-math.js';
@@ -54,7 +54,7 @@ export class AlternityItemSheet extends foundry.applications.api.HandlebarsAppli
     /** @override */
     static PARTS = {
         sheet: {
-            template: 'systems/alternity-v2/templates/item/item-sheet.hbs',
+            template: 'systems/alternity/templates/item/item-sheet.hbs',
         },
     };
 

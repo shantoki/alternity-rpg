@@ -1,7 +1,7 @@
 {
-  "id": "alternity-v2",
-  "title": "Alternity Fastplay Core",
-  "description": "Alternity Fastplay Core RPG System for Foundry VTT.",
+  "id": "alternity",
+  "title": "Alternity",
+  "description": "The Alternity science fiction roleplaying game for Foundry VTT.",
   "version": "1.2.0",
   "compatibility": {
     "minimum": "12",
@@ -58,7 +58,7 @@
       "label": "Alternity: Weapons",
       "path": "packs/alternity-weapons",
       "type": "Item",
-      "system": "alternity-v2",
+      "system": "alternity",
       "ownership": {
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
@@ -69,7 +69,7 @@
       "label": "Alternity: Armor",
       "path": "packs/alternity-armor",
       "type": "Item",
-      "system": "alternity-v2",
+      "system": "alternity",
       "ownership": {
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
@@ -80,7 +80,7 @@
       "label": "Alternity: Equipment & Computers",
       "path": "packs/alternity-equipment",
       "type": "Item",
-      "system": "alternity-v2",
+      "system": "alternity",
       "ownership": {
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
@@ -91,7 +91,7 @@
       "label": "Alternity: Cybertech",
       "path": "packs/alternity-cybertech",
       "type": "Item",
-      "system": "alternity-v2",
+      "system": "alternity",
       "ownership": {
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
@@ -102,7 +102,7 @@
       "label": "Alternity: Skills",
       "path": "packs/alternity-skills",
       "type": "Item",
-      "system": "alternity-v2",
+      "system": "alternity",
       "ownership": {
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
@@ -113,7 +113,7 @@
       "label": "Alternity: Psionics & FX",
       "path": "packs/alternity-fx",
       "type": "Item",
-      "system": "alternity-v2",
+      "system": "alternity",
       "ownership": {
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
@@ -124,7 +124,7 @@
       "label": "Alternity: Achievement Benefits",
       "path": "packs/alternity-achievements",
       "type": "Item",
-      "system": "alternity-v2",
+      "system": "alternity",
       "ownership": {
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
@@ -135,7 +135,7 @@
       "label": "Alternity: Species",
       "path": "packs/alternity-species",
       "type": "Item",
-      "system": "alternity-v2",
+      "system": "alternity",
       "ownership": {
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
@@ -146,7 +146,7 @@
       "label": "Alternity: Career Templates",
       "path": "packs/alternity-templates",
       "type": "Actor",
-      "system": "alternity-v2",
+      "system": "alternity",
       "ownership": {
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"

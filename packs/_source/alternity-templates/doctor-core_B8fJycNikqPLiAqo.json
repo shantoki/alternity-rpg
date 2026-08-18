@@ -145,7 +145,7 @@
         "default": 0
       },
       "flags": {
-        "alternity-v2": {
+        "alternity": {
           "provenance": {
             "book": "Core Rulebook",
             "sourceFile": "Templates/Doctor (Core).json",
@@ -174,7 +174,7 @@
     }
   },
   "flags": {
-    "alternity-v2": {
+    "alternity": {
       "characterState": {
         "actorId": "B8fJycNikqPLiAqo",
         "abilitySets": [],

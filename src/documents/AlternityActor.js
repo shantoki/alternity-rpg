@@ -16,7 +16,7 @@
  *
  * Data flow:
  *   actor.system.*           ← TypeDataModel (CharacterData / NpcData / VehicleData)
- *   actor flag 'alternity-v2/characterState' ← AlternityCharacterState (runtime wrapper)
+ *   actor flag 'alternity/characterState' ← AlternityCharacterState (runtime wrapper)
  *
  * The flag-based AlternityCharacterState is still the primary store for
  * abilities, stances, and special rules — the two layers are kept in sync by
@@ -528,7 +528,7 @@ export class AlternityActor extends Actor {
         console.log(`[Alternity] Roll: ${result}, Phase: ${phaseLabel}, Score: ${ac.ordinary}, Calculated Init: ${baseInit}`);
 
         // Post the action check result to chat using the template
-        const content = await renderTemplate("systems/alternity-v2/templates/roll/action-check-card.hbs", {
+        const content = await renderTemplate("systems/alternity/templates/roll/action-check-card.hbs", {
             actorName: this.name,
             phaseLabel,
             result,
@@ -562,9 +562,9 @@ export class AlternityActor extends Actor {
                         actorId: combatant.actorId,
                         sceneId: combatant.sceneId,
                         initiative: (nextPhase * 10) + (ac.ordinary / 100),
-                        'flags.alternity-v2.isExtraAction': true,
-                        'flags.alternity-v2.actionNumber': i + 1,
-                        'flags.alternity-v2.parentCombatantId': combatant.id
+                        'flags.alternity.isExtraAction': true,
+                        'flags.alternity.actionNumber': i + 1,
+                        'flags.alternity.parentCombatantId': combatant.id
                     };
                     console.log(`[Alternity] Preparing extra turn data:`, extraData);
                     extraCombatants.push(extraData);
@@ -938,7 +938,7 @@ export class AlternityActor extends Actor {
             whisper,
         } = rollOptions;
 
-        const content = await renderTemplate("systems/alternity-v2/templates/roll/roll-card.hbs", {
+        const content = await renderTemplate("systems/alternity/templates/roll/roll-card.hbs", {
             context,
             actorName: this.name,
             succeeded,

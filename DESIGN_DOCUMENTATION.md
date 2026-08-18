@@ -1,8 +1,9 @@
-# Alternity Fastplay Core Module Design Document
+# Alternity Module Design Document
 
 **Date:** 2026-05-11
 **Status:** Phase 3 Complete - Ready for Phase 4 Testing
-**Goal:** To create a fully functional, highly modular game system module for Foundry VTT v14 based on the Alternity Fastplay core ruleset.
+**Goal:** To create a fully functional, highly modular game system module for Foundry VTT v14 based on the Alternity ruleset. (Originally scoped to the Fastplay cut-down; the
+compendium and the schemas have since grown past it.)
 
 ## I. Guiding Principles & Philosophy
 The module must adhere to three primary principles:

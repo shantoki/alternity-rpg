@@ -1,6 +1,6 @@
 /**
  * @file index.js
- * @description Alternity Fastplay Core system entry point.
+ * @description Alternity system entry point.
  */
 
 console.log('[Alternity] src/index.js loaded.');
@@ -38,6 +38,7 @@ import {
 // ── Logic / hooks ───────────────────────────────────────────────────────────
 import { initializeAlternityHooks } from '../module_hooks/alt-mechanics.js';
 import { initializeDamageFormMigration } from './migrations/damage-forms.js';
+import { initializeSystemIdMigration } from './migrations/system-id.js';
 
 // ── Client sheet ────────────────────────────────────────────────────────────
 import { registerAlternitySheet } from './client/alternity-sheet-module.js';
@@ -48,7 +49,7 @@ import { registerAlternitySheet } from './client/alternity-sheet-module.js';
 // ---------------------------------------------------------------------------
 
 Hooks.once('init', async () => {
-    console.log('[Alternity] Initialising Alternity Fastplay Core system...');
+    console.log('[Alternity] Initialising the Alternity system...');
 
     // ── 1. Document classes ─────────────────────────────────────────────────
     CONFIG.Actor.documentClass = AlternityActor;
@@ -146,10 +147,14 @@ Hooks.once('init', async () => {
     initializeAlternityHooks();
 
     // ── 5b. World migrations ────────────────────────────────────────────────
-    // Registers its own `ready` listener. Needed because `migrateData` only fixes
-    // a document's in-memory copy: a stored value that is no longer a legal
-    // `choices` entry makes every future save of that document fail, so it has to
-    // be written back to the database once.
+    // Each registers its own `ready` listener, and they fire in the order they are
+    // registered here — which is why the flag namespace moves first. Everything the
+    // other migrations read lives in a flag, and under the old namespace the flag
+    // API refuses to look at it at all.
+    initializeSystemIdMigration();
+    // Needed because `migrateData` only fixes a document's in-memory copy: a stored
+    // value that is no longer a legal `choices` entry makes every future save of that
+    // document fail, so it has to be written back to the database once.
     initializeDamageFormMigration();
 
     // ── 6. Character sheet ──────────────────────────────────────────────────

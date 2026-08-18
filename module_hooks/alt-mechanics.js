@@ -10,7 +10,7 @@ import { AlternityRollService } from "../src/services/alternity-roll-service.js"
 import { getAlternityState } from "../src/data/alternity-actor-data.js";
 
 /** Flag scope shared with the roll service and the sheets. */
-const NAMESPACE = 'alternity-v2';
+const NAMESPACE = 'alternity';
 
 /**
  * Initializes all necessary event listeners for the module. This should be called early in the game load cycle (e.g., in a 'ready' hook).
@@ -64,7 +64,7 @@ export function initializeAlternityHooks() {
     // 3. Initiative Management (Intercept raw d20 updates from Combat Tracker)
     Hooks.on("preUpdateCombatant", (combatant, changes, options, userId) => {
         if (changes.initiative !== undefined && !options.alternity_processed) {
-            if (combatant.getFlag('alternity-v2', 'isExtraAction')) return true;
+            if (combatant.getFlag('alternity', 'isExtraAction')) return true;
 
             if (typeof changes.initiative === 'number' && combatant.actor) {
                 (async () => {
@@ -82,7 +82,7 @@ export function initializeAlternityHooks() {
         // If the round changed or combat ended
         if (changes.round || (changes.active === false)) {
             // A. Remove extra combatants
-            const extras = combat.combatants.filter(c => c.getFlag('alternity-v2', 'isExtraAction'));
+            const extras = combat.combatants.filter(c => c.getFlag('alternity', 'isExtraAction'));
             if (extras.length > 0) {
                 console.log(`[Alternity] Cleaning up ${extras.length} extra combatants at end of round.`);
                 await combat.deleteEmbeddedDocuments("Combatant", extras.map(e => e.id));
@@ -90,7 +90,7 @@ export function initializeAlternityHooks() {
 
             // B. Reset initiative for all remaining combatants
             const updates = combat.combatants
-                .filter(c => !c.getFlag('alternity-v2', 'isExtraAction'))
+                .filter(c => !c.getFlag('alternity', 'isExtraAction'))
                 .map(c => ({ _id: c.id, initiative: null }));
             
             if (updates.length > 0) {

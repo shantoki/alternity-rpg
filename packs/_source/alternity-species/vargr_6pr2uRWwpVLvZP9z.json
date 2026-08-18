@@ -62,7 +62,7 @@
     "default": 0
   },
   "flags": {
-    "alternity-v2": {
+    "alternity": {
       "provenance": {
         "book": "Traveller",
         "sourceFile": "data/species.json",

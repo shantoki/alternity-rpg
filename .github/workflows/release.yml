@@ -52,10 +52,10 @@ jobs:
       # Staged by a Node script rather than by `rsync --exclude-from` so the file
       # selection can be checked on a contributor's machine instead of only in CI.
       - name: Stage the release files
-        run: node tools/stage-release.mjs dist/alternity-v2
+        run: node tools/stage-release.mjs dist/alternity
 
       - name: Assemble the release archive
-        run: cd dist/alternity-v2 && zip -r ../alternity-v2.zip .
+        run: cd dist/alternity && zip -r ../alternity.zip .
 
       # `gh` is preinstalled on the runner, so this needs no third-party action - one
       # less thing with write access to the repository's releases.
@@ -68,7 +68,7 @@ jobs:
           TAG: ${{ github.ref_name }}
         run: |
           gh release create "$TAG" \
-            dist/alternity-v2.zip \
+            dist/alternity.zip \
             system.json \
             --title "$TAG" \
             --generate-notes

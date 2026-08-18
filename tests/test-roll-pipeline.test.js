@@ -307,7 +307,7 @@ describe('AlternityRollService.rollCheck', () => {
                 scores: SCORES, baseStep: 0, damage,
             });
 
-            expect(chatLog[0].flags['alternity-v2'].check).toMatchObject({
+            expect(chatLog[0].flags['alternity'].check).toMatchObject({
                 actorUuid: actor.uuid,
                 degree: SUCCESS_DEGREES.AMAZING,
                 damage: { grade: 'amazing' },
@@ -395,7 +395,7 @@ describe('AlternityRollService.rollDamage', () => {
 
         await AlternityRollService.rollDamage({ actor, name: 'Rifle', code: 'd8+1m' });
 
-        expect(chatLog[0].flags['alternity-v2'].damage).toMatchObject({
+        expect(chatLog[0].flags['alternity'].damage).toMatchObject({
             name: 'Rifle', total: 7, category: 'mortal',
         });
     });
@@ -881,7 +881,7 @@ describe('Dodge defence', () => {
 
         expect(result.degree).toBe(SUCCESS_DEGREES.GOOD);
         expect(result.dodge.steps).toBe(2);
-        expect(actor.flags['alternity-v2'].pendingDodge).toMatchObject({ steps: 2 });
+        expect(actor.flags['alternity'].pendingDodge).toMatchObject({ steps: 2 });
     });
 
     it('should hand the stored adjustment to the attacker, then spend it', async () => {

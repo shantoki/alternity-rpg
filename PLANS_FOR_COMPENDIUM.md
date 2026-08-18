@@ -50,7 +50,7 @@ Two rules the tooling depends on:
   the same compendium entry. Renaming a document *does* change its id, and that is the
   one edit that breaks existing links.
 - **Nothing printed is thrown away.** Columns with no schema field land on the item's
-  `flags['alternity-v2'].provenance` and are rendered into the description inside
+  `flags['alternity'].provenance` and are rendered into the description inside
   `<dl class="alternity-source-stats">`. The prose pass prepends to that element rather
   than replacing the description.
 
@@ -218,7 +218,7 @@ system whose numbers reach outside itself:
       from the record rather than from an assumption.
 
 **The document ids changed, and no id would have prevented that.** A compendium UUID
-names the document type, so `Compendium.alternity-v2.alternity-species.JournalEntry.<id>`
+names the document type, so `Compendium.alternity.alternity-species.JournalEntry.<id>`
 cannot resolve to an Item whatever id it is given. The pack's ids are hashed from
 `(pack, 'species', name)` like every other item and are stable from here on.
 

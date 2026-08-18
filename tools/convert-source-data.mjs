@@ -52,7 +52,7 @@ function documentType(doc) {
 function addFolders(pack, docs) {
     const type = documentType(docs[0]);
     const folderNames = [...new Set(docs.map(doc => {
-        const provenance = doc.flags?.['alternity-v2']?.provenance ?? {};
+        const provenance = doc.flags?.['alternity']?.provenance ?? {};
         return provenance.folder ?? provenance.book;
     }).filter(Boolean))].sort();
 
@@ -60,7 +60,7 @@ function addFolders(pack, docs) {
     const idsByName = new Map(folders.map(folder => [folder.name, folder._id]));
 
     for (const doc of docs) {
-        const provenance = doc.flags?.['alternity-v2']?.provenance ?? {};
+        const provenance = doc.flags?.['alternity']?.provenance ?? {};
         doc.folder = idsByName.get(provenance.folder ?? provenance.book) ?? null;
     }
     return folders;
