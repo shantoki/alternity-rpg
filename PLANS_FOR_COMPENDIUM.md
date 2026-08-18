@@ -15,8 +15,8 @@ external/json/**            npm run convert:source     packs/_source/**       np
                                                        ^ committed                                     ^ gitignored
 ```
 
-**`npm run build:packs` is a setup step.** Only `packs/_source` is committed, so a fresh
-clone has no loadable compendia until it is run — and it needs running again after any
+**`npm install` then `npm run build:packs` is a setup step.** Only `packs/_source` is
+committed, so a fresh clone has no loadable compendia until the build is run — and it needs running again after any
 pull that touched `packs/_source`. The compiled packs are excluded because a LevelDB is a
 live database: Foundry rewrites `CURRENT` and spawns a new `MANIFEST-*` every time it
 opens one, so a committed pack collides with the local Foundry on every pull. Ignoring

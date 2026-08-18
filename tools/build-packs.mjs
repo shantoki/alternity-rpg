@@ -15,7 +15,34 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { compilePack, extractPack } from '@foundryvtt/foundryvtt-cli';
+
+/**
+ * The compiler is loaded dynamically so a missing install can be reported as the setup
+ * step it is. A static import fails before any of this file runs, and all the operator
+ * gets is a `ERR_MODULE_NOT_FOUND` stack trace out of node's ESM resolver — which says
+ * nothing about `npm install` being the fix.
+ */
+const { compilePack, extractPack } = await (async () => {
+    try {
+        return await import('@foundryvtt/foundryvtt-cli');
+    } catch (error) {
+        if (error?.code === 'ERR_MODULE_NOT_FOUND' && String(error.message).includes('foundryvtt-cli')) {
+            console.error([
+                'Cannot find @foundryvtt/foundryvtt-cli, which compiles the packs.',
+                '',
+                'It is a devDependency, so this usually means dependencies have not been',
+                'installed since it was added. Run:',
+                '',
+                '    npm install',
+                '',
+                'If you install with --omit=dev or NODE_ENV=production, the pack tooling is',
+                'skipped and this script cannot run at all.',
+            ].join('\n'));
+            process.exit(1);
+        }
+        throw error;
+    }
+})();
 
 const REPO_ROOT = path.resolve(import.meta.dirname, '..');
 const PACKS_DIR = path.join(REPO_ROOT, 'packs');
@@ -43,9 +70,33 @@ async function build(filters) {
         const source = path.join(SOURCE_DIR, name);
         const destination = path.join(PACKS_DIR, name);
         const count = fs.readdirSync(source).filter(file => file.endsWith('.json')).length;
-        await compilePack(source, destination, { recursive: true });
+        try {
+            await compilePack(source, destination, { recursive: true });
+        } catch (error) {
+            reportNativeBindingFailure(error);
+            throw error;
+        }
         console.log(`${name.padEnd(24)} ${String(count).padStart(4)} documents -> packs/${name}`);
     }
+}
+
+/**
+ * A LevelDB is a native module, and npm can be configured not to run the install script
+ * that fetches its prebuilt binary. When that happens the failure surfaces here rather
+ * than at install time, as a missing `.node` file, so say what it actually means.
+ */
+function reportNativeBindingFailure(error) {
+    const message = String(error?.message ?? '');
+    if (!/classic-level|node-gyp-build|\.node|bindings/i.test(message)) return;
+    console.error([
+        '',
+        'The LevelDB binding (classic-level) failed to load. It ships a prebuilt binary',
+        'fetched by an install script, which some npm configurations do not run.',
+        '',
+        '    npm rebuild classic-level',
+        '',
+        'or reinstall with install scripts permitted.',
+    ].join('\n'));
 }
 
 async function extract(filters) {
